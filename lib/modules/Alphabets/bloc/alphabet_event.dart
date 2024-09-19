@@ -1,6 +1,6 @@
 import 'package:equatable/equatable.dart';
 
-// Alphabet Event and State (same as provided earlier)
+
 abstract class AlphabetEvent extends Equatable {
   const AlphabetEvent();
 }

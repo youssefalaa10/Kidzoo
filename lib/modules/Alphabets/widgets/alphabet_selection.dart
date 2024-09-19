@@ -1,35 +1,47 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../models/alphabet_model.dart';
 import '../bloc/alphabet_bloc.dart';
 import '../bloc/alphabet_event.dart';
-
 
 class AlphabetSelection extends StatelessWidget {
   const AlphabetSelection({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(26, (index) {
-          final alphabet = String.fromCharCode(65 + index);  // A-Z
-          return GestureDetector(
-            onTap: () {
-              BlocProvider.of<AlphabetBloc>(context)
-                  .add(SelectAlphabetEvent(alphabet));
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: CircleAvatar(
-                radius: 30,
-                child: Text(alphabet, style: const TextStyle(fontSize: 24)),
-              ),
-            ),
-          );
-        }),
+    final List<AlphabetModel> alphabets = AlphabetModel.alphabets;
+
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    int crossAxisCount = screenWidth < 600
+        ? 2
+        : screenWidth < 900
+            ? 3
+            : 4;
+
+    double childAspectRatio = screenWidth < 600 ? 1.2 : 1.5;
+
+    return GridView.builder(
+      shrinkWrap: true,
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: crossAxisCount,
+        crossAxisSpacing: 10,
+        mainAxisSpacing: 10,
+        childAspectRatio: childAspectRatio,
       ),
+      itemCount: alphabets.length,
+      itemBuilder: (context, index) {
+        final alphabet = alphabets[index];
+
+        return GestureDetector(
+          onTap: () {
+            BlocProvider.of<AlphabetBloc>(context)
+                .add(SelectAlphabetEvent(alphabet.letter));
+          },
+          child: Image.asset(alphabet.imagePath),
+        );
+      },
     );
   }
 }
