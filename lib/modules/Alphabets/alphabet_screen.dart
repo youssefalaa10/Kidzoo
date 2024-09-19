@@ -11,7 +11,7 @@ class AlphabetScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Alphabet Selector'),
       ),
-      body: Row(
+      body: const Row(
         children: [
           // Left side: Alphabet display area
           Expanded(
