@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/modules/home/UI/home_screen.dart';
 
-import 'modules/Alphabets/alphabet_screen.dart';
 import 'modules/Alphabets/bloc/alphabet_bloc.dart';
 
 void main() {
@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: BlocProvider(
         create: (context) => AlphabetBloc(),
-        child: const AlphabetScreen(),
+        child: const HomeScreen(),
       ),
     );
   }
