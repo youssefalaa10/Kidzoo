@@ -39,7 +39,10 @@ class AlphabetSelection extends StatelessWidget {
             BlocProvider.of<AlphabetBloc>(context)
                 .add(SelectAlphabetEvent(alphabet.letter));
           },
-          child: Image.asset(alphabet.imagePath),
+          child: Padding(
+            padding: const EdgeInsets.all(3.0),
+            child: Image.asset(alphabet.imagePath),
+          ),
         );
       },
     );

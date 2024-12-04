@@ -37,6 +37,7 @@ dependencies:
   bloc: ^8.1.4
   flutter_bloc: ^8.1.6
   equatable: ^2.0.5
+  flutter_svg: ^2.0.16
 
 dev_dependencies:
   flutter_test:
@@ -63,6 +64,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/shapes/
+    - assets/images/numbers/
     - assets/images/alphabet/
   #   - images/a_dot_ham.jpeg
 

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
+import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
+import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import '../../../../shared/media_query.dart';
 import '../../../Alphabets/alphabet_screen.dart';
 import '../../../Alphabets/bloc/alphabet_bloc.dart';
@@ -17,7 +18,10 @@ class OptionsGrid extends StatelessWidget {
         'icon': Icons.looks_one,
         'title': 'Numbers',
         'subtitle': '(números)',
-        'screen': null,
+        'screen': BlocProvider(
+          create: (context) => NumberBloc(),
+          child: const NumberScreen(),
+        ),
       },
       {
         'icon': Icons.menu_book,

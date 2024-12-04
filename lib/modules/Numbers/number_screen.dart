@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/modules/Alphabets/widgets/alphabet_app_bar.dart';
+import 'package:kidzoo/modules/Numbers/UI/widgets/number_app_bar.dart';
+import 'package:kidzoo/modules/Numbers/UI/widgets/number_display.dart';
+import 'package:kidzoo/modules/Numbers/UI/widgets/number_selection.dart';
 
-import 'widgets/alphabet_display.dart';
-import 'widgets/alphabet_selection.dart';
-
-class AlphabetScreen extends StatelessWidget {
-  const AlphabetScreen({super.key});
+class NumberScreen extends StatelessWidget {
+  const NumberScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xfffaf5f1),
       body: Row(
         children: [
           // Left side: Alphabet display area
@@ -19,8 +17,8 @@ class AlphabetScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                AlphabetAppBar(),
-                AlphabetDisplay(),
+                NumberAppBar(),
+                NumberDisplay(),
               ],
             ),
           ),
@@ -31,7 +29,7 @@ class AlphabetScreen extends StatelessWidget {
               child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  AlphabetSelection(),
+                  NumberSelection(),
                 ],
               ),
             ),

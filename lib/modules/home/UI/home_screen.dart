@@ -12,7 +12,7 @@ class HomeScreen extends StatelessWidget {
     final mq = CustomMQ(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F4F1),
+      backgroundColor: const Color(0xfffaf5f1),
       body: SafeArea(
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: mq.width(5)),

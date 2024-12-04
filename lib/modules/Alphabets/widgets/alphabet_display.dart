@@ -13,7 +13,10 @@ class AlphabetDisplay extends StatelessWidget {
     return BlocBuilder<AlphabetBloc, AlphabetState>(
       builder: (context, state) {
         if (state is AlphabetInitialState) {
-          return const Center(child: Text('Select a letter',style: TextStyle(fontSize: 20,color: Colors.grey),));
+          return const Padding(
+            padding: EdgeInsets.only(left: 30.0),
+            child: Text('Select a letter',style: TextStyle(fontSize: 20,color: Colors.grey),),
+          );
         } else if (state is AlphabetLoadingState) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is AlphabetLoadedState) {
@@ -25,17 +28,19 @@ class AlphabetDisplay extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-       
               if (alphabetModel.imagePath.isNotEmpty)
-                Image.asset(
-                  alphabetModel.imagePath,
-                  width: 200, 
-                  height: 200, 
+                Padding(
+                  padding: const EdgeInsets.only(left: 10.0),
+                  child: Image.asset(
+                    alphabetModel.imagePath,
+                    width: 200,
+                    height: 200,
+                  ),
                 ),
               const SizedBox(height: 20),
               Text(
                 '${state.alphabet} = ${state.example}',
-                style: const TextStyle(fontSize: 24),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent),
               ),
             ],
           );
