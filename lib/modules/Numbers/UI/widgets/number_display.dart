@@ -29,13 +29,13 @@ class NumberDisplay extends StatelessWidget {
               if (numberModel.imagePath.isNotEmpty)
                 SvgPicture.asset(
                   numberModel.imagePath,
-                  width: 200,
-                  height: 200,
+                  width: 300,
+                  height: 300,
                 ),
               const SizedBox(height: 20),
               Text(
                 '${state.number} = ${state.example}',
-                style: const TextStyle(fontSize: 24),
+                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent),
               ),
             ],
           );

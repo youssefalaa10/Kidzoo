@@ -9,29 +9,28 @@ class NumberScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+      body: Column(
         children: [
           // Left side: Alphabet display area
           const Expanded(
-            flex: 6,
+            flex: 3,
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                NumberAppBar(),
+                Row(
+                  children: [
+                    NumberAppBar(),
+                    Spacer(),
+                  ],
+                ),
                 NumberDisplay(),
               ],
             ),
           ),
           Expanded(
-            flex: 3,
+            flex: 1,
             child: Container(
               color: Colors.white,
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  NumberSelection(),
-                ],
-              ),
+              child: NumberSelection(),
             ),
           ),
         ],
