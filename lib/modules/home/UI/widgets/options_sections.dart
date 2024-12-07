@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
+import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/modules/Shapes/bloc/shape_bloc.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
 import '../../../../shared/media_query.dart';
@@ -17,48 +18,42 @@ class OptionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final options = [
       {
-        'icon': Icons.looks_one,
+        'icon': "assets/images/home/numbers.png",
         'title': 'Numbers',
-        'subtitle': '(números)',
         'screen': BlocProvider(
           create: (context) => NumberBloc(),
           child: const NumberScreen(),
         ),
       },
       {
-        'icon': Icons.menu_book,
-        'title': 'Reading',
-        'subtitle': '(Leer)',
-        'screen': null,
+        'icon': "assets/images/home/brain.png",
+        'title': 'Quiz',
+        'screen': const AnimalQuizScreen(),
       },
       {
-        'icon': Icons.category,
+        'icon': "assets/images/home/shapes.png",
         'title': 'Shapes',
-        'subtitle': '(Formas)',
         'screen': BlocProvider(
           create: (context) => ShapeBloc(),
           child: const ShapeScreen(),
         ),
       },
       {
-        'icon': Icons.abc,
+        'icon': "assets/images/home/abc-block.png",
         'title': 'Vocab & Letters',
-        'subtitle': '(Vocabulario & Letras)',
         'screen': BlocProvider(
           create: (context) => AlphabetBloc(),
           child: const AlphabetScreen(),
         ),
       },
       {
-        'icon': Icons.bar_chart,
+        'icon': "assets/images/home/setting.png", // Add the asset image path
         'title': 'Learning Analysis',
-        'subtitle': '(análisis de aprendizaje)',
         'screen': null,
       },
       {
-        'icon': Icons.settings,
+        'icon': "assets/images/home/setting.png",
         'title': 'Settings',
-        'subtitle': '(Ajustes de aplicación)',
         'screen': null,
       },
     ];
@@ -74,9 +69,8 @@ class OptionsGrid extends StatelessWidget {
       itemBuilder: (context, index) {
         final option = options[index];
         return OptionCard(
-          icon: option['icon'] as IconData,
+          icon: option['icon'] as String,
           title: option['title'] as String,
-          subtitle: option['subtitle'] as String,
           screen: option['screen'] as Widget?,
           mq: mq,
         );
@@ -86,9 +80,9 @@ class OptionsGrid extends StatelessWidget {
 }
 
 class OptionCard extends StatelessWidget {
-  final IconData icon;
+  final String icon;
   final String title;
-  final String subtitle;
+
   final Widget? screen;
   final CustomMQ mq;
 
@@ -96,7 +90,6 @@ class OptionCard extends StatelessWidget {
     super.key,
     required this.icon,
     required this.title,
-    required this.subtitle,
     this.screen,
     required this.mq,
   });
@@ -128,7 +121,12 @@ class OptionCard extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, size: mq.width(10), color: Colors.deepPurple),
+            Image.asset(
+              icon,
+              width: mq.width(12), // Adjust size as needed
+              height: mq.width(12),
+              fit: BoxFit.contain,
+            ),
             SizedBox(height: mq.height(1)),
             Text(
               title,
@@ -136,12 +134,6 @@ class OptionCard extends StatelessWidget {
                 fontSize: mq.width(4),
                 fontWeight: FontWeight.bold,
               ),
-            ),
-            SizedBox(height: mq.height(0.5)),
-            Text(
-              subtitle,
-              style: TextStyle(fontSize: mq.width(3), color: Colors.grey[600]),
-              textAlign: TextAlign.center,
             ),
           ],
         ),
