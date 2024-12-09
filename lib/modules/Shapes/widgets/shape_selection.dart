@@ -4,12 +4,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kidzoo/models/shape_model.dart';
 import 'package:kidzoo/modules/Shapes/bloc/shape_bloc.dart';
 import 'package:kidzoo/modules/Shapes/bloc/shape_event.dart';
+import 'package:kidzoo/shared/tts_helper.dart';
 
 class ShapeSelection extends StatelessWidget {
   const ShapeSelection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TtsHelper ttsHelper = TtsHelper();
+
     final List<ShapeModel> shapes = ShapeModel.shapes;
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -38,6 +41,8 @@ class ShapeSelection extends StatelessWidget {
           onTap: () {
             BlocProvider.of<ShapeBloc>(context)
                 .add(SelectShapeEvent(shape.shape));
+            ttsHelper.speak(shape.shape);
+            ttsHelper.getVoices();
           },
           child: Padding(
             padding: const EdgeInsets.all(3.0),

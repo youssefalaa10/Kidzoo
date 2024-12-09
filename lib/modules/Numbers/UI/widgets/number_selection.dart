@@ -4,12 +4,15 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kidzoo/models/number_model.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_event.dart';
+import 'package:kidzoo/shared/tts_helper.dart';
 
 class NumberSelection extends StatelessWidget {
   const NumberSelection({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final TtsHelper ttsHelper = TtsHelper();
+
     final List<NumberModel> numbers = NumberModel.numbers;
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -38,6 +41,7 @@ class NumberSelection extends StatelessWidget {
           onTap: () {
             BlocProvider.of<NumberBloc>(context)
                 .add(SelectNumberEvent(number.num));
+            ttsHelper.speak(number.num);
           },
           child: Padding(
             padding: const EdgeInsets.all(3.0),

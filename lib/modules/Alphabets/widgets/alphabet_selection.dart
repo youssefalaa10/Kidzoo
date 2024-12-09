@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/shared/tts_helper.dart';
 
 import '../../../models/alphabet_model.dart';
 import '../bloc/alphabet_bloc.dart';
@@ -10,6 +11,8 @@ class AlphabetSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final TtsHelper ttsHelper = TtsHelper();
+
     final List<AlphabetModel> alphabets = AlphabetModel.alphabets;
 
     final screenWidth = MediaQuery.of(context).size.width;
@@ -38,6 +41,7 @@ class AlphabetSelection extends StatelessWidget {
           onTap: () {
             BlocProvider.of<AlphabetBloc>(context)
                 .add(SelectAlphabetEvent(alphabet.letter));
+            ttsHelper.speak("${alphabet.letter}  ${alphabet.example}");
           },
           child: Padding(
             padding: const EdgeInsets.all(3.0),

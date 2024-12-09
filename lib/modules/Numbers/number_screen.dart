@@ -30,7 +30,7 @@ class NumberScreen extends StatelessWidget {
             flex: 1,
             child: Container(
               color: Colors.white,
-              child: NumberSelection(),
+              child:  NumberSelection(),
             ),
           ),
         ],
