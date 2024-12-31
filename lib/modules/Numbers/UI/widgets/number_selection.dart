@@ -45,7 +45,7 @@ class NumberSelection extends StatelessWidget {
           },
           child: Padding(
             padding: const EdgeInsets.all(3.0),
-            child: SvgPicture.asset(number.imagePath),
+            child: Image.asset(number.imagePath),
           ),
         );
       },

@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kidzoo/models/shape_model.dart';
-import 'package:kidzoo/modules/Shapes/bloc/shape_bloc.dart';
-import 'package:kidzoo/modules/Shapes/bloc/shape_event.dart';
+import 'package:kidzoo/modules/Shapes/bloc/shape_cubit.dart';
+import 'package:kidzoo/modules/Shapes/bloc/shape_states.dart';
 import 'package:kidzoo/shared/tts_helper.dart';
 
 class ShapeSelection extends StatelessWidget {
@@ -36,18 +35,34 @@ class ShapeSelection extends StatelessWidget {
       itemCount: shapes.length,
       itemBuilder: (context, index) {
         final shape = shapes[index];
+        return BlocConsumer<ShapeCubit, ShapeStates>(
+          listener: (context, state) {},
+          builder: (context, state) {
+            return GestureDetector(
+            onTap: () {
+              // BlocProvider.of<ShapeBloc>(context)
+              //     .add(SelectShapeEvent(shape.shape, shape.temp));
+               ttsHelper.speak(shape.shape);
+              ttsHelper.getVoices();
+            },
+            child: Padding(
+              padding: const EdgeInsets.all(3.0),
+              child: Draggable<ShapeModel>(
+                  feedback: Container(
+                      width: 80,
+                      height: 80,
+                      child: Image.asset(shape.imagePath)),
+              child: Image.asset(shape.imagePath),
+                childWhenDragging: Image.asset(shape.imagePath, color: Colors.grey[300],),
+                onDragCompleted: (){
 
-        return GestureDetector(
-          onTap: () {
-            BlocProvider.of<ShapeBloc>(context)
-                .add(SelectShapeEvent(shape.shape));
-            ttsHelper.speak(shape.shape);
-            ttsHelper.getVoices();
+                 //   BlocProvider.of<ShapeBloc>(context)
+                 // .add(SelectShapeEvent(shape.shape, shape.temp));
+                },
+              ),
+            ),
+          );
           },
-          child: Padding(
-            padding: const EdgeInsets.all(3.0),
-            child: SvgPicture.asset(shape.imagePath),
-          ),
         );
       },
     );

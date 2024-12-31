@@ -27,7 +27,7 @@ class NumberDisplay extends StatelessWidget {
             children: [
        
               if (numberModel.imagePath.isNotEmpty)
-                SvgPicture.asset(
+                Image.asset(
                   numberModel.imagePath,
                   width: 300,
                   height: 300,

@@ -3,12 +3,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
-import 'package:kidzoo/modules/Shapes/bloc/shape_bloc.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
 import '../../../../shared/media_query.dart';
 
 import '../../../Alphabets/alphabet_screen.dart';
 import '../../../Alphabets/bloc/alphabet_bloc.dart';
+import '../../../Shapes/bloc/shape_cubit.dart';
 
 class OptionsGrid extends StatelessWidget {
   final CustomMQ mq;
@@ -37,7 +37,7 @@ class OptionsGrid extends StatelessWidget {
         'icon': "assets/images/home/shapes.png",
         'title': 'Shapes',
         'screen': BlocProvider(
-          create: (context) => ShapeBloc(),
+          create: (context) => ShapeCubit(),
           child: const ShapeScreen(),
         ),
         'flipImage': "assets/images/home/rule.png",
