@@ -91,164 +91,179 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
     }
 
     return Scaffold(
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: Text.rich(
-                  TextSpan(
-                    children: [
+      body: Stack(
+        children: [
+          Image.asset(
+            'assets/images/home/Page Border in Green Illustrative Nature Pastels Jungle Themed Style.png',
+            height: MediaQuery.of(context).size.height,
+            //width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+          ),
+          SafeArea(
+            child: SingleChildScrollView(
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 15),
+                    child: Text.rich(
                       TextSpan(
-                        text: 'Score: ',
-                        style: Theme.of(context).textTheme.bodySmall,
+                        children: [
+                          TextSpan(
+                            text: 'Score: ',
+                            style: Theme.of(context).textTheme.bodySmall,
+                          ),
+                          TextSpan(
+                            text: '$score',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyLarge
+                                ?.copyWith(color: Colors.teal),
+                          ),
+                        ],
                       ),
-                      TextSpan(
-                        text: '$score',
-                        style: Theme.of(context)
-                            .textTheme
-                            .bodyLarge
-                            ?.copyWith(color: Colors.teal),
-                      ),
-                    ],
+                    ),
                   ),
-                ),
-              ),
-              if (!gameOver)
-                Row(
-                  children: [
-                    const Spacer(),
-                    Column(
-                      children: animals.map((animal) {
-                        return Container(
-                          margin: const EdgeInsets.all(8),
-                          child: Draggable<AnimalQuizModel>(
-                            data: animal,
-                            childWhenDragging: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: AssetImage(animal.animalImage),
-                              radius: 50,
-                            ),
-                            feedback: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: AssetImage(animal.animalImage),
-                              radius: 30,
-                            ),
-                            child: CircleAvatar(
-                              backgroundColor: Colors.white,
-                              backgroundImage: AssetImage(animal.animalImage),
-                              radius: 30,
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                  if (!gameOver)
+                    Row(
+                      children: [
+                        const Spacer(),
+                        Column(
+                          children: animals.map((animal) {
+                            return Container(
+                              margin: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 7),
+                              child: Draggable<AnimalQuizModel>(
+                                data: animal,
+                                childWhenDragging: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage:
+                                      AssetImage(animal.animalImage),
+                                  radius: 50,
+                                ),
+                                feedback: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage:
+                                      AssetImage(animal.animalImage),
+                                  radius: 30,
+                                ),
+                                child: CircleAvatar(
+                                  backgroundColor: Colors.white,
+                                  backgroundImage:
+                                      AssetImage(animal.animalImage),
+                                  radius: 30,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const Spacer(
+                          flex: 2,
+                        ),
+                        Column(
+                          children: chooseAnimals.map((animalLetter) {
+                            return DragTarget<AnimalQuizModel>(
+                              onAcceptWithDetails: (receivedAnimal) {
+                                if (receivedAnimal.data.value ==
+                                    animalLetter.value) {
+                                  setState(() {
+                                    animals.remove(receivedAnimal.data);
+                                    chooseAnimals.remove(animalLetter);
+                                    score += 10;
+                                  });
+                                } else {
+                                  setState(() {
+                                    score -= 5;
+                                  });
+                                }
+                              },
+                              onWillAcceptWithDetails: (receivedAnimal) {
+                                setState(() {
+                                  animalLetter.accepting = true;
+                                });
+                                return true;
+                              },
+                              onLeave: (_) {
+                                setState(() {
+                                  animalLetter.accepting = false;
+                                });
+                              },
+                              builder:
+                                  (context, acceptedItems, rejectedItems) =>
+                                      Container(
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(8),
+                                  color: animalLetter.accepting
+                                      ? Colors.grey[400]
+                                      : Colors.grey[200],
+                                ),
+                                alignment: Alignment.center,
+                                height: MediaQuery.of(context).size.width / 6.5,
+                                width: MediaQuery.of(context).size.width / 3,
+                                margin: const EdgeInsets.all(8),
+                                child: Text(
+                                  animalLetter.animalName,
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                        const Spacer(),
+                      ],
                     ),
-                    const Spacer(
-                      flex: 2,
-                    ),
-                    Column(
-                      children: chooseAnimals.map((animalLetter) {
-                        return DragTarget<AnimalQuizModel>(
-                          onAcceptWithDetails: (receivedAnimal) {
-                            if (receivedAnimal.data.value ==
-                                animalLetter.value) {
-                              setState(() {
-                                animals.remove(receivedAnimal.data);
-                                chooseAnimals.remove(animalLetter);
-                                score += 10;
-                              });
-                            } else {
-                              setState(() {
-                                score -= 5;
-                              });
-                            }
-                          },
-                          onWillAcceptWithDetails: (receivedAnimal) {
-                            setState(() {
-                              animalLetter.accepting = true;
-                            });
-                            return true;
-                          },
-                          onLeave: (_) {
-                            setState(() {
-                              animalLetter.accepting = false;
-                            });
-                          },
-                          builder: (context, acceptedItems, rejectedItems) =>
-                              Container(
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(8),
-                              color: animalLetter.accepting
-                                  ? Colors.grey[400]
-                                  : Colors.grey[200],
-                            ),
-                            alignment: Alignment.center,
-                            height: MediaQuery.of(context).size.width / 6.5,
-                            width: MediaQuery.of(context).size.width / 3,
-                            margin: const EdgeInsets.all(8),
+                  if (gameOver)
+                    Center(
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.all(8),
                             child: Text(
-                              animalLetter.animalName,
-                              style: Theme.of(context).textTheme.bodyLarge,
+                              "Game Over",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.red),
                             ),
                           ),
-                        );
-                      }).toList(),
+                          Padding(
+                            padding: const EdgeInsets.all(8),
+                            child: Text(
+                              result(),
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                    const Spacer(),
-                  ],
-                ),
-              if (gameOver)
-                Center(
-                  child: Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(8),
+                  if (gameOver)
+                    Container(
+                      height: MediaQuery.of(context).size.width / 10,
+                      decoration: BoxDecoration(
+                        color: Colors.teal,
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: TextButton(
+                        onPressed: () {
+                          setState(() {
+                            initGame();
+                          });
+                        },
                         child: Text(
-                          "Game Over",
+                          'Play Again',
                           style: Theme.of(context)
                               .textTheme
-                              .bodyMedium
-                              ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.red),
+                              .bodyLarge
+                              ?.copyWith(color: Colors.white),
                         ),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.all(8),
-                        child: Text(
-                          result(),
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              if (gameOver)
-                Container(
-                  height: MediaQuery.of(context).size.width / 10,
-                  decoration: BoxDecoration(
-                    color: Colors.teal,
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: TextButton(
-                    onPressed: () {
-                      setState(() {
-                        initGame();
-                      });
-                    },
-                    child: Text(
-                      'Play Again',
-                      style: Theme.of(context)
-                          .textTheme
-                          .bodyLarge
-                          ?.copyWith(color: Colors.white),
                     ),
-                  ),
-                ),
-            ],
+                ],
+              ),
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

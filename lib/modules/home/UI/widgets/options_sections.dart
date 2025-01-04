@@ -4,6 +4,7 @@ import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
+import 'package:kidzoo/shared/style/image_manager.dart';
 import '../../../../shared/media_query.dart';
 
 import '../../../Alphabets/alphabet_screen.dart';
@@ -19,46 +20,46 @@ class OptionsGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final options = [
       {
-        'icon': "assets/images/home/numbers.png",
+        'icon': ImageManager.numbers,
         'title': 'Numbers',
         'screen': BlocProvider(
           create: (context) => NumberBloc(),
           child: const NumberScreen(),
         ),
-        'flipImage': "assets/images/home/one.png",
+        'flipImage': ImageManager.flipNumbers,
       },
       {
-        'icon': "assets/images/home/brain.png",
+        'icon': ImageManager.quiz,
         'title': 'Quiz',
         'screen': const AnimalQuizScreen(),
-        'flipImage': "assets/images/animal/lion.png",
+        'flipImage': ImageManager.flipQuiz,
       },
       {
-        'icon': "assets/images/home/shapes.png",
+        'icon': ImageManager.shapes,
         'title': 'Shapes',
         'screen': BlocProvider(
           create: (context) => ShapeCubit(),
           child: const ShapeScreen(),
         ),
-        'flipImage': "assets/images/home/rule.png",
+        'flipImage': ImageManager.flipShapes,
       },
       {
-        'icon': "assets/images/home/abc-block.png",
+        'icon': ImageManager.letters,
         'title': 'Vocab & Letters',
         'screen': BlocProvider(
           create: (context) => AlphabetBloc(),
           child: const AlphabetScreen(),
         ),
-        'flipImage': "assets/images/alphabet/a.png",
+        'flipImage': ImageManager.flipLetters,
       },
       {
-        'icon': "assets/images/home/setting.png",
-        'title': 'Learning Analysis',
+        'icon': ImageManager.math,
+        'title': 'Mathematics',
         'screen': null,
-        'flipImage': null,
+        'flipImage': ImageManager.flipMath,
       },
       {
-        'icon': "assets/images/home/setting.png",
+        'icon': ImageManager.setting,
         'title': 'Settings',
         'screen': null,
         'flipImage': null,

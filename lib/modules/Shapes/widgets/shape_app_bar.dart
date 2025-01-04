@@ -1,23 +1,47 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/modules/Shapes/widgets/custom_icon.dart';
 
 class ShapeAppBar extends StatelessWidget {
-  const ShapeAppBar({super.key});
+  String score;
+  Function() onTapGameOVer;
+  ShapeAppBar({super.key, required this.score, required this.onTapGameOVer});
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 30),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
         children: [
-          GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: const Icon(Icons.arrow_back, size: 30,)),
-          const Text(
-            'Shapes',
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          CustomIcon(
+            icon: Icons.arrow_back,
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          const SizedBox(width: 5),
+          CustomIcon(
+            icon: Icons.refresh,
+            onTap: onTapGameOVer,
+          ),
+          Padding(
+            padding: const EdgeInsets.all(15.0),
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: 'Score: ',
+                    style: Theme.of(context).textTheme.bodyLarge,
+                  ),
+                  TextSpan(
+                    text: score,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(color: Colors.teal),
+                  ),
+                ],
+              ),
+            ),
           ),
         ],
       ),
