@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/modules/Memory%20Game/UI/memory_game.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
@@ -10,6 +11,7 @@ import '../../../../shared/media_query.dart';
 import '../../../Alphabets/alphabet_screen.dart';
 import '../../../Alphabets/bloc/alphabet_bloc.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';
+import '../../../Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 
 class OptionsGrid extends StatelessWidget {
   final CustomMQ mq;
@@ -53,16 +55,16 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipLetters,
       },
       {
-        'icon': ImageManager.math,
-        'title': 'Mathematics',
-        'screen': null,
+        'icon': ImageManager.setting,
+        'title': 'Memory Game',
+        'screen': const MemoryGameScreen(),
         'flipImage': ImageManager.flipMath,
       },
       {
-        'icon': ImageManager.setting,
-        'title': 'Settings',
-        'screen': null,
-        'flipImage': null,
+        'icon': ImageManager.math,
+        'title': 'Tic Tac Toe',
+        'screen': const TicTacToeGame(),
+        'flipImage': ImageManager.flipQuiz,
       },
     ];
 
@@ -105,10 +107,10 @@ class OptionCard extends StatefulWidget {
   });
 
   @override
-  _OptionCardState createState() => _OptionCardState();
+  OptionCardState createState() => OptionCardState();
 }
 
-class _OptionCardState extends State<OptionCard>
+class OptionCardState extends State<OptionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
@@ -155,7 +157,7 @@ class _OptionCardState extends State<OptionCard>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          final angle = _animation.value * 3.14159; 
+          final angle = _animation.value * 3.14159;
           final isFront = angle < 3.14159 / 2;
 
           return Transform(
