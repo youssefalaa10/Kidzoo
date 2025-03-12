@@ -8,9 +8,6 @@ import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
 import '../../../../shared/media_query.dart';
-
-import '../../../Alphabets/alphabet_screen.dart';
-import '../../../Alphabets/bloc/alphabet_bloc.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';
 
 class OptionsGrid extends StatelessWidget {
@@ -31,13 +28,19 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipNumbers,
       },
       {
-        'icon': ImageManager.letters,
-        'title': 'Vocab & Letters',
+        'icon': ImageManager.quiz,
+        'title': 'Quiz',
+        'screen': const AnimalQuizScreen(),
+        'flipImage': ImageManager.flipQuiz,
+      },
+      {
+        'icon': ImageManager.puzzle,
+        'title': 'Puzzels',
         'screen': BlocProvider(
-          create: (context) => AlphabetBloc(),
-          child: const AlphabetScreen(),
+          create: (context) => PuzzleCubit(),
+          child: const PuzzleScreen(),
         ),
-        'flipImage': ImageManager.flipLetters,
+        'flipImage': ImageManager.flipPuzzle,
       },
       {
         'icon': ImageManager.math,
@@ -116,10 +119,10 @@ class OptionCard extends StatefulWidget {
   });
 
   @override
-  _OptionCardState createState() => _OptionCardState();
+  OptionCardState createState() => OptionCardState();
 }
 
-class _OptionCardState extends State<OptionCard>
+class OptionCardState extends State<OptionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
