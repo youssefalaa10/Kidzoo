@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
+import 'package:kidzoo/modules/Puzzle/bloc/cubit.dart';
+import 'package:kidzoo/modules/Puzzle/puzzle_screen.dart';
 import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
@@ -29,21 +31,6 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipNumbers,
       },
       {
-        'icon': ImageManager.quiz,
-        'title': 'Quiz',
-        'screen': const AnimalQuizScreen(),
-        'flipImage': ImageManager.flipQuiz,
-      },
-      {
-        'icon': ImageManager.shapes,
-        'title': 'Shapes',
-        'screen': BlocProvider(
-          create: (context) => ShapeCubit(),
-          child: const ShapeScreen(),
-        ),
-        'flipImage': ImageManager.flipShapes,
-      },
-      {
         'icon': ImageManager.letters,
         'title': 'Vocab & Letters',
         'screen': BlocProvider(
@@ -57,6 +44,30 @@ class OptionsGrid extends StatelessWidget {
         'title': 'Mathematics',
         'screen': null,
         'flipImage': ImageManager.flipMath,
+      },
+      {
+        'icon': ImageManager.shapes,
+        'title': 'Shapes',
+        'screen': BlocProvider(
+          create: (context) => ShapeCubit(),
+          child: const ShapeScreen(),
+        ),
+        'flipImage': ImageManager.flipShapes,
+      },
+      {
+        'icon': ImageManager.quiz,
+        'title': 'Quiz',
+        'screen': const AnimalQuizScreen(),
+        'flipImage': ImageManager.flipQuiz,
+      },
+      {
+        'icon': ImageManager.puzzle,
+        'title': 'Puzzels',
+        'screen': BlocProvider(
+          create: (context) => PuzzleCubit(),
+          child: const PuzzleScreen(),
+        ),
+        'flipImage': ImageManager.flipPuzzle,
       },
       {
         'icon': ImageManager.setting,
@@ -155,7 +166,7 @@ class _OptionCardState extends State<OptionCard>
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
-          final angle = _animation.value * 3.14159; 
+          final angle = _animation.value * 3.14159;
           final isFront = angle < 3.14159 / 2;
 
           return Transform(

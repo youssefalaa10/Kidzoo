@@ -30,6 +30,7 @@ environment:
 dependencies:
   bloc: ^8.1.4
   cupertino_icons: ^1.0.8
+  #easy_puzzle_game: ^0.0.2
   equatable: ^2.0.5
   flutter:
     sdk: flutter
@@ -64,6 +65,10 @@ flutter:
     - assets/images/numbers/
     - assets/images/alphabet/
     - assets/images/animal/
+    - assets/images/puzzle/
+    - assets/images/puzzle/gazelle block/
+    - assets/images/puzzle/ghost block/
+    - assets/images/puzzle/blocks4/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

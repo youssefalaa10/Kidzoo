@@ -18,4 +18,7 @@ class PuzzleLoaded extends PuzzleState {
   List<Object> get props => [puzzleWidget];
 }
 
+class PuzzleScoreUpdated extends PuzzleState {}
+class PuzzleImageSelected extends PuzzleState {}
+
 class PuzzleError extends PuzzleState {}
