@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/modules/Memory%20Game/UI/memory_game.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import 'package:kidzoo/modules/Puzzle/bloc/cubit.dart';
 import 'package:kidzoo/modules/Puzzle/puzzle_screen.dart';
 import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
+import 'package:kidzoo/modules/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
 import '../../../../shared/media_query.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';
@@ -43,10 +45,16 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipPuzzle,
       },
       {
-        'icon': ImageManager.math,
-        'title': 'Mathematics',
-        'screen': null,
+        'icon': ImageManager.setting,
+        'title': 'Memory Game',
+        'screen': const MemoryGameScreen(),
         'flipImage': ImageManager.flipMath,
+      },
+      {
+        'icon': ImageManager.math,
+        'title': 'Tic Tac Toe',
+        'screen': const TicTacToeGame(),
+        'flipImage': ImageManager.flipQuiz,
       },
       {
         'icon': ImageManager.shapes,
