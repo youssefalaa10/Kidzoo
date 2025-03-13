@@ -4,9 +4,9 @@ import 'package:kidzoo/modules/home/UI/home_screen.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
 
 class CompleteScreen extends StatelessWidget {
-  Function() onPressedGameOVer;
+  final Function() onPressedGameOVer;
 
-  CompleteScreen({super.key, required this.onPressedGameOVer});
+  const CompleteScreen({super.key, required this.onPressedGameOVer});
 
   @override
   Widget build(BuildContext context) {

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/modules/home/UI/home_screen.dart';
 
-
 void main() {
   runApp(const MyApp());
 }
@@ -18,7 +17,7 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-       home: const HomeScreen(),
+      home: const HomeScreen(),
       // BlocProvider(
       //   create: (context) => AlphabetBloc(),
       //   child: const HomeScreen(),

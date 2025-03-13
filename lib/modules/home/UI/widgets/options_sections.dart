@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/modules/Alphabets/alphabet_screen.dart';
+import 'package:kidzoo/modules/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzoo/modules/Memory%20Game/UI/memory_game.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
@@ -36,13 +38,13 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipQuiz,
       },
       {
-        'icon': ImageManager.puzzle,
-        'title': 'Puzzels',
+        'icon': ImageManager.letters,
+        'title': 'Alphabet',
         'screen': BlocProvider(
-          create: (context) => PuzzleCubit(),
-          child: const PuzzleScreen(),
+          create: (context) => AlphabetBloc(),
+          child: const AlphabetScreen(),
         ),
-        'flipImage': ImageManager.flipPuzzle,
+        'flipImage': ImageManager.flipLetters,
       },
       {
         'icon': ImageManager.setting,
