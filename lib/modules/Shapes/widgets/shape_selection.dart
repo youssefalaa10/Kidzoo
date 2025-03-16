@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
 class ShapeSelection extends StatelessWidget {
-  bool isMatched;
-  String temp;
-  int index;
-  ShapeSelection(
+  final bool isMatched;
+  final String temp;
+  final int index;
+  const ShapeSelection(
       {super.key,
       required this.isMatched,
       required this.temp,

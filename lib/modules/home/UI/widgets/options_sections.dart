@@ -12,6 +12,8 @@ import 'package:kidzoo/modules/Shapes/shape_screen.dart';
 import 'package:kidzoo/modules/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
 import '../../../../shared/media_query.dart';
+import '../../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
+import '../../../LevelsMap/levelmap_screen.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';
 
 class OptionsGrid extends StatelessWidget {
@@ -84,9 +86,12 @@ class OptionsGrid extends StatelessWidget {
       },
       {
         'icon': ImageManager.setting,
-        'title': 'Settings',
-        'screen': null,
-        'flipImage': null,
+        'title': 'Level Map',
+        'screen': BlocProvider(
+          create: (context) => LevelCubit(),
+          child: const LevelMapScreen(),
+        ),
+        'flipImage': ImageManager.flipPuzzle,
       },
     ];
 

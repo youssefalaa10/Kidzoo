@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class CustomIcon extends StatelessWidget {
-  IconData icon;
+  final IconData icon;
   final Function() onTap;
-  CustomIcon({super.key, required this.icon, required this.onTap}); 
+  const CustomIcon({super.key, required this.icon, required this.onTap});
 
   @override
   Widget build(BuildContext context) {

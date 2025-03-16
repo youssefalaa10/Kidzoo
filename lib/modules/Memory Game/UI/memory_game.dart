@@ -260,17 +260,6 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     }
   }
 
-  int _getMainAxisCount() {
-    switch (_currentLevel) {
-      case GameLevel.easy:
-        return 3; // 3x3 grid
-      case GameLevel.medium:
-        return 4; // 4x4 grid
-      case GameLevel.hard:
-        return 5; // 4x5 grid
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -369,7 +358,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.blue.withOpacity(0.3),
+                                  color: Colors.blue.withValues(alpha: 0.3),
                                   blurRadius: 20,
                                   spreadRadius: 5,
                                 ),
@@ -510,7 +499,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.blue.withOpacity(0.1),
+            color: Colors.blue.withValues(alpha: 0.1),
             blurRadius: 5,
             spreadRadius: 1,
           ),
@@ -555,7 +544,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 5,
                 spreadRadius: 1,
               ),
@@ -578,7 +567,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                 : Border.all(color: Colors.blue[200]!, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.1),
+                color: Colors.black.withValues(alpha: 0.1),
                 blurRadius: 5,
                 spreadRadius: 1,
               ),

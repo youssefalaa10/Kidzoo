@@ -96,8 +96,8 @@ class ImageSelectionPage extends StatelessWidget {
 }
 
 class PuzzleFrame extends StatefulWidget {
-  int index;
-  PuzzleFrame({super.key, required this.index});
+  final int index;
+  const PuzzleFrame({super.key, required this.index});
 
   @override
   State<PuzzleFrame> createState() => _PuzzleFrameState();
@@ -215,11 +215,11 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
 }
 
 class DraggableItem extends StatefulWidget {
-  List<PuzzleModel> puzzle;
-  List<PuzzleModel> choosePiece;
-  int index;
-  int score;
-  DraggableItem(
+  final List<PuzzleModel> puzzle;
+  final List<PuzzleModel> choosePiece;
+  final int index;
+  final int score;
+  const DraggableItem(
       {super.key,
       required this.puzzle,
       required this.choosePiece,

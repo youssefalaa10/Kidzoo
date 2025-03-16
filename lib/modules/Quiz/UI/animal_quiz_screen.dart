@@ -293,7 +293,7 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withOpacity(0.2),
+                            color: Colors.teal.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -388,7 +388,7 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   color: animalLetter.accepting
-                                      ? Colors.teal.withOpacity(0.3)
+                                      ? Colors.teal.withValues(alpha: 0.3)
                                       : Colors.grey[200],
                                 ),
                                 alignment: Alignment.center,
@@ -414,11 +414,11 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 10,
                                   spreadRadius: 5,
                                 ),
@@ -465,7 +465,7 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.teal.withOpacity(0.4),
+                                  color: Colors.teal.withValues(alpha: 0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
