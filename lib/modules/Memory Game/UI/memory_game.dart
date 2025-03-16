@@ -2,6 +2,12 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 
+enum GameLevel {
+  easy,
+  medium,
+  hard,
+}
+
 class MemoryGameScreen extends StatefulWidget {
   const MemoryGameScreen({super.key});
 
@@ -11,8 +17,8 @@ class MemoryGameScreen extends StatefulWidget {
 
 class _MemoryGameScreenState extends State<MemoryGameScreen>
     with TickerProviderStateMixin {
-  final int _numPairs = 8; // 16 cards total
-  final List<String> _emojis = [
+  // Define emojis for all levels
+  final List<String> _allEmojis = [
     '🦄',
     '🌈',
     '🚀',
@@ -21,27 +27,42 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     '🍕',
     '🏆',
     '🎨',
-    '🦄',
-    '🌈',
-    '🚀',
-    '🌮',
-    '🎮',
-    '🍕',
-    '🏆',
-    '🎨',
+    '🐱',
+    '🐶',
+    '🐼',
+    '🦊',
+    '🦁',
+    '🐯',
+    '🐵',
+    '🐸',
+    '🍎',
+    '🍌',
+    '🍓',
+    '🥑',
+    '🌽',
+    '🥕',
+    '🍉',
+    '🍇',
   ];
 
+  // Game state variables
   late List<CardModel> _cards;
   int? _firstFlippedIndex;
   int? _secondFlippedIndex;
   int _pairs = 0;
+  int _totalPairs = 0;
   int _moves = 0;
   bool _isProcessing = false;
   bool _gameStarted = false;
   bool _gameCompleted = false;
+  GameLevel _currentLevel = GameLevel.easy;
+
+  // Timer variables
   late Stopwatch _stopwatch;
   late Timer _timer;
   String _timeElapsed = '00:00';
+
+  // Animation controllers
   late AnimationController _gameCompletedController;
   late Animation<double> _gameCompletedAnimation;
 
@@ -56,7 +77,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
       parent: _gameCompletedController,
       curve: Curves.easeInOut,
     );
-    _initGame();
+    _initGame(_currentLevel);
   }
 
   @override
@@ -66,21 +87,54 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     super.dispose();
   }
 
-  void _initGame() {
-    // Make a copy of emojis and shuffle them
-    _emojis.shuffle();
+  void _initGame(GameLevel level) {
+    // Set number of pairs based on difficulty level
+    int numPairs;
+    switch (level) {
+      case GameLevel.easy:
+        numPairs = 4; // 8 cards (3x3 grid - 9 spots with 1 empty)
+        break;
+      case GameLevel.medium:
+        numPairs = 8; // 16 cards (4x4 grid)
+        break;
+      case GameLevel.hard:
+        numPairs = 10; // 20 cards (4x5 grid)
+        break;
+    }
+
+    _currentLevel = level;
+    _totalPairs = numPairs;
+
+    // Create a list with the needed number of emojis, each appearing twice
+    List<String> gameEmojis = [];
+    List<String> shuffledEmojis = List.from(_allEmojis)..shuffle();
+
+    for (int i = 0; i < numPairs; i++) {
+      gameEmojis.add(shuffledEmojis[i]);
+      gameEmojis.add(shuffledEmojis[i]);
+    }
+
+    // For easy level, add an empty spot if needed
+    if (level == GameLevel.easy && gameEmojis.length < 9) {
+      gameEmojis.add('');
+    }
+
+    // Shuffle the final list of emojis
+    gameEmojis.shuffle();
 
     // Create card models with matching pairs
     _cards = List.generate(
-      _emojis.length,
+      gameEmojis.length,
       (index) => CardModel(
         id: index,
-        content: _emojis[index],
+        content: gameEmojis[index],
         isFlipped: false,
         isMatched: false,
+        isEmpty: gameEmojis[index].isEmpty,
       ),
     );
 
+    // Reset game state
     _firstFlippedIndex = null;
     _secondFlippedIndex = null;
     _pairs = 0;
@@ -88,6 +142,10 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     _gameStarted = false;
     _gameCompleted = false;
     _timeElapsed = '00:00';
+
+    if (_gameStarted) {
+      _timer.cancel();
+    }
     _stopwatch = Stopwatch();
   }
 
@@ -104,7 +162,10 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
   }
 
   void _flipCard(int index) {
-    if (_isProcessing || _cards[index].isFlipped || _cards[index].isMatched) {
+    if (_isProcessing ||
+        _cards[index].isFlipped ||
+        _cards[index].isMatched ||
+        _cards[index].isEmpty) {
       return;
     }
 
@@ -142,7 +203,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
           _pairs++;
 
           // Check if game is completed
-          if (_pairs == _numPairs) {
+          if (_pairs == _totalPairs) {
             _gameCompleted = true;
             _stopwatch.stop();
             _timer.cancel();
@@ -169,11 +230,45 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
       _stopwatch.reset();
       if (_gameCompleted) {
         _gameCompletedController.reset();
-      } else {
+      } else if (_gameStarted) {
         _timer.cancel();
       }
-      _initGame();
+      _initGame(_currentLevel);
     });
+  }
+
+  void _changeLevel(GameLevel level) {
+    setState(() {
+      _stopwatch.reset();
+      if (_gameCompleted) {
+        _gameCompletedController.reset();
+      } else if (_gameStarted) {
+        _timer.cancel();
+      }
+      _initGame(level);
+    });
+  }
+
+  int _getCrossAxisCount() {
+    switch (_currentLevel) {
+      case GameLevel.easy:
+        return 3; // 3x3 grid
+      case GameLevel.medium:
+        return 4; // 4x4 grid
+      case GameLevel.hard:
+        return 4; // 4x5 grid
+    }
+  }
+
+  int _getMainAxisCount() {
+    switch (_currentLevel) {
+      case GameLevel.easy:
+        return 3; // 3x3 grid
+      case GameLevel.medium:
+        return 4; // 4x4 grid
+      case GameLevel.hard:
+        return 5; // 4x5 grid
+    }
   }
 
   @override
@@ -184,7 +279,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
-            colors: [Color(0xFF141E30), Color(0xFF243B55)],
+            colors: [Color(0xFFF0F8FF), Color(0xFFE6F2FF)],
           ),
         ),
         child: SafeArea(
@@ -198,15 +293,35 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                   children: [
                     Text(
                       'Memory Game',
-                      style: TextStyle(color: Colors.white, fontSize: 24),
+                      style: TextStyle(
+                        color: Colors.blueGrey[800],
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.refresh, color: Colors.white),
+                      icon: Icon(Icons.refresh, color: Colors.blueGrey[800]),
                       onPressed: _restartGame,
                     ),
                   ],
                 ),
               ),
+              // Level selector
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildLevelButton('Easy', GameLevel.easy),
+                    const SizedBox(width: 12),
+                    _buildLevelButton('Medium', GameLevel.medium),
+                    const SizedBox(width: 12),
+                    _buildLevelButton('Hard', GameLevel.hard),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Game stats
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
                 child: Row(
@@ -214,7 +329,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                   children: [
                     _buildInfoCard('Time', _timeElapsed),
                     _buildInfoCard('Moves', _moves.toString()),
-                    _buildInfoCard('Pairs', '$_pairs/$_numPairs'),
+                    _buildInfoCard('Pairs', '$_pairs/$_totalPairs'),
                   ],
                 ),
               ),
@@ -225,16 +340,21 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: GridView.builder(
-                        gridDelegate:
-                            const SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 4,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: _getCrossAxisCount(),
                           crossAxisSpacing: 8,
                           mainAxisSpacing: 8,
+                          childAspectRatio: 1,
+                          mainAxisExtent: (MediaQuery.of(context).size.width -
+                                  (16 + (_getCrossAxisCount() - 1) * 8)) /
+                              _getCrossAxisCount(),
                         ),
                         itemCount: _cards.length,
                         itemBuilder: (context, index) {
-                          return _buildCard(
-                              _cards[index], () => _flipCard(index));
+                          return _cards[index].isEmpty
+                              ? Container() // Empty space for easy level
+                              : _buildCard(
+                                  _cards[index], () => _flipCard(index));
                         },
                       ),
                     ),
@@ -245,11 +365,11 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                           child: Container(
                             padding: const EdgeInsets.all(24),
                             decoration: BoxDecoration(
-                              color: Colors.black.withValues(alpha: 0.8),
+                              color: Colors.white,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.indigo.withValues(alpha: 0.5),
+                                  color: Colors.blue.withOpacity(0.3),
                                   blurRadius: 20,
                                   spreadRadius: 5,
                                 ),
@@ -258,10 +378,10 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                const Text(
+                                Text(
                                   '🎉 Congratulations! 🎉',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: Colors.blueGrey[800],
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -269,13 +389,16 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                                 const SizedBox(height: 16),
                                 Text(
                                   'You completed the game in:',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: TextStyle(
+                                    color: Colors.blueGrey[600],
+                                    fontSize: 16,
+                                  ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   _timeElapsed,
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: Colors.blueGrey[800],
                                     fontSize: 36,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -283,23 +406,65 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
                                 const SizedBox(height: 8),
                                 Text(
                                   'Total Moves: $_moves',
-                                  style: Theme.of(context).textTheme.bodyLarge,
+                                  style: TextStyle(
+                                    color: Colors.blueGrey[600],
+                                    fontSize: 16,
+                                  ),
                                 ),
                                 const SizedBox(height: 24),
-                                ElevatedButton(
-                                  onPressed: _restartGame,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.indigo,
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 32, vertical: 16),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(30),
+                                Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: _restartGame,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.blue[400],
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 32, vertical: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Play Again',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
                                     ),
-                                  ),
-                                  child: const Text(
-                                    'Play Again',
-                                    style: TextStyle(fontSize: 18),
-                                  ),
+                                    const SizedBox(width: 16),
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        GameLevel nextLevel;
+                                        switch (_currentLevel) {
+                                          case GameLevel.easy:
+                                            nextLevel = GameLevel.medium;
+                                            break;
+                                          case GameLevel.medium:
+                                            nextLevel = GameLevel.hard;
+                                            break;
+                                          case GameLevel.hard:
+                                            nextLevel = GameLevel.easy;
+                                            break;
+                                        }
+                                        _changeLevel(nextLevel);
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green[400],
+                                        foregroundColor: Colors.white,
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 32, vertical: 16),
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(30),
+                                        ),
+                                      ),
+                                      child: const Text(
+                                        'Next Level',
+                                        style: TextStyle(fontSize: 16),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -316,27 +481,55 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
     );
   }
 
+  Widget _buildLevelButton(String label, GameLevel level) {
+    final bool isSelected = _currentLevel == level;
+
+    return ElevatedButton(
+      onPressed: () => _changeLevel(level),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: isSelected ? Colors.blue[400] : Colors.white,
+        foregroundColor: isSelected ? Colors.white : Colors.blue[400],
+        elevation: isSelected ? 4 : 2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(30),
+          side: BorderSide(
+            color: Colors.blue[400]!,
+            width: 1,
+          ),
+        ),
+      ),
+      child: Text(label),
+    );
+  }
+
   Widget _buildInfoCard(String title, String value) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.1),
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.blue.withOpacity(0.1),
+            blurRadius: 5,
+            spreadRadius: 1,
+          ),
+        ],
       ),
       child: Column(
         children: [
           Text(
             title,
-            style: const TextStyle(
-              color: Colors.white70,
+            style: TextStyle(
+              color: Colors.blueGrey[400],
               fontSize: 14,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             value,
-            style: const TextStyle(
-              color: Colors.white,
+            style: TextStyle(
+              color: Colors.blueGrey[800],
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -355,14 +548,14 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
         front: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
-            gradient: const LinearGradient(
+            gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Color(0xFF6A11CB), Color(0xFF2575FC)],
+              colors: [Colors.blue[300]!, Colors.blue[500]!],
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 5,
                 spreadRadius: 1,
               ),
@@ -378,13 +571,14 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
         ),
         back: Container(
           decoration: BoxDecoration(
-            color: card.isMatched
-                ? Colors.green.withValues(alpha: 0.3)
-                : Colors.white,
+            color: card.isMatched ? Colors.green[100] : Colors.white,
             borderRadius: BorderRadius.circular(12),
+            border: card.isMatched
+                ? Border.all(color: Colors.green[400]!, width: 2)
+                : Border.all(color: Colors.blue[200]!, width: 1),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 5,
                 spreadRadius: 1,
               ),
@@ -395,9 +589,8 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
               card.content,
               style: TextStyle(
                 fontSize: 32,
-                color: card.isMatched
-                    ? Colors.white.withValues(alpha: 0.8)
-                    : Colors.black87,
+                color:
+                    card.isMatched ? Colors.green[800] : Colors.blueGrey[800],
               ),
             ),
           ),
@@ -546,11 +739,13 @@ class CardModel {
   final String content;
   bool isFlipped;
   bool isMatched;
+  bool isEmpty;
 
   CardModel({
     required this.id,
     required this.content,
     required this.isFlipped,
     required this.isMatched,
+    this.isEmpty = false,
   });
 }
