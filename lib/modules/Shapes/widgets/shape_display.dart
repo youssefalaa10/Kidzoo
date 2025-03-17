@@ -3,8 +3,8 @@ import 'package:kidzoo/models/shape_model.dart';
 import 'package:kidzoo/shared/tts_helper.dart';
 
 class ShapeDisplay extends StatelessWidget {
-  List<ShapeModel> shapes;
-  ShapeDisplay({super.key, required this.shapes});
+  final List<ShapeModel> shapes;
+  const ShapeDisplay({super.key, required this.shapes});
 
   @override
   Widget build(BuildContext context) {

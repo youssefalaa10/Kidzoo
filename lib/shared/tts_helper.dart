@@ -16,7 +16,7 @@ class TtsHelper {
     try {
       await _flutterTts.speak(text);
     } catch (e) {
-      print("Error with TTS: $e");
+      throw Exception("Error with TTS: $e");
     }
   }
 
@@ -24,17 +24,17 @@ class TtsHelper {
     try {
       await _flutterTts.stop();
     } catch (e) {
-      print("Error stopping TTS: $e");
+      throw Exception("Error stopping TTS: $e");
     }
   }
 
   Future<void> getVoices() async {
     try {
       _flutterTts.getVoices.then((voices) {
-        print("Available Voices: $voices");
+        throw Exception("Available Voices: $voices");
       });
     } catch (e) {
-      print("Error fetching voices: $e");
+      throw Exception("Error fetching voices: $e");
     }
   }
 }

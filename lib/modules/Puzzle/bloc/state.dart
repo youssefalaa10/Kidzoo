@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 abstract class PuzzleState {
   const PuzzleState();
 
-  @override
   List<Object> get props => [];
 }
 

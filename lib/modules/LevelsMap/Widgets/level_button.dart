@@ -16,10 +16,10 @@ class LevelButton extends StatefulWidget {
   });
 
   @override
-  _LevelButtonState createState() => _LevelButtonState();
+  LevelButtonState createState() => LevelButtonState();
 }
 
-class _LevelButtonState extends State<LevelButton> with TickerProviderStateMixin {
+class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin {
   late AnimationController _tapController;
   late Animation<double> _scaleAnimation;
   late AnimationController _bounceController;

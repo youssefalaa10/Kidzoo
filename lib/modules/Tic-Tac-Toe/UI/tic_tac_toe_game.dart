@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class TicTacToeGame extends StatefulWidget {
   const TicTacToeGame({super.key});
 
@@ -206,7 +205,7 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
     final scoreValueFontSize = (screenWidth * 0.05).clamp(18.0, 24.0);
     
     return Scaffold(
-      backgroundColor: const Color(0xFF1A2038),
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: isLandscape
             ? _buildLandscapeLayout(
@@ -313,23 +312,21 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
   }
   
   Widget _buildGameTitle(double fontSize) {
-    return ShaderMask(
-      shaderCallback: (bounds) {
-        return const LinearGradient(
-          colors: [Colors.purple, Colors.blue, Colors.teal],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ).createShader(bounds);
-      },
-      child: Text(
-        'EPIC TIC TAC TOE',
-        style: TextStyle(
-          fontSize: fontSize,
-          fontWeight: FontWeight.bold,
-          color: Colors.white,
-        ),
-        textAlign: TextAlign.center,
+    return Text(
+      'EPIC TIC TAC TOE',
+      style: TextStyle(
+        fontSize: fontSize,
+        fontWeight: FontWeight.bold,
+        color: Colors.black,
+        shadows: [
+          Shadow(
+            color: Colors.black.withAlpha(100),
+            blurRadius: 5,
+            offset: const Offset(2, 2),
+          ),
+        ],
       ),
+      textAlign: TextAlign.center,
     );
   }
   
@@ -346,17 +343,13 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
             ),
             margin: EdgeInsets.symmetric(horizontal: textSize * 0.5),
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Colors.purple, Colors.blue],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.purple.withValues(alpha: 0.3),
-                  blurRadius: 15,
-                  spreadRadius: 5,
+                  color: Colors.black.withAlpha(100),
+                  blurRadius: 5,
+                  spreadRadius: 1,
                 ),
               ],
             ),
@@ -364,7 +357,7 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildScoreColumn('Player X', xScore, Colors.red, textSize, valueSize),
-                _buildScoreColumn('Draws', drawScore, Colors.white, textSize, valueSize),
+                _buildScoreColumn('Draws', drawScore, Colors.grey, textSize, valueSize),
                 _buildScoreColumn('Player O', oScore, Colors.blue, textSize, valueSize),
               ],
             ),
@@ -384,11 +377,11 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
           ? Colors.red 
           : gameStatus.contains('O') 
             ? Colors.blue 
-            : Colors.white,
+            : Colors.black,
         shadows: [
           Shadow(
-            color: Colors.black.withValues(alpha: 0.3),
-            blurRadius: 5,
+            color: Colors.black.withAlpha(100),
+            blurRadius: 2,
             offset: const Offset(2, 2),
           ),
         ],
@@ -407,13 +400,13 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
             child: Container(
               padding: EdgeInsets.all(cellSize * 0.12),
               decoration: BoxDecoration(
-                color: const Color(0xFF2D3250),
+                color: Colors.white,
                 borderRadius: BorderRadius.circular(cellSize * 0.2),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.3),
-                    blurRadius: 15,
-                    spreadRadius: 5,
+                    color: Colors.black.withAlpha(100),
+                    blurRadius: 5,
+                    spreadRadius: 2,
                   ),
                 ],
               ),
@@ -442,7 +435,7 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
       label: const Text('New Game'),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
-        backgroundColor: const Color(0xFF424C6E),
+        backgroundColor: Colors.blue,
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(30),
@@ -460,7 +453,7 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
           style: TextStyle(
             fontSize: textSize,
             fontWeight: FontWeight.bold,
-            color: Colors.white,
+            color: Colors.black,
           ),
         ),
         SizedBox(height: textSize * 0.3),
@@ -489,11 +482,11 @@ class TicTacToeGameState extends State<TicTacToeGame> with TickerProviderStateMi
             height: cellSize,
             margin: EdgeInsets.all(cellSize * 0.04),
             decoration: BoxDecoration(
-              color: const Color(0xFF374073),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(cellSize * 0.15),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
+                  color: Colors.black.withAlpha(100),
                   blurRadius: 5,
                   offset: const Offset(2, 2),
                 ),

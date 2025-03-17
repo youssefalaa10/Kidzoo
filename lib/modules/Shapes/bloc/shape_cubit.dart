@@ -22,7 +22,7 @@ class ShapeCubit extends Cubit<ShapeStates> {
 
   @override
   Future<void> close() {
-    print("ShapeCubit is being closed");
+    print("Shape Cubit closed");
     return super.close();
   }
 
@@ -30,7 +30,7 @@ class ShapeCubit extends Cubit<ShapeStates> {
     score = 0;
     matchedShapes.clear();
     shapes = List.from(shapesList);
-    print(shapes.length);
+    
     init();
     emit(ShapeGameOver());
   }
