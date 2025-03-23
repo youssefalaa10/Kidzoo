@@ -30,6 +30,7 @@ environment:
 dependencies:
   animations: ^2.0.11
   bloc: ^9.0.0
+  confetti: ^0.8.0
   cupertino_icons: ^1.0.8
   equatable: ^2.0.5
   flutter:
