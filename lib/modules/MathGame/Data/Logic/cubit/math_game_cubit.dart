@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:bloc/bloc.dart';
-import 'package:kidzoo/modules/Math%20Game/Data/Logic/cubit/math_game_state.dart';
+import 'package:kidzoo/modules/MathGame/Data/Logic/cubit/math_game_state.dart';
 
 class MathGameCubit extends Cubit<MathGameState> {
   final String operation;

@@ -33,6 +33,7 @@ dependencies:
   confetti: ^0.8.0
   cupertino_icons: ^1.0.8
   equatable: ^2.0.5
+  flame:
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
@@ -61,6 +62,7 @@ flutter:
   assets:
     - assets/images/
     - assets/images/home/
+    - assets/images/flappy/
     - assets/images/shapes/
     - assets/images/numbers/
     - assets/images/alphabet/

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/modules/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzoo/modules/Memory%20Game/UI/memory_game.dart';
+import 'package:kidzoo/modules/MemoryGame/UI/memory_game.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import 'package:kidzoo/modules/Puzzle/bloc/cubit.dart';
