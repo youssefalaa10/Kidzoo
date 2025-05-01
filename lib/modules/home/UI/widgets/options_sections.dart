@@ -14,6 +14,8 @@ import 'package:kidzoo/shared/style/image_manager.dart';
 import '../../../../shared/media_query.dart';
 import '../../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
 import '../../../LevelsMap/levelmap_screen.dart';
+import '../../../MathGame/Data/Logic/cubit/math_game_cubit.dart';
+import '../../../MathGame/Ui/math_game.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';
 
 class OptionsGrid extends StatelessWidget {
@@ -70,9 +72,12 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipShapes,
       },
       {
-        'icon': ImageManager.quiz,
-        'title': 'Quiz',
-        'screen': const AnimalQuizScreen(),
+        'icon': ImageManager.flipMath,
+        'title': 'Math Game',
+        'screen': BlocProvider(
+          create: (context) => MathGameCubit(),
+          child: const MathGame(),
+        ),
         'flipImage': ImageManager.flipQuiz,
       },
       {
