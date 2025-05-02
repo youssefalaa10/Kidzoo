@@ -1,4 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/modules/AppCategory/education_screen.dart';
+import 'package:kidzoo/modules/AppCategory/games_screen.dart';
+
+import '../../Alphabets/bloc/alphabet_bloc.dart';
+import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
+import '../../LevelsMap/levelmap_screen.dart';
+import 'home_screen.dart';
 
 class CharacterSelectionScreen extends StatefulWidget {
   const CharacterSelectionScreen({super.key});
@@ -16,25 +24,37 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
     CharacterCategory(
       name: "Games",
       characterName: "Games",
-      characterDesc: "Wise mentor teaching valuable lessons across disciplines",
+      characterDesc: "enjoy and have fun",
       color: Colors.blue.shade100,
-      coins: 980,
+      buttonLabel: 'Play',
+      screen:  BlocProvider(
+        create: (context) => AlphabetBloc(),
+        child:  GamesScreen(),
+      ),
     ),
     CharacterCategory(
       name: "Education",
       characterName: "Education",
       characterDesc:
-          "Enigmatic explorer guiding metaverse adventures through endless digital dimensions",
+          "Learn new things and improve your skills",
       color: Colors.orange.shade300,
-      coins: 1240,
+      buttonLabel: 'Learn',
+      screen: BlocProvider(
+        create: (context) => AlphabetBloc(),
+        child:  EducationScreen(),
+      ),
     ),
     CharacterCategory(
       name: "Challenge",
       characterName: "Challenge",
       characterDesc:
-          "Mysterious problem-solver who creates mind-bending challenges",
+          "Challenge yourself and be the best",
       color: Colors.purple.shade100,
-      coins: 1500,
+      buttonLabel: 'compete',
+      screen: BlocProvider(
+          create: (context) => LevelCubit(),
+          child: const LevelMapScreen(),
+        ),
     ),
   ];
 
@@ -83,32 +103,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                   padding: const EdgeInsets.only(top: 35),
                   child: Column(
                     children: [
-                      // Explore and View More section
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 24),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              'Explore',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey[600],
-                              ),
-                            ),
-                            Text(
-                              'View More',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.blue[600],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-
+                    
                       // Carousel section
                       Expanded(
                         child: OverlappedCarousel(
@@ -238,14 +233,16 @@ class CharacterCategory {
   final String characterName;
   final String characterDesc;
   final Color color;
-  final int coins;
+  final String buttonLabel;
+  final Widget screen;
 
   CharacterCategory({
     required this.name,
     required this.characterName,
     required this.characterDesc,
     required this.color,
-    required this.coins,
+    required this.buttonLabel,
+    required this.screen,
   });
 }
 
@@ -290,6 +287,7 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
       itemCount: widget.items.length,
       onPageChanged: widget.onItemChanged,
       itemBuilder: (context, index) {
+        final category = widget.items[index];
         final isSelected = index == widget.selectedIndex;
         final double scale = isSelected ? 1.0 : 0.8;
         final double opacity = isSelected ? 1.0 : 0.8;
@@ -299,13 +297,23 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
           duration: const Duration(milliseconds: 350),
           curve: Curves.easeOutCubic,
           builder: (context, value, child) {
-            return Transform.scale(
-              scale: value,
-              child: Opacity(
-                opacity: opacity,
-                child: CharacterCard(
-                  category: widget.items[index],
-                  isSelected: isSelected,
+            return GestureDetector(
+               onTap: isSelected
+            ? () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => category.screen,
+                  ),
+                )
+            : null,
+              child: Transform.scale(
+                scale: value,
+                child: Opacity(
+                  opacity: opacity,
+                  child: CharacterCard(
+                    category: widget.items[index],
+                    isSelected: isSelected,
+                  ),
                 ),
               ),
             );
@@ -397,11 +405,11 @@ class CharacterCard extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Icon(Icons.monetization_on,
-                    color: Colors.yellow, size: 18),
-                const SizedBox(width: 8),
+                // const Icon(Icons.monetization_on,
+                //     color: Colors.yellow, size: 18),
+                // const SizedBox(width: 8),
                 Text(
-                  category.coins.toString(),
+                  category.buttonLabel,
                   style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
