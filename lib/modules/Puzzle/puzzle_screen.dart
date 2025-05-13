@@ -4,20 +4,20 @@ import 'package:kidzoo/models/puzzle_model.dart';
 import 'package:kidzoo/modules/Puzzle/bloc/cubit.dart';
 import 'package:kidzoo/modules/Puzzle/bloc/state.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
+import 'package:kidzoo/shared/base/protected_game_screen.dart';
 
-class PuzzleScreen extends StatefulWidget {
-  const PuzzleScreen({super.key});
+class PuzzleScreen extends ProtectedGameScreen {
+  const PuzzleScreen({super.key, required super.level});
 
   @override
   State<PuzzleScreen> createState() => _PuzzleScreenState();
 }
 
-class _PuzzleScreenState extends State<PuzzleScreen> {
+class _PuzzleScreenState extends ProtectedGameScreenState<PuzzleScreen> {
   //late final PuzzleCubit puzzleCubit;
 
   @override
-  void initState() {
-    super.initState();
+  void onGameInit() {
     //puzzleCubit = PuzzleCubit();
   }
 
@@ -33,11 +33,16 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
       body: BlocConsumer<PuzzleCubit, PuzzleState>(
           listener: (context, state) {},
           builder: (context, state) {
-            return const Center(
+            // Adjust grid size based on level (3x3 for level 1, 4x4 for level 2, 5x5 for level 3+)
+            final gridSize =
+                widget.level == 1 ? 3 : (widget.level == 2 ? 4 : 5);
+
+            return Center(
               child: SizedBox(
                 height: 500,
                 width: 250,
-                child: ImageSelectionPage(gridSize: 4),
+                child:
+                    ImageSelectionPage(gridSize: gridSize, level: widget.level),
               ),
             );
           }),
@@ -47,8 +52,9 @@ class _PuzzleScreenState extends State<PuzzleScreen> {
 
 class ImageSelectionPage extends StatelessWidget {
   final int gridSize;
+  final int level;
 
-  const ImageSelectionPage({super.key, required this.gridSize});
+  const ImageSelectionPage({super.key, required this.gridSize, this.level = 1});
 
   @override
   Widget build(BuildContext context) {

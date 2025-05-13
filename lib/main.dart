@@ -23,11 +23,11 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       debugShowCheckedModeBanner: false,
-         home: BlocProvider(
+      home: BlocProvider(
         create: (context) => AlphabetBloc(),
         child: const CharacterSelectionScreen(),
       ),
-          // CharacterSelectionScreen(),
+      // CharacterSelectionScreen(),
       // GameWidget(game: FlappyBirdGame()),
       // BlocProvider(
       //   create: (context) => AlphabetBloc(),

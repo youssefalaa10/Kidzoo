@@ -4,8 +4,9 @@ import 'package:kidzoo/modules/MathGame/Data/Logic/cubit/math_game_state.dart';
 
 class MathGameCubit extends Cubit<MathGameState> {
   final String operation;
+  final int level;
 
-  MathGameCubit({this.operation = 'ayu'})
+  MathGameCubit({this.operation = 'ayu', this.level = 1})
       : super(MathGameState(
             questions: [],
             currentQuestionIndex: 0,
@@ -18,22 +19,26 @@ class MathGameCubit extends Cubit<MathGameState> {
     List<Map<String, dynamic>> newQuestions = [];
     final random = Random();
 
+    // Adjust difficulty based on level
+    int maxNumber = level == 1 ? 10 : (level == 2 ? 20 : 30);
+    int minNumber = level == 1 ? 1 : (level == 2 ? 5 : 10);
+
     for (int i = 0; i < 5; i++) {
       int correctAnswer;
       String questionText;
       if (operation == 'addition') {
-        int a = random.nextInt(10) + 1;
-        int b = random.nextInt(10) + 1;
+        int a = random.nextInt(maxNumber) + minNumber;
+        int b = random.nextInt(maxNumber) + minNumber;
         correctAnswer = a + b;
         questionText = '$a + $b = ?';
       } else if (operation == 'subtraction') {
-        int a = random.nextInt(10) + 5;
-        int b = random.nextInt(a) + 1;
+        int a = random.nextInt(maxNumber) + minNumber + 5;
+        int b = random.nextInt(a - minNumber) + minNumber;
         correctAnswer = a - b;
         questionText = '$a - $b = ?';
       } else {
-        int a = random.nextInt(5) + 1;
-        int b = random.nextInt(5) + 1;
+        int a = random.nextInt(level * 3) + 1;
+        int b = random.nextInt(level * 3) + 1;
         correctAnswer = a * b;
         questionText = '$a × $b = ?';
       }

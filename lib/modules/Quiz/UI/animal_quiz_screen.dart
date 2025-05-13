@@ -2,20 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../models/quiz_model.dart';
+import '../../../shared/base/protected_game_screen.dart';
 
-class AnimalQuizScreen extends StatefulWidget {
-  const AnimalQuizScreen({super.key});
+class AnimalQuizScreen extends ProtectedGameScreen {
+  const AnimalQuizScreen({super.key, required super.level});
 
   @override
   State<AnimalQuizScreen> createState() => _AnimalQuizScreenState();
 }
 
-class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
+class _AnimalQuizScreenState
+    extends ProtectedGameScreenState<AnimalQuizScreen> {
   List<AnimalQuizModel> animals = [];
   List<AnimalQuizModel> chooseAnimals = [];
   int score = 0;
   bool gameOver = false;
-  int level = 1;
+  late int level;
   int maxLevel = 3;
   int pointsPerCorrectMatch = 10;
   int penaltyPerWrongMatch = 5;
@@ -51,7 +53,7 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
       animalImage: "assets/images/animal/bird.png",
       value: "bird",
     ),
-    
+
     // Level 2 animals (medium)
     AnimalQuizModel(
       animalName: 'lion',
@@ -93,9 +95,9 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
       animalImage: "assets/images/animal/bird.png",
       value: "bird",
     ),
-    
+
     // Level 3 animals (hard)
-     AnimalQuizModel(
+    AnimalQuizModel(
       animalName: 'cat',
       animalImage: "assets/images/animal/cat.png",
       value: "cat",
@@ -198,48 +200,20 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
 
   void checkLevelCompletion() {
     if (animals.isEmpty && chooseAnimals.isEmpty) {
-      if (level < maxLevel) {
-        // Move to next level
-        showLevelCompleteDialog();
-      } else {
-        // Game completed
-        setState(() {
-          gameOver = true;
-        });
-      }
+      // Show a brief congratulations message
+      speak("Congratulations! Level complete!");
+
+      // Add a small delay to allow the speech to be heard
+      // Future.delayed(const Duration(milliseconds: 1500), () {
+      // Always return to map screen with completion status
+      // This will signal the level map to automatically open the next stage
+      if (mounted) Navigator.of(context).pop(true);
+      // Return true to indicate level completion
+      // });
     }
   }
 
-  void showLevelCompleteDialog() {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Level $level Complete!'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('You scored $score points'),
-              const SizedBox(height: 20),
-              Text('Ready for Level ${level + 1}?'),
-            ],
-          ),
-          actions: [
-            TextButton(
-              child: const Text('Continue'),
-              onPressed: () {
-                Navigator.of(context).pop();
-                setState(() {
-                  setupLevel(level + 1);
-                });
-              },
-            ),
-          ],
-        );
-      },
-    );
-  }
+  // Removed showLevelCompleteDialog as we're no longer using it
 
   void speak(String text) async {
     await flutterTts.setLanguage("en-US");
@@ -248,9 +222,10 @@ class _AnimalQuizScreenState extends State<AnimalQuizScreen> {
   }
 
   @override
-  void initState() {
-    super.initState();
+  void onGameInit() {
+    level = widget.level;
     initGame();
+    speak('Welcome to Animal Quiz Level $level');
   }
 
   @override

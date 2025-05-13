@@ -66,7 +66,7 @@ class OptionsGrid extends StatelessWidget {
       OptionItem(
         icon: ImageManager.setting,
         title: 'Memory Game',
-        screen: const MemoryGameScreen(),
+        screen: const MemoryGameScreen(level: 1),
         flipImage: ImageManager.flipMath,
       ),
       OptionItem(
@@ -79,7 +79,6 @@ class OptionsGrid extends StatelessWidget {
         icon: ImageManager.flipMath,
         title: 'Flappy Bird',
         screen: GameWidget(game: FlappyBirdGame()),
-
         flipImage: ImageManager.flipQuiz,
       ),
     ];
@@ -99,7 +98,7 @@ class OptionsGrid extends StatelessWidget {
       OptionItem(
         icon: ImageManager.quiz,
         title: 'Quiz',
-        screen: const AnimalQuizScreen(),
+        screen: const AnimalQuizScreen(level: 1),
         flipImage: ImageManager.flipQuiz,
       ),
       OptionItem(
@@ -125,9 +124,15 @@ class OptionsGrid extends StatelessWidget {
         title: 'Puzzles',
         screen: BlocProvider(
           create: (context) => PuzzleCubit(),
-          child: const PuzzleScreen(),
+          child: const PuzzleScreen(level: 1),
         ),
         flipImage: ImageManager.flipPuzzle,
+      ),
+      OptionItem(
+        icon: ImageManager.math,
+        title: 'Math Game',
+        screen: const MathGame(level: 1),
+        flipImage: ImageManager.flipMath,
       ),
       OptionItem(
         icon: ImageManager.setting,

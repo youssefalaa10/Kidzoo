@@ -5,23 +5,24 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
+import '../../../shared/base/protected_game_screen.dart';
 
-class MathGame extends StatefulWidget {
-  const MathGame({super.key});
+class MathGame extends ProtectedGameScreen {
+  const MathGame({super.key, required super.level});
 
   @override
   _MathGameState createState() => _MathGameState();
 }
 
-class _MathGameState extends State<MathGame> with TickerProviderStateMixin {
+class _MathGameState extends ProtectedGameScreenState<MathGame>
+    with TickerProviderStateMixin {
   late ConfettiController _confettiController;
   late AnimationController _characterController;
   late Animation<double> _characterAnimation;
   bool _isHappy = true; // For character expression
 
   @override
-  void initState() {
-    super.initState();
+  void onGameInit() {
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
 
@@ -46,7 +47,7 @@ class _MathGameState extends State<MathGame> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => MathGameCubit(),
+      create: (context) => MathGameCubit(level: widget.level),
       child: BlocConsumer<MathGameCubit, MathGameState>(
         listener: (context, state) {
           if (state.starsEarned > 0 && state.currentQuestionIndex > 0) {
@@ -113,7 +114,8 @@ class _MathGameState extends State<MathGame> with TickerProviderStateMixin {
                       Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => const MathGame()),
+                            builder: (context) =>
+                                MathGame(level: widget.level)),
                       );
                     },
                     child: const Text(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/modules/AppCategory/education_screen.dart';
 import 'package:kidzoo/modules/Shapes/widgets/custom_button.dart';
 import 'package:kidzoo/modules/home/UI/home_screen.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
@@ -38,7 +39,7 @@ class CompleteScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
-                      return const HomeScreen();
+                      return  EducationScreen();
                     }));
                   },
                   color: Colors.red,

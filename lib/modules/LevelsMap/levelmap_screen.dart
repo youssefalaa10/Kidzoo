@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'Data/Logic/Model/level_model.dart';
+import 'Data/Logic/Model/game_sequence_model.dart';
+import 'Data/Logic/Model/map_stage_model.dart';
 import 'Data/Logic/cubit/levelmap_cubit.dart';
 import 'Widgets/level_button.dart';
+import '../../shared/services/navigation_service.dart';
 
 class LevelMapScreen extends StatelessWidget {
   // Define the height of the background image (adjust based on actual image height)
@@ -17,58 +20,241 @@ class LevelMapScreen extends StatelessWidget {
     return Scaffold(
       body: BlocProvider(
         create: (context) => LevelCubit(),
-        child: SingleChildScrollView(
-          child: SizedBox(
-            height:
-                backgroundHeight, // Set the container height to match the image
-            child: Stack(
-              children: [
-                // Background Image
-                Container(
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: AssetImage('assets/images/home/Fav.jpg'),
-                      fit: BoxFit.cover,
+        child: BlocBuilder<LevelCubit, LevelMapState>(
+          builder: (context, state) {
+            return SingleChildScrollView(
+              child: SizedBox(
+                // Set the container height to match the image
+                height: backgroundHeight,
+                child: Stack(
+                  children: [
+                    // Background Image
+                    Container(
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/home/Fav.jpg'),
+                          fit: BoxFit.cover,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                // Level Buttons
-                BlocBuilder<LevelCubit, List<Level>>(
-                  builder: (context, levels) {
-                    return Stack(
-                      children: levels.map((level) {
-                        return Positioned(
-                          left: level.positionX,
-                          top: level.positionY,
-                          child: LevelButton(
-                            level: level,
-                            onTap: () {
-                              if (!level.isLocked) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text('Playing Level ${level.id}')),
-                                );
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content:
-                                          Text('Level ${level.id} is locked!')),
-                                );
-                              }
-                            },
+                    // Current Level Indicator
+                    Positioned(
+                      top: 20,
+                      left: 20,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Text(
+                          'Current Level: ${state.currentLevelId}',
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.deepPurple,
                           ),
-                        );
+                        ),
+                      ),
+                    ),
+                    // Level Buttons
+                    Stack(
+                      children: state.levels.map((level) {
+                        // Get game info for this level
+                        final gameInfo =
+                            GameSequence.createGameForLevel(level.id);
+
+                        // Display difficulty level and game type information
+                        final difficultyLevel = gameInfo.level;
+                        final gameType = gameInfo.gameType;
+
+                        // Determine button color based on game type
+                        Color buttonColor;
+                        switch (gameInfo.gameType) {
+                          case GameType.animalQuiz:
+                            buttonColor = Colors.red;
+                            break;
+                          case GameType.memoryGame:
+                            buttonColor = Colors.blue;
+                            break;
+                          case GameType.puzzle:
+                            buttonColor = Colors.green;
+                            break;
+                          case GameType.mathGame:
+                            buttonColor = Colors.orange;
+                            break;
+                        }
+
+                        return Positioned(
+                            left: level.positionX,
+                            top: level.positionY,
+                            child: LevelButton(
+                              level: level,
+                              color: buttonColor,
+                              onTap: () {
+                                if (!level.isLocked) {
+                                  // Set this as the current level
+                                  context
+                                      .read<LevelCubit>()
+                                      .setCurrentLevel(level.id);
+
+                                  // Navigate to the appropriate game screen
+                                  _navigateToGameScreen(context, level);
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                      content: Text(
+                                          'Level ${level.id} is locked! Complete previous levels first.'),
+                                    ),
+                                  );
+                                }
+                              },
+                            ));
                       }).toList(),
-                    );
-                  },
+                    ),
+                    // Game Type Legend
+                    Positioned(
+                      bottom: 20,
+                      left: 20,
+                      child: Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.8),
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.1),
+                              blurRadius: 4,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Game Types:',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 8),
+                            _buildLegendItem(Colors.red, 'Animal Quiz'),
+                            _buildLegendItem(Colors.blue, 'Memory Game'),
+                            _buildLegendItem(Colors.green, 'Puzzle'),
+                            _buildLegendItem(Colors.orange, 'Math Game'),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ],
-            ),
-          ),
+              ),
+            );
+          },
         ),
       ),
     );
   }
-}
 
+  // Helper method to build legend items
+  Widget _buildLegendItem(Color color, String text) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        children: [
+          Container(
+            width: 16,
+            height: 16,
+            decoration: BoxDecoration(
+              color: color,
+              shape: BoxShape.circle,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Text(text),
+        ],
+      ),
+    );
+  }
+
+  // Navigate to the appropriate game screen based on the level
+  void _navigateToGameScreen(BuildContext context, Level level) {
+    // Create the game sequence item for this level
+    final gameSequenceItem = GameSequence.createGameForLevel(level.id);
+
+    // Get the navigation service
+    final navigationService = NavigationService();
+
+    // Show a dialog with game information
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Level ${level.id}: ${gameSequenceItem.name}'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text('Game: ${gameSequenceItem.name}'),
+            Text('Difficulty: Level ${gameSequenceItem.level}'),
+            const SizedBox(height: 8),
+            // Show the fixed stage mapping information
+            Text('Stage: ${level.id}'),
+            const SizedBox(height: 16),
+            const Text('Ready to play?'),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context); // Close dialog
+
+              // Use the navigation service to navigate to the game screen
+              // This sets the proper navigation flags to allow the game to run
+              navigationService
+                  .navigateToGameScreen(context, gameSequenceItem.gameScreen,
+                      stageNumber: level.id)
+                  .then((result) {
+                // Check if the game was completed (result == true)
+                if (result == true) {
+                  // Mark the level as completed and unlock the next level
+                  final levelCubit = context.read<LevelCubit>();
+                  levelCubit.completeCurrentLevel();
+
+                  // Get the next level ID
+                  final nextLevelId = level.id + 1;
+
+                  // Find the next level in the list
+                  final nextLevel = levelCubit.state.levels.firstWhere(
+                    (l) => l.id == nextLevelId,
+                    orElse: () =>
+                        level, // Default to current level if next not found
+                  );
+
+                  // If next level exists and is not locked, automatically open it
+                  if (nextLevel.id != level.id && !nextLevel.isLocked) {
+                    // Small delay to allow state to update
+                    Future.delayed(const Duration(milliseconds: 300), () {
+                      _navigateToGameScreen(context, nextLevel);
+                    });
+                  }
+                }
+              });
+            },
+            child: const Text('Play'),
+          ),
+        ],
+      ),
+    );
+  }
+}

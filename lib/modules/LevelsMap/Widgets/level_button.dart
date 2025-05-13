@@ -4,27 +4,37 @@ import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Data/Logic/Model/level_model.dart';
+import '../Data/Logic/Model/game_sequence_model.dart';
 
 class LevelButton extends StatefulWidget {
   final Level level;
   final VoidCallback onTap;
+  final Color? color; // Optional color parameter for game type
 
   const LevelButton({
     super.key,
     required this.level,
     required this.onTap,
+    this.color,
   });
 
   @override
   LevelButtonState createState() => LevelButtonState();
 }
 
-class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin {
+class LevelButtonState extends State<LevelButton>
+    with TickerProviderStateMixin {
+  // Helper method to darken a color for borders
+  Color _darkenColor(Color color) {
+    final HSLColor hsl = HSLColor.fromColor(color);
+    return hsl.withLightness((hsl.lightness - 0.2).clamp(0.0, 1.0)).toColor();
+  }
+
   late AnimationController _tapController;
   late Animation<double> _scaleAnimation;
   late AnimationController _bounceController;
   late Animation<double> _bounceAnimation;
-  late AnimationController _rotationController; 
+  late AnimationController _rotationController;
   bool _isVisible = true;
 
   @override
@@ -71,7 +81,9 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
 
   // Check if this is the last level of its phase (6, 12, 18)
   bool _isLastLevelOfPhase() {
-    return widget.level.id == 6 || widget.level.id == 12 || widget.level.id == 18;
+    return widget.level.id == 6 ||
+        widget.level.id == 12 ||
+        widget.level.id == 18;
   }
 
   @override
@@ -88,7 +100,9 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
           child: isLastLevel
               ? CustomPaint(
                   painter: StarPainter(
-                    color: widget.level.isLocked ? Colors.grey.shade600 : Colors.yellow.shade700,
+                    color: widget.level.isLocked
+                        ? Colors.grey.shade600
+                        : Colors.yellow.shade700,
                   ),
                   child: Container(
                     decoration: BoxDecoration(
@@ -107,7 +121,9 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
                         ),
                       ],
                       border: Border.all(
-                        color: widget.level.isLocked ? Colors.grey.shade800 : Colors.yellow.shade900,
+                        color: widget.level.isLocked
+                            ? Colors.grey.shade800
+                            : Colors.yellow.shade900,
                         width: 3,
                       ),
                     ),
@@ -119,7 +135,12 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
                     gradient: LinearGradient(
                       colors: widget.level.isLocked
                           ? [Colors.grey.shade400, Colors.grey.shade600]
-                          : [Colors.orange.shade300, Colors.orange.shade500],
+                          : widget.color != null
+                              ? [widget.color!.withOpacity(0.7), widget.color!]
+                              : [
+                                  Colors.orange.shade300,
+                                  Colors.orange.shade500
+                                ],
                       begin: Alignment.topLeft,
                       end: Alignment.bottomRight,
                     ),
@@ -131,7 +152,11 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
                       ),
                     ],
                     border: Border.all(
-                      color: widget.level.isLocked ? Colors.grey.shade800 : Colors.yellow.shade700,
+                      color: widget.level.isLocked
+                          ? Colors.grey.shade800
+                          : widget.color != null
+                              ? _darkenColor(widget.color!)
+                              : Colors.yellow.shade700,
                       width: 3,
                     ),
                   ),
@@ -157,7 +182,8 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
                 ),
               ),
               if (isLastLevel && !widget.level.isLocked)
-                const Icon(Icons.expand_circle_down_outlined, color: Colors.yellowAccent, size: 20),
+                const Icon(Icons.expand_circle_down_outlined,
+                    color: Colors.yellowAccent, size: 20),
             ],
           ),
         ),
@@ -210,7 +236,9 @@ class LevelButtonState extends State<LevelButton> with TickerProviderStateMixin 
                         ),
                         child: Icon(
                           Icons.star,
-                          color: isLastLevel ? Colors.yellow.shade800 : Colors.yellow.shade300,
+                          color: isLastLevel
+                              ? Colors.yellow.shade800
+                              : Colors.yellow.shade300,
                           size: isLastLevel ? 70 : 60,
                         ),
                       ),

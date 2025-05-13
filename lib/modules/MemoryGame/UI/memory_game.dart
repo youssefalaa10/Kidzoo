@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
+import '../../../shared/base/protected_game_screen.dart';
 
 enum GameLevel {
   easy,
@@ -8,14 +9,14 @@ enum GameLevel {
   hard,
 }
 
-class MemoryGameScreen extends StatefulWidget {
-  const MemoryGameScreen({super.key});
+class MemoryGameScreen extends ProtectedGameScreen {
+  const MemoryGameScreen({super.key, required super.level});
 
   @override
   State<MemoryGameScreen> createState() => _MemoryGameScreenState();
 }
 
-class _MemoryGameScreenState extends State<MemoryGameScreen>
+class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     with TickerProviderStateMixin {
   // Define emojis for all levels
   final List<String> _allEmojis = [
@@ -55,7 +56,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
   bool _isProcessing = false;
   bool _gameStarted = false;
   bool _gameCompleted = false;
-  GameLevel _currentLevel = GameLevel.easy;
+  late GameLevel _currentLevel;
 
   // Timer variables
   late Stopwatch _stopwatch;
@@ -67,8 +68,7 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
   late Animation<double> _gameCompletedAnimation;
 
   @override
-  void initState() {
-    super.initState();
+  void onGameInit() {
     _gameCompletedController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 800),
@@ -77,6 +77,20 @@ class _MemoryGameScreenState extends State<MemoryGameScreen>
       parent: _gameCompletedController,
       curve: Curves.easeInOut,
     );
+
+    // Set difficulty based on the level passed from constructor
+    switch (widget.level) {
+      case 1:
+        _currentLevel = GameLevel.easy;
+        break;
+      case 2:
+        _currentLevel = GameLevel.medium;
+        break;
+      default:
+        _currentLevel = GameLevel.hard;
+        break;
+    }
+
     _initGame(_currentLevel);
   }
 
@@ -615,8 +629,7 @@ class _AnimatedFlipCardState extends State<AnimatedFlipCard>
   late Animation<double> _matchedAnimation;
 
   @override
-  void initState() {
-    super.initState();
+  void onGameInit() {
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),

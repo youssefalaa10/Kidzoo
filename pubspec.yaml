@@ -33,7 +33,7 @@ dependencies:
   confetti: ^0.8.0
   cupertino_icons: ^1.0.8
   equatable: ^2.0.5
-  flame:
+  flame: null
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
@@ -42,6 +42,7 @@ dependencies:
   flutter_tts: ^4.2.0
   google_fonts: ^6.1.0
   lottie: ^3.3.1
+  shared_preferences: ^2.5.3
   visibility_detector: ^0.4.0+2
 
 dev_dependencies:
