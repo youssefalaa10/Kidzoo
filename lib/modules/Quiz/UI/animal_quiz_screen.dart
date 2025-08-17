@@ -204,16 +204,18 @@ class _AnimalQuizScreenState
       speak("Congratulations! Level complete!");
 
       // Add a small delay to allow the speech to be heard
-      // Future.delayed(const Duration(milliseconds: 1500), () {
-      // Always return to map screen with completion status
-      // This will signal the level map to automatically open the next stage
-      if (mounted) Navigator.of(context).pop(true);
-      // Return true to indicate level completion
-      // });
+      Future.delayed(const Duration(milliseconds: 1500), () {
+        // Always return to map screen with completion status
+        // This will signal the level map to automatically open the next stage
+        if (mounted) {
+          Navigator.of(context)
+              .pop(true); // Return true to indicate level completion
+        }
+      });
     }
   }
 
-  // Removed showLevelCompleteDialog as we're no longer using it
+
 
   void speak(String text) async {
     await flutterTts.setLanguage("en-US");

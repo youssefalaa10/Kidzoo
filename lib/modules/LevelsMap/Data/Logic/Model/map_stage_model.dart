@@ -33,30 +33,31 @@ class MapStage {
 /// Utility class to manage the fixed stage mapping
 class StageMapping {
   /// Get all stages with their fixed game types and levels
+  /// Level progression: Animal Quiz (1) -> Memory Game (2) -> Puzzle (3) -> Math Game (4)
+  /// Then repeat with level 2: Animal Quiz (5) -> Memory Game (6) -> Puzzle (7) -> Math Game (8)
+  /// Then repeat with level 3: Animal Quiz (9) -> Memory Game (10) -> Puzzle (11) -> Math Game (12)
   static List<MapStage> getAllStages() {
     return [
-      // Animal Quiz stages
+      // Level 1 Cycle (Stages 1-4)
       MapStage(
           stageNumber: 1,
           gameType: GameType.animalQuiz,
           level: 1,
           isLocked: false), // First stage is unlocked by default
-      MapStage(stageNumber: 5, gameType: GameType.animalQuiz, level: 2),
-      MapStage(stageNumber: 9, gameType: GameType.animalQuiz, level: 3),
-
-      // Memory Game stages
       MapStage(stageNumber: 2, gameType: GameType.memoryGame, level: 1),
-      MapStage(stageNumber: 6, gameType: GameType.memoryGame, level: 2),
-      MapStage(stageNumber: 10, gameType: GameType.memoryGame, level: 3),
-
-      // Puzzle stages
       MapStage(stageNumber: 3, gameType: GameType.puzzle, level: 1),
-      MapStage(stageNumber: 7, gameType: GameType.puzzle, level: 2),
-      MapStage(stageNumber: 11, gameType: GameType.puzzle, level: 3),
-
-      // Math Game stages
       MapStage(stageNumber: 4, gameType: GameType.mathGame, level: 1),
+
+      // Level 2 Cycle (Stages 5-8)
+      MapStage(stageNumber: 5, gameType: GameType.animalQuiz, level: 2),
+      MapStage(stageNumber: 6, gameType: GameType.memoryGame, level: 2),
+      MapStage(stageNumber: 7, gameType: GameType.puzzle, level: 2),
       MapStage(stageNumber: 8, gameType: GameType.mathGame, level: 2),
+
+      // Level 3 Cycle (Stages 9-12)
+      MapStage(stageNumber: 9, gameType: GameType.animalQuiz, level: 3),
+      MapStage(stageNumber: 10, gameType: GameType.memoryGame, level: 3),
+      MapStage(stageNumber: 11, gameType: GameType.puzzle, level: 3),
       MapStage(stageNumber: 12, gameType: GameType.mathGame, level: 3),
     ];
   }
@@ -80,5 +81,40 @@ class StageMapping {
     } catch (e) {
       return null;
     }
+  }
+
+  /// Get the next stage number in the progression
+  static int getNextStageNumber(int currentStageNumber) {
+    final stages = getAllStages();
+    final maxStageNumber = stages.length;
+
+    if (currentStageNumber >= maxStageNumber) {
+      return maxStageNumber; // Stay at the last stage if completed all
+    }
+
+    return currentStageNumber + 1;
+  }
+
+  /// Get the game type for a specific stage number
+  static GameType getGameTypeForStage(int stageNumber) {
+    final stage = getStageByNumber(stageNumber);
+    return stage?.gameType ?? GameType.animalQuiz;
+  }
+
+  /// Get the level for a specific stage number
+  static int getLevelForStage(int stageNumber) {
+    final stage = getStageByNumber(stageNumber);
+    return stage?.level ?? 1;
+  }
+
+  /// Check if a stage is the last stage in the progression
+  static bool isLastStage(int stageNumber) {
+    final stages = getAllStages();
+    return stageNumber >= stages.length;
+  }
+
+  /// Get the total number of stages
+  static int getTotalStages() {
+    return getAllStages().length;
   }
 }

@@ -418,53 +418,46 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                 Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    ElevatedButton(
-                                      onPressed: _restartGame,
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.blue[400],
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 32, vertical: 16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
+                                    Flexible(
+                                      child: ElevatedButton(
+                                        onPressed: _restartGame,
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.blue[400],
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
                                         ),
-                                      ),
-                                      child: const Text(
-                                        'Play Again',
-                                        style: TextStyle(fontSize: 16),
+                                        child: const Text(
+                                          'Play Again',
+                                          style: TextStyle(fontSize: 14),
+                                        ),
                                       ),
                                     ),
-                                    const SizedBox(width: 16),
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        GameLevel nextLevel;
-                                        switch (_currentLevel) {
-                                          case GameLevel.easy:
-                                            nextLevel = GameLevel.medium;
-                                            break;
-                                          case GameLevel.medium:
-                                            nextLevel = GameLevel.hard;
-                                            break;
-                                          case GameLevel.hard:
-                                            nextLevel = GameLevel.easy;
-                                            break;
-                                        }
-                                        _changeLevel(nextLevel);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.green[400],
-                                        foregroundColor: Colors.white,
-                                        padding: const EdgeInsets.symmetric(
-                                            horizontal: 32, vertical: 16),
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(30),
+                                    const SizedBox(width: 8),
+                                    Flexible(
+                                      child: ElevatedButton(
+                                        onPressed: () {
+                                          // Return to level map with completion status
+                                          Navigator.of(context).pop(true);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: Colors.green[400],
+                                          foregroundColor: Colors.white,
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 16, vertical: 12),
+                                          shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(30),
+                                          ),
                                         ),
-                                      ),
-                                      child: const Text(
-                                        'Next Level',
-                                        style: TextStyle(fontSize: 16),
+                                        child: const Text(
+                                          'Continue',
+                                          style: TextStyle(fontSize: 14),
+                                        ),
                                       ),
                                     ),
                                   ],
@@ -629,7 +622,8 @@ class _AnimatedFlipCardState extends State<AnimatedFlipCard>
   late Animation<double> _matchedAnimation;
 
   @override
-  void onGameInit() {
+  void initState() {
+    super.initState();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 400),

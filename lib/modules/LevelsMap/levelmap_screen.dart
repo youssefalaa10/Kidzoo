@@ -3,10 +3,29 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'Data/Logic/Model/level_model.dart';
 import 'Data/Logic/Model/game_sequence_model.dart';
-import 'Data/Logic/Model/map_stage_model.dart';
 import 'Data/Logic/cubit/levelmap_cubit.dart';
 import 'Widgets/level_button.dart';
 import '../../shared/services/navigation_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+// Global state for level completion
+class LevelCompletionManager {
+  static final LevelCompletionManager _instance =
+      LevelCompletionManager._internal();
+  factory LevelCompletionManager() => _instance;
+  LevelCompletionManager._internal();
+
+  Future<void> completeLevel(int levelId) async {
+    final nextLevelId = GameSequence.getNextStageNumber(levelId);
+    print('DEBUG: Completing level $levelId, next level is $nextLevelId');
+
+    // Save progress to SharedPreferences
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('highest_unlocked_level', nextLevelId);
+
+    print('DEBUG: Saved progress - highest unlocked level: $nextLevelId');
+  }
+}
 
 class LevelMapScreen extends StatelessWidget {
   // Define the height of the background image (adjust based on actual image height)
@@ -65,6 +84,41 @@ class LevelMapScreen extends StatelessWidget {
                         ),
                       ),
                     ),
+                    // Debug button to unlock level 2
+                    Positioned(
+                      top: 20,
+                      right: 20,
+                      child: Column(
+                        children: [
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<LevelCubit>().unlockLevel(2);
+                              print('DEBUG: Manually unlocked level 2');
+                            },
+                            child: const Text('Debug: Unlock Level 2'),
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () {
+                              context.read<LevelCubit>().unlockLevel(3);
+                              print('DEBUG: Manually unlocked level 3');
+                            },
+                            child: const Text('Debug: Unlock Level 3'),
+                          ),
+                          const SizedBox(height: 8),
+                          ElevatedButton(
+                            onPressed: () async {
+                              final prefs =
+                                  await SharedPreferences.getInstance();
+                              await prefs.clear();
+                              print('DEBUG: Cleared all progress');
+                              // Restart the app or reload the level map
+                            },
+                            child: const Text('Debug: Reset Progress'),
+                          ),
+                        ],
+                      ),
+                    ),
                     // Level Buttons
                     Stack(
                       children: state.levels.map((level) {
@@ -72,9 +126,7 @@ class LevelMapScreen extends StatelessWidget {
                         final gameInfo =
                             GameSequence.createGameForLevel(level.id);
 
-                        // Display difficulty level and game type information
-                        final difficultyLevel = gameInfo.level;
-                        final gameType = gameInfo.gameType;
+                        // Display difficulty level and game type information (reserved for future use)
 
                         // Determine button color based on game type
                         Color buttonColor;
@@ -192,10 +244,13 @@ class LevelMapScreen extends StatelessWidget {
     // Get the navigation service
     final navigationService = NavigationService();
 
+    // Capture the cubit before opening dialog to avoid using a deactivated context later
+    final levelCubit = context.read<LevelCubit>();
+
     // Show a dialog with game information
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
+      builder: (dialogContext) => AlertDialog(
         title: Text('Level ${level.id}: ${gameSequenceItem.name}'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
@@ -212,42 +267,30 @@ class LevelMapScreen extends StatelessWidget {
         ),
         actions: [
           TextButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(dialogContext),
             child: const Text('Cancel'),
           ),
           ElevatedButton(
             onPressed: () {
-              Navigator.pop(context); // Close dialog
+              Navigator.pop(dialogContext); // Close dialog
 
-              // Use the navigation service to navigate to the game screen
-              // This sets the proper navigation flags to allow the game to run
               navigationService
                   .navigateToGameScreen(context, gameSequenceItem.gameScreen,
                       stageNumber: level.id)
                   .then((result) {
                 // Check if the game was completed (result == true)
+                print('DEBUG: Game returned result: $result');
                 if (result == true) {
-                  // Mark the level as completed and unlock the next level
-                  final levelCubit = context.read<LevelCubit>();
-                  levelCubit.completeCurrentLevel();
+                  print(
+                      'DEBUG: Game completed successfully, unlocking next level');
 
-                  // Get the next level ID
-                  final nextLevelId = level.id + 1;
-
-                  // Find the next level in the list
-                  final nextLevel = levelCubit.state.levels.firstWhere(
-                    (l) => l.id == nextLevelId,
-                    orElse: () =>
-                        level, // Default to current level if next not found
-                  );
-
-                  // If next level exists and is not locked, automatically open it
-                  if (nextLevel.id != level.id && !nextLevel.isLocked) {
-                    // Small delay to allow state to update
-                    Future.delayed(const Duration(milliseconds: 300), () {
-                      _navigateToGameScreen(context, nextLevel);
-                    });
-                  }
+                  // Use the global completion manager
+                  LevelCompletionManager().completeLevel(level.id).then((_) {
+                    // Refresh the level map using the captured cubit
+                    levelCubit.completeLevel(level.id);
+                  });
+                } else {
+                  print('DEBUG: Game not completed');
                 }
               });
             },
@@ -257,4 +300,6 @@ class LevelMapScreen extends StatelessWidget {
       ),
     );
   }
+
+  // Unused dialogs removed to avoid warnings
 }

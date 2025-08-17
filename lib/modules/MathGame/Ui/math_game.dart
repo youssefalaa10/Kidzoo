@@ -71,6 +71,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
             _confettiController.play();
             showDialog(
               context: context,
+              barrierDismissible: false,
               builder: (context) => AlertDialog(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
@@ -80,7 +81,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     const Text(
-                      '🎉 You’re a Math Wizard! 🧙‍♂️',
+                      '🎉 You\'re a Math Wizard! 🧙‍♂️',
                       style:
                           TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
@@ -121,6 +122,17 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                     child: const Text(
                       'Play Again! 🚀',
                       style: TextStyle(fontSize: 18, color: Colors.purple),
+                    ),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      // Return to level map with completion status
+                      Navigator.of(context).pop(true);
+                    },
+                    child: const Text(
+                      'Continue to Next Level! 🎯',
+                      style: TextStyle(fontSize: 18, color: Colors.green),
                     ),
                   ),
                 ],

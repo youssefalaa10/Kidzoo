@@ -107,4 +107,29 @@ class GameSequence {
     final stage = StageMapping.getStageByGameTypeAndLevel(gameType, level);
     return stage?.stageNumber;
   }
+
+  /// Get the next stage number in the progression
+  static int getNextStageNumber(int currentStageNumber) {
+    return StageMapping.getNextStageNumber(currentStageNumber);
+  }
+
+  /// Check if a stage is the last stage in the progression
+  static bool isLastStage(int stageNumber) {
+    return StageMapping.isLastStage(stageNumber);
+  }
+
+  /// Get the total number of stages
+  static int getTotalStages() {
+    return StageMapping.getTotalStages();
+  }
+
+  /// Get the game type for a specific stage number
+  static GameType getGameTypeForStage(int stageNumber) {
+    return StageMapping.getGameTypeForStage(stageNumber);
+  }
+
+  /// Get the level for a specific stage number
+  static int getLevelForStage(int stageNumber) {
+    return StageMapping.getLevelForStage(stageNumber);
+  }
 }
