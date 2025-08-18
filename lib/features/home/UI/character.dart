@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzoo/features/AppCategory/education_screen.dart';
 import 'package:kidzoo/features/AppCategory/games_screen.dart';
-import 'package:kidzoo/features/LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
-import 'package:kidzoo/features/LevelsMap/levelmap_screen.dart';
+
+import '../../Alphabets/bloc/alphabet_bloc.dart';
+import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
+import '../../LevelsMap/levelmap_screen.dart';
 
 class CharacterSelectionScreen extends StatefulWidget {
   const CharacterSelectionScreen({super.key});

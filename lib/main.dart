@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'modules/Alphabets/bloc/alphabet_bloc.dart';
-import 'modules/home/UI/character.dart';
+import 'features/Alphabets/bloc/alphabet_bloc.dart';
+import 'features/home/UI/character.dart';
 
 void main() {
   runApp(const MyApp());

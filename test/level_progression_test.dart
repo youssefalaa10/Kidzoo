@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kidzoo/modules/LevelsMap/Data/Logic/Model/game_sequence_model.dart';
-import 'package:kidzoo/modules/LevelsMap/Data/Logic/Model/map_stage_model.dart';
+import 'package:kidzoo/features/LevelsMap/Data/Logic/Model/game_sequence_model.dart';
+import 'package:kidzoo/features/LevelsMap/Data/Logic/Model/map_stage_model.dart';
 
 void main() {
   group('Level Progression System Tests', () {
