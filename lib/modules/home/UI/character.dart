@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/AppCategory/education_screen.dart';
 import 'package:kidzoo/modules/AppCategory/games_screen.dart';
+import 'package:kidzoo/shared/style/image_manager.dart';
 
 import '../../Alphabets/bloc/alphabet_bloc.dart';
 import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
 import '../../LevelsMap/levelmap_screen.dart';
-import 'home_screen.dart';
 
 class CharacterSelectionScreen extends StatefulWidget {
   const CharacterSelectionScreen({super.key});
@@ -27,34 +27,35 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
       characterDesc: "enjoy and have fun",
       color: Colors.blue.shade100,
       buttonLabel: 'Play',
-      screen:  BlocProvider(
+      characterImage: ImageManager.gamepad,
+      screen: BlocProvider(
         create: (context) => AlphabetBloc(),
-        child:  GamesScreen(),
+        child: GamesScreen(),
       ),
     ),
     CharacterCategory(
       name: "Education",
       characterName: "Education",
-      characterDesc:
-          "Learn new things and improve your skills",
+      characterDesc: "Learn new things and improve your skills",
       color: Colors.orange.shade300,
       buttonLabel: 'Learn',
+      characterImage: ImageManager.letters,
       screen: BlocProvider(
         create: (context) => AlphabetBloc(),
-        child:  EducationScreen(),
+        child: EducationScreen(),
       ),
     ),
     CharacterCategory(
       name: "Challenge",
       characterName: "Challenge",
-      characterDesc:
-          "Challenge yourself and be the best",
+      characterDesc: "Challenge yourself and be the best",
       color: Colors.purple.shade100,
       buttonLabel: 'compete',
+      characterImage: ImageManager.brainstorming,
       screen: BlocProvider(
-          create: (context) => LevelCubit(),
-          child: const LevelMapScreen(),
-        ),
+        create: (context) => LevelCubit(),
+        child: const LevelMapScreen(),
+      ),
     ),
   ];
 
@@ -103,7 +104,6 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                   padding: const EdgeInsets.only(top: 35),
                   child: Column(
                     children: [
-                    
                       // Carousel section
                       Expanded(
                         child: OverlappedCarousel(
@@ -234,6 +234,7 @@ class CharacterCategory {
   final String characterDesc;
   final Color color;
   final String buttonLabel;
+  final String characterImage;
   final Widget screen;
 
   CharacterCategory({
@@ -242,6 +243,7 @@ class CharacterCategory {
     required this.characterDesc,
     required this.color,
     required this.buttonLabel,
+    required this.characterImage,
     required this.screen,
   });
 }
@@ -298,14 +300,14 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
           curve: Curves.easeOutCubic,
           builder: (context, value, child) {
             return GestureDetector(
-               onTap: isSelected
-            ? () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => category.screen,
-                  ),
-                )
-            : null,
+              onTap: isSelected
+                  ? () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => category.screen,
+                        ),
+                      )
+                  : null,
               child: Transform.scale(
                 scale: value,
                 child: Opacity(
@@ -313,6 +315,7 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
                   child: CharacterCard(
                     category: widget.items[index],
                     isSelected: isSelected,
+                    characterImage: widget.items[index].characterImage,
                   ),
                 ),
               ),
@@ -327,11 +330,13 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
 class CharacterCard extends StatelessWidget {
   final CharacterCategory category;
   final bool isSelected;
+  final String characterImage;
 
   const CharacterCard({
     super.key,
     required this.category,
     required this.isSelected,
+    required this.characterImage,
   });
 
   @override
@@ -350,7 +355,7 @@ class CharacterCard extends StatelessWidget {
               borderRadius: BorderRadius.circular(30),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
+                  color: Colors.black.withValues(alpha: 0.1),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -359,7 +364,7 @@ class CharacterCard extends StatelessWidget {
             child: Center(
               child: isSelected
                   ? Image.asset(
-                      'assets/images/home/abc-block.png',
+                      characterImage,
                       height: 180,
                       width: 180,
                     )

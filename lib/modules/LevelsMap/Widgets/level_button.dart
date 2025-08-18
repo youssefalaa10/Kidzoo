@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:visibility_detector/visibility_detector.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../Data/Logic/Model/level_model.dart';
-import '../Data/Logic/Model/game_sequence_model.dart';
 
 class LevelButton extends StatefulWidget {
   final Level level;
@@ -136,7 +135,10 @@ class LevelButtonState extends State<LevelButton>
                       colors: widget.level.isLocked
                           ? [Colors.grey.shade400, Colors.grey.shade600]
                           : widget.color != null
-                              ? [widget.color!.withOpacity(0.7), widget.color!]
+                              ? [
+                                  widget.color!.withValues(alpha: 0.7),
+                                  widget.color!
+                                ]
                               : [
                                   Colors.orange.shade300,
                                   Colors.orange.shade500
@@ -200,12 +202,15 @@ class LevelButtonState extends State<LevelButton>
     return VisibilityDetector(
       key: Key('level-${widget.level.id}'),
       onVisibilityChanged: (info) {
+        if (!mounted) return;
         setState(() {
           _isVisible = info.visibleFraction > 0;
           // Pause or resume animations based on visibility
           if (_isVisible) {
-            _bounceController.repeat(reverse: true);
-            _rotationController.repeat();
+            if (mounted) {
+              _bounceController.repeat(reverse: true);
+              _rotationController.repeat();
+            }
           } else {
             _bounceController.stop();
             _rotationController.stop();

@@ -17,13 +17,10 @@ class LevelCompletionManager {
 
   Future<void> completeLevel(int levelId) async {
     final nextLevelId = GameSequence.getNextStageNumber(levelId);
-    print('DEBUG: Completing level $levelId, next level is $nextLevelId');
 
     // Save progress to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     await prefs.setInt('highest_unlocked_level', nextLevelId);
-
-    print('DEBUG: Saved progress - highest unlocked level: $nextLevelId');
   }
 }
 
@@ -84,41 +81,7 @@ class LevelMapScreen extends StatelessWidget {
                         ),
                       ),
                     ),
-                    // Debug button to unlock level 2
-                    Positioned(
-                      top: 20,
-                      right: 20,
-                      child: Column(
-                        children: [
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<LevelCubit>().unlockLevel(2);
-                              print('DEBUG: Manually unlocked level 2');
-                            },
-                            child: const Text('Debug: Unlock Level 2'),
-                          ),
-                          const SizedBox(height: 8),
-                          ElevatedButton(
-                            onPressed: () {
-                              context.read<LevelCubit>().unlockLevel(3);
-                              print('DEBUG: Manually unlocked level 3');
-                            },
-                            child: const Text('Debug: Unlock Level 3'),
-                          ),
-                          const SizedBox(height: 8),
-                          ElevatedButton(
-                            onPressed: () async {
-                              final prefs =
-                                  await SharedPreferences.getInstance();
-                              await prefs.clear();
-                              print('DEBUG: Cleared all progress');
-                              // Restart the app or reload the level map
-                            },
-                            child: const Text('Debug: Reset Progress'),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Debug buttons removed
                     // Level Buttons
                     Stack(
                       children: state.levels.map((level) {
@@ -279,11 +242,7 @@ class LevelMapScreen extends StatelessWidget {
                       stageNumber: level.id)
                   .then((result) {
                 // Check if the game was completed (result == true)
-                print('DEBUG: Game returned result: $result');
                 if (result == true) {
-                  print(
-                      'DEBUG: Game completed successfully, unlocking next level');
-
                   // Use the global completion manager
                   LevelCompletionManager().completeLevel(level.id).then((_) {
                     // Refresh the level map using the captured cubit

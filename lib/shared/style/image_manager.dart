@@ -57,6 +57,12 @@ class ImageManager {
 
   static const String setting = "assets/images/home/setting.png";
 
+  static const String brainstorming = 'assets/images/home/brainstorming.png';
+  static const String gamepad = 'assets/images/home/gamepad.png';
+  static const String flappyBird = 'assets/images/flappy/flappybird.png';
+  static const String birdAnimal = 'assets/images/animal/bird.png';
+  static const String brain = 'assets/images/home/brain.png';
+
   // puzzle images
   static const String cat = "assets/images/puzzle/cat.png";
   static const String dog = "assets/images/puzzle/dog.png";
@@ -77,7 +83,7 @@ class ImageManager {
   static const String gazelle4 = "assets/images/puzzle/gazelle block/4.jpg";
 
   // ghost
-    static const String ghost = "assets/images/puzzle/ghost.png";
+  static const String ghost = "assets/images/puzzle/ghost.png";
   static const String ghost1 = "assets/images/puzzle/ghost block/1.png";
   static const String ghost2 = "assets/images/puzzle/ghost block/2.png";
   static const String ghost3 = "assets/images/puzzle/ghost block/3.png";

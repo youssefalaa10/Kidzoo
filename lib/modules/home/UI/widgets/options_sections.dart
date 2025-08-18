@@ -2,20 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/modules/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzoo/modules/MemoryGame/UI/memory_game.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
-import 'package:kidzoo/modules/Puzzle/bloc/cubit.dart';
-import 'package:kidzoo/modules/Puzzle/puzzle_screen.dart';
-import 'package:kidzoo/modules/Quiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/modules/Shapes/shape_screen.dart';
-import 'package:kidzoo/modules/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 import 'package:kidzoo/shared/style/image_manager.dart';
 import '../../../../shared/media_query.dart';
-import '../../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
-import '../../../LevelsMap/levelmap_screen.dart';
-import '../../../MathGame/Data/Logic/cubit/math_game_cubit.dart';
-import '../../../MathGame/Ui/math_game.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';
 
 class OptionsGrid extends StatelessWidget {
@@ -36,12 +27,6 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipNumbers,
       },
       {
-        'icon': ImageManager.quiz,
-        'title': 'Quiz',
-        'screen': AnimalQuizScreen(level: 1),
-        'flipImage': ImageManager.flipQuiz,
-      },
-      {
         'icon': ImageManager.letters,
         'title': 'Alphabet',
         'screen': BlocProvider(
@@ -51,18 +36,6 @@ class OptionsGrid extends StatelessWidget {
         'flipImage': ImageManager.flipLetters,
       },
       {
-        'icon': ImageManager.setting,
-        'title': 'Memory Game',
-        'screen': MemoryGameScreen(level: 1),
-        'flipImage': ImageManager.flipMath,
-      },
-      {
-        'icon': ImageManager.math,
-        'title': 'Tic Tac Toe',
-        'screen': TicTacToeGame(),
-        'flipImage': ImageManager.flipQuiz,
-      },
-      {
         'icon': ImageManager.shapes,
         'title': 'Shapes',
         'screen': BlocProvider(
@@ -70,33 +43,6 @@ class OptionsGrid extends StatelessWidget {
           child: ShapeScreen(),
         ),
         'flipImage': ImageManager.flipShapes,
-      },
-      {
-        'icon': ImageManager.flipMath,
-        'title': 'Math Game',
-        'screen': BlocProvider(
-          create: (context) => MathGameCubit(),
-          child: MathGame(level: 1),
-        ),
-        'flipImage': ImageManager.flipQuiz,
-      },
-      {
-        'icon': ImageManager.puzzle,
-        'title': 'Puzzels',
-        'screen': BlocProvider(
-          create: (context) => PuzzleCubit(),
-          child: PuzzleScreen(level: 1),
-        ),
-        'flipImage': ImageManager.flipPuzzle,
-      },
-      {
-        'icon': ImageManager.setting,
-        'title': 'Level Map',
-        'screen': BlocProvider(
-          create: (context) => LevelCubit(),
-          child: LevelMapScreen(),
-        ),
-        'flipImage': ImageManager.flipPuzzle,
       },
     ];
 

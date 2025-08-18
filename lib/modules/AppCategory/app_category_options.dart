@@ -4,7 +4,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/modules/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/modules/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzoo/modules/FlappyBird/flappy_bird_game.dart';
-import 'package:kidzoo/modules/MemoryGame/UI/memory_game.dart';
 import 'package:kidzoo/modules/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/modules/Numbers/number_screen.dart';
 import 'package:kidzoo/modules/Puzzle/bloc/cubit.dart';
@@ -63,22 +62,16 @@ class OptionsGrid extends StatelessWidget {
   List<OptionItem> _getGameOptions() {
     return [
       OptionItem(
-        icon: ImageManager.setting,
-        title: 'Memory Game',
-        screen: const MemoryGameScreen(level: 1),
-        flipImage: ImageManager.flipMath,
-      ),
-      OptionItem(
-        icon: ImageManager.math,
+        icon: ImageManager.flipMath,
         title: 'Tic Tac Toe',
         screen: const TicTacToeGame(),
-        flipImage: ImageManager.flipQuiz,
+        flipImage: ImageManager.brain,
       ),
       OptionItem(
-        icon: ImageManager.flipMath,
+        icon: ImageManager.flappyBird,
         title: 'Flappy Bird',
         screen: GameWidget(game: FlappyBirdGame()),
-        flipImage: ImageManager.flipQuiz,
+        flipImage: ImageManager.birdAnimal,
       ),
     ];
   }
@@ -94,12 +87,7 @@ class OptionsGrid extends StatelessWidget {
         ),
         flipImage: ImageManager.flipNumbers,
       ),
-      OptionItem(
-        icon: ImageManager.quiz,
-        title: 'Quiz',
-        screen: const AnimalQuizScreen(level: 1),
-        flipImage: ImageManager.flipQuiz,
-      ),
+
       OptionItem(
         icon: ImageManager.letters,
         title: 'Alphabet',
@@ -118,30 +106,9 @@ class OptionsGrid extends StatelessWidget {
         ),
         flipImage: ImageManager.flipShapes,
       ),
-      OptionItem(
-        icon: ImageManager.puzzle,
-        title: 'Puzzles',
-        screen: BlocProvider(
-          create: (context) => PuzzleCubit(),
-          child: const PuzzleScreen(level: 1),
-        ),
-        flipImage: ImageManager.flipPuzzle,
-      ),
-      OptionItem(
-        icon: ImageManager.math,
-        title: 'Math Game',
-        screen: const MathGame(level: 1),
-        flipImage: ImageManager.flipMath,
-      ),
-      OptionItem(
-        icon: ImageManager.setting,
-        title: 'Level Map',
-        screen: BlocProvider(
-          create: (context) => LevelCubit(),
-          child: const LevelMapScreen(),
-        ),
-        flipImage: ImageManager.flipPuzzle,
-      ),
+
+
+ 
     ];
   }
 
