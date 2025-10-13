@@ -1,4 +1,9 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+
+import 'widgets/game_result_dialog.dart';
 
 class TicTacToeGame extends StatefulWidget {
   const TicTacToeGame({super.key});
@@ -16,6 +21,8 @@ class TicTacToeGameState extends State<TicTacToeGame>
   int xScore = 0;
   int oScore = 0;
   int drawScore = 0;
+  GameMode gameMode = GameMode.twoPlayer;
+  bool aiThinking = false;
 
   // Animation controllers
   late AnimationController _boardController;
@@ -101,7 +108,8 @@ class TicTacToeGameState extends State<TicTacToeGame>
     setState(() {
       board = List.generate(3, (_) => List.filled(3, ''));
       xTurn = true;
-      gameStatus = 'Player X\'s Turn';
+      gameStatus = gameMode == GameMode.vsAI ? 'Your Turn' : 'Player X\'s Turn';
+      aiThinking = false;
 
       // Reset cell animations
       for (int i = 0; i < 3; i++) {
@@ -115,8 +123,18 @@ class TicTacToeGameState extends State<TicTacToeGame>
     });
   }
 
+  void changeGameMode(GameMode mode) {
+    setState(() {
+      gameMode = mode;
+      xScore = 0;
+      oScore = 0;
+      drawScore = 0;
+      resetGame();
+    });
+  }
+
   void makeMove(int row, int col) {
-    if (board[row][col] != '' || checkWinner() != null) {
+    if (board[row][col] != '' || checkWinner() != null || aiThinking) {
       return;
     }
 
@@ -126,23 +144,157 @@ class TicTacToeGameState extends State<TicTacToeGame>
 
       final String? winner = checkWinner();
       if (winner != null) {
-        if (winner == 'X') {
-          gameStatus = 'Player X Wins!';
-          xScore++;
-          _winController.forward();
-        } else if (winner == 'O') {
-          gameStatus = 'Player O Wins!';
-          oScore++;
-          _winController.forward();
-        } else {
-          gameStatus = 'It\'s a Draw!';
-          drawScore++;
-        }
+        _handleGameEnd(winner);
       } else {
         xTurn = !xTurn;
-        gameStatus = xTurn ? 'Player X\'s Turn' : 'Player O\'s Turn';
+        _updateGameStatus();
+
+        // Trigger AI move if in AI mode and it's AI's turn
+        if (gameMode == GameMode.vsAI && !xTurn) {
+          _makeAIMove();
+        }
       }
     });
+  }
+
+  void _handleGameEnd(String winner) {
+    if (winner == 'X') {
+      gameStatus = gameMode == GameMode.vsAI ? 'You Win!' : 'Player X Wins!';
+      xScore++;
+      _winController.forward();
+    } else if (winner == 'O') {
+      gameStatus = gameMode == GameMode.vsAI ? 'AI Wins!' : 'Player O Wins!';
+      oScore++;
+      _winController.forward();
+    } else {
+      gameStatus = 'It\'s a Draw!';
+      drawScore++;
+    }
+
+    // Show result dialog after a short delay
+    Future.delayed(const Duration(milliseconds: 1000), () {
+      if (mounted) {
+        _showResultDialog(winner);
+      }
+    });
+  }
+
+  void _showResultDialog(String winner) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => GameResultDialog(
+        result: winner,
+        gameMode: gameMode,
+        onNewGame: () {
+          Navigator.of(context).pop();
+          resetGame();
+        },
+        onClose: () {
+          Navigator.of(context).pop();
+        },
+      ),
+    );
+  }
+
+  void _updateGameStatus() {
+    if (gameMode == GameMode.vsAI) {
+      gameStatus = xTurn ? 'Your Turn' : 'AI Thinking...';
+    } else {
+      gameStatus = xTurn ? 'Player X\'s Turn' : 'Player O\'s Turn';
+    }
+  }
+
+  Future<void> _makeAIMove() async {
+    setState(() {
+      aiThinking = true;
+    });
+
+    // Add a small delay to make it feel more natural
+    await Future<void>.delayed(const Duration(milliseconds: 500));
+
+    if (checkWinner() != null) {
+      setState(() {
+        aiThinking = false;
+      });
+      return;
+    }
+
+    final move = _getBestMove();
+
+    if (move != null) {
+      setState(() {
+        board[move.$1][move.$2] = 'O';
+        cellControllers[move.$1][move.$2].forward();
+        aiThinking = false;
+
+        final String? winner = checkWinner();
+        if (winner != null) {
+          _handleGameEnd(winner);
+        } else {
+          xTurn = true;
+          _updateGameStatus();
+        }
+      });
+    }
+  }
+
+  (int, int)? _getBestMove() {
+    int bestScore = -1000;
+    (int, int)? bestMove;
+
+    for (int i = 0; i < 3; i++) {
+      for (int j = 0; j < 3; j++) {
+        if (board[i][j] == '') {
+          board[i][j] = 'O';
+          final int score = _minimax(0, false);
+          board[i][j] = '';
+
+          if (score > bestScore) {
+            bestScore = score;
+            bestMove = (i, j);
+          }
+        }
+      }
+    }
+
+    return bestMove;
+  }
+
+  int _minimax(int depth, bool isMaximizing) {
+    final winner = checkWinner();
+
+    if (winner == 'O') return 10 - depth;
+    if (winner == 'X') return depth - 10;
+    if (winner == 'Draw') return 0;
+
+    if (isMaximizing) {
+      int bestScore = -1000;
+      for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+          if (board[i][j] == '') {
+            board[i][j] = 'O';
+            final int score = _minimax(depth + 1, false);
+            board[i][j] = '';
+            bestScore = max(bestScore, score);
+          }
+        }
+      }
+      return bestScore;
+    } else {
+      int bestScore = 1000;
+      for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+          if (board[i][j] == '') {
+            board[i][j] = 'X';
+            final int score = _minimax(depth + 1, true);
+            board[i][j] = '';
+            bestScore = min(bestScore, score);
+          }
+        }
+      }
+      return bestScore;
+    }
   }
 
   String? checkWinner() {
@@ -241,7 +393,11 @@ class TicTacToeGameState extends State<TicTacToeGame>
             children: [
               // Game Title with Glow
               _buildGameTitle(titleFontSize),
-              SizedBox(height: cellSize * 0.2),
+              SizedBox(height: cellSize * 0.15),
+
+              // Game Mode Selector
+              _buildGameModeSelector(),
+              SizedBox(height: cellSize * 0.15),
 
               // Score Board
               _buildScoreBoard(scoreFontSize, scoreValueFontSize),
@@ -293,7 +449,9 @@ class TicTacToeGameState extends State<TicTacToeGame>
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     _buildGameTitle(titleFontSize * 0.8),
-                    SizedBox(height: cellSize * 0.15),
+                    SizedBox(height: cellSize * 0.1),
+                    _buildGameModeSelector(),
+                    SizedBox(height: cellSize * 0.1),
                     _buildScoreBoard(scoreFontSize, scoreValueFontSize),
                     SizedBox(height: cellSize * 0.15),
                     _buildGameStatus(statusFontSize),
@@ -355,11 +513,15 @@ class TicTacToeGameState extends State<TicTacToeGame>
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildScoreColumn(
-                    'Player X', xScore, Colors.red, textSize, valueSize),
+                    gameMode == GameMode.vsAI ? 'You' : 'Player X',
+                    xScore,
+                    Colors.red,
+                    textSize,
+                    valueSize),
                 _buildScoreColumn(
                     'Draws', drawScore, Colors.grey, textSize, valueSize),
-                _buildScoreColumn(
-                    'Player O', oScore, Colors.blue, textSize, valueSize),
+                _buildScoreColumn(gameMode == GameMode.vsAI ? 'AI' : 'Player O',
+                    oScore, Colors.blue, textSize, valueSize),
               ],
             ),
           ),
@@ -442,6 +604,65 @@ class TicTacToeGameState extends State<TicTacToeGame>
           borderRadius: BorderRadius.circular(30),
         ),
         elevation: 10,
+      ),
+    );
+  }
+
+  Widget _buildGameModeSelector() {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(25),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildModeButton(
+            'VS Player',
+            GameMode.twoPlayer,
+            Icons.people,
+          ),
+          const SizedBox(width: 4),
+          _buildModeButton(
+            'VS AI',
+            GameMode.vsAI,
+            Icons.smart_toy,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildModeButton(String label, GameMode mode, IconData icon) {
+    final isSelected = gameMode == mode;
+    return GestureDetector(
+      onTap: () => changeGameMode(mode),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        decoration: BoxDecoration(
+          color: isSelected ? Colors.blue : Colors.transparent,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              color: isSelected ? Colors.white : Colors.black54,
+              size: 20,
+            ),
+            const SizedBox(width: 6),
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.black54,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
