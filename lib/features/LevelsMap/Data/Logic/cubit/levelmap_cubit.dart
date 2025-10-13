@@ -70,7 +70,7 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 160,
           positionY: 170),
 
-      // Stage 3: Puzzle Level 1
+      // Stage 3: Color Memory Level 1
       Level(
           id: 3,
           phase: 1,
@@ -78,7 +78,7 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 100,
           positionY: 300),
 
-      // Stage 4: Math Game Level 1
+      // Stage 4: Puzzle Level 1
       Level(
           id: 4,
           phase: 1,
@@ -86,23 +86,23 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 110,
           positionY: 400),
 
-      // Stage 5: Animal Quiz Level 2
+      // Stage 5: Math Game Level 1
       Level(
           id: 5,
-          phase: 2,
+          phase: 1,
           isLocked: highestUnlockedLevelId < 5,
           positionX: 160,
           positionY: 530),
 
-      // Stage 6: Memory Game Level 2
+      // Stage 6: Crossword Level 1
       Level(
           id: 6,
-          phase: 2,
+          phase: 1,
           isLocked: highestUnlockedLevelId < 6,
           positionX: 150,
           positionY: 650),
 
-      // Stage 7: Puzzle Level 2
+      // Stage 7: Animal Quiz Level 2
       Level(
           id: 7,
           phase: 2,
@@ -110,7 +110,7 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 130,
           positionY: 800),
 
-      // Stage 8: Math Game Level 2
+      // Stage 8: Memory Game Level 2
       Level(
           id: 8,
           phase: 2,
@@ -118,37 +118,85 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 160,
           positionY: 900),
 
-      // Stage 9: Animal Quiz Level 3
+      // Stage 9: Color Memory Level 2
       Level(
           id: 9,
-          phase: 3,
+          phase: 2,
           isLocked: highestUnlockedLevelId < 9,
           positionX: 160,
           positionY: 1000),
 
-      // Stage 10: Memory Game Level 3
+      // Stage 10: Puzzle Level 2
       Level(
           id: 10,
-          phase: 3,
+          phase: 2,
           isLocked: highestUnlockedLevelId < 10,
           positionX: 160,
           positionY: 1100),
 
-      // Stage 11: Puzzle Level 3
+      // Stage 11: Math Game Level 2
       Level(
           id: 11,
-          phase: 3,
+          phase: 2,
           isLocked: highestUnlockedLevelId < 11,
           positionX: 110,
           positionY: 1200),
 
-      // Stage 12: Math Game Level 3
+      // Stage 12: Crossword Level 2
       Level(
           id: 12,
-          phase: 3,
+          phase: 2,
           isLocked: highestUnlockedLevelId < 12,
+          positionX: 150,
+          positionY: 1330),
+
+      // Stage 13: Animal Quiz Level 3
+      Level(
+          id: 13,
+          phase: 3,
+          isLocked: highestUnlockedLevelId < 13,
           positionX: 180,
-          positionY: 1300),
+          positionY: 1470),
+
+      // Stage 14: Memory Game Level 3
+      Level(
+          id: 14,
+          phase: 3,
+          isLocked: highestUnlockedLevelId < 14,
+          positionX: 130,
+          positionY: 1600),
+
+      // Stage 15: Color Memory Level 3
+      Level(
+          id: 15,
+          phase: 3,
+          isLocked: highestUnlockedLevelId < 15,
+          positionX: 160,
+          positionY: 1720),
+
+      // Stage 16: Puzzle Level 3
+      Level(
+          id: 16,
+          phase: 3,
+          isLocked: highestUnlockedLevelId < 16,
+          positionX: 120,
+          positionY: 1840),
+
+      // Stage 17: Math Game Level 3
+      Level(
+          id: 17,
+          phase: 3,
+          isLocked: highestUnlockedLevelId < 17,
+          positionX: 150,
+          positionY: 1960),
+
+      // Stage 18: Crossword Level 3 (Final Stage)
+      Level(
+          id: 18,
+          phase: 3,
+          isLocked: highestUnlockedLevelId < 18,
+          positionX: 180,
+          positionY: 2080),
     ];
 
     emit(LevelMapState(

@@ -4,6 +4,7 @@ import 'package:kidzoo/core/helpers/media_query.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
@@ -81,6 +82,12 @@ class OptionsGrid extends StatelessWidget {
           child: const Game2048Home(),
         ),
         flipImage: ImageManager.numbers,
+      ),
+      OptionItem(
+        icon: ImageManager.shapes,
+        title: 'Dots & Boxes',
+        screen: const DotsAndBoxesScreen(),
+        flipImage: ImageManager.flipShapes,
       ),
     ];
   }

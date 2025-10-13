@@ -28,7 +28,7 @@ class LevelMapScreen extends StatelessWidget {
   const LevelMapScreen({super.key});
   // Define the height of the background image (adjust based on actual image height)
   final double backgroundHeight =
-      2000; // Example height in pixels (adjust as needed)
+      2300; // Increased height to accommodate all 18 stages
 
   @override
   Widget build(BuildContext context) {
@@ -108,6 +108,12 @@ class LevelMapScreen extends StatelessWidget {
                           case GameType.mathGame:
                             buttonColor = Colors.orange;
                             break;
+                          case GameType.crossword:
+                            buttonColor = Colors.brown;
+                            break;
+                          case GameType.dotsAndBoxes:
+                            buttonColor = Colors.teal;
+                            break;
                         }
 
                         return Positioned(
@@ -167,6 +173,7 @@ class LevelMapScreen extends StatelessWidget {
                             _buildLegendItem(Colors.purple, 'Color Memory'),
                             _buildLegendItem(Colors.green, 'Puzzle'),
                             _buildLegendItem(Colors.orange, 'Math Game'),
+                            _buildLegendItem(Colors.brown, 'Crossword'),
                           ],
                         ),
                       ),
@@ -214,7 +221,7 @@ class LevelMapScreen extends StatelessWidget {
     final levelCubit = context.read<LevelCubit>();
 
     // Show a dialog with game information
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         title: Text('Level ${level.id}: ${gameSequenceItem.name}'),
@@ -241,7 +248,8 @@ class LevelMapScreen extends StatelessWidget {
               Navigator.pop(dialogContext); // Close dialog
 
               navigationService
-                  .navigateToGameScreen(context, gameSequenceItem.gameScreen,
+                  .navigateToGameScreen<bool>(
+                      context, gameSequenceItem.gameScreen,
                       stageNumber: level.id)
                   .then((result) {
                 // Check if the game was completed (result == true)

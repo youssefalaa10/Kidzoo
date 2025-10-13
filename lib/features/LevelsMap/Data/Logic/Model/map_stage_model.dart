@@ -32,11 +32,11 @@ class MapStage {
 /// Utility class to manage the fixed stage mapping
 class StageMapping {
   /// Get all stages with their fixed game types and levels
-  /// Level progression: Animal Quiz -> Memory (Cards) -> Color Memory -> Puzzle -> Math Game
-  /// Then repeat with level 2, level 3, and level 4
+  /// Level progression: Animal Quiz -> Memory (Cards) -> Color Memory -> Puzzle -> Math Game -> Crossword
+  /// Then repeat with level 2 and level 3
   static List<MapStage> getAllStages() {
     return [
-      // Level 1 Cycle (Stages 1-5)
+      // Level 1 Cycle (Stages 1-6)
       MapStage(
           stageNumber: 1,
           gameType: GameType.animalQuiz,
@@ -46,27 +46,23 @@ class StageMapping {
       MapStage(stageNumber: 3, gameType: GameType.colorMemoryGame, level: 1),
       MapStage(stageNumber: 4, gameType: GameType.puzzle, level: 1),
       MapStage(stageNumber: 5, gameType: GameType.mathGame, level: 1),
+      MapStage(stageNumber: 6, gameType: GameType.crossword, level: 1),
 
-      // Level 2 Cycle (Stages 6-10)
-      MapStage(stageNumber: 6, gameType: GameType.animalQuiz, level: 2),
-      MapStage(stageNumber: 7, gameType: GameType.memoryGame, level: 2),
-      MapStage(stageNumber: 8, gameType: GameType.colorMemoryGame, level: 2),
-      MapStage(stageNumber: 9, gameType: GameType.puzzle, level: 2),
-      MapStage(stageNumber: 10, gameType: GameType.mathGame, level: 2),
+      // Level 2 Cycle (Stages 7-12)
+      MapStage(stageNumber: 7, gameType: GameType.animalQuiz, level: 2),
+      MapStage(stageNumber: 8, gameType: GameType.memoryGame, level: 2),
+      MapStage(stageNumber: 9, gameType: GameType.colorMemoryGame, level: 2),
+      MapStage(stageNumber: 10, gameType: GameType.puzzle, level: 2),
+      MapStage(stageNumber: 11, gameType: GameType.mathGame, level: 2),
+      MapStage(stageNumber: 12, gameType: GameType.crossword, level: 2),
 
-      // Level 3 Cycle (Stages 11-15)
-      MapStage(stageNumber: 11, gameType: GameType.animalQuiz, level: 3),
-      MapStage(stageNumber: 12, gameType: GameType.memoryGame, level: 3),
-      MapStage(stageNumber: 13, gameType: GameType.colorMemoryGame, level: 3),
-      MapStage(stageNumber: 14, gameType: GameType.puzzle, level: 3),
-      MapStage(stageNumber: 15, gameType: GameType.mathGame, level: 3),
-
-      // Level 4 Cycle (Stages 16-20)
-      MapStage(stageNumber: 16, gameType: GameType.animalQuiz, level: 4),
-      MapStage(stageNumber: 17, gameType: GameType.memoryGame, level: 4),
-      MapStage(stageNumber: 18, gameType: GameType.colorMemoryGame, level: 4),
-      MapStage(stageNumber: 19, gameType: GameType.puzzle, level: 4),
-      MapStage(stageNumber: 20, gameType: GameType.mathGame, level: 4),
+      // Level 3 Cycle (Stages 13-18)
+      MapStage(stageNumber: 13, gameType: GameType.animalQuiz, level: 3),
+      MapStage(stageNumber: 14, gameType: GameType.memoryGame, level: 3),
+      MapStage(stageNumber: 15, gameType: GameType.colorMemoryGame, level: 3),
+      MapStage(stageNumber: 16, gameType: GameType.puzzle, level: 3),
+      MapStage(stageNumber: 17, gameType: GameType.mathGame, level: 3),
+      MapStage(stageNumber: 18, gameType: GameType.crossword, level: 3),
     ];
   }
 

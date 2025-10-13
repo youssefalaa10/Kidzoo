@@ -138,3 +138,4 @@ class UpdateBestScoreEvent extends ColorMemoryEvent {
   List<Object?> get props => [score];
 }
 
+

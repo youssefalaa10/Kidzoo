@@ -173,3 +173,4 @@ dependencies:
 - لإضافة تأثيرات جزيئات: استخدم مكتبة `particles_flutter`
 - لإضافة مشاركة: استخدم مكتبة `share_plus`
 
+

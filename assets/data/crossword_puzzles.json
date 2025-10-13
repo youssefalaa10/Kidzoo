@@ -1,0 +1,233 @@
+[
+  {
+    "id": "puzzle_001",
+    "title": "حيوانات أليفة",
+    "rows": 4,
+    "cols": 4,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "حيوان أليف يموء 🐱", "answer": "قطة" },
+      { "num": 3, "row": 2, "col": 0, "length": 3, "clue_ar": "حيوان مخلص ينبح 🐕", "answer": "كلب" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "كبير الحجم", "answer": "قوم" },
+      { "num": 2, "row": 0, "col": 2, "length": 3, "clue_ar": "جزء من الجسم", "answer": "ةبب" }
+    ],
+    "solution": {
+      "grid": [
+        ["ق", "ط", "ة", "ـ"],
+        ["و", "ـ", "ب", "ـ"],
+        ["م", "ـ", "ب", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "easy",
+    "tags": ["حيوانات", "مبتدئ"]
+  },
+  {
+    "id": "puzzle_002",
+    "title": "الفواكه",
+    "rows": 4,
+    "cols": 4,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "فاكهة صفراء 🍌", "answer": "موز" },
+      { "num": 3, "row": 2, "col": 0, "length": 4, "clue_ar": "فاكهة خضراء 🍇", "answer": "عنب" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "شيء", "answer": "موع" },
+      { "num": 2, "row": 0, "col": 2, "length": 3, "clue_ar": "حرف", "answer": "زنب" }
+    ],
+    "solution": {
+      "grid": [
+        ["م", "و", "ز", "ـ"],
+        ["و", "ـ", "ن", "ـ"],
+        ["ع", "ن", "ب", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "easy",
+    "tags": ["فواكه", "طعام"]
+  },
+  {
+    "id": "puzzle_003",
+    "title": "الألوان",
+    "rows": 4,
+    "cols": 4,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 4, "clue_ar": "لون السماء 🔵", "answer": "أزرق" },
+      { "num": 3, "row": 2, "col": 0, "length": 4, "clue_ar": "لون الشمس ☀️", "answer": "أصفر" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "حرف", "answer": "أأأ" },
+      { "num": 2, "row": 0, "col": 2, "length": 3, "clue_ar": "شيء", "answer": "رصف" }
+    ],
+    "solution": {
+      "grid": [
+        ["أ", "ز", "ر", "ق"],
+        ["أ", "ـ", "ص", "ـ"],
+        ["أ", "ص", "ف", "ر"],
+        ["ـ", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "easy",
+    "tags": ["ألوان", "سهل"]
+  },
+  {
+    "id": "puzzle_004",
+    "title": "العائلة",
+    "rows": 5,
+    "cols": 5,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 2, "clue_ar": "والد 👨", "answer": "أب" },
+      { "num": 2, "row": 1, "col": 0, "length": 2, "clue_ar": "والدة 👩", "answer": "أم" },
+      { "num": 4, "row": 3, "col": 0, "length": 3, "clue_ar": "ولد صغير 👦", "answer": "ابن" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "عائلة", "answer": "أأا" },
+      { "num": 3, "row": 0, "col": 1, "length": 4, "clue_ar": "شيء", "answer": "بمبن" }
+    ],
+    "solution": {
+      "grid": [
+        ["أ", "ب", "ـ", "ـ", "ـ"],
+        ["أ", "م", "ـ", "ـ", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ", "ـ"],
+        ["ا", "ب", "ن", "ـ", "ـ"],
+        ["ـ", "ن", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "medium",
+    "tags": ["عائلة", "أسرة"]
+  },
+  {
+    "id": "puzzle_005",
+    "title": "المدرسة",
+    "rows": 5,
+    "cols": 5,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "أداة الكتابة ✏️", "answer": "قلم" },
+      { "num": 3, "row": 2, "col": 0, "length": 4, "clue_ar": "نقرأ منه 📖", "answer": "كتاب" },
+      { "num": 5, "row": 4, "col": 0, "length": 3, "clue_ar": "مكان الجلوس", "answer": "كرسي" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "شيء", "answer": "قكك" },
+      { "num": 2, "row": 0, "col": 2, "length": 5, "clue_ar": "شيء", "answer": "متابر" }
+    ],
+    "solution": {
+      "grid": [
+        ["ق", "ل", "م", "ـ", "ـ"],
+        ["ك", "ـ", "ت", "ـ", "ـ"],
+        ["ك", "ت", "ا", "ب", "ـ"],
+        ["ـ", "ـ", "ب", "ـ", "ـ"],
+        ["ك", "ر", "س", "ي", "ـ"]
+      ]
+    },
+    "difficulty": "medium",
+    "tags": ["تعليم", "مدرسة"]
+  },
+  {
+    "id": "puzzle_006",
+    "title": "الطبيعة",
+    "rows": 5,
+    "cols": 5,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 4, "clue_ar": "نبات أخضر 🌳", "answer": "شجرة" },
+      { "num": 3, "row": 2, "col": 0, "length": 3, "clue_ar": "نور من السماء ☀️", "answer": "شمس" },
+      { "num": 5, "row": 4, "col": 0, "length": 3, "clue_ar": "ماء من السماء ☔", "answer": "مطر" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "شيء", "answer": "ششم" },
+      { "num": 2, "row": 0, "col": 2, "length": 5, "clue_ar": "شيء", "answer": "رمسط" }
+    ],
+    "solution": {
+      "grid": [
+        ["ش", "ج", "ر", "ة", "ـ"],
+        ["ش", "ـ", "م", "ـ", "ـ"],
+        ["ش", "م", "س", "ـ", "ـ"],
+        ["ـ", "ـ", "ط", "ـ", "ـ"],
+        ["م", "ط", "ر", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "medium",
+    "tags": ["طبيعة", "بيئة"]
+  },
+  {
+    "id": "puzzle_007",
+    "title": "الحيوانات",
+    "rows": 6,
+    "cols": 6,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "ملك الغابة 🦁", "answer": "أسد" },
+      { "num": 3, "row": 2, "col": 0, "length": 3, "clue_ar": "حيوان طويل 🦒", "answer": "زرافة" },
+      { "num": 5, "row": 4, "col": 0, "length": 3, "clue_ar": "حيوان كبير 🐘", "answer": "فيل" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "حيوان", "answer": "أزف" },
+      { "num": 2, "row": 0, "col": 2, "length": 4, "clue_ar": "شيء", "answer": "دايل" }
+    ],
+    "solution": {
+      "grid": [
+        ["أ", "س", "د", "ـ", "ـ", "ـ"],
+        ["ز", "ـ", "ا", "ـ", "ـ", "ـ"],
+        ["ز", "ر", "ا", "ف", "ة", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ", "ـ", "ـ"],
+        ["ف", "ي", "ل", "ـ", "ـ", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "hard",
+    "tags": ["حيوانات", "غابة"]
+  },
+  {
+    "id": "puzzle_008",
+    "title": "الأرقام",
+    "rows": 6,
+    "cols": 6,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 4, "clue_ar": "1️⃣ الرقم الأول", "answer": "واحد" },
+      { "num": 3, "row": 2, "col": 0, "length": 5, "clue_ar": "5️⃣ خمسة", "answer": "خمسة" },
+      { "num": 5, "row": 4, "col": 0, "length": 4, "clue_ar": "🔟 عشرة", "answer": "عشرة" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "رقم", "answer": "وخع" },
+      { "num": 2, "row": 0, "col": 2, "length": 5, "clue_ar": "عدد", "answer": "حمشر" }
+    ],
+    "solution": {
+      "grid": [
+        ["و", "ا", "ح", "د", "ـ", "ـ"],
+        ["خ", "ـ", "م", "ـ", "ـ", "ـ"],
+        ["خ", "م", "س", "ة", "ـ", "ـ"],
+        ["ـ", "ـ", "ش", "ـ", "ـ", "ـ"],
+        ["ع", "ش", "ر", "ة", "ـ", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "hard",
+    "tags": ["أرقام", "رياضيات"]
+  },
+  {
+    "id": "puzzle_009",
+    "title": "الجسم",
+    "rows": 6,
+    "cols": 6,
+    "across": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "نرى بها 👁️", "answer": "عين" },
+      { "num": 3, "row": 2, "col": 0, "length": 2, "clue_ar": "نمسك بها ✋", "answer": "يد" },
+      { "num": 4, "row": 3, "col": 0, "length": 3, "clue_ar": "نسمع بها 👂", "answer": "أذن" }
+    ],
+    "down": [
+      { "num": 1, "row": 0, "col": 0, "length": 3, "clue_ar": "جزء", "answer": "عيأ" },
+      { "num": 2, "row": 0, "col": 2, "length": 4, "clue_ar": "عضو", "answer": "ندذ" }
+    ],
+    "solution": {
+      "grid": [
+        ["ع", "ي", "ن", "ـ", "ـ", "ـ"],
+        ["ي", "ـ", "د", "ـ", "ـ", "ـ"],
+        ["ي", "د", "ـ", "ـ", "ـ", "ـ"],
+        ["أ", "ذ", "ن", "ـ", "ـ", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ", "ـ", "ـ"],
+        ["ـ", "ـ", "ـ", "ـ", "ـ", "ـ"]
+      ]
+    },
+    "difficulty": "hard",
+    "tags": ["جسم", "صحة"]
+  }
+]

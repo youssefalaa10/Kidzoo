@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
+
 import '../../../core/base/protected_game_screen.dart';
 
 enum GameLevel {
@@ -60,7 +62,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
 
   // Timer variables
   late Stopwatch _stopwatch;
-  late Timer _timer;
+  Timer? _timer;
   String _timeElapsed = '00:00';
 
   // Animation controllers
@@ -96,7 +98,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
 
   @override
   void dispose() {
-    _timer.cancel();
+    _timer?.cancel();
     _gameCompletedController.dispose();
     super.dispose();
   }
@@ -157,9 +159,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     _gameCompleted = false;
     _timeElapsed = '00:00';
 
-    if (_gameStarted) {
-      _timer.cancel();
-    }
+    _timer?.cancel();
     _stopwatch = Stopwatch();
   }
 
@@ -220,7 +220,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
           if (_pairs == _totalPairs) {
             _gameCompleted = true;
             _stopwatch.stop();
-            _timer.cancel();
+            _timer?.cancel();
             _gameCompletedController.forward();
           }
         });
@@ -244,9 +244,8 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
       _stopwatch.reset();
       if (_gameCompleted) {
         _gameCompletedController.reset();
-      } else if (_gameStarted) {
-        _timer.cancel();
       }
+      _timer?.cancel();
       _initGame(_currentLevel);
     });
   }
@@ -256,9 +255,8 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
       _stopwatch.reset();
       if (_gameCompleted) {
         _gameCompletedController.reset();
-      } else if (_gameStarted) {
-        _timer.cancel();
       }
+      _timer?.cancel();
       _initGame(level);
     });
   }
@@ -473,26 +471,6 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildLevelButton(String label, GameLevel level) {
-    final bool isSelected = _currentLevel == level;
-
-    return ElevatedButton(
-      onPressed: () => _changeLevel(level),
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isSelected ? Colors.blue[400] : Colors.white,
-        foregroundColor: isSelected ? Colors.white : Colors.blue[400],
-        elevation: isSelected ? 4 : 2,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(30),
-          side: BorderSide(
-            color: Colors.blue[400]!,
-          ),
-        ),
-      ),
-      child: Text(label),
     );
   }
 
