@@ -5,6 +5,8 @@ import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
+import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
+import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzoo/features/MissingLetterGame/Ui/missing_letter_screen.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/number_screen.dart';
@@ -70,6 +72,15 @@ class OptionsGrid extends StatelessWidget {
         title: 'Missing Letter',
         screen: const MissingLetterScreen(),
         flipImage: ImageManager.flipQuiz,
+      ),
+      OptionItem(
+        icon: ImageManager.math,
+        title: '2048 Game',
+        screen: BlocProvider(
+          create: (context) => GameCubit(),
+          child: const Game2048Home(),
+        ),
+        flipImage: ImageManager.numbers,
       ),
     ];
   }
