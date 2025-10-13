@@ -1,0 +1,316 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_fonts/google_fonts.dart';
+import '../Data/Logic/cubit/missing_letter_cubit.dart';
+import '../Data/game_storage.dart';
+import 'missing_letter_screen.dart';
+
+class MissingLetterHome extends StatefulWidget {
+  const MissingLetterHome({super.key});
+
+  @override
+  State<MissingLetterHome> createState() => _MissingLetterHomeState();
+}
+
+class _MissingLetterHomeState extends State<MissingLetterHome> {
+  final MissingLetterStorage _storage = MissingLetterStorage();
+  bool _hasProgress = false;
+  int _currentIndex = 0;
+  int _currentScore = 0;
+  int _bestScore = 0;
+  int _completedWords = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    final hasProgress = await _storage.hasProgress();
+    final currentIndex = await _storage.getCurrentIndex();
+    final currentScore = await _storage.getTotalScore();
+    final bestScore = await _storage.getBestScore();
+    final completedWords = await _storage.getCompletedCount();
+
+    setState(() {
+      _hasProgress = hasProgress;
+      _currentIndex = currentIndex;
+      _currentScore = currentScore;
+      _bestScore = bestScore;
+      _completedWords = completedWords;
+    });
+  }
+
+  void _startNewGame() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => BlocProvider(
+          create: (context) => MissingLetterCubit(),
+          child: const MissingLetterScreen(),
+        ),
+      ),
+    );
+  }
+
+  void _continueGame() {
+    Navigator.push(
+      context,
+      MaterialPageRoute<void>(
+        builder: (context) => BlocProvider(
+          create: (context) => MissingLetterCubit(
+            initialIndex: _currentIndex,
+            initialScore: _currentScore,
+          )..loadProgress(),
+          child: const MissingLetterScreen(),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF9C27B0),
+              Color(0xFF3F51B5),
+              Color(0xFF2196F3),
+              Color(0xFF00BCD4),
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                // Back button
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: const Icon(Icons.arrow_back_ios_new,
+                          color: Colors.white),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+                // Title
+                Center(
+                  child: Text(
+                    'Missing Letter',
+                    style: GoogleFonts.daiBannaSil(
+                      fontSize: 42,
+                      color: Colors.white,
+                      shadows: [
+                        const Shadow(
+                          color: Colors.black26,
+                          offset: Offset(2, 2),
+                          blurRadius: 4,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 10),
+                Center(
+                  child: Text(
+                    'Learn the Alphabet!',
+                    style: GoogleFonts.nunito(
+                      fontSize: 18,
+                      color: Colors.white.withValues(alpha: 0.9),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+                // Stats Container
+                Container(
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.1),
+                        blurRadius: 20,
+                        offset: const Offset(0, 10),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Text(
+                        'Your Progress',
+                        style: GoogleFonts.nunito(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF6C63FF),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          _buildStatItem(
+                            icon: Icons.emoji_events,
+                            label: 'Best Score',
+                            value: '$_bestScore',
+                            color: Colors.amber,
+                          ),
+                          Container(
+                            width: 1,
+                            height: 50,
+                            color: Colors.grey.shade300,
+                          ),
+                          _buildStatItem(
+                            icon: Icons.check_circle,
+                            label: 'Completed',
+                            value: '$_completedWords/25',
+                            color: Colors.green,
+                          ),
+                        ],
+                      ),
+                      if (_hasProgress) ...[
+                        const SizedBox(height: 20),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.blue.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                'Current Score:',
+                                style: GoogleFonts.nunito(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              Text(
+                                '$_currentScore',
+                                style: GoogleFonts.nunito(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.blue.shade700,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                const Spacer(),
+                // Action Buttons
+                if (_hasProgress)
+                  _buildButton(
+                    label: 'Continue',
+                    icon: Icons.play_arrow_rounded,
+                    colors: const [Color(0xFF4CAF50), Color(0xFF8BC34A)],
+                    onPressed: _continueGame,
+                  ),
+                if (_hasProgress) const SizedBox(height: 16),
+                _buildButton(
+                  label: 'New Game',
+                  icon: Icons.refresh_rounded,
+                  colors: const [Color(0xFFFF9800), Color(0xFFFF5722)],
+                  onPressed: _startNewGame,
+                ),
+                const SizedBox(height: 40),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStatItem({
+    required IconData icon,
+    required String label,
+    required String value,
+    required Color color,
+  }) {
+    return Column(
+      children: [
+        Icon(icon, color: color, size: 36),
+        const SizedBox(height: 8),
+        Text(
+          value,
+          style: GoogleFonts.nunito(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+            color: Colors.black87,
+          ),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: GoogleFonts.nunito(
+            fontSize: 14,
+            color: Colors.grey.shade600,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildButton({
+    required String label,
+    required IconData icon,
+    required List<Color> colors,
+    required VoidCallback onPressed,
+  }) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 20),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: colors,
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: [
+            BoxShadow(
+              color: colors[0].withValues(alpha: 0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              color: Colors.white,
+              size: 32,
+            ),
+            const SizedBox(width: 12),
+            Text(
+              label,
+              style: GoogleFonts.nunito(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
