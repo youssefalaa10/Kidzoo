@@ -87,7 +87,7 @@ class HeaderSection extends StatelessWidget {
           width: mq.width(20),
           height: mq.height(0.8),
           decoration: BoxDecoration(
-            color: textColor.withOpacity(0.7),
+            color: textColor.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(mq.width(1)),
           ),
         ),

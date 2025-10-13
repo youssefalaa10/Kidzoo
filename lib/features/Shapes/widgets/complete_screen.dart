@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/AppCategory/education_screen.dart';
 import 'package:kidzoo/features/Shapes/widgets/custom_button.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
 
 class CompleteScreen extends StatelessWidget {
+  const CompleteScreen({required this.onPressedGameOVer, super.key});
   final Function() onPressedGameOVer;
-
-  const CompleteScreen({super.key, required this.onPressedGameOVer});
 
   @override
   Widget build(BuildContext context) {
@@ -38,7 +37,7 @@ class CompleteScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.push(context,
                         MaterialPageRoute(builder: (context) {
-                      return  EducationScreen();
+                      return const EducationScreen();
                     }));
                   },
                   color: Colors.red,

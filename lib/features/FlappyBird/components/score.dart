@@ -6,9 +6,9 @@ import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
 class ScoreText extends TextComponent with HasGameRef<FlappyBirdGame> {
   ScoreText()
       : super(
-            text: "0",
-            textRenderer:
-                TextPaint(style: TextStyle(fontSize: 40, color: Colors.white)));
+            text: '0',
+            textRenderer: TextPaint(
+                style: const TextStyle(fontSize: 40, color: Colors.white)));
 
   @override
   FutureOr<void> onLoad() {

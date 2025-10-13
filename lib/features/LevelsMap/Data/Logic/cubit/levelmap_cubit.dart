@@ -176,22 +176,12 @@ class LevelCubit extends Cubit<LevelMapState> {
   Future<void> completeCurrentLevel() async {
     final nextLevelId = GameSequence.getNextStageNumber(state.currentLevelId);
 
-    print(
-        'DEBUG: Completing level ${state.currentLevelId}, next level is $nextLevelId');
-    print(
-        'DEBUG: Current highest unlocked level: ${state.highestUnlockedLevelId}');
-
     // Unlock the next level if it exists
     if (nextLevelId <= GameSequence.getTotalStages()) {
-      print('DEBUG: Unlocking level $nextLevelId');
       await unlockLevel(nextLevelId);
 
       // Set the current level to the next level
       await setCurrentLevel(nextLevelId);
-
-      print('DEBUG: Level $nextLevelId unlocked and set as current');
-      print(
-          'DEBUG: New highest unlocked level: ${state.highestUnlockedLevelId}');
     } else {
       print('DEBUG: No more levels to unlock');
     }
@@ -229,13 +219,8 @@ class LevelCubit extends Cubit<LevelMapState> {
 
   // Unlock a specific level
   Future<void> unlockLevel(int levelId) async {
-    print('DEBUG: Unlocking level $levelId');
-    print(
-        'DEBUG: Before unlock - highest unlocked: ${state.highestUnlockedLevelId}');
-
     final updatedLevels = state.levels.map((level) {
       if (level.id == levelId) {
-        print('DEBUG: Setting level $levelId to unlocked');
         return level.copyWith(isLocked: false);
       }
       return level;
@@ -245,8 +230,7 @@ class LevelCubit extends Cubit<LevelMapState> {
     int highestUnlockedLevelId = state.highestUnlockedLevelId;
     if (levelId > highestUnlockedLevelId) {
       highestUnlockedLevelId = levelId;
-      print(
-          'DEBUG: Updating highest unlocked level to $highestUnlockedLevelId');
+
       // Save progress to SharedPreferences
       final prefs = await SharedPreferences.getInstance();
       await prefs.setInt(_prefKeyHighestLevel, highestUnlockedLevelId);
@@ -257,13 +241,8 @@ class LevelCubit extends Cubit<LevelMapState> {
       highestUnlockedLevelId: highestUnlockedLevelId,
     ));
 
-    print('DEBUG: State updated with unlocked level $levelId');
-    print(
-        'DEBUG: After unlock - highest unlocked: ${state.highestUnlockedLevelId}');
-
     // Verify the level is actually unlocked
     final unlockedLevel =
         updatedLevels.firstWhere((level) => level.id == levelId);
-    print('DEBUG: Level $levelId isLocked: ${unlockedLevel.isLocked}');
   }
 }

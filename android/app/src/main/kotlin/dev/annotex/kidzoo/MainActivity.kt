@@ -1,4 +1,4 @@
-package com.example.kidzoo
+package dev.annotex.kidzoo
 
 import io.flutter.embedding.android.FlutterActivity
 

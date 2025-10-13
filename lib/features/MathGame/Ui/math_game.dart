@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import '../../../core/base/protected_game_screen.dart';
 import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
-import '../../../core/base/protected_game_screen.dart';
 
 class MathGame extends ProtectedGameScreen {
-  const MathGame({super.key, required super.level});
+  const MathGame({required super.level, super.key});
 
   @override
   _MathGameState createState() => _MathGameState();
@@ -338,7 +338,6 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                       child: ConfettiWidget(
                         confettiController: _confettiController,
                         blastDirectionality: BlastDirectionality.explosive,
-                        shouldLoop: false,
                         colors: const [
                           Colors.red,
                           Colors.blue,
@@ -348,8 +347,6 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                           Colors.orange,
                         ],
                         numberOfParticles: 50,
-                        maxBlastForce: 20,
-                        minBlastForce: 5,
                       ),
                     ),
                   ],
@@ -365,17 +362,16 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
 
 // Custom Widget for Funny Animated Option Buttons
 class _FunnyOptionButton extends StatefulWidget {
-  final int option;
-  final int index;
-  final bool isCorrect;
-  final VoidCallback onPressed;
-
   const _FunnyOptionButton({
     required this.option,
     required this.index,
     required this.isCorrect,
     required this.onPressed,
   });
+  final int option;
+  final int index;
+  final bool isCorrect;
+  final VoidCallback onPressed;
 
   @override
   __FunnyOptionButtonState createState() => __FunnyOptionButtonState();

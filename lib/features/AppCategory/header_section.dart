@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import '../../core/helpers/media_query.dart';
 
 class HeaderSection extends StatelessWidget {
-  final CustomMQ mq;
-  final String title;
-  final Color textColor;
-
   const HeaderSection({
-    super.key, 
     required this.mq,
+    super.key,
     this.title = 'Welcome to KidZoo!',
     this.textColor = const Color(0xFF6A1B9A), // Purple by default
   });
+  final CustomMQ mq;
+  final String title;
+  final Color textColor;
 
   @override
   Widget build(BuildContext context) {
