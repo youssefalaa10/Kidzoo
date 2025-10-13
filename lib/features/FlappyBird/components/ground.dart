@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 
 import '../flappy_bird_game.dart';
 
@@ -21,10 +22,13 @@ class Ground extends SpriteComponent
 
   @override
   void update(double dt) {
-    position.x -= 100 * dt;
+    // Only move ground when game is playing
+    if (gameRef.gameState == GameState.playing) {
+      position.x -= groundSpeed * dt;
 
-    if (position.x + size.x / 2 <= 0) {
-      position.x = 0;
+      if (position.x + size.x / 2 <= 0) {
+        position.x = 0;
+      }
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
@@ -12,7 +13,10 @@ import 'components/ground.dart';
 import 'components/pipe.dart';
 import 'components/score.dart';
 
-class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
+enum GameState { waiting, playing, gameOver }
+
+class FlappyBirdGame extends FlameGame
+    with TapCallbacks, HasCollisionDetection {
   /* 
   Basic Game Componenets:
   -bird
@@ -28,6 +32,9 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
   late Ground ground;
   late PipeManager pipeManager;
   late ScoreText scoreText;
+  late TextComponent startText;
+
+  GameState gameState = GameState.waiting;
 
   @override
   FutureOr<void> onLoad() {
@@ -41,11 +48,40 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
     add(pipeManager);
     scoreText = ScoreText();
     add(scoreText);
+
+    // Add start instruction text
+    startText = TextComponent(
+      text: 'Tap to Start!',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 48,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              offset: Offset(2, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+      ),
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2 - 100),
+    );
+    add(startText);
   }
 
   @override
-  void onTap() {
-    bird.flap();
+  void onTapDown(TapDownEvent event) {
+    if (gameState == GameState.waiting) {
+      // Start the game on first tap
+      gameState = GameState.playing;
+      startText.removeFromParent();
+      bird.flap();
+    } else if (gameState == GameState.playing) {
+      // Flap during gameplay
+      bird.flap();
+    }
   }
 
   /*
@@ -65,10 +101,9 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
   Game Over  
   */
 
-  bool isGameOver = false;
   void gameOver() {
-    if (isGameOver) return;
-    isGameOver = true;
+    if (gameState == GameState.gameOver) return;
+    gameState = GameState.gameOver;
     pauseEngine();
 
     //show Dialog Box to restart
@@ -77,17 +112,63 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
         barrierDismissible: false,
         context: buildContext!,
         builder: (context) => AlertDialog(
-              title: const Text('Game Over'),
-              content: Text('Score: $score'),
+              backgroundColor: Colors.orange.shade100,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: const Text(
+                'Game Over!',
+                style: TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepOrange,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Icon(
+                    Icons.emoji_events,
+                    size: 60,
+                    color: Colors.amber,
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Score: $score',
+                    style: const TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.black87,
+                    ),
+                  ),
+                ],
+              ),
               actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    resetGame();
-                  },
-                  child: const Text(
-                    'Restart',
-                    style: TextStyle(color: Colors.blue),
+                Center(
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      resetGame();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 40,
+                        vertical: 15,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(25),
+                      ),
+                    ),
+                    child: const Text(
+                      'Play Again',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -95,12 +176,34 @@ class FlappyBirdGame extends FlameGame with TapDetector, HasCollisionDetection {
   }
 
   void resetGame() {
-    bird.position = Vector2(birdStartX, birdStartY);
+    bird.position = Vector2(birdStartX, size.y / 2);
     bird.velocity = 0;
     resetScore();
-    isGameOver = false;
+    gameState = GameState.waiting;
     //
     children.whereType<Pipe>().forEach((pipe) => pipe.removeFromParent());
+
+    // Re-add start text
+    startText = TextComponent(
+      text: 'Tap to Start!',
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 48,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              offset: Offset(2, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+      ),
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2 - 100),
+    );
+    add(startText);
+
     resumeEngine();
   }
 }

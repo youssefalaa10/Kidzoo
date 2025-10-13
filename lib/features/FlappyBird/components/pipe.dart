@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
 
 class Pipe extends SpriteComponent
@@ -20,20 +21,23 @@ class Pipe extends SpriteComponent
 
   @override
   void update(double dt) {
-    position.x -= 200 * dt;
+    // Only move pipes when game is playing
+    if (gameRef.gameState == GameState.playing) {
+      position.x -= pipeSpeed * dt;
 
-    //check if bird has passed the pipe
-    if (!isScored && position.x + size.x < gameRef.bird.position.x) {
-      isScored = true;
-      // avoid double scoring
+      //check if bird has passed the pipe
+      if (!isScored && position.x + size.x < gameRef.bird.position.x) {
+        isScored = true;
+        // avoid double scoring
 
-      if (isUpPipe) {
-        gameRef.incrementScore();
+        if (isUpPipe) {
+          gameRef.incrementScore();
+        }
       }
-    }
 
-    if (position.x + size.x <= 0) {
-      removeFromParent();
+      if (position.x + size.x <= 0) {
+        removeFromParent();
+      }
     }
   }
 }

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:flame/extensions.dart';
 import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/components/ground.dart';
 import 'package:kidzoo/features/FlappyBird/components/pipe.dart';
@@ -47,12 +46,21 @@ Init Bird
 
   @override
   void update(double dt) {
-    //apply gravity
-    velocity += gravity * dt;
+    // Only apply physics if the game is playing
+    final game = parent as FlappyBirdGame;
+    if (game.gameState == GameState.playing) {
+      //apply gravity
+      velocity += gravity * dt;
 
-//update bird's position based on current velocity
-
-    position.y += velocity * dt;
+      //update bird's position based on current velocity
+      position.y += velocity * dt;
+      
+      // Prevent bird from going above screen
+      if (position.y < 0) {
+        position.y = 0;
+        velocity = 0;
+      }
+    }
   }
 
   //Closision

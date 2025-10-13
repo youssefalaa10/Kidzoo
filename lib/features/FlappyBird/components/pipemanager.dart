@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
+import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/components/pipe.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
 
@@ -9,19 +10,20 @@ class PipeManager extends Component with HasGameRef<FlappyBirdGame> {
 
   @override
   void update(double dt) {
-    pipeSpawnTimer += dt;
-    const double pipeInterval = 2;
+    // Only spawn pipes when game is playing
+    if (gameRef.gameState == GameState.playing) {
+      pipeSpawnTimer += dt;
 
-    if (pipeSpawnTimer > pipeInterval) {
-      pipeSpawnTimer = 0;
-      spwanPipe();
+      if (pipeSpawnTimer > pipeInterval) {
+        pipeSpawnTimer = 0;
+        spwanPipe();
+      }
     }
   }
 
   void spwanPipe() {
     final double screenHeight = gameRef.size.y;
-    const double pipeGap = 200;
-    const double minPipeHeight = 50;
+    const double minPipeHeight = 80;
     const double pipeWidth = 60;
 
     //Calculate pipe heights

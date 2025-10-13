@@ -1,11 +1,10 @@
-import 'package:flame/game.dart' hide Matrix4;
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
+import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/MissingLetterGame/Ui/missing_letter_screen.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/number_screen.dart';
@@ -63,7 +62,7 @@ class OptionsGrid extends StatelessWidget {
       OptionItem(
         icon: ImageManager.flappyBird,
         title: 'Flappy Bird',
-        screen: GameWidget(game: FlappyBirdGame()),
+        screen: const FlappyBirdScreen(),
         flipImage: ImageManager.birdAnimal,
       ),
       OptionItem(
@@ -170,7 +169,7 @@ class OptionCardState extends State<OptionCard>
 
   void _flipCard() {
     if (_flipped) {
-      Navigator.push(
+      Navigator.push<void>(
         context,
         MaterialPageRoute(builder: (context) => widget.screen),
       );
