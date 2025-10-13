@@ -70,7 +70,8 @@ class GameBoardPainter extends CustomPainter {
     if (state.isLineDrawn(hoveredLine!)) return;
 
     final paint = Paint()
-      ..color = state.currentPlayer.color.withOpacity(0.15) // Reduced from 0.3
+      ..color =
+          state.currentPlayer.color.withValues(alpha: 0.15) // Reduced from 0.3
       ..strokeWidth = cellSize * 0.06 // Thinner line
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
@@ -107,7 +108,7 @@ class GameBoardPainter extends CustomPainter {
             : 0.85; // Reduced base opacity
 
         final paint = Paint()
-          ..color = box.ownedBy!.lightColor.withOpacity(opacity)
+          ..color = box.ownedBy!.lightColor.withValues(alpha: opacity)
           ..style = PaintingStyle.fill;
 
         // Draw filled box with scale animation
@@ -129,7 +130,7 @@ class GameBoardPainter extends CustomPainter {
         final indicatorSize = cellSize * 0.15 * scale;
 
         final indicatorPaint = Paint()
-          ..color = box.ownedBy!.color.withOpacity(opacity)
+          ..color = box.ownedBy!.color.withValues(alpha: opacity)
           ..style = PaintingStyle.fill;
 
         if (box.ownedBy == Player.player1) {

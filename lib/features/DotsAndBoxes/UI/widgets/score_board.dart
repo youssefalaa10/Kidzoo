@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import '../../data/models/dots_and_boxes_models.dart';
 
 class ScoreBoard extends StatelessWidget {
@@ -24,7 +25,7 @@ class ScoreBoard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.1),
+            color: Colors.black.withValues(alpha: 0.1),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -58,11 +59,14 @@ class ScoreBoard extends StatelessWidget {
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 12),
         decoration: BoxDecoration(
-          color: isActive ? player.color.withOpacity(0.08) : Colors.transparent,
+          color: isActive
+              ? player.color.withValues(alpha: 0.08)
+              : Colors.transparent,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
-            color:
-                isActive ? player.color.withOpacity(0.4) : Colors.transparent,
+            color: isActive
+                ? player.color.withValues(alpha: 0.4)
+                : Colors.transparent,
             width: 1.5,
           ),
         ),
@@ -90,7 +94,7 @@ class ScoreBoard extends StatelessWidget {
               style: TextStyle(
                 fontSize: isActive ? 30 : 26,
                 fontWeight: FontWeight.bold,
-                color: player.color.withOpacity(isActive ? 1.0 : 0.7),
+                color: player.color.withValues(alpha: isActive ? 1.0 : 0.7),
               ),
               child: Text('$score'),
             ),

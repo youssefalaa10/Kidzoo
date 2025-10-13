@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/features/AnimalQuiz/UI/animal_quiz_screen.dart';
 import 'package:kidzoo/features/ColorMemoryGame/UI/color_memory_screen.dart';
-import 'package:kidzoo/features/CrosswordGame/UI/crossword_game_screen.dart';
-import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_cubit.dart';
-import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_loader.dart';
-import 'package:kidzoo/features/CrosswordGame/data/models/crossword_models.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzoo/features/MathGame/Ui/math_game.dart';
+import 'package:kidzoo/features/MazeGame/UI/maze_game_screen.dart';
 import 'package:kidzoo/features/MemoryGame/UI/memory_game.dart';
 import 'package:kidzoo/features/Puzzle/puzzle_screen.dart';
 
@@ -20,7 +16,7 @@ enum GameType {
   puzzle,
   mathGame,
   colorMemoryGame,
-  crossword,
+  mazeGame,
   dotsAndBoxes
 }
 
@@ -71,11 +67,11 @@ class GameSequenceItem {
           gameScreen: MathGame(level: level),
           level: level,
         );
-      case GameType.crossword:
+      case GameType.mazeGame:
         return GameSequenceItem(
           gameType: type,
-          name: 'Crossword',
-          gameScreen: _CrosswordGameWrapper(level: level),
+          name: 'Maze Game',
+          gameScreen: MazeGameScreen(level: level),
           level: level,
         );
       case GameType.dotsAndBoxes:
@@ -167,51 +163,5 @@ class GameSequence {
   /// Get the level for a specific stage number
   static int getLevelForStage(int stageNumber) {
     return StageMapping.getLevelForStage(stageNumber);
-  }
-}
-
-// Wrapper widget to load crossword puzzle based on level
-class _CrosswordGameWrapper extends StatelessWidget {
-  const _CrosswordGameWrapper({required this.level});
-
-  final int level;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<CrosswordPuzzle?>(
-      future: _loadPuzzle(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasError || snapshot.data == null) {
-          return Scaffold(
-            body: Center(
-              child: Text('Error loading puzzle: ${snapshot.error}'),
-            ),
-          );
-        }
-
-        return BlocProvider(
-          create: (context) => CrosswordCubit(snapshot.data!),
-          child: const CrosswordGameScreen(),
-        );
-      },
-    );
-  }
-
-  Future<CrosswordPuzzle?> _loadPuzzle() async {
-    // Map level to difficulty and puzzle index
-    final difficulty = level == 1
-        ? Difficulty.easy
-        : level == 2
-            ? Difficulty.medium
-            : Difficulty.hard;
-
-    final puzzles = await CrosswordLoader.loadPuzzlesByDifficulty(difficulty);
-    return puzzles.isNotEmpty ? puzzles[0] : null;
   }
 }

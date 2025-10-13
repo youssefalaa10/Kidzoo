@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
+
 import '../../data/models/dots_and_boxes_models.dart';
 
 class GameResultDialog extends StatelessWidget {
   const GameResultDialog({
-    super.key,
-    required this.player1Score,
-    required this.player2Score,
+    required this.player1Score, required this.player2Score, required this.gameMode, required this.onNewGame, required this.onClose, super.key,
     this.winner,
-    required this.gameMode,
-    required this.onNewGame,
-    required this.onClose,
     this.moveCount = 0,
     this.maxCombo = 0,
   });
@@ -51,7 +47,7 @@ class GameResultDialog extends StatelessWidget {
             colors: [
               isTie 
                   ? Colors.amber.shade50
-                  : winner!.lightColor.withOpacity(0.3),
+                  : winner!.lightColor.withValues(alpha:0.3),
               Colors.white,
             ],
           ),
@@ -76,7 +72,7 @@ class GameResultDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: winner!.color.withOpacity(0.1),
+                  color: winner!.color.withValues(alpha:0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(

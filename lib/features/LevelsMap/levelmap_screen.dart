@@ -108,8 +108,9 @@ class LevelMapScreen extends StatelessWidget {
                           case GameType.mathGame:
                             buttonColor = Colors.orange;
                             break;
-                          case GameType.crossword:
-                            buttonColor = Colors.brown;
+                          case GameType.mazeGame:
+                            buttonColor =
+                                const Color(0xFF8B4513); // SaddleBrown
                             break;
                           case GameType.dotsAndBoxes:
                             buttonColor = Colors.teal;
@@ -173,7 +174,8 @@ class LevelMapScreen extends StatelessWidget {
                             _buildLegendItem(Colors.purple, 'Color Memory'),
                             _buildLegendItem(Colors.green, 'Puzzle'),
                             _buildLegendItem(Colors.orange, 'Math Game'),
-                            _buildLegendItem(Colors.brown, 'Crossword'),
+                            _buildLegendItem(
+                                const Color(0xFF8B4513), 'Maze Game'),
                           ],
                         ),
                       ),

@@ -4,6 +4,10 @@ import 'package:kidzoo/core/helpers/media_query.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzoo/features/CrosswordGame/UI/crossword_game_screen.dart';
+import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_cubit.dart';
+import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_loader.dart';
+import 'package:kidzoo/features/CrosswordGame/data/models/crossword_models.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
@@ -88,6 +92,12 @@ class OptionsGrid extends StatelessWidget {
         title: 'Dots & Boxes',
         screen: const DotsAndBoxesScreen(),
         flipImage: ImageManager.flipShapes,
+      ),
+      OptionItem(
+        icon: ImageManager.letterL,
+        title: 'Crossword',
+        screen: const _CrosswordGameWrapper(),
+        flipImage: ImageManager.flipLetters,
       ),
     ];
   }
@@ -288,5 +298,43 @@ class OptionCardState extends State<OptionCard>
         fit: BoxFit.contain,
       ),
     );
+  }
+}
+
+// Crossword game wrapper for fun games
+class _CrosswordGameWrapper extends StatelessWidget {
+  const _CrosswordGameWrapper();
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder<CrosswordPuzzle?>(
+      future: _loadPuzzle(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Scaffold(
+            body: Center(child: CircularProgressIndicator()),
+          );
+        }
+
+        if (snapshot.hasError || snapshot.data == null) {
+          return Scaffold(
+            body: Center(
+              child: Text('Error loading puzzle: ${snapshot.error}'),
+            ),
+          );
+        }
+
+        return BlocProvider(
+          create: (context) => CrosswordCubit(snapshot.data!),
+          child: const CrosswordGameScreen(),
+        );
+      },
+    );
+  }
+
+  Future<CrosswordPuzzle?> _loadPuzzle() async {
+    // Load a random medium difficulty puzzle for fun games
+    final puzzles = await CrosswordLoader.loadPuzzlesByDifficulty(Difficulty.medium);
+    return puzzles.isNotEmpty ? puzzles[0] : null;
   }
 }

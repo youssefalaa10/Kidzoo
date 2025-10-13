@@ -46,7 +46,7 @@ class StageMapping {
       MapStage(stageNumber: 3, gameType: GameType.colorMemoryGame, level: 1),
       MapStage(stageNumber: 4, gameType: GameType.puzzle, level: 1),
       MapStage(stageNumber: 5, gameType: GameType.mathGame, level: 1),
-      MapStage(stageNumber: 6, gameType: GameType.crossword, level: 1),
+      MapStage(stageNumber: 6, gameType: GameType.mazeGame, level: 1),
 
       // Level 2 Cycle (Stages 7-12)
       MapStage(stageNumber: 7, gameType: GameType.animalQuiz, level: 2),
@@ -54,7 +54,7 @@ class StageMapping {
       MapStage(stageNumber: 9, gameType: GameType.colorMemoryGame, level: 2),
       MapStage(stageNumber: 10, gameType: GameType.puzzle, level: 2),
       MapStage(stageNumber: 11, gameType: GameType.mathGame, level: 2),
-      MapStage(stageNumber: 12, gameType: GameType.crossword, level: 2),
+      MapStage(stageNumber: 12, gameType: GameType.mazeGame, level: 2),
 
       // Level 3 Cycle (Stages 13-18)
       MapStage(stageNumber: 13, gameType: GameType.animalQuiz, level: 3),
@@ -62,7 +62,7 @@ class StageMapping {
       MapStage(stageNumber: 15, gameType: GameType.colorMemoryGame, level: 3),
       MapStage(stageNumber: 16, gameType: GameType.puzzle, level: 3),
       MapStage(stageNumber: 17, gameType: GameType.mathGame, level: 3),
-      MapStage(stageNumber: 18, gameType: GameType.crossword, level: 3),
+      MapStage(stageNumber: 18, gameType: GameType.mazeGame, level: 3),
     ];
   }
 
