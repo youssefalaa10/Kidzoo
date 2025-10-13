@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/features/AnimalQuiz/UI/animal_quiz_screen.dart';
+import 'package:kidzoo/features/ColorMemoryGame/UI/color_memory_screen.dart';
 import 'package:kidzoo/features/MathGame/Ui/math_game.dart';
 import 'package:kidzoo/features/MemoryGame/UI/memory_game.dart';
 import 'package:kidzoo/features/Puzzle/puzzle_screen.dart';
@@ -7,7 +8,7 @@ import 'package:kidzoo/features/Puzzle/puzzle_screen.dart';
 import 'map_stage_model.dart';
 
 /// Defines the game types available in the sequence
-enum GameType { animalQuiz, memoryGame, puzzle, mathGame }
+enum GameType { animalQuiz, memoryGame, puzzle, mathGame, colorMemoryGame }
 
 /// Model class to represent a game in the sequence
 class GameSequenceItem {
@@ -33,6 +34,13 @@ class GameSequenceItem {
           gameType: type,
           name: 'Memory Game',
           gameScreen: MemoryGameScreen(level: level),
+          level: level,
+        );
+      case GameType.colorMemoryGame:
+        return GameSequenceItem(
+          gameType: type,
+          name: 'Color Memory',
+          gameScreen: ColorMemoryScreen(level: level),
           level: level,
         );
       case GameType.puzzle:

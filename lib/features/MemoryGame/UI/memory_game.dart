@@ -310,20 +310,20 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                 ),
               ),
               // Level selector
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    _buildLevelButton('Easy', GameLevel.easy),
-                    const SizedBox(width: 12),
-                    _buildLevelButton('Medium', GameLevel.medium),
-                    const SizedBox(width: 12),
-                    _buildLevelButton('Hard', GameLevel.hard),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
+              // Padding(
+              //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              //   child: Row(
+              //     mainAxisAlignment: MainAxisAlignment.center,
+              //     children: [
+              //       _buildLevelButton('Easy', GameLevel.easy),
+              //       const SizedBox(width: 12),
+              //       _buildLevelButton('Medium', GameLevel.medium),
+              //       const SizedBox(width: 12),
+              //       _buildLevelButton('Hard', GameLevel.hard),
+              //     ],
+              //   ),
+              // ),
+              // const SizedBox(height: 16),
               // Game stats
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16.0),
