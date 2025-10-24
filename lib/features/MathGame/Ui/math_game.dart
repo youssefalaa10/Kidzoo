@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/base/protected_game_screen.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
 
@@ -17,30 +18,16 @@ class MathGame extends ProtectedGameScreen {
 class _MathGameState extends ProtectedGameScreenState<MathGame>
     with TickerProviderStateMixin {
   late ConfettiController _confettiController;
-  late AnimationController _characterController;
-  late Animation<double> _characterAnimation;
-  bool _isHappy = true; // For character expression
 
   @override
   void onGameInit() {
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
-
-    // Animation for character
-    _characterController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _characterAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _characterController, curve: Curves.bounceOut),
-    );
-    _characterController.forward();
   }
 
   @override
   void dispose() {
     _confettiController.dispose();
-    _characterController.dispose();
     super.dispose();
   }
 
@@ -51,13 +38,9 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
       child: BlocConsumer<MathGameCubit, MathGameState>(
         listener: (context, state) {
           if (state.starsEarned > 0 && state.currentQuestionIndex > 0) {
-            setState(() {
-              _isHappy = true;
-            });
-            _characterController.forward(from: 0);
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Text('Super Duper! 🌟'),
+                content: Text(AppLocalizations.of(context).superDuper),
                 backgroundColor: Colors.greenAccent,
                 duration: const Duration(seconds: 1),
                 behavior: SnackBarBehavior.floating,
@@ -69,7 +52,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
           }
           if (state.isCompleted) {
             _confettiController.play();
-            showDialog(
+            showDialog<void>(
               context: context,
               barrierDismissible: false,
               builder: (context) => AlertDialog(
@@ -80,16 +63,16 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                 content: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Text(
-                      '🎉 You\'re a Math Wizard! 🧙‍♂️',
-                      style:
-                          TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    Text(
+                      AppLocalizations.of(context).mathWizard,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold),
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 10),
                     const SizedBox(height: 10),
                     Text(
-                      'You earned ${state.starsEarned} stars! 🌟',
+                      '${AppLocalizations.of(context).youEarned} ${state.starsEarned} ${AppLocalizations.of(context).stars}',
                       style: const TextStyle(fontSize: 20),
                       textAlign: TextAlign.center,
                     ),
@@ -112,16 +95,17 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                     onPressed: () {
                       Navigator.pop(context);
                       context.read<MathGameCubit>().close();
-                      Navigator.pushReplacement(
+                      Navigator.pushReplacement<void, void>(
                         context,
-                        MaterialPageRoute(
+                        MaterialPageRoute<void>(
                             builder: (context) =>
                                 MathGame(level: widget.level)),
                       );
                     },
-                    child: const Text(
-                      'Play Again! 🚀',
-                      style: TextStyle(fontSize: 18, color: Colors.purple),
+                    child: Text(
+                      AppLocalizations.of(context).playAgain,
+                      style:
+                          const TextStyle(fontSize: 18, color: Colors.purple),
                     ),
                   ),
                   ElevatedButton(
@@ -130,9 +114,9 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                       // Return to level map with completion status
                       Navigator.of(context).pop(true);
                     },
-                    child: const Text(
-                      'Continue to Next Level! 🎯',
-                      style: TextStyle(fontSize: 18, color: Colors.green),
+                    child: Text(
+                      AppLocalizations.of(context).continueToNextLevel,
+                      style: const TextStyle(fontSize: 18, color: Colors.green),
                     ),
                   ),
                 ],
@@ -173,7 +157,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Math Magic! ',
+                                AppLocalizations.of(context).mathMagic,
                                 style: GoogleFonts.poppins(
                                   fontSize: 28,
                                   fontWeight: FontWeight.bold,
@@ -251,7 +235,8 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                                       children: currentQuestion['options']
                                           .asMap()
                                           .entries
-                                          .map<Widget>((entry) {
+                                          .map<Widget>(
+                                              (MapEntry<int, dynamic> entry) {
                                         final option = entry.value;
                                         final index = entry.key;
                                         return _FunnyOptionButton(
@@ -266,16 +251,13 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                                             if (option !=
                                                 currentQuestion[
                                                     'correctAnswer']) {
-                                              setState(() {
-                                                _isHappy = false;
-                                              });
-                                              _characterController.forward(
-                                                  from: 0);
                                               ScaffoldMessenger.of(context)
                                                   .showSnackBar(
                                                 SnackBar(
-                                                  content: const Text(
-                                                      'Oopsie! Try Again! 🙈'),
+                                                  content: Text(
+                                                      AppLocalizations.of(
+                                                              context)
+                                                          .oopsieTryAgain),
                                                   backgroundColor:
                                                       Colors.redAccent,
                                                   duration: const Duration(

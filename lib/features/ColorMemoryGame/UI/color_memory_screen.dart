@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/base/protected_game_screen.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../bloc/color_memory_bloc.dart';
 import '../bloc/color_memory_event.dart';
 import '../data/models/color_memory_constants.dart';
@@ -191,46 +192,47 @@ class _ColorMemoryScreenState
   }
 
   Widget _buildStatusMessage(ColorMemoryGameState state) {
+    final l10n = AppLocalizations.of(context);
     String message = '';
     Color color = Colors.black87;
     IconData icon = Icons.info;
 
     switch (state.phase) {
       case GamePhase.waiting:
-        message = 'Get ready...';
+        message = l10n.getReady;
         icon = Icons.hourglass_empty;
         break;
       case GamePhase.showingSequence:
-        message = 'Watch carefully!';
+        message = l10n.watchCarefully;
         color = Colors.blue.shade700;
         icon = Icons.visibility;
         break;
       case GamePhase.playerTurn:
-        message = 'Your turn! Repeat the sequence';
+        message = l10n.yourTurn;
         color = Colors.green.shade700;
         icon = Icons.touch_app;
         break;
       case GamePhase.checking:
-        message = 'Checking...';
+        message = l10n.checking;
         icon = Icons.pending;
         break;
       case GamePhase.success:
-        message = 'Perfect!';
+        message = l10n.perfect;
         color = Colors.green.shade700;
         icon = Icons.check_circle;
         break;
       case GamePhase.failure:
-        message = state.errorMessage ?? 'Game Over!';
+        message = state.errorMessage ?? l10n.gameOver;
         color = Colors.red.shade700;
         icon = Icons.error;
         break;
       case GamePhase.gameOver:
-        message = 'Game Over';
+        message = l10n.gameOver;
         color = Colors.red.shade700;
         icon = Icons.stop_circle;
         break;
       case GamePhase.levelComplete:
-        message = 'Level Complete!';
+        message = l10n.levelComplete;
         color = Colors.amber.shade700;
         icon = Icons.emoji_events;
         break;
@@ -269,6 +271,7 @@ class _ColorMemoryScreenState
   }
 
   Widget _buildProgressIndicator(ColorMemoryGameState state) {
+    final l10n = AppLocalizations.of(context);
     final progress = state.playerSequence.length / state.sequence.length;
     final remaining = state.sequence.length - state.playerSequence.length;
 
@@ -280,7 +283,7 @@ class _ColorMemoryScreenState
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Tapped: ${state.playerSequence.length}/${state.sequence.length} • $remaining left',
+                '${l10n.tapped}: ${state.playerSequence.length}/${state.sequence.length} • $remaining ${l10n.left}',
                 style: const TextStyle(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
@@ -289,7 +292,7 @@ class _ColorMemoryScreenState
               ),
               if (state.mode == ColorMemoryGameMode.timed)
                 Text(
-                  'Time: ${state.remainingTime.toStringAsFixed(1)}s',
+                  '${l10n.time}: ${state.remainingTime.toStringAsFixed(1)}s',
                   style: TextStyle(
                     fontSize: 14,
                     fontWeight: FontWeight.w500,
@@ -318,6 +321,7 @@ class _ColorMemoryScreenState
   }
 
   Widget _buildSequenceProgress(ColorMemoryGameState state) {
+    final l10n = AppLocalizations.of(context);
     // Count steps the user actually sees: include current highlight if visible
     int shown =
         state.currentSequenceIndex + (state.highlightedColorIndex >= 0 ? 1 : 0);
@@ -329,7 +333,7 @@ class _ColorMemoryScreenState
       child: Column(
         children: [
           Text(
-            'Showing: $shown/$total',
+            '${l10n.showing}: $shown/$total',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w500,

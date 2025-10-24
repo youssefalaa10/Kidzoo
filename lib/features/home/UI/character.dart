@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/AppCategory/education_screen.dart';
 import 'package:kidzoo/features/AppCategory/games_screen.dart';
+import 'package:kidzoo/features/settings/settings_screen.dart';
 
 import '../../Alphabets/bloc/alphabet_bloc.dart';
 import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
@@ -20,44 +22,47 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
   int _selectedIndex = 1; // Default selected card (middle one)
 
   // Define our character categories
-  final List<CharacterCategory> _categories = [
-    CharacterCategory(
-      name: 'Games',
-      characterName: 'Games',
-      characterDesc: 'enjoy and have fun',
-      color: Colors.blue.shade100,
-      buttonLabel: 'Play',
-      characterImage: ImageManager.gamepad,
-      screen: BlocProvider(
-        create: (context) => AlphabetBloc(),
-        child: const GamesScreen(),
+  List<CharacterCategory> _getCategories(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      CharacterCategory(
+        name: l10n.games,
+        characterName: l10n.games,
+        characterDesc: l10n.enjoyAndHaveFun,
+        color: Colors.blue.shade100,
+        buttonLabel: l10n.play,
+        characterImage: ImageManager.gamepad,
+        screen: BlocProvider(
+          create: (context) => AlphabetBloc(),
+          child: const GamesScreen(),
+        ),
       ),
-    ),
-    CharacterCategory(
-      name: 'Education',
-      characterName: 'Education',
-      characterDesc: 'Learn new things and improve your skills',
-      color: Colors.orange.shade300,
-      buttonLabel: 'Learn',
-      characterImage: ImageManager.letters,
-      screen: BlocProvider(
-        create: (context) => AlphabetBloc(),
-        child: const EducationScreen(),
+      CharacterCategory(
+        name: l10n.education,
+        characterName: l10n.education,
+        characterDesc: l10n.learnNewThings,
+        color: Colors.orange.shade300,
+        buttonLabel: l10n.learn,
+        characterImage: ImageManager.letters,
+        screen: BlocProvider(
+          create: (context) => AlphabetBloc(),
+          child: const EducationScreen(),
+        ),
       ),
-    ),
-    CharacterCategory(
-      name: 'Challenge',
-      characterName: 'Challenge',
-      characterDesc: 'Challenge yourself and be the best',
-      color: Colors.purple.shade100,
-      buttonLabel: 'compete',
-      characterImage: ImageManager.brainstorming,
-      screen: BlocProvider(
-        create: (context) => LevelCubit(),
-        child: const LevelMapScreen(),
+      CharacterCategory(
+        name: l10n.challenge,
+        characterName: l10n.challenge,
+        characterDesc: l10n.challengeYourself,
+        color: Colors.purple.shade100,
+        buttonLabel: l10n.compete,
+        characterImage: ImageManager.brainstorming,
+        screen: BlocProvider(
+          create: (context) => LevelCubit(),
+          child: const LevelMapScreen(),
+        ),
       ),
-    ),
-  ];
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -75,14 +80,14 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
             ),
 
             // Title in blue area
-            const Positioned(
+            Positioned(
               top: 80,
               left: 0,
               right: 0,
               child: Center(
                 child: Text(
-                  'Improve Your Skills',
-                  style: TextStyle(
+                  AppLocalizations.of(context).improveYourSkills,
+                  style: const TextStyle(
                     fontSize: 28,
                     fontWeight: FontWeight.bold,
                     color: Colors.white,
@@ -107,7 +112,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                       // Carousel section
                       Expanded(
                         child: OverlappedCarousel(
-                          items: _categories,
+                          items: _getCategories(context),
                           selectedIndex: _selectedIndex,
                           onItemChanged: (index) {
                             setState(() {
@@ -148,16 +153,24 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
                 ),
               ),
               const SizedBox(width: 10),
-              Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.blue[300],
-                  border: Border.all(color: Colors.white, width: 2),
+              GestureDetector(
+                onTap: () => Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => const SettingsScreen(),
+                  ),
                 ),
-                child: const Icon(Icons.settings_outlined,
-                    color: Colors.white, size: 20),
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.blue[300],
+                    border: Border.all(color: Colors.white, width: 2),
+                  ),
+                  child: const Icon(Icons.settings_outlined,
+                      color: Colors.white, size: 20),
+                ),
               ),
             ],
           ),
@@ -256,7 +269,7 @@ class OverlappedCarousel extends StatefulWidget {
   });
   final List<CharacterCategory> items;
   final int selectedIndex;
-  final Function(int) onItemChanged;
+  final void Function(int) onItemChanged;
 
   @override
   State<OverlappedCarousel> createState() => _OverlappedCarouselState();
@@ -299,9 +312,9 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
           builder: (context, value, child) {
             return GestureDetector(
               onTap: isSelected
-                  ? () => Navigator.push(
+                  ? () => Navigator.push<void>(
                         context,
-                        MaterialPageRoute(
+                        MaterialPageRoute<void>(
                           builder: (context) => category.screen,
                         ),
                       )

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../data/logic/dots_and_boxes_cubit.dart';
 import '../data/models/dots_and_boxes_models.dart';
 import '../data/models/game_state_model.dart';
@@ -62,10 +63,10 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text(
-          'Choose Game Mode',
+        title: Text(
+          AppLocalizations.of(context).chooseGameMode,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 24,
             fontWeight: FontWeight.bold,
           ),
@@ -73,17 +74,17 @@ class _DotsAndBoxesScreenContentState
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text(
-              'Who would you like to play against?',
+            Text(
+              AppLocalizations.of(context).whoWouldYouLikeToPlayAgainst,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14),
+              style: const TextStyle(fontSize: 14),
             ),
             const SizedBox(height: 24),
             _buildModeCard(
               context: dialogContext,
               icon: Icons.smart_toy,
-              title: 'Play vs AI',
-              description: 'Challenge the computer',
+              title: AppLocalizations.of(context).playVsAI,
+              description: AppLocalizations.of(context).challengeTheComputer,
               color: Colors.blue,
               mode: GameMode.vsAI,
               gradient: LinearGradient(
@@ -94,8 +95,8 @@ class _DotsAndBoxesScreenContentState
             _buildModeCard(
               context: dialogContext,
               icon: Icons.people,
-              title: 'Play vs Friend',
-              description: 'Play with a friend',
+              title: AppLocalizations.of(context).playVsFriend,
+              description: AppLocalizations.of(context).playWithAFriend,
               color: Colors.green,
               mode: GameMode.vsPlayer,
               gradient: LinearGradient(
@@ -190,10 +191,10 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text(
-          'Select AI Difficulty',
+        title: Text(
+          AppLocalizations.of(context).selectAIDifficulty,
           textAlign: TextAlign.center,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 22,
             fontWeight: FontWeight.bold,
           ),
@@ -359,9 +360,9 @@ class _DotsAndBoxesScreenContentState
           // Title
           Column(
             children: [
-              const Text(
-                'Dots & Boxes',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context).dotsAndBoxes,
+                style: const TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   color: Colors.black87,
@@ -384,44 +385,44 @@ class _DotsAndBoxesScreenContentState
               borderRadius: BorderRadius.circular(12),
             ),
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'difficulty',
                 child: Row(
                   children: [
-                    Icon(Icons.grid_3x3, size: 20),
-                    SizedBox(width: 8),
-                    Text('Grid Size'),
+                    const Icon(Icons.grid_3x3, size: 20),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context).gridSize),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'mode',
                 child: Row(
                   children: [
-                    Icon(Icons.people, size: 20),
-                    SizedBox(width: 8),
-                    Text('Game Mode'),
+                    const Icon(Icons.people, size: 20),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context).gameMode),
                   ],
                 ),
               ),
               if (state.gameMode == GameMode.vsAI)
-                const PopupMenuItem(
+                PopupMenuItem(
                   value: 'ai',
                   child: Row(
                     children: [
-                      Icon(Icons.psychology, size: 20),
-                      SizedBox(width: 8),
-                      Text('AI Difficulty'),
+                      const Icon(Icons.psychology, size: 20),
+                      const SizedBox(width: 8),
+                      Text(AppLocalizations.of(context).aiDifficulty),
                     ],
                   ),
                 ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'how',
                 child: Row(
                   children: [
-                    Icon(Icons.help_outline, size: 20),
-                    SizedBox(width: 8),
-                    Text('How to Play'),
+                    const Icon(Icons.help_outline, size: 20),
+                    const SizedBox(width: 8),
+                    Text(AppLocalizations.of(context).howToPlay),
                   ],
                 ),
               ),
@@ -479,8 +480,8 @@ class _DotsAndBoxesScreenContentState
           const SizedBox(width: 8),
           Text(
             isAITurn
-                ? 'AI thinking...'
-                : '${state.currentPlayer.displayName}\'s turn',
+                ? AppLocalizations.of(context).aiThinking
+                : '${state.currentPlayer.displayName}\'s ${AppLocalizations.of(context).turn}',
             style: TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.w600,
@@ -518,7 +519,7 @@ class _DotsAndBoxesScreenContentState
           const Icon(Icons.flash_on, color: Colors.white, size: 18),
           const SizedBox(width: 6),
           Text(
-            'Combo ×${state.currentCombo}',
+            '${AppLocalizations.of(context).combo} ×${state.currentCombo}',
             style: const TextStyle(
               fontSize: 14,
               fontWeight: FontWeight.bold,
@@ -537,11 +538,13 @@ class _DotsAndBoxesScreenContentState
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildStatChip(
-              Icons.swap_horiz, 'Moves: ${state.moveCount}', Colors.blue),
+              Icons.swap_horiz,
+              '${AppLocalizations.of(context).moves}: ${state.moveCount}',
+              Colors.blue),
           const SizedBox(width: 12),
           _buildStatChip(
               Icons.local_fire_department,
-              'Best: ×${state.maxCombo}',
+              '${AppLocalizations.of(context).best}: ×${state.maxCombo}',
               state.maxCombo > 0 ? Colors.orange : Colors.grey),
         ],
       ),
@@ -585,7 +588,7 @@ class _DotsAndBoxesScreenContentState
                 _showRestartConfirmation(context);
               },
               icon: const Icon(Icons.refresh_rounded),
-              label: const Text('New Game'),
+              label: Text(AppLocalizations.of(context).newGame),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue.shade600,
                 foregroundColor: Colors.white,
@@ -632,12 +635,13 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Start New Game?'),
-        content: const Text('Current game progress will be lost.'),
+        title: Text(AppLocalizations.of(context).startNewGame),
+        content:
+            Text(AppLocalizations.of(context).currentGameProgressWillBeLost),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -648,7 +652,7 @@ class _DotsAndBoxesScreenContentState
               backgroundColor: Colors.blue.shade600,
               foregroundColor: Colors.white,
             ),
-            child: const Text('New Game'),
+            child: Text(AppLocalizations.of(context).newGame),
           ),
         ],
       ),
@@ -662,7 +666,7 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Select Grid Size'),
+        title: Text(AppLocalizations.of(context).selectGridSize),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: GameDifficulty.values.map((difficulty) {
@@ -702,7 +706,7 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Select Game Mode'),
+        title: Text(AppLocalizations.of(context).selectGameMode),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: GameMode.values.map((mode) {
@@ -743,7 +747,7 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('Select AI Difficulty'),
+        title: Text(AppLocalizations.of(context).selectAIDifficulty),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: AIDifficulty.values.map((difficulty) {
@@ -789,7 +793,7 @@ class _DotsAndBoxesScreenContentState
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16),
         ),
-        title: const Text('How to Play'),
+        title: Text(AppLocalizations.of(context).howToPlay),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -797,22 +801,22 @@ class _DotsAndBoxesScreenContentState
             children: [
               _buildHowToPlayItem(
                 '1',
-                'Players take turns drawing lines between adjacent dots',
+                AppLocalizations.of(context).playersTakeTurns,
               ),
               const SizedBox(height: 12),
               _buildHowToPlayItem(
                 '2',
-                'When you complete the 4th side of a box, you claim it and get another turn',
+                AppLocalizations.of(context).whenYouComplete,
               ),
               const SizedBox(height: 12),
               _buildHowToPlayItem(
                 '3',
-                'The game ends when all boxes are claimed',
+                AppLocalizations.of(context).gameEndsWhen,
               ),
               const SizedBox(height: 12),
               _buildHowToPlayItem(
                 '4',
-                'The player with the most boxes wins!',
+                AppLocalizations.of(context).playerWithMostBoxes,
               ),
               const SizedBox(height: 16),
               Container(
@@ -821,14 +825,14 @@ class _DotsAndBoxesScreenContentState
                   color: Colors.blue.shade50,
                   borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.lightbulb_outline, color: Colors.blue),
-                    SizedBox(width: 8),
+                    const Icon(Icons.lightbulb_outline, color: Colors.blue),
+                    const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Tip: Try to avoid giving your opponent easy boxes!',
-                        style: TextStyle(fontSize: 12),
+                        AppLocalizations.of(context).tipAvoidGiving,
+                        style: const TextStyle(fontSize: 12),
                       ),
                     ),
                   ],
@@ -844,7 +848,7 @@ class _DotsAndBoxesScreenContentState
               backgroundColor: Colors.blue.shade600,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Got it!'),
+            child: Text(AppLocalizations.of(context).gotIt),
           ),
         ],
       ),

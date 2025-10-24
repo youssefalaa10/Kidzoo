@@ -1,0 +1,297 @@
+import 'dart:convert';
+
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
+class AppLocalizations {
+  AppLocalizations(this.locale, this._localizedValues);
+  final Locale locale;
+  final Map<String, String> _localizedValues;
+
+  static AppLocalizations of(BuildContext context) {
+    return Localizations.of<AppLocalizations>(context, AppLocalizations)!;
+  }
+
+  static const LocalizationsDelegate<AppLocalizations> delegate =
+      _AppLocalizationsDelegate();
+
+  static const List<Locale> supportedLocales = [
+    Locale('en', ''),
+    Locale('ar', ''),
+  ];
+
+  // DrawLab translations
+  String get drawLab => _localizedValues['drawLab']!;
+  String get brushSettings => _localizedValues['brushSettings']!;
+  String get brushType => _localizedValues['brushType']!;
+  String get brushShape => _localizedValues['brushShape']!;
+  String get strokeWidth => _localizedValues['strokeWidth']!;
+  String get opacity => _localizedValues['opacity']!;
+  String get colorPicker => _localizedValues['colorPicker']!;
+  String get currentColor => _localizedValues['currentColor']!;
+  String get customColor => _localizedValues['customColor']!;
+  String get pickColor => _localizedValues['pickColor']!;
+  String get tools => _localizedValues['tools']!;
+  String get gallery => _localizedValues['gallery']!;
+  String get drawingTools => _localizedValues['drawingTools']!;
+  String get shapes => _localizedValues['shapes']!;
+  String get grid => _localizedValues['grid']!;
+  String get showGrid => _localizedValues['showGrid']!;
+  String get snapToGrid => _localizedValues['snapToGrid']!;
+  String get undo => _localizedValues['undo']!;
+  String get redo => _localizedValues['redo']!;
+  String get clearCanvas => _localizedValues['clearCanvas']!;
+  String get saveDrawing => _localizedValues['saveDrawing']!;
+  String get exportImage => _localizedValues['exportImage']!;
+  String get openGallery => _localizedValues['openGallery']!;
+  String get enterDrawingName => _localizedValues['enterDrawingName']!;
+  String get cancel => _localizedValues['cancel']!;
+  String get save => _localizedValues['save']!;
+  String get clear => _localizedValues['clear']!;
+  String get clearCanvasConfirm => _localizedValues['clearCanvasConfirm']!;
+  String get drawingSaved => _localizedValues['drawingSaved']!;
+  String get drawingExported => _localizedValues['drawingExported']!;
+  String get failedToSave => _localizedValues['failedToSave']!;
+  String get failedToExport => _localizedValues['failedToExport']!;
+  String get myDrawings => _localizedValues['myDrawings']!;
+  String get noDrawingsYet => _localizedValues['noDrawingsYet']!;
+  String get startCreating => _localizedValues['startCreating']!;
+  String get startDrawing => _localizedValues['startDrawing']!;
+  String get renameDrawing => _localizedValues['renameDrawing']!;
+  String get enterNewName => _localizedValues['enterNewName']!;
+  String get rename => _localizedValues['rename']!;
+  String get share => _localizedValues['share']!;
+  String get delete => _localizedValues['delete']!;
+  String get deleteDrawing => _localizedValues['deleteDrawing']!;
+  String get deleteConfirm => _localizedValues['deleteConfirm']!;
+  String get drawingDeleted => _localizedValues['drawingDeleted']!;
+  String get drawingRenamed => _localizedValues['drawingRenamed']!;
+  String get failedToDelete => _localizedValues['failedToDelete']!;
+  String get failedToRename => _localizedValues['failedToRename']!;
+  String get addText => _localizedValues['addText']!;
+  String get enterText => _localizedValues['enterText']!;
+  String get add => _localizedValues['add']!;
+  String get today => _localizedValues['today']!;
+  String get yesterday => _localizedValues['yesterday']!;
+  String get daysAgo => _localizedValues['daysAgo']!;
+  String get hideGrid => _localizedValues['hideGrid']!;
+  String get showGridTooltip => _localizedValues['showGridTooltip']!;
+  String get undoTooltip => _localizedValues['undoTooltip']!;
+  String get redoTooltip => _localizedValues['redoTooltip']!;
+  String get clearCanvasTooltip => _localizedValues['clearCanvasTooltip']!;
+  String get renameTooltip => _localizedValues['renameTooltip']!;
+  String get shareTooltip => _localizedValues['shareTooltip']!;
+  String get deleteTooltip => _localizedValues['deleteTooltip']!;
+
+  // Brush types
+  String get pen => _localizedValues['pen']!;
+  String get marker => _localizedValues['marker']!;
+  String get pencil => _localizedValues['pencil']!;
+  String get eraser => _localizedValues['eraser']!;
+  String get highlighter => _localizedValues['highlighter']!;
+
+  // Brush shapes
+  String get round => _localizedValues['round']!;
+  String get square => _localizedValues['square']!;
+  String get calligraphy => _localizedValues['calligraphy']!;
+
+  // Shape types
+  String get line => _localizedValues['line']!;
+  String get rectangle => _localizedValues['rectangle']!;
+  String get circle => _localizedValues['circle']!;
+  String get triangle => _localizedValues['triangle']!;
+  String get arrow => _localizedValues['arrow']!;
+
+  // Color picker
+  String get defaultColors => _localizedValues['defaultColors']!;
+  String get pastelColors => _localizedValues['pastelColors']!;
+  String get vibrantColors => _localizedValues['vibrantColors']!;
+  String get pickAColor => _localizedValues['pickAColor']!;
+  String get select => _localizedValues['select']!;
+  String get hue => _localizedValues['hue']!;
+  String get saturation => _localizedValues['saturation']!;
+  String get value => _localizedValues['value']!;
+  String get alpha => _localizedValues['alpha']!;
+  String get hex => _localizedValues['hex']!;
+
+  // Language settings
+  String get languageSettings => _localizedValues['languageSettings']!;
+  String get switchToArabic => _localizedValues['switchToArabic']!;
+  String get switchToEnglish => _localizedValues['switchToEnglish']!;
+  String get english => _localizedValues['english']!;
+  String get arabic => _localizedValues['arabic']!;
+
+  // Home Screen
+  String get improveYourSkills => _localizedValues['improveYourSkills']!;
+  String get games => _localizedValues['games']!;
+  String get education => _localizedValues['education']!;
+  String get challenge => _localizedValues['challenge']!;
+  String get enjoyAndHaveFun => _localizedValues['enjoyAndHaveFun']!;
+  String get learnNewThings => _localizedValues['learnNewThings']!;
+  String get challengeYourself => _localizedValues['challengeYourself']!;
+  String get play => _localizedValues['play']!;
+  String get learn => _localizedValues['learn']!;
+  String get compete => _localizedValues['compete']!;
+
+  // Color Memory Game
+  String get colorMemory => _localizedValues['colorMemory']!;
+  String get getReady => _localizedValues['getReady']!;
+  String get watchCarefully => _localizedValues['watchCarefully']!;
+  String get yourTurn => _localizedValues['yourTurn']!;
+  String get checking => _localizedValues['checking']!;
+  String get perfect => _localizedValues['perfect']!;
+  String get gameOver => _localizedValues['gameOver']!;
+  String get levelComplete => _localizedValues['levelComplete']!;
+  String get tapped => _localizedValues['tapped']!;
+  String get left => _localizedValues['left']!;
+  String get time => _localizedValues['time']!;
+  String get showing => _localizedValues['showing']!;
+  String get score => _localizedValues['score']!;
+  String get bestScore => _localizedValues['bestScore']!;
+  String get roundText => _localizedValues['round']!;
+  String get longestSequence => _localizedValues['longestSequence']!;
+  String get restart => _localizedValues['restart']!;
+  String get continueText => _localizedValues['continue']!;
+  String get exit => _localizedValues['exit']!;
+
+  // Math Game
+  String get mathMagic => _localizedValues['mathMagic']!;
+  String get superDuper => _localizedValues['superDuper']!;
+  String get mathWizard => _localizedValues['mathWizard']!;
+  String get youEarned => _localizedValues['youEarned']!;
+  String get stars => _localizedValues['stars']!;
+  String get playAgain => _localizedValues['playAgain']!;
+  String get continueToNextLevel => _localizedValues['continueToNextLevel']!;
+  String get oopsieTryAgain => _localizedValues['oopsieTryAgain']!;
+
+  // Tic Tac Toe
+  String get epicTicTacToe => _localizedValues['epicTicTacToe']!;
+  String get playerXTurn => _localizedValues['playerXTurn']!;
+  String get playerOTurn => _localizedValues['playerOTurn']!;
+  String get yourTurnTicTacToe => _localizedValues['yourTurn']!;
+  String get aiThinking => _localizedValues['aiThinking']!;
+  String get youWin => _localizedValues['youWin']!;
+  String get aiWins => _localizedValues['aiWins']!;
+  String get playerXWins => _localizedValues['playerXWins']!;
+  String get playerOWins => _localizedValues['playerOWins']!;
+  String get itsADraw => _localizedValues['itsADraw']!;
+  String get newGame => _localizedValues['newGame']!;
+  String get vsPlayer => _localizedValues['vsPlayer']!;
+  String get vsAI => _localizedValues['vsAI']!;
+  String get playerX => _localizedValues['playerX']!;
+  String get playerO => _localizedValues['playerO']!;
+  String get you => _localizedValues['you']!;
+  String get ai => _localizedValues['ai']!;
+  String get draws => _localizedValues['draws']!;
+
+  // Dots & Boxes
+  String get dotsAndBoxes => _localizedValues['dotsAndBoxes']!;
+  String get chooseGameMode => _localizedValues['chooseGameMode']!;
+  String get whoWouldYouLikeToPlayAgainst =>
+      _localizedValues['whoWouldYouLikeToPlayAgainst']!;
+  String get playVsAI => _localizedValues['playVsAI']!;
+  String get challengeTheComputer => _localizedValues['challengeTheComputer']!;
+  String get playVsFriend => _localizedValues['playVsFriend']!;
+  String get playWithAFriend => _localizedValues['playWithAFriend']!;
+  String get selectAIDifficulty => _localizedValues['selectAIDifficulty']!;
+  String get easy => _localizedValues['easy']!;
+
+  String get hard => _localizedValues['hard']!;
+  String get gridSize => _localizedValues['gridSize']!;
+  String get gameMode => _localizedValues['gameMode']!;
+  String get aiDifficulty => _localizedValues['aiDifficulty']!;
+  String get howToPlay => _localizedValues['howToPlay']!;
+  String get turn => _localizedValues['turn']!;
+  String get combo => _localizedValues['combo']!;
+  String get moves => _localizedValues['moves']!;
+  String get best => _localizedValues['best']!;
+  String get startNewGame => _localizedValues['startNewGame']!;
+  String get currentGameProgressWillBeLost =>
+      _localizedValues['currentGameProgressWillBeLost']!;
+  String get selectGridSize => _localizedValues['selectGridSize']!;
+  String get selectGameMode => _localizedValues['selectGameMode']!;
+  String get gotIt => _localizedValues['gotIt']!;
+  String get playersTakeTurns => _localizedValues['playersTakeTurns']!;
+  String get whenYouComplete => _localizedValues['whenYouComplete']!;
+  String get gameEndsWhen => _localizedValues['gameEndsWhen']!;
+  String get playerWithMostBoxes => _localizedValues['playerWithMostBoxes']!;
+  String get tipAvoidGiving => _localizedValues['tipAvoidGiving']!;
+  String get easyDescription => _localizedValues['easyDescription']!;
+  String get mediumDescription => _localizedValues['mediumDescription']!;
+  String get hardDescription => _localizedValues['hardDescription']!;
+
+  // Settings Screen
+  String get settings => _localizedValues['settings']!;
+  String get funSettings => _localizedValues['funSettings']!;
+  String get language => _localizedValues['language']!;
+  String get sound => _localizedValues['sound']!;
+  String get music => _localizedValues['music']!;
+  String get notifications => _localizedValues['notifications']!;
+  String get theme => _localizedValues['theme']!;
+  String get brightness => _localizedValues['brightness']!;
+  String get volume => _localizedValues['volume']!;
+  String get on => _localizedValues['on']!;
+  String get off => _localizedValues['off']!;
+  String get auto => _localizedValues['auto']!;
+  String get light => _localizedValues['light']!;
+  String get dark => _localizedValues['dark']!;
+  String get system => _localizedValues['system']!;
+  String get high => _localizedValues['high']!;
+  String get low => _localizedValues['low']!;
+  String get medium => _localizedValues['medium']!;
+  String get enableSound => _localizedValues['enableSound']!;
+  String get enableMusic => _localizedValues['enableMusic']!;
+  String get enableNotifications => _localizedValues['enableNotifications']!;
+  String get selectTheme => _localizedValues['selectTheme']!;
+  String get selectBrightness => _localizedValues['selectBrightness']!;
+  String get adjustVolume => _localizedValues['adjustVolume']!;
+  String get languageDescription => _localizedValues['languageDescription']!;
+  String get soundDescription => _localizedValues['soundDescription']!;
+  String get musicDescription => _localizedValues['musicDescription']!;
+  String get notificationsDescription =>
+      _localizedValues['notificationsDescription']!;
+  String get themeDescription => _localizedValues['themeDescription']!;
+  String get brightnessDescription =>
+      _localizedValues['brightnessDescription']!;
+  String get volumeDescription => _localizedValues['volumeDescription']!;
+  String get backToHome => _localizedValues['backToHome']!;
+  String get saveSettings => _localizedValues['saveSettings']!;
+  String get resetSettings => _localizedValues['resetSettings']!;
+  String get settingsSaved => _localizedValues['settingsSaved']!;
+  String get settingsReset => _localizedValues['settingsReset']!;
+}
+
+class _AppLocalizationsDelegate
+    extends LocalizationsDelegate<AppLocalizations> {
+  const _AppLocalizationsDelegate();
+
+  @override
+  bool isSupported(Locale locale) {
+    return ['en', 'ar'].contains(locale.languageCode);
+  }
+
+  @override
+  Future<AppLocalizations> load(Locale locale) async {
+    final String languageCode = locale.languageCode;
+    final String assetPath = 'assets/lang/$languageCode.json';
+
+    try {
+      final String jsonString = await rootBundle.loadString(assetPath);
+      final Map<String, dynamic> jsonMap = json.decode(jsonString);
+      final Map<String, String> localizedValues = jsonMap.map(
+        (key, value) => MapEntry(key, value.toString()),
+      );
+
+      return AppLocalizations(locale, localizedValues);
+    } catch (e) {
+      // Fallback to English if the language file is not found
+      if (languageCode != 'en') {
+        return load(const Locale('en', ''));
+      }
+      rethrow;
+    }
+  }
+
+  @override
+  bool shouldReload(_AppLocalizationsDelegate old) => false;
+}

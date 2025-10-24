@@ -37,6 +37,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_animate: ^4.5.2
+  flutter_localizations:
+    sdk: flutter
   flutter_bloc: ^9.1.0
   flutter_svg: ^2.0.16
   flutter_tts: ^4.2.0
@@ -73,6 +75,8 @@ flutter:
     - assets/images/puzzle/ghost block/
     - assets/images/puzzle/blocks4/
     - assets/data/
+    - assets/lang/
+    - assets/audio/
   #   - images/a_dot_ham.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images

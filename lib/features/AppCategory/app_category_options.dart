@@ -9,6 +9,7 @@ import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_cubit.dart';
 import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_loader.dart';
 import 'package:kidzoo/features/CrosswordGame/data/models/crossword_models.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
+import 'package:kidzoo/features/DrawLab/UI/drawlab_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
@@ -61,7 +62,7 @@ class OptionsGrid extends StatelessWidget {
   List<OptionItem> _getGameOptions() {
     return [
       OptionItem(
-        icon: ImageManager.flipMath,
+        icon: ImageManager.xo,
         title: 'Tic Tac Toe',
         screen: const TicTacToeGame(),
         flipImage: ImageManager.brain,
@@ -79,7 +80,7 @@ class OptionsGrid extends StatelessWidget {
         flipImage: ImageManager.flipQuiz,
       ),
       OptionItem(
-        icon: ImageManager.math,
+        icon: ImageManager.i2048,
         title: '2048 Game',
         screen: BlocProvider(
           create: (context) => GameCubit(),
@@ -88,7 +89,7 @@ class OptionsGrid extends StatelessWidget {
         flipImage: ImageManager.numbers,
       ),
       OptionItem(
-        icon: ImageManager.shapes,
+        icon: ImageManager.pen,
         title: 'Dots & Boxes',
         screen: const DotsAndBoxesScreen(),
         flipImage: ImageManager.flipShapes,
@@ -98,6 +99,12 @@ class OptionsGrid extends StatelessWidget {
         title: 'Crossword',
         screen: const _CrosswordGameWrapper(),
         flipImage: ImageManager.flipLetters,
+      ),
+      OptionItem(
+        icon: ImageManager.simle,
+        title: 'DrawLab',
+        screen: const DrawLabScreen(),
+        flipImage: ImageManager.flipShapes,
       ),
     ];
   }
@@ -334,7 +341,8 @@ class _CrosswordGameWrapper extends StatelessWidget {
 
   Future<CrosswordPuzzle?> _loadPuzzle() async {
     // Load a random medium difficulty puzzle for fun games
-    final puzzles = await CrosswordLoader.loadPuzzlesByDifficulty(Difficulty.medium);
+    final puzzles =
+        await CrosswordLoader.loadPuzzlesByDifficulty(Difficulty.medium);
     return puzzles.isNotEmpty ? puzzles[0] : null;
   }
 }

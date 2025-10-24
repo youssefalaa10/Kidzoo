@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import 'widgets/game_result_dialog.dart';
 
 class TicTacToeGame extends StatefulWidget {
@@ -108,7 +109,9 @@ class TicTacToeGameState extends State<TicTacToeGame>
     setState(() {
       board = List.generate(3, (_) => List.filled(3, ''));
       xTurn = true;
-      gameStatus = gameMode == GameMode.vsAI ? 'Your Turn' : 'Player X\'s Turn';
+      gameStatus = gameMode == GameMode.vsAI
+          ? AppLocalizations.of(context).yourTurnTicTacToe
+          : AppLocalizations.of(context).playerXTurn;
       aiThinking = false;
 
       // Reset cell animations
@@ -158,16 +161,17 @@ class TicTacToeGameState extends State<TicTacToeGame>
   }
 
   void _handleGameEnd(String winner) {
+    final l10n = AppLocalizations.of(context);
     if (winner == 'X') {
-      gameStatus = gameMode == GameMode.vsAI ? 'You Win!' : 'Player X Wins!';
+      gameStatus = gameMode == GameMode.vsAI ? l10n.youWin : l10n.playerXWins;
       xScore++;
       _winController.forward();
     } else if (winner == 'O') {
-      gameStatus = gameMode == GameMode.vsAI ? 'AI Wins!' : 'Player O Wins!';
+      gameStatus = gameMode == GameMode.vsAI ? l10n.aiWins : l10n.playerOWins;
       oScore++;
       _winController.forward();
     } else {
-      gameStatus = 'It\'s a Draw!';
+      gameStatus = l10n.itsADraw;
       drawScore++;
     }
 
@@ -180,7 +184,7 @@ class TicTacToeGameState extends State<TicTacToeGame>
   }
 
   void _showResultDialog(String winner) {
-    showDialog(
+    showDialog<void>(
       context: context,
       barrierDismissible: false,
       builder: (context) => GameResultDialog(
@@ -198,10 +202,11 @@ class TicTacToeGameState extends State<TicTacToeGame>
   }
 
   void _updateGameStatus() {
+    final l10n = AppLocalizations.of(context);
     if (gameMode == GameMode.vsAI) {
-      gameStatus = xTurn ? 'Your Turn' : 'AI Thinking...';
+      gameStatus = xTurn ? l10n.yourTurnTicTacToe : l10n.aiThinking;
     } else {
-      gameStatus = xTurn ? 'Player X\'s Turn' : 'Player O\'s Turn';
+      gameStatus = xTurn ? l10n.playerXTurn : l10n.playerOTurn;
     }
   }
 
@@ -469,7 +474,7 @@ class TicTacToeGameState extends State<TicTacToeGame>
 
   Widget _buildGameTitle(double fontSize) {
     return Text(
-      'EPIC TIC TAC TOE',
+      AppLocalizations.of(context).epicTicTacToe,
       style: TextStyle(
         fontSize: fontSize,
         fontWeight: FontWeight.bold,
@@ -513,15 +518,23 @@ class TicTacToeGameState extends State<TicTacToeGame>
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _buildScoreColumn(
-                    gameMode == GameMode.vsAI ? 'You' : 'Player X',
+                    gameMode == GameMode.vsAI
+                        ? AppLocalizations.of(context).you
+                        : AppLocalizations.of(context).playerX,
                     xScore,
                     Colors.red,
                     textSize,
                     valueSize),
+                _buildScoreColumn(AppLocalizations.of(context).draws, drawScore,
+                    Colors.grey, textSize, valueSize),
                 _buildScoreColumn(
-                    'Draws', drawScore, Colors.grey, textSize, valueSize),
-                _buildScoreColumn(gameMode == GameMode.vsAI ? 'AI' : 'Player O',
-                    oScore, Colors.blue, textSize, valueSize),
+                    gameMode == GameMode.vsAI
+                        ? AppLocalizations.of(context).ai
+                        : AppLocalizations.of(context).playerO,
+                    oScore,
+                    Colors.blue,
+                    textSize,
+                    valueSize),
               ],
             ),
           ),
@@ -595,7 +608,7 @@ class TicTacToeGameState extends State<TicTacToeGame>
     return ElevatedButton.icon(
       onPressed: resetGame,
       icon: const Icon(Icons.refresh),
-      label: const Text('New Game'),
+      label: Text(AppLocalizations.of(context).newGame),
       style: ElevatedButton.styleFrom(
         foregroundColor: Colors.white,
         backgroundColor: Colors.blue,
@@ -619,13 +632,13 @@ class TicTacToeGameState extends State<TicTacToeGame>
         mainAxisSize: MainAxisSize.min,
         children: [
           _buildModeButton(
-            'VS Player',
+            AppLocalizations.of(context).vsPlayer,
             GameMode.twoPlayer,
             Icons.people,
           ),
           const SizedBox(width: 4),
           _buildModeButton(
-            'VS AI',
+            AppLocalizations.of(context).vsAI,
             GameMode.vsAI,
             Icons.smart_toy,
           ),

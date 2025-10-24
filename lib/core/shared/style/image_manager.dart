@@ -141,4 +141,10 @@ class ImageManager {
   static const String ghost2 = 'assets/images/puzzle/ghost block/2.png';
   static const String ghost3 = 'assets/images/puzzle/ghost block/3.png';
   static const String ghost4 = 'assets/images/puzzle/ghost block/4.png';
+
+  // icons
+  static const String i2048 = 'assets/images/icons/2048.png';
+  static const String pen = 'assets/images/icons/pen.png';
+  static const String simle = 'assets/images/icons/simle.png';
+  static const String xo = 'assets/images/icons/xo.png';
 }
