@@ -47,6 +47,11 @@ class DrawLabCubit extends Cubit<DrawingState> {
     emit(state.copyWith(brushShape: brushShape));
   }
 
+  /// Set selected shape type
+  void setSelectedShape(ShapeType shapeType) {
+    emit(state.copyWith(selectedShape: shapeType));
+  }
+
   /// Toggle grid visibility
   void toggleGrid() {
     emit(state.copyWith(isGridVisible: !state.isGridVisible));
@@ -60,15 +65,26 @@ class DrawLabCubit extends Cubit<DrawingState> {
   /// Start a new stroke
   void startStroke(Offset point) {
     if (state.currentTool == DrawingTool.brush ||
+        state.currentTool == DrawingTool.pencil ||
         state.currentTool == DrawingTool.eraser) {
+      // Set brush type based on tool
+      BrushType brushType = state.brushType;
+      if (state.currentTool == DrawingTool.pencil) {
+        brushType = BrushType.pencil;
+      } else if (state.currentTool == DrawingTool.brush) {
+        brushType = BrushType.pen;
+      }
+
       final newStroke = DrawingStroke(
         points: [point],
         color: state.currentTool == DrawingTool.eraser
             ? Colors.transparent
             : state.currentColor,
-        strokeWidth: state.strokeWidth,
+        strokeWidth: state.currentTool == DrawingTool.pencil
+            ? state.strokeWidth * 0.7 // Pencil is slightly thinner
+            : state.strokeWidth,
         opacity: state.currentTool == DrawingTool.eraser ? 1.0 : state.opacity,
-        brushType: state.brushType,
+        brushType: brushType,
         blendMode: state.currentTool == DrawingTool.eraser
             ? ui.BlendMode.clear
             : ui.BlendMode.srcOver,
@@ -112,19 +128,19 @@ class DrawLabCubit extends Cubit<DrawingState> {
       );
 
       final newShapes = List<DrawingShape>.from(state.shapes)..add(newShape);
-      emit(state.copyWith(shapes: newShapes, selectedShape: newShape));
+      emit(state.copyWith(shapes: newShapes, currentShape: newShape));
     }
   }
 
   /// Update current shape
   void updateShape(Offset point) {
-    if (state.selectedShape != null) {
-      final updatedShape = state.selectedShape!.copyWith(endPoint: point);
+    if (state.currentShape != null) {
+      final updatedShape = state.currentShape!.copyWith(endPoint: point);
       final newShapes = List<DrawingShape>.from(state.shapes);
-      final index = newShapes.indexOf(state.selectedShape!);
+      final index = newShapes.indexOf(state.currentShape!);
       if (index != -1) {
         newShapes[index] = updatedShape;
-        emit(state.copyWith(shapes: newShapes, selectedShape: updatedShape));
+        emit(state.copyWith(shapes: newShapes, currentShape: updatedShape));
       }
     }
   }

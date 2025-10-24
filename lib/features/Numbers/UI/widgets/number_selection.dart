@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/helpers/tts_helper.dart';
+import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_event.dart';
 import 'package:kidzoo/features/Numbers/data/model/number_model.dart';
@@ -10,7 +11,8 @@ class NumberSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TtsHelper ttsHelper = TtsHelper();
+    final musicCubit = context.read<MusicCubit>();
+    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
 
     final List<NumberModel> numbers = NumberModel.numbers;
 

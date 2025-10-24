@@ -1,4 +1,5 @@
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 
 /// Represents a drawing stroke
@@ -178,6 +179,7 @@ enum ShapeType {
 /// Drawing tool types
 enum DrawingTool {
   brush,
+  pencil,
   eraser,
   shape,
   text,
@@ -229,6 +231,7 @@ class DrawingState {
     required this.isGridVisible,
     required this.isSnapToGrid,
     this.selectedShape,
+    this.currentShape,
     this.selectedText,
     this.historyIndex = -1,
     this.history = const [],
@@ -245,7 +248,8 @@ class DrawingState {
   final BrushShape brushShape;
   final bool isGridVisible;
   final bool isSnapToGrid;
-  final DrawingShape? selectedShape;
+  final ShapeType? selectedShape;
+  final DrawingShape? currentShape;
   final DrawingText? selectedText;
   final int historyIndex;
   final List<DrawingState> history;
@@ -271,7 +275,8 @@ class DrawingState {
     BrushShape? brushShape,
     bool? isGridVisible,
     bool? isSnapToGrid,
-    DrawingShape? selectedShape,
+    ShapeType? selectedShape,
+    DrawingShape? currentShape,
     DrawingText? selectedText,
     int? historyIndex,
     List<DrawingState>? history,
@@ -289,6 +294,7 @@ class DrawingState {
       isGridVisible: isGridVisible ?? this.isGridVisible,
       isSnapToGrid: isSnapToGrid ?? this.isSnapToGrid,
       selectedShape: selectedShape ?? this.selectedShape,
+      currentShape: currentShape ?? this.currentShape,
       selectedText: selectedText ?? this.selectedText,
       historyIndex: historyIndex ?? this.historyIndex,
       history: history ?? this.history,

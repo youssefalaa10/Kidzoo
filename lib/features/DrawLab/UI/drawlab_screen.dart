@@ -1,33 +1,72 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzoo/core/localization/language_settings_screen.dart';
+import 'package:kidzoo/features/DrawLab/UI/screens/gallery_screen.dart';
+import 'package:kidzoo/features/DrawLab/UI/widgets/brush_controls.dart';
+import 'package:kidzoo/features/DrawLab/UI/widgets/color_picker_widget.dart';
+import 'package:kidzoo/features/DrawLab/UI/widgets/drawing_canvas.dart';
+import 'package:kidzoo/features/DrawLab/UI/widgets/tool_palette.dart';
+import 'package:kidzoo/features/DrawLab/data/logic/drawlab_cubit.dart';
+import 'package:kidzoo/features/DrawLab/data/models/drawlab_models.dart';
 
-import '../../../core/localization/app_localizations.dart';
-import '../../../core/localization/language_settings_screen.dart';
-import '../data/logic/drawlab_cubit.dart';
-import '../data/models/drawlab_models.dart';
-import 'screens/gallery_screen.dart';
-import 'widgets/brush_controls.dart';
-import 'widgets/color_picker_widget.dart';
-import 'widgets/drawing_canvas.dart';
-import 'widgets/tool_palette.dart';
+import 'drawlab_mobile_screen.dart';
 
-class DrawLabScreen extends StatefulWidget {
+class DrawLabScreen extends StatelessWidget {
   const DrawLabScreen({super.key});
 
   @override
-  State<DrawLabScreen> createState() => _DrawLabScreenState();
+  Widget build(BuildContext context) {
+    // Use mobile-optimized version for all devices
+    return const DrawLabMobileScreen();
+  }
 }
 
-class _DrawLabScreenState extends State<DrawLabScreen>
+// Old desktop version kept for reference
+class _OldDrawLabScreen extends StatefulWidget {
+  const _OldDrawLabScreen({super.key});
+
+  @override
+  State<_OldDrawLabScreen> createState() => _OldDrawLabScreenState();
+}
+
+class _OldDrawLabScreenState extends State<_OldDrawLabScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  final Size _canvasSize = const Size(800, 600);
+  Size _canvasSize = const Size(800, 600);
+  double _zoomLevel = 1.0;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateCanvasSize();
+    });
+  }
+
+  void _updateCanvasSize() {
+    final screenSize = MediaQuery.of(context).size;
+    final orientation = MediaQuery.of(context).orientation;
+
+    if (orientation == Orientation.landscape) {
+      // In landscape, use more horizontal space and allow for larger canvas
+      _canvasSize = Size(
+        (screenSize.width * 0.5).clamp(800.0, 1600.0),
+        (screenSize.height * 0.8).clamp(500.0, 1000.0),
+      );
+    } else {
+      // In portrait, use more vertical space
+      _canvasSize = Size(
+        (screenSize.width * 0.95).clamp(400.0, 800.0),
+        (screenSize.height * 0.6).clamp(500.0, 1000.0),
+      );
+    }
+
+    if (mounted) {
+      setState(() {});
+    }
   }
 
   @override
@@ -38,34 +77,34 @@ class _DrawLabScreenState extends State<DrawLabScreen>
 
   @override
   Widget build(BuildContext context) {
+    final orientation = MediaQuery.of(context).orientation;
+
     return BlocProvider(
       create: (context) => DrawLabCubit(),
       child: Scaffold(
         key: _scaffoldKey,
         appBar: _buildAppBar(),
-        body: Column(
-          children: [
-            // Tool palette
-            _buildToolPalette(),
+        body: LayoutBuilder(
+          builder: (context, constraints) {
+            // Update canvas size when layout changes
+            WidgetsBinding.instance.addPostFrameCallback((_) {
+              _updateCanvasSize();
+            });
 
-            // Main content area
-            Expanded(
-              child: Row(
-                children: [
-                  // Left sidebar - Controls
-                  _buildLeftSidebar(),
+            return Column(
+              children: [
+                // Tool palette
+                _buildToolPalette(),
 
-                  // Center - Canvas
-                  Expanded(
-                    child: _buildCanvasArea(),
-                  ),
-
-                  // Right sidebar - Gallery
-                  _buildRightSidebar(),
-                ],
-              ),
-            ),
-          ],
+                // Main content area
+                Expanded(
+                  child: orientation == Orientation.landscape
+                      ? _buildLandscapeLayout()
+                      : _buildPortraitLayout(),
+                ),
+              ],
+            );
+          },
         ),
         floatingActionButton: _buildFloatingActionButtons(),
       ),
@@ -155,9 +194,57 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     );
   }
 
-  Widget _buildLeftSidebar() {
+  Widget _buildLandscapeLayout() {
+    return Row(
+      children: [
+        // Left sidebar - Controls (wider in landscape)
+        _buildLeftSidebar(320),
+
+        // Center - Canvas with scrollable area
+        Expanded(
+          child: _buildCanvasArea(),
+        ),
+
+        // Right sidebar - Gallery (narrower in landscape)
+        _buildRightSidebar(200),
+      ],
+    );
+  }
+
+  Widget _buildPortraitLayout() {
+    return Column(
+      children: [
+        // Canvas area (larger in portrait)
+        Expanded(
+          flex: 3,
+          child: _buildCanvasArea(),
+        ),
+
+        // Bottom controls
+        SizedBox(
+          height: 200,
+          child: Row(
+            children: [
+              // Left controls
+              Expanded(
+                flex: 2,
+                child: _buildLeftSidebar(0),
+              ),
+
+              // Right gallery
+              Expanded(
+                child: _buildRightSidebar(0),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLeftSidebar(double width) {
     return Container(
-      width: 280,
+      width: width > 0 ? width : null,
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         border: Border(
@@ -200,20 +287,29 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     return Container(
       padding: const EdgeInsets.all(16),
       child: Center(
-        child: Container(
-          decoration: BoxDecoration(
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
-                blurRadius: 10,
-                offset: const Offset(0, 5),
+        child: InteractiveViewer(
+          minScale: 0.3,
+          maxScale: 4.0,
+          onInteractionUpdate: (details) {
+            setState(() {
+              _zoomLevel = details.scale;
+            });
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: ExportableDrawingCanvas(
+                canvasSize: _canvasSize,
               ),
-            ],
-          ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: ExportableDrawingCanvas(
-              canvasSize: _canvasSize,
             ),
           ),
         ),
@@ -221,11 +317,11 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     );
   }
 
-  Widget _buildRightSidebar() {
+  Widget _buildRightSidebar(double width) {
     final l10n = AppLocalizations.of(context);
 
     return Container(
-      width: 200,
+      width: width > 0 ? width : null,
       decoration: BoxDecoration(
         color: Colors.grey.shade50,
         border: Border(
@@ -277,8 +373,39 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         return Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
+            // Zoom in button
+            FloatingActionButton(
+              heroTag: 'zoom_in',
+              onPressed: () => _zoomIn(),
+              backgroundColor: Colors.green,
+              tooltip: 'Zoom In',
+              child: const Icon(Icons.zoom_in, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+
+            // Zoom out button
+            FloatingActionButton(
+              heroTag: 'zoom_out',
+              onPressed: () => _zoomOut(),
+              backgroundColor: Colors.orange,
+              tooltip: 'Zoom Out',
+              child: const Icon(Icons.zoom_out, color: Colors.white),
+            ),
+            const SizedBox(height: 8),
+
+            // Reset zoom button
+            FloatingActionButton(
+              heroTag: 'reset_zoom',
+              onPressed: () => _resetZoom(),
+              backgroundColor: Colors.purple,
+              tooltip: 'Reset Zoom',
+              child: const Icon(Icons.center_focus_strong, color: Colors.white),
+            ),
+            const SizedBox(height: 16),
+
             // Undo button
             FloatingActionButton(
+              heroTag: 'undo',
               onPressed: state.canUndo
                   ? () => context.read<DrawLabCubit>().undo()
                   : null,
@@ -291,6 +418,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
 
             // Redo button
             FloatingActionButton(
+              heroTag: 'redo',
               onPressed: state.canRedo
                   ? () => context.read<DrawLabCubit>().redo()
                   : null,
@@ -303,6 +431,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
 
             // Clear button
             FloatingActionButton(
+              heroTag: 'clear',
               onPressed:
                   state.hasContent ? () => _showClearConfirmation() : null,
               backgroundColor:
@@ -358,7 +487,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     try {
       // Get the canvas widget and export it
       final canvasWidget = _scaffoldKey.currentContext!
-          .findAncestorStateOfType<_DrawLabScreenState>();
+          .findAncestorStateOfType<_OldDrawLabScreenState>();
       if (canvasWidget != null) {
         // Export logic would go here
         _showSuccessSnackBar(l10n.drawingExported);
@@ -450,5 +579,23 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         duration: const Duration(seconds: 3),
       ),
     );
+  }
+
+  void _zoomIn() {
+    setState(() {
+      _zoomLevel = (_zoomLevel * 1.2).clamp(0.3, 4.0);
+    });
+  }
+
+  void _zoomOut() {
+    setState(() {
+      _zoomLevel = (_zoomLevel / 1.2).clamp(0.3, 4.0);
+    });
+  }
+
+  void _resetZoom() {
+    setState(() {
+      _zoomLevel = 1.0;
+    });
   }
 }

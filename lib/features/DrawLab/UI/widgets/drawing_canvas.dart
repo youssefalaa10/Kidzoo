@@ -1,8 +1,10 @@
 import 'dart:typed_data';
 import 'dart:ui' as ui;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../../../../core/localization/app_localizations.dart';
 import '../../data/logic/drawlab_cubit.dart';
 import '../../data/models/drawlab_models.dart';
@@ -13,10 +15,14 @@ class DrawingCanvas extends StatefulWidget {
     required this.canvasSize,
     super.key,
     this.gridSize = 20.0,
+    this.isScrollable = true,
+    this.minSize = const Size(400, 300),
   });
 
   final Size canvasSize;
   final double gridSize;
+  final bool isScrollable;
+  final Size minSize;
 
   @override
   State<DrawingCanvas> createState() => _DrawingCanvasState();
@@ -29,14 +35,20 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
   Widget build(BuildContext context) {
     return BlocBuilder<DrawLabCubit, DrawingState>(
       builder: (context, state) {
-        return GestureDetector(
+        final effectiveSize = Size(
+          widget.canvasSize.width.clamp(widget.minSize.width, double.infinity),
+          widget.canvasSize.height
+              .clamp(widget.minSize.height, double.infinity),
+        );
+
+        final Widget canvasWidget = GestureDetector(
           onPanStart: _onPanStart,
           onPanUpdate: _onPanUpdate,
           onPanEnd: _onPanEnd,
           onTapDown: _onTapDown,
           child: Container(
-            width: widget.canvasSize.width,
-            height: widget.canvasSize.height,
+            width: effectiveSize.width,
+            height: effectiveSize.height,
             decoration: BoxDecoration(
               border: Border.all(color: Colors.grey.shade300),
               borderRadius: BorderRadius.circular(8),
@@ -44,16 +56,27 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8),
               child: CustomPaint(
-                size: widget.canvasSize,
+                size: effectiveSize,
                 painter: DrawingCanvasPainter(
                   state: state,
-                  canvasSize: widget.canvasSize,
+                  canvasSize: effectiveSize,
                   gridSize: widget.gridSize,
                 ),
               ),
             ),
           ),
         );
+
+        if (widget.isScrollable) {
+          return SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: SingleChildScrollView(
+              child: canvasWidget,
+            ),
+          );
+        }
+
+        return canvasWidget;
       },
     );
   }
@@ -68,11 +91,13 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
 
     switch (cubit.state.currentTool) {
       case DrawingTool.brush:
+      case DrawingTool.pencil:
       case DrawingTool.eraser:
         cubit.startStroke(localPosition);
         break;
       case DrawingTool.shape:
-        cubit.startShape(localPosition, ShapeType.rectangle); // Default shape
+        cubit.startShape(
+            localPosition, cubit.state.selectedShape ?? ShapeType.rectangle);
         break;
       case DrawingTool.text:
         _showTextDialog(localPosition);
@@ -91,6 +116,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
 
     switch (cubit.state.currentTool) {
       case DrawingTool.brush:
+      case DrawingTool.pencil:
       case DrawingTool.eraser:
         cubit.updateStroke(localPosition);
         break;
@@ -111,6 +137,7 @@ class _DrawingCanvasState extends State<DrawingCanvas> {
 
     switch (cubit.state.currentTool) {
       case DrawingTool.brush:
+      case DrawingTool.pencil:
       case DrawingTool.eraser:
         cubit.endStroke();
         break;
@@ -181,11 +208,15 @@ class ExportableDrawingCanvas extends StatefulWidget {
     super.key,
     this.gridSize = 20.0,
     this.quality = ExportQuality.original,
+    this.isScrollable = true,
+    this.minSize = const Size(400, 300),
   });
 
   final Size canvasSize;
   final double gridSize;
   final ExportQuality quality;
+  final bool isScrollable;
+  final Size minSize;
 
   @override
   State<ExportableDrawingCanvas> createState() =>
@@ -202,6 +233,8 @@ class _ExportableDrawingCanvasState extends State<ExportableDrawingCanvas> {
       child: DrawingCanvas(
         canvasSize: widget.canvasSize,
         gridSize: widget.gridSize,
+        isScrollable: widget.isScrollable,
+        minSize: widget.minSize,
       ),
     );
   }

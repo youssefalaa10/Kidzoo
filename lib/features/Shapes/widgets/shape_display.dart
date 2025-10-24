@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/helpers/tts_helper.dart';
+import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 import 'package:kidzoo/features/Shapes/data/model/shape_model.dart';
 
 class ShapeDisplay extends StatelessWidget {
@@ -8,7 +10,8 @@ class ShapeDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TtsHelper ttsHelper = TtsHelper();
+    final musicCubit = context.read<MusicCubit>();
+    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
     final screenWidth = MediaQuery.of(context).size.width;
     final int selectionCrossAxisCount = screenWidth < 600
         ? 1

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../core/base/protected_game_screen.dart';
+import '../../../core/mixins/background_music_mixin.dart';
 import '../data/model/animal_quiz_model.dart';
 
 class AnimalQuizScreen extends ProtectedGameScreen {
@@ -11,8 +12,8 @@ class AnimalQuizScreen extends ProtectedGameScreen {
   State<AnimalQuizScreen> createState() => _AnimalQuizScreenState();
 }
 
-class _AnimalQuizScreenState
-    extends ProtectedGameScreenState<AnimalQuizScreen> {
+class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
+    with TTSMusicMixin {
   List<AnimalQuizModel> animals = [];
   List<AnimalQuizModel> chooseAnimals = [];
   int score = 0;
@@ -216,9 +217,17 @@ class _AnimalQuizScreenState
   }
 
   void speak(String text) async {
+    // Stop background music completely for TTS to avoid تداخل
+    stopForSpeech();
+
     await flutterTts.setLanguage('en-US');
     await flutterTts.setPitch(1.0);
     await flutterTts.speak(text);
+
+    // Resume background music after a delay
+    Future.delayed(const Duration(seconds: 3), () {
+      resumeAfterSpeech();
+    });
   }
 
   @override

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
@@ -50,20 +51,21 @@ class OptionsGrid extends StatelessWidget {
   final CustomMQ mq;
   final AppCategory category;
 
-  List<OptionItem> get options {
+  List<OptionItem> getOptions(BuildContext context) {
     switch (category) {
       case AppCategory.games:
-        return _getGameOptions();
+        return _getGameOptions(context);
       case AppCategory.education:
         return _getEducationOptions();
     }
   }
 
-  List<OptionItem> _getGameOptions() {
+  List<OptionItem> _getGameOptions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return [
       OptionItem(
         icon: ImageManager.xo,
-        title: 'Tic Tac Toe',
+        title: l10n.ticTacToe,
         screen: const TicTacToeGame(),
         flipImage: ImageManager.brain,
       ),
@@ -77,7 +79,7 @@ class OptionsGrid extends StatelessWidget {
         icon: ImageManager.letterL,
         title: 'Missing Letter',
         screen: const MissingLetterHome(),
-        flipImage: ImageManager.flipQuiz,
+        flipImage: ImageManager.brain,
       ),
       OptionItem(
         icon: ImageManager.i2048,
@@ -90,21 +92,21 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.pen,
-        title: 'Dots & Boxes',
+        title: l10n.dotsAndBoxes,
         screen: const DotsAndBoxesScreen(),
         flipImage: ImageManager.flipShapes,
       ),
       OptionItem(
-        icon: ImageManager.letterL,
+        icon: ImageManager.letterW,
         title: 'Crossword',
         screen: const _CrosswordGameWrapper(),
         flipImage: ImageManager.flipLetters,
       ),
       OptionItem(
         icon: ImageManager.simle,
-        title: 'DrawLab',
+        title: l10n.drawLab,
         screen: const DrawLabScreen(),
-        flipImage: ImageManager.flipShapes,
+        flipImage: ImageManager.pen,
       ),
     ];
   }
@@ -150,9 +152,9 @@ class OptionsGrid extends StatelessWidget {
         mainAxisSpacing: mq.height(2),
         childAspectRatio: 3 / 2.5,
       ),
-      itemCount: options.length,
+      itemCount: getOptions(context).length,
       itemBuilder: (context, index) {
-        final option = options[index];
+        final option = getOptions(context)[index];
         return OptionCard(
           icon: option.icon,
           title: option.title,
@@ -249,6 +251,13 @@ class OptionCardState extends State<OptionCard>
   }
 
   Widget _buildFrontSide() {
+    // Check if this is one of the specific icons that need larger size
+    final isSpecialIcon = widget.icon == ImageManager.simle ||
+        widget.icon == ImageManager.pen ||
+        widget.icon == ImageManager.xo;
+
+    final iconSize = isSpecialIcon ? widget.mq.width(16) : widget.mq.width(12);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -267,8 +276,8 @@ class OptionCardState extends State<OptionCard>
         children: [
           Image.asset(
             widget.icon,
-            width: widget.mq.width(12),
-            height: widget.mq.width(12),
+            width: iconSize,
+            height: iconSize,
             fit: BoxFit.contain,
           ),
           SizedBox(height: widget.mq.height(1)),
@@ -285,6 +294,13 @@ class OptionCardState extends State<OptionCard>
   }
 
   Widget _buildBackSide() {
+    // Check if this is one of the specific icons that need larger size
+    final isSpecialIcon = widget.icon == ImageManager.simle ||
+        widget.icon == ImageManager.pen ||
+        widget.icon == ImageManager.xo;
+
+    final iconSize = isSpecialIcon ? widget.mq.width(16) : widget.mq.width(12);
+
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -300,8 +316,8 @@ class OptionCardState extends State<OptionCard>
       alignment: Alignment.center,
       child: Image.asset(
         widget.flipImage,
-        width: widget.mq.width(12),
-        height: widget.mq.width(12),
+        width: iconSize,
+        height: iconSize,
         fit: BoxFit.contain,
       ),
     );

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:provider/provider.dart';
 
 import '../../core/helpers/media_query.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/localization/language_provider.dart';
+import '../../core/mixins/background_music_mixin.dart';
+import '../../core/services/cubit/music_cubit.dart';
 import '../../core/shared/style/image_manager.dart';
-import 'settings_provider.dart';
+import 'cubit/settings_cubit.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -15,7 +16,8 @@ class SettingsScreen extends StatefulWidget {
   State<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _SettingsScreenState extends State<SettingsScreen>
+    with BackgroundMusicMixin {
   @override
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);
@@ -110,30 +112,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                           SizedBox(height: mq.height(2)),
 
-                          // Theme Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.palette,
-                            title: l10n.theme,
-                            description: l10n.themeDescription,
-                            child: _buildThemeSelector(context, l10n),
-                            color: Colors.purple,
-                          ),
-                          SizedBox(height: mq.height(2)),
-
-                          // Brightness Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.brightness_6,
-                            title: l10n.brightness,
-                            description: l10n.brightnessDescription,
-                            child: _buildBrightnessSelector(context, l10n),
-                            color: Colors.amber,
-                          ),
-                          SizedBox(height: mq.height(2)),
-
                           // Volume Settings Card
                           _buildSettingsCard(
                             context,
@@ -145,6 +123,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             color: Colors.teal,
                           ),
                           SizedBox(height: mq.height(3)),
+
+                          // Test Music Button (for debugging)
+                          _buildTestMusicButton(context, mq, l10n),
+                          SizedBox(height: mq.height(1)),
 
                           // Action Buttons
                           _buildActionButtons(context, mq, l10n),
@@ -314,8 +296,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildSoundSettings(BuildContext context, AppLocalizations l10n) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, settingsState) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -324,8 +306,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             Switch(
-              value: settings.soundEnabled,
-              onChanged: (value) => settings.setSoundEnabled(value),
+              value: settingsState.soundEnabled,
+              onChanged: (value) =>
+                  context.read<SettingsCubit>().setSoundEnabled(value),
               activeThumbColor: Colors.green,
             ),
           ],
@@ -335,8 +318,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Widget _buildMusicSettings(BuildContext context, AppLocalizations l10n) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
+    return BlocBuilder<MusicCubit, MusicState>(
+      builder: (context, musicState) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -345,8 +328,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             Switch(
-              value: settings.musicEnabled,
-              onChanged: (value) => settings.setMusicEnabled(value),
+              value: musicState.isMusicEnabled,
+              onChanged: (value) {
+                context.read<MusicCubit>().setMusicEnabled(value);
+              },
               activeThumbColor: Colors.orange,
             ),
           ],
@@ -357,8 +342,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Widget _buildNotificationSettings(
       BuildContext context, AppLocalizations l10n) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
+    return BlocBuilder<SettingsCubit, SettingsState>(
+      builder: (context, settingsState) {
         return Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -367,8 +352,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
             ),
             Switch(
-              value: settings.notificationsEnabled,
-              onChanged: (value) => settings.setNotificationsEnabled(value),
+              value: settingsState.notificationsEnabled,
+              onChanged: (value) =>
+                  context.read<SettingsCubit>().setNotificationsEnabled(value),
               activeThumbColor: Colors.red,
             ),
           ],
@@ -377,121 +363,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  Widget _buildThemeSelector(BuildContext context, AppLocalizations l10n) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
-        return Wrap(
-          spacing: 8,
-          children: [
-            _buildThemeOption(
-                l10n.light, 'light', Icons.light_mode, settings.selectedTheme),
-            _buildThemeOption(
-                l10n.dark, 'dark', Icons.dark_mode, settings.selectedTheme),
-            _buildThemeOption(l10n.system, 'system',
-                Icons.settings_system_daydream, settings.selectedTheme),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildThemeOption(
-      String label, String value, IconData icon, String selectedTheme) {
-    final isSelected = selectedTheme == value;
-    return GestureDetector(
-      onTap: () => Provider.of<SettingsProvider>(context, listen: false)
-          .setSelectedTheme(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.purple.withValues(alpha: 0.1)
-              : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Colors.purple : Colors.grey[300]!,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon,
-                size: 16, color: isSelected ? Colors.purple : Colors.grey[600]),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.purple : Colors.grey[700],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildBrightnessSelector(BuildContext context, AppLocalizations l10n) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
-        return Wrap(
-          spacing: 8,
-          children: [
-            _buildBrightnessOption(l10n.low, 'low', Icons.brightness_2,
-                settings.selectedBrightness),
-            _buildBrightnessOption(l10n.medium, 'medium', Icons.brightness_4,
-                settings.selectedBrightness),
-            _buildBrightnessOption(l10n.high, 'high', Icons.brightness_7,
-                settings.selectedBrightness),
-            _buildBrightnessOption(l10n.auto, 'auto', Icons.brightness_auto,
-                settings.selectedBrightness),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildBrightnessOption(
-      String label, String value, IconData icon, String selectedBrightness) {
-    final isSelected = selectedBrightness == value;
-    return GestureDetector(
-      onTap: () => Provider.of<SettingsProvider>(context, listen: false)
-          .setSelectedBrightness(value),
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? Colors.amber.withValues(alpha: 0.1)
-              : Colors.grey[100],
-          borderRadius: BorderRadius.circular(8),
-          border: Border.all(
-            color: isSelected ? Colors.amber : Colors.grey[300]!,
-          ),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(icon,
-                size: 16, color: isSelected ? Colors.amber : Colors.grey[600]),
-            const SizedBox(width: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.amber : Colors.grey[700],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildVolumeSlider(BuildContext context, AppLocalizations l10n) {
-    return Consumer<SettingsProvider>(
-      builder: (context, settings, child) {
+    return BlocBuilder<MusicCubit, MusicState>(
+      builder: (context, musicState) {
         return Column(
           children: [
             Row(
@@ -503,7 +377,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 Text(
-                  '${(settings.volume * 100).round()}%',
+                  '${(musicState.volume * 100).round()}%',
                   style: const TextStyle(
                       fontSize: 14, fontWeight: FontWeight.bold),
                 ),
@@ -518,8 +392,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 overlayColor: Colors.teal.withValues(alpha: 0.2),
               ),
               child: Slider(
-                value: settings.volume,
-                onChanged: (value) => settings.setVolume(value),
+                value: musicState.volume,
+                onChanged: (value) {
+                  context.read<MusicCubit>().setVolume(value);
+                },
                 divisions: 10,
               ),
             ),
@@ -569,7 +445,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   void _saveSettings() {
-    Provider.of<SettingsProvider>(context, listen: false).saveSettings();
+    // Settings are automatically saved when changed
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(AppLocalizations.of(context).settingsSaved),
@@ -582,8 +458,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  void _resetSettings() {
-    Provider.of<SettingsProvider>(context, listen: false).resetSettings();
+  void _resetSettings() async {
+    await context.read<SettingsCubit>().resetSettings();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -592,6 +468,155 @@ class _SettingsScreenState extends State<SettingsScreen> {
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTestMusicButton(
+      BuildContext context, CustomMQ mq, AppLocalizations l10n) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.purple.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+        border: Border.all(
+          color: Colors.purple.withValues(alpha: 0.3),
+          width: 2,
+        ),
+      ),
+      child: Padding(
+        padding: EdgeInsets.all(mq.width(4)),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.purple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(
+                    Icons.music_note,
+                    color: Colors.purple,
+                    size: 24,
+                  ),
+                ),
+                SizedBox(width: mq.width(3)),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Test Music',
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.purple,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Test background music playback',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<MusicCubit>().testAudio();
+                    },
+                    icon: const Icon(Icons.play_arrow),
+                    label: const Text('Test Audio'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.purple,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<MusicCubit>().logAudioState();
+                    },
+                    icon: const Icon(Icons.info),
+                    label: const Text('Log State'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.blue,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<MusicCubit>().forcePlayMusic();
+                    },
+                    icon: const Icon(Icons.play_circle),
+                    label: const Text('Force Play'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.green,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      context.read<MusicCubit>().checkAudioFile();
+                    },
+                    icon: const Icon(Icons.audiotrack),
+                    label: const Text('Check File'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
         ),
       ),
     );

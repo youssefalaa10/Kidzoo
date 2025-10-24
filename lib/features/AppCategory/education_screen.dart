@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
+import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 
 import 'app_category_options.dart';
 import 'header_section.dart';
 
-class EducationScreen extends StatelessWidget {
+class EducationScreen extends StatefulWidget {
   const EducationScreen({super.key});
 
+  @override
+  State<EducationScreen> createState() => _EducationScreenState();
+}
+
+class _EducationScreenState extends State<EducationScreen> with TTSMusicMixin {
   @override
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);

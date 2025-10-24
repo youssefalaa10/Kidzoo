@@ -34,8 +34,12 @@ class ImageManager {
 
 //  home images
 
-  static const String homeBackground =
-      'assets/images/home/Soft Blue Kids Cute Page Border.png';
+  static const String homeBackground = 'assets/images/home/cloudy_bg.png';
+  static const String mathBg = 'assets/images/home/math_bg.png';
+  static const String catsBg = 'assets/images/home/cats_bg.png';
+  static const String learningBg = 'assets/images/home/learn_bg.png';
+  static const String techBg = 'assets/images/home/tech_bg.jpeg';
+
 
   static const String numbers = 'assets/images/home/numbers.png';
   static const String flipNumbers = 'assets/images/home/one.png';
@@ -53,7 +57,6 @@ class ImageManager {
   static const String flipMath = 'assets/images/home/calc.png';
 
   static const String puzzle = 'assets/images/home/puzzle1.png';
-  static const String flipPuzzle = 'assets/images/home/puzzle-icon.jpg';
 
   static const String setting = 'assets/images/home/setting.png';
 

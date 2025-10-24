@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/helpers/tts_helper.dart';
+import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 
 import '../bloc/alphabet_bloc.dart';
 import '../bloc/alphabet_event.dart';
@@ -11,7 +12,8 @@ class AlphabetSelection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final TtsHelper ttsHelper = TtsHelper();
+    final musicCubit = context.read<MusicCubit>();
+    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
 
     final List<AlphabetModel> alphabets = AlphabetModel.alphabets;
 

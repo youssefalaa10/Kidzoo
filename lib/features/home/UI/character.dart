@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/AppCategory/education_screen.dart';
 import 'package:kidzoo/features/AppCategory/games_screen.dart';
@@ -18,7 +19,8 @@ class CharacterSelectionScreen extends StatefulWidget {
       _CharacterSelectionScreenState();
 }
 
-class _CharacterSelectionScreenState extends State<CharacterSelectionScreen> {
+class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
+    with BackgroundMusicMixin {
   int _selectedIndex = 1; // Default selected card (middle one)
 
   // Define our character categories

@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/features/Numbers/UI/widgets/number_app_bar.dart';
 import 'package:kidzoo/features/Numbers/UI/widgets/number_display.dart';
 import 'package:kidzoo/features/Numbers/UI/widgets/number_selection.dart';
 
-class NumberScreen extends StatelessWidget {
+class NumberScreen extends StatefulWidget {
   const NumberScreen({super.key});
 
+  @override
+  State<NumberScreen> createState() => _NumberScreenState();
+}
+
+class _NumberScreenState extends State<NumberScreen> with TTSMusicMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

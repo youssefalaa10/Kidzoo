@@ -29,6 +29,7 @@ environment:
 # versions available, run `flutter pub outdated`.
 dependencies:
   animations: ^2.0.11
+  audioplayers: ^6.1.0
   bloc: ^9.0.0
   confetti: ^0.8.0
   cupertino_icons: ^1.0.8
@@ -41,7 +42,7 @@ dependencies:
     sdk: flutter
   flutter_bloc: ^9.1.0
   flutter_svg: ^2.0.16
-  flutter_tts: ^4.2.0
+  flutter_tts: ^4.2.3
   google_fonts: ^6.1.0
   lottie: ^3.3.1
   shared_preferences: ^2.5.3
@@ -74,6 +75,7 @@ flutter:
     - assets/images/puzzle/gazelle block/
     - assets/images/puzzle/ghost block/
     - assets/images/puzzle/blocks4/
+    - assets/images/icons/
     - assets/data/
     - assets/lang/
     - assets/audio/

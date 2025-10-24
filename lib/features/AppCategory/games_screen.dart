@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
+import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 
 import 'app_category_options.dart';
 
-class GamesScreen extends StatelessWidget {
+class GamesScreen extends StatefulWidget {
   const GamesScreen({super.key});
 
+  @override
+  State<GamesScreen> createState() => _GamesScreenState();
+}
+
+class _GamesScreenState extends State<GamesScreen> with BackgroundMusicMixin {
   @override
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);

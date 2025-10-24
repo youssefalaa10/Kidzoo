@@ -70,6 +70,8 @@ class AppLocalizations {
   String get failedToRename => _localizedValues['failedToRename']!;
   String get addText => _localizedValues['addText']!;
   String get enterText => _localizedValues['enterText']!;
+  String get ticTacToe => _localizedValues['ticTacToe']!;
+  String get dotsAndBoxes => _localizedValues['dotsAndBoxes']!;
   String get add => _localizedValues['add']!;
   String get today => _localizedValues['today']!;
   String get yesterday => _localizedValues['yesterday']!;
@@ -185,7 +187,6 @@ class AppLocalizations {
   String get draws => _localizedValues['draws']!;
 
   // Dots & Boxes
-  String get dotsAndBoxes => _localizedValues['dotsAndBoxes']!;
   String get chooseGameMode => _localizedValues['chooseGameMode']!;
   String get whoWouldYouLikeToPlayAgainst =>
       _localizedValues['whoWouldYouLikeToPlayAgainst']!;

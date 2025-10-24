@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/mixins/background_music_mixin.dart';
+import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 import 'package:kidzoo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzoo/features/Shapes/bloc/shape_states.dart';
 import 'package:kidzoo/features/Shapes/widgets/complete_screen.dart';
@@ -10,12 +12,18 @@ import 'package:kidzoo/features/Shapes/widgets/shape_selection.dart';
 import '../../core/helpers/tts_helper.dart';
 import 'data/model/shape_model.dart';
 
-class ShapeScreen extends StatelessWidget {
+class ShapeScreen extends StatefulWidget {
   const ShapeScreen({super.key});
 
   @override
+  State<ShapeScreen> createState() => _ShapeScreenState();
+}
+
+class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
+  @override
   Widget build(BuildContext context) {
-    final TtsHelper ttsHelper = TtsHelper();
+    final musicCubit = context.read<MusicCubit>();
+    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
 
     final screenWidth = MediaQuery.of(context).size.width;
 

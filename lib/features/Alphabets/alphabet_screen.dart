@@ -1,12 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/features/Alphabets/widgets/alphabet_app_bar.dart';
 
 import 'widgets/alphabet_display.dart';
 import 'widgets/alphabet_selection.dart';
 
-class AlphabetScreen extends StatelessWidget {
+class AlphabetScreen extends StatefulWidget {
   const AlphabetScreen({super.key});
 
+  @override
+  State<AlphabetScreen> createState() => _AlphabetScreenState();
+}
+
+class _AlphabetScreenState extends State<AlphabetScreen> with TTSMusicMixin {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
