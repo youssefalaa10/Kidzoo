@@ -10,7 +10,7 @@ import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_cubit.dart';
 import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_loader.dart';
 import 'package:kidzoo/features/CrosswordGame/data/models/crossword_models.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
-import 'package:kidzoo/features/DrawLab/UI/drawlab_screen.dart';
+import 'package:kidzoo/features/DrawLab/UI/screens/drawlab_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
