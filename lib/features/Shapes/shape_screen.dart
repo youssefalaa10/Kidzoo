@@ -97,7 +97,7 @@ class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
                                                 context
                                                     .read<ShapeCubit>()
                                                     .addMatch(temp);
-                                                ttsHelper.speak('Great!.');
+                                                ttsHelper.speak(data.shape);
                                                 if (cubit.shapes.isEmpty) {
                                                   cubit.init();
                                                 }

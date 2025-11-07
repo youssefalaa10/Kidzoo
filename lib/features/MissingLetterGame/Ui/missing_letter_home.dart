@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
+
+import '../../../core/localization/app_localizations.dart';
+import '../../../core/localization/language_provider.dart';
 import '../Data/Logic/cubit/missing_letter_cubit.dart';
 import '../Data/game_storage.dart';
 import 'missing_letter_screen.dart';
@@ -43,11 +46,15 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
   }
 
   void _startNewGame() {
+    final languageCubit = context.read<LanguageCubit>();
+    final languageCode = languageCubit.state.languageCode;
     Navigator.push(
       context,
       MaterialPageRoute<void>(
         builder: (context) => BlocProvider(
-          create: (context) => MissingLetterCubit(),
+          create: (context) => MissingLetterCubit(
+            languageCode: languageCode,
+          ),
           child: const MissingLetterScreen(),
         ),
       ),
@@ -55,6 +62,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
   }
 
   void _continueGame() {
+    final languageCubit = context.read<LanguageCubit>();
+    final languageCode = languageCubit.state.languageCode;
     Navigator.push(
       context,
       MaterialPageRoute<void>(
@@ -62,6 +71,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
           create: (context) => MissingLetterCubit(
             initialIndex: _currentIndex,
             initialScore: _currentScore,
+            languageCode: languageCode,
           )..loadProgress(),
           child: const MissingLetterScreen(),
         ),
@@ -71,6 +81,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -91,13 +103,18 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // Back button
+                // Back button and language toggle
                 Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     IconButton(
                       onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.arrow_back_ios_new,
                           color: Colors.white),
+                    ),
+                    IconButton(
+                      onPressed: () => _showLanguageDialog(context),
+                      icon: const Icon(Icons.language, color: Colors.white),
                     ),
                   ],
                 ),
@@ -105,7 +122,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                 // Title
                 Center(
                   child: Text(
-                    'Missing Letter',
+                    l10n.missingLetter,
                     style: GoogleFonts.daiBannaSil(
                       fontSize: 42,
                       color: Colors.white,
@@ -122,7 +139,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                 const SizedBox(height: 10),
                 Center(
                   child: Text(
-                    'Learn the Alphabet!',
+                    l10n.learnTheAlphabet,
                     style: GoogleFonts.nunito(
                       fontSize: 18,
                       color: Colors.white.withValues(alpha: 0.9),
@@ -147,7 +164,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                   child: Column(
                     children: [
                       Text(
-                        'Your Progress',
+                        l10n.yourProgress,
                         style: GoogleFonts.nunito(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -160,7 +177,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                         children: [
                           _buildStatItem(
                             icon: Icons.emoji_events,
-                            label: 'Best Score',
+                            label: l10n.bestScore,
                             value: '$_bestScore',
                             color: Colors.amber,
                           ),
@@ -171,7 +188,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                           ),
                           _buildStatItem(
                             icon: Icons.check_circle,
-                            label: 'Completed',
+                            label: l10n.completed,
                             value: '$_completedWords/25',
                             color: Colors.green,
                           ),
@@ -189,7 +206,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
-                                'Current Score:',
+                                l10n.currentScore,
                                 style: GoogleFonts.nunito(
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
@@ -214,14 +231,14 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                 // Action Buttons
                 if (_hasProgress)
                   _buildButton(
-                    label: 'Continue',
+                    label: l10n.continueGame,
                     icon: Icons.play_arrow_rounded,
                     colors: const [Color(0xFF4CAF50), Color(0xFF8BC34A)],
                     onPressed: _continueGame,
                   ),
                 if (_hasProgress) const SizedBox(height: 16),
                 _buildButton(
-                  label: 'New Game',
+                  label: l10n.newGame,
                   icon: Icons.refresh_rounded,
                   colors: const [Color(0xFFFF9800), Color(0xFFFF5722)],
                   onPressed: _startNewGame,
@@ -312,5 +329,61 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
       ),
     );
   }
-}
 
+  void _showLanguageDialog(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final languageCubit = context.read<LanguageCubit>();
+    final isArabic = languageCubit.isArabic;
+
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.language, color: Colors.blue, size: 32),
+            const SizedBox(width: 12),
+            Text(
+              l10n.changeLanguage,
+              style: GoogleFonts.nunito(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          isArabic ? l10n.translateToEnglish : l10n.translateToArabic,
+          style: GoogleFonts.nunito(fontSize: 16),
+          textAlign: TextAlign.center,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(dialogContext).pop(),
+            child: Text(
+              l10n.no,
+              style: GoogleFonts.nunito(fontSize: 16),
+            ),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              languageCubit.toggleLanguage();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            child: Text(
+              l10n.yes,
+              style: GoogleFonts.nunito(fontSize: 16),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

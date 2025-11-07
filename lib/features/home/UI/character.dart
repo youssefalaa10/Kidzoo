@@ -69,67 +69,78 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xff1646cc),
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Top header section
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              child: _buildHeader(),
+      body: Stack(
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              ImageManager.techBg,
+              fit: BoxFit.cover,
             ),
+          ),
 
-            // Title in blue area
-            Positioned(
-              top: 80,
-              left: 0,
-              right: 0,
-              child: Center(
-                child: Text(
-                  AppLocalizations.of(context).improveYourSkills,
-                  style: const TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-
-            // Curved white container with clip path
-            Positioned(
-              top: 140,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              child: ClipPath(
-                clipper: WaveClipper(),
-                child: Container(
-                  color: Colors.white,
-                  padding: const EdgeInsets.only(top: 35),
-                  child: Column(
-                    children: [
-                      // Carousel section
-                      Expanded(
-                        child: OverlappedCarousel(
-                          items: _getCategories(context),
-                          selectedIndex: _selectedIndex,
-                          onItemChanged: (index) {
-                            setState(() {
-                              _selectedIndex = index;
-                            });
-                          },
+          // Content
+          SafeArea(
+            child: Column(
+              children: [
+                // Header section
+                _buildHeader(),
+                const SizedBox(height: 20),
+                // Title
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade200,
+                      borderRadius: BorderRadius.circular(50),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
                         ),
+                      ],
+                    ),
+                    child: Text(
+                      AppLocalizations.of(context).improveYourSkills,
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        shadows: [
+                          Shadow(
+                            color: Colors.black54,
+                            blurRadius: 8,
+                            offset: Offset(0, 2),
+                          ),
+                        ],
                       ),
-                    ],
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-              ),
+                const SizedBox(height: 30),
+                // Carousel section
+                Expanded(
+                  child: OverlappedCarousel(
+                    items: _getCategories(context),
+                    selectedIndex: _selectedIndex,
+                    onItemChanged: (index) {
+                      setState(() {
+                        _selectedIndex = index;
+                      });
+                    },
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -140,107 +151,39 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Row(
-            children: [
-              Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white,
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/home/abc-block.png'),
-                    fit: BoxFit.cover,
-                  ),
-                ),
+          GestureDetector(
+            onTap: () => Navigator.push<void>(
+              context,
+              MaterialPageRoute<void>(
+                builder: (context) => const SettingsScreen(),
               ),
-              const SizedBox(width: 10),
-              GestureDetector(
-                onTap: () => Navigator.push<void>(
-                  context,
-                  MaterialPageRoute<void>(
-                    builder: (context) => const SettingsScreen(),
-                  ),
-                ),
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: Colors.blue[300],
-                    border: Border.all(color: Colors.white, width: 2),
-                  ),
-                  child: const Icon(Icons.settings_outlined,
-                      color: Colors.white, size: 20),
-                ),
-              ),
-            ],
-          ),
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 8),
-            decoration: BoxDecoration(
-              color: Colors.blue[800],
-              borderRadius: BorderRadius.circular(20),
             ),
-            child: Row(
-              children: [
-                const Icon(Icons.monetization_on,
-                    color: Colors.yellow, size: 20),
-                const SizedBox(width: 5),
-                Text(
-                  '3,100',
-                  style: TextStyle(
-                    color: Colors.yellow[300],
-                    fontWeight: FontWeight.bold,
+            child: Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: Colors.white.withValues(alpha: 0.9),
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
                   ),
-                ),
-              ],
+                ],
+              ),
+              child: Icon(
+                Icons.settings_outlined,
+                color: Colors.blue[800],
+                size: 20,
+              ),
             ),
           ),
         ],
       ),
     );
   }
-}
-
-// Custom ClipPath to create the wave effect
-class WaveClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    final path = Path();
-
-    // Start at top-left
-    path.lineTo(0, 40);
-
-    // Create the wave curve
-    final firstControlPoint = Offset(size.width / 4, 0);
-    final firstEndPoint = Offset(size.width / 2, 20);
-    path.quadraticBezierTo(
-      firstControlPoint.dx,
-      firstControlPoint.dy,
-      firstEndPoint.dx,
-      firstEndPoint.dy,
-    );
-
-    final secondControlPoint = Offset(size.width * 3 / 4, 40);
-    final secondEndPoint = Offset(size.width, 20);
-    path.quadraticBezierTo(
-      secondControlPoint.dx,
-      secondControlPoint.dy,
-      secondEndPoint.dx,
-      secondEndPoint.dy,
-    );
-
-    // Complete the clip path
-    path.lineTo(size.width, size.height);
-    path.lineTo(0, size.height);
-    path.close();
-
-    return path;
-  }
-
-  @override
-  bool shouldReclip(covariant CustomClipper<Path> oldClipper) => false;
 }
 
 class CharacterCategory {

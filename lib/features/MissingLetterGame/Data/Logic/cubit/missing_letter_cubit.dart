@@ -1,4 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../Data/game_storage.dart';
 import '../../../Data/word_list.dart';
@@ -8,7 +9,9 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
   MissingLetterCubit({
     int initialIndex = 0,
     int initialScore = 0,
+    String languageCode = 'en',
   })  : _storage = MissingLetterStorage(),
+        _tts = FlutterTts(),
         super(MissingLetterState(
           currentWord: WordList.getWordAtIndex(initialIndex),
           isCorrect: false,
@@ -17,18 +20,72 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
           currentWordIndex: initialIndex,
           totalWords: WordList.getTotalWords(),
           completedWords: initialIndex,
+          languageCode: languageCode,
         ));
 
   final MissingLetterStorage _storage;
+  final FlutterTts _tts;
+
+  Future<void> _initializeTts() async {
+    final language = state.languageCode == 'ar' ? 'ar-SA' : 'en-US';
+    await _tts.setLanguage(language);
+    await _tts.setSpeechRate(0.5);
+    await _tts.setVolume(1.0);
+    await _tts.setPitch(1.0);
+  }
+
+  void updateLanguage(String languageCode) {
+    emit(state.copyWith(languageCode: languageCode));
+  }
+
+  Future<void> _speakWord(String word) async {
+    try {
+      await _initializeTts();
+      await _tts.speak(word);
+    } catch (e) {
+      // Handle TTS errors silently
+      print('TTS Error: $e');
+    }
+  }
 
   void selectOption(String option) async {
-    if (option == state.currentWord.correctLetter) {
-      // Correct answer: increment score and mark as correct
+    final word = state.currentWord;
+    final filledLetters = Map<int, String>.from(state.filledLetters);
+
+    // Find the first unfilled missing index
+    int? targetIndex;
+    String? targetLetter;
+    for (int i = 0; i < word.missingIndices.length; i++) {
+      final index = word.missingIndices[i];
+      if (!filledLetters.containsKey(index)) {
+        targetIndex = index;
+        targetLetter = word.correctLetters[i];
+        break;
+      }
+    }
+
+    if (targetIndex == null || targetLetter == null) {
+      return; // All letters already filled
+    }
+
+    if (option == targetLetter) {
+      // Correct answer: fill this letter
+      filledLetters[targetIndex] = option;
+
+      // Check if all letters are filled
+      final allFilled = filledLetters.length == word.missingIndices.length;
+
       emit(state.copyWith(
-        isCorrect: true,
+        isCorrect: allFilled,
         isIncorrect: false,
-        score: state.score + 10, // Add 10 points for a correct answer
+        filledLetters: filledLetters,
+        score: state.score + 10, // Add 10 points for each correct answer
       ));
+
+      // Speak the word after all letters are filled
+      if (allFilled) {
+        await _speakWord(word.word);
+      }
     } else {
       // Incorrect answer: trigger feedback and deduct points
       emit(state.copyWith(
@@ -67,6 +124,8 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
         isIncorrect: false,
         currentWordIndex: nextIndex,
         completedWords: completedCount,
+        filledLetters: {},
+        languageCode: state.languageCode,
       ));
     }
   }
@@ -85,6 +144,7 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
       currentWordIndex: currentIndex,
       totalWords: WordList.getTotalWords(),
       completedWords: completedCount,
+      filledLetters: {},
     ));
   }
 
@@ -96,10 +156,16 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
       isIncorrect: false,
       score: 0,
       totalWords: WordList.getTotalWords(),
+      filledLetters: {},
+      languageCode: state.languageCode,
     ));
   }
 
   Future<int> getBestScore() async {
     return await _storage.getBestScore();
+  }
+
+  Future<void> dispose() async {
+    await _tts.stop();
   }
 }

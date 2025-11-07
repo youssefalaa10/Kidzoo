@@ -7,7 +7,6 @@ import '../../core/localization/language_provider.dart';
 import '../../core/mixins/background_music_mixin.dart';
 import '../../core/services/cubit/music_cubit.dart';
 import '../../core/shared/style/image_manager.dart';
-import 'cubit/settings_cubit.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -76,18 +75,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                           ),
                           SizedBox(height: mq.height(2)),
 
-                          // Sound Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.volume_up,
-                            title: l10n.sound,
-                            description: l10n.soundDescription,
-                            child: _buildSoundSettings(context, l10n),
-                            color: Colors.green,
-                          ),
-                          SizedBox(height: mq.height(2)),
-
                           // Music Settings Card
                           _buildSettingsCard(
                             context,
@@ -100,17 +87,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                           ),
                           SizedBox(height: mq.height(2)),
 
-                          // Notifications Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.notifications,
-                            title: l10n.notifications,
-                            description: l10n.notificationsDescription,
-                            child: _buildNotificationSettings(context, l10n),
-                            color: Colors.red,
-                          ),
-                          SizedBox(height: mq.height(2)),
 
                           // Volume Settings Card
                           _buildSettingsCard(
@@ -124,13 +100,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                           ),
                           SizedBox(height: mq.height(3)),
 
-                          // Test Music Button (for debugging)
-                          _buildTestMusicButton(context, mq, l10n),
-                          SizedBox(height: mq.height(1)),
 
-                          // Action Buttons
-                          _buildActionButtons(context, mq, l10n),
-                          SizedBox(height: mq.height(2)),
                         ],
                       ),
                     ),
@@ -295,27 +265,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  Widget _buildSoundSettings(BuildContext context, AppLocalizations l10n) {
-    return BlocBuilder<SettingsCubit, SettingsState>(
-      builder: (context, settingsState) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l10n.enableSound,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            Switch(
-              value: settingsState.soundEnabled,
-              onChanged: (value) =>
-                  context.read<SettingsCubit>().setSoundEnabled(value),
-              activeThumbColor: Colors.green,
-            ),
-          ],
-        );
-      },
-    );
-  }
+
 
   Widget _buildMusicSettings(BuildContext context, AppLocalizations l10n) {
     return BlocBuilder<MusicCubit, MusicState>(
@@ -333,29 +283,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                 context.read<MusicCubit>().setMusicEnabled(value);
               },
               activeThumbColor: Colors.orange,
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  Widget _buildNotificationSettings(
-      BuildContext context, AppLocalizations l10n) {
-    return BlocBuilder<SettingsCubit, SettingsState>(
-      builder: (context, settingsState) {
-        return Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              l10n.enableNotifications,
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-            ),
-            Switch(
-              value: settingsState.notificationsEnabled,
-              onChanged: (value) =>
-                  context.read<SettingsCubit>().setNotificationsEnabled(value),
-              activeThumbColor: Colors.red,
             ),
           ],
         );
@@ -402,223 +329,6 @@ class _SettingsScreenState extends State<SettingsScreen>
           ],
         );
       },
-    );
-  }
-
-  Widget _buildActionButtons(
-      BuildContext context, CustomMQ mq, AppLocalizations l10n) {
-    return Row(
-      children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _saveSettings,
-            icon: const Icon(Icons.save),
-            label: Text(l10n.saveSettings),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.green,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: mq.height(2)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-          ),
-        ),
-        SizedBox(width: mq.width(3)),
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: _resetSettings,
-            icon: const Icon(Icons.refresh),
-            label: Text(l10n.resetSettings),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.orange,
-              foregroundColor: Colors.white,
-              padding: EdgeInsets.symmetric(vertical: mq.height(2)),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15),
-              ),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  void _saveSettings() {
-    // Settings are automatically saved when changed
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context).settingsSaved),
-        backgroundColor: Colors.green,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
-  void _resetSettings() async {
-    await context.read<SettingsCubit>().resetSettings();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context).settingsReset),
-        backgroundColor: Colors.orange,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildTestMusicButton(
-      BuildContext context, CustomMQ mq, AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.95),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.purple.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-        border: Border.all(
-          color: Colors.purple.withValues(alpha: 0.3),
-          width: 2,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(mq.width(4)),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: Colors.purple.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: const Icon(
-                    Icons.music_note,
-                    color: Colors.purple,
-                    size: 24,
-                  ),
-                ),
-                SizedBox(width: mq.width(3)),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text(
-                        'Test Music',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.purple,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Test background music playback',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<MusicCubit>().testAudio();
-                    },
-                    icon: const Icon(Icons.play_arrow),
-                    label: const Text('Test Audio'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.purple,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<MusicCubit>().logAudioState();
-                    },
-                    icon: const Icon(Icons.info),
-                    label: const Text('Log State'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.blue,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
-            Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<MusicCubit>().forcePlayMusic();
-                    },
-                    icon: const Icon(Icons.play_circle),
-                    label: const Text('Force Play'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<MusicCubit>().checkAudioFile();
-                    },
-                    icon: const Icon(Icons.audiotrack),
-                    label: const Text('Check File'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange,
-                      foregroundColor: Colors.white,
-                      padding: EdgeInsets.symmetric(vertical: mq.height(1.5)),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
     );
   }
 }

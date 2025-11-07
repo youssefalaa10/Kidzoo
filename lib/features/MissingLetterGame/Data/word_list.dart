@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'Model/word_model.dart';
 
 class WordList {
@@ -6,177 +7,177 @@ class WordList {
     // 1
     Word(
       word: 'Apple',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['A', 'E', 'I', 'O'],
-      correctLetter: 'A',
+      correctLetters: ['A'],
     ),
     // 2
     Word(
       word: 'Ball',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['B', 'C', 'D', 'F'],
-      correctLetter: 'B',
+      correctLetters: ['B'],
     ),
     // 3
     Word(
       word: 'Cat',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['C', 'K', 'S', 'T'],
-      correctLetter: 'C',
+      correctLetters: ['C'],
     ),
     // 4
     Word(
       word: 'Dog',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['D', 'B', 'G', 'P'],
-      correctLetter: 'D',
+      correctLetters: ['D'],
     ),
     // 5
     Word(
       word: 'Elephant',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['E', 'I', 'A', 'U'],
-      correctLetter: 'E',
+      correctLetters: ['E'],
     ),
     // 6
     Word(
       word: 'Fish',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['F', 'P', 'V', 'T'],
-      correctLetter: 'F',
+      correctLetters: ['F'],
     ),
     // 7
     Word(
       word: 'Goat',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['G', 'C', 'J', 'K'],
-      correctLetter: 'G',
+      correctLetters: ['G'],
     ),
     // 8
     Word(
       word: 'House',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['H', 'Y', 'F', 'M'],
-      correctLetter: 'H',
+      correctLetters: ['H'],
     ),
     // 9
     Word(
       word: 'Ice',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['I', 'E', 'Y', 'A'],
-      correctLetter: 'I',
+      correctLetters: ['I'],
     ),
     // 10
     Word(
       word: 'Jelly',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['J', 'G', 'Y', 'I'],
-      correctLetter: 'J',
+      correctLetters: ['J'],
     ),
     // 11
     Word(
       word: 'Kite',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['K', 'C', 'Q', 'X'],
-      correctLetter: 'K',
+      correctLetters: ['K'],
     ),
     // 12
     Word(
       word: 'Lion',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['L', 'I', 'T', 'Y'],
-      correctLetter: 'L',
+      correctLetters: ['L'],
     ),
     // 13
     Word(
       word: 'Moon',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['M', 'N', 'W', 'V'],
-      correctLetter: 'M',
+      correctLetters: ['M'],
     ),
     // 14
     Word(
       word: 'Nest',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['N', 'M', 'H', 'R'],
-      correctLetter: 'N',
+      correctLetters: ['N'],
     ),
     // 15
     Word(
       word: 'Orange',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['O', 'A', 'U', 'I'],
-      correctLetter: 'O',
+      correctLetters: ['O'],
     ),
     // 16
     Word(
       word: 'Pen',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['P', 'B', 'D', 'Q'],
-      correctLetter: 'P',
+      correctLetters: ['P'],
     ),
     // 17
     Word(
       word: 'Queen',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['Q', 'K', 'C', 'G'],
-      correctLetter: 'Q',
+      correctLetters: ['Q'],
     ),
     // 18
     Word(
       word: 'Rabbit',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['R', 'P', 'L', 'W'],
-      correctLetter: 'R',
+      correctLetters: ['R'],
     ),
     // 19
     Word(
       word: 'Sun',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['S', 'Z', 'C', 'X'],
-      correctLetter: 'S',
+      correctLetters: ['S'],
     ),
     // 20
     Word(
       word: 'Tree',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['T', 'D', 'F', 'P'],
-      correctLetter: 'T',
+      correctLetters: ['T'],
     ),
     // 21
     Word(
       word: 'Umbrella',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['U', 'A', 'O', 'E'],
-      correctLetter: 'U',
+      correctLetters: ['U'],
     ),
     // 22
     Word(
       word: 'Van',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['V', 'W', 'F', 'B'],
-      correctLetter: 'V',
+      correctLetters: ['V'],
     ),
     // 23
     Word(
       word: 'Water',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['W', 'V', 'U', 'M'],
-      correctLetter: 'W',
+      correctLetters: ['W'],
     ),
     // 24
     Word(
       word: 'Xylophone',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['X', 'Z', 'S', 'K'],
-      correctLetter: 'X',
+      correctLetters: ['X'],
     ),
     // 25
     Word(
       word: 'Zebra',
-      missingIndex: 0,
+      missingIndices: [0],
       options: ['Z', 'S', 'X', 'C'],
-      correctLetter: 'Z',
+      correctLetters: ['Z'],
     ),
   ];
 
@@ -184,7 +185,57 @@ class WordList {
     if (index < 0 || index >= allWords.length) {
       return allWords[0];
     }
-    return allWords[index];
+    final originalWord = allWords[index];
+
+    // Randomly decide if this word should have 1, 2, or 3 missing letters
+    final random = Random();
+    final missingCount = random.nextInt(3) + 1; // 1, 2, or 3
+
+    if (missingCount == 1) {
+      // Single missing letter (original behavior)
+      return Word.withSingleMissingLetter(
+        word: originalWord.word,
+        missingIndex: originalWord.missingIndex,
+        correctLetter: originalWord.correctLetter,
+      );
+    } else if (missingCount == 2 && originalWord.word.length >= 3) {
+      // Two missing letters
+      final firstIndex = originalWord.missingIndex;
+      int secondIndex;
+      do {
+        secondIndex = random.nextInt(originalWord.word.length);
+      } while (secondIndex == firstIndex);
+
+      final firstLetter = originalWord.word[firstIndex];
+      final secondLetter = originalWord.word[secondIndex];
+
+      return Word.withRandomizedOptions(
+        word: originalWord.word,
+        missingIndices: [firstIndex, secondIndex],
+        correctLetters: [firstLetter, secondLetter],
+      );
+    } else if (missingCount == 3 && originalWord.word.length >= 4) {
+      // Three missing letters
+      final indices = <int>{originalWord.missingIndex};
+      while (indices.length < 3 && indices.length < originalWord.word.length) {
+        indices.add(random.nextInt(originalWord.word.length));
+      }
+      final sortedIndices = indices.toList()..sort();
+      final letters = sortedIndices.map((i) => originalWord.word[i]).toList();
+
+      return Word.withRandomizedOptions(
+        word: originalWord.word,
+        missingIndices: sortedIndices,
+        correctLetters: letters,
+      );
+    } else {
+      // Fallback to single missing letter
+      return Word.withSingleMissingLetter(
+        word: originalWord.word,
+        missingIndex: originalWord.missingIndex,
+        correctLetter: originalWord.correctLetter,
+      );
+    }
   }
 
   static int getTotalWords() => allWords.length;
@@ -195,7 +246,6 @@ class WordList {
     do {
       index = random.nextInt(allWords.length);
     } while (excludeIndex != null && index == excludeIndex);
-    return allWords[index];
+    return getWordAtIndex(index);
   }
 }
-

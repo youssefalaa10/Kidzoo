@@ -14,6 +14,7 @@ class MusicState {
     this.volume = 0.3,
     this.isLoading = false,
     this.error,
+    this.pauseRequestCount = 0,
   });
   final bool isInitialized;
   final bool isMusicEnabled;
@@ -22,6 +23,7 @@ class MusicState {
   final double volume;
   final bool isLoading;
   final String? error;
+  final int pauseRequestCount; // Track how many screens need music paused
 
   MusicState copyWith({
     bool? isInitialized,
@@ -31,6 +33,7 @@ class MusicState {
     double? volume,
     bool? isLoading,
     String? error,
+    int? pauseRequestCount,
   }) {
     return MusicState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -40,6 +43,7 @@ class MusicState {
       volume: volume ?? this.volume,
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
+      pauseRequestCount: pauseRequestCount ?? this.pauseRequestCount,
     );
   }
 }
@@ -185,9 +189,12 @@ class MusicCubit extends Cubit<MusicState> {
   // Internal method to play background music
   Future<void> _playBackgroundMusic() async {
     print(
-        '🎵 MusicCubit: _playBackgroundMusic called - initialized: ${state.isInitialized}, enabled: ${state.isMusicEnabled}, shouldPause: ${state.shouldPause}');
+        '🎵 MusicCubit: _playBackgroundMusic called - initialized: ${state.isInitialized}, enabled: ${state.isMusicEnabled}, shouldPause: ${state.shouldPause}, pauseRequestCount: ${state.pauseRequestCount}');
 
-    if (!state.isInitialized || !state.isMusicEnabled || state.shouldPause) {
+    if (!state.isInitialized ||
+        !state.isMusicEnabled ||
+        state.shouldPause ||
+        state.pauseRequestCount > 0) {
       print('🎵 MusicCubit: Not playing music - conditions not met');
       return;
     }
@@ -254,6 +261,40 @@ class MusicCubit extends Cubit<MusicState> {
     }
   }
 
+  // Request pause (for educational screens) - increments counter
+  Future<void> requestPause() async {
+    final newCount = state.pauseRequestCount + 1;
+    print('🎵 MusicCubit: Request pause - count: $newCount');
+    emit(state.copyWith(pauseRequestCount: newCount));
+
+    if (state.isPlaying) {
+      await _audioPlayer.stop();
+      emit(state.copyWith(isPlaying: false, shouldPause: true));
+    }
+  }
+
+  // Release pause (for educational screens) - decrements counter
+  Future<void> releasePause() async {
+    if (state.pauseRequestCount <= 0) {
+      print('🎵 MusicCubit: Release pause - count already 0, ignoring');
+      return;
+    }
+
+    final newCount = state.pauseRequestCount - 1;
+    print('🎵 MusicCubit: Release pause - count: $newCount');
+
+    if (newCount == 0) {
+      // All pause requests released, resume music if enabled
+      emit(state.copyWith(pauseRequestCount: 0, shouldPause: false));
+      if (state.isMusicEnabled && !state.isPlaying) {
+        await _playBackgroundMusic();
+      }
+    } else {
+      // Still have pause requests, keep music stopped
+      emit(state.copyWith(pauseRequestCount: newCount));
+    }
+  }
+
   // Internal stop music method
   Future<void> _stopMusic() async {
     try {
@@ -275,11 +316,18 @@ class MusicCubit extends Cubit<MusicState> {
   // Resume music (public method)
   Future<void> resumeMusic() async {
     print(
-        '🎵 MusicCubit: resumeMusic called - initialized: ${state.isInitialized}, enabled: ${state.isMusicEnabled}, playing: ${state.isPlaying}');
+        '🎵 MusicCubit: resumeMusic called - initialized: ${state.isInitialized}, enabled: ${state.isMusicEnabled}, playing: ${state.isPlaying}, pauseRequestCount: ${state.pauseRequestCount}');
 
     if (!state.isInitialized) {
       print(
           '🎵 MusicCubit: Not initialized yet, will play after initialization');
+      return;
+    }
+
+    // Don't resume if there are active pause requests
+    if (state.pauseRequestCount > 0) {
+      print(
+          '🎵 MusicCubit: Not resuming - pause requests active (count: ${state.pauseRequestCount})');
       return;
     }
 

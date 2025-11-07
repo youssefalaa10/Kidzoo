@@ -260,6 +260,67 @@ class AppLocalizations {
   String get resetSettings => _localizedValues['resetSettings']!;
   String get settingsSaved => _localizedValues['settingsSaved']!;
   String get settingsReset => _localizedValues['settingsReset']!;
+
+  // Missing Letter Game translations
+  String get missingLetter => _localizedValues['missingLetter']!;
+  String get learnTheAlphabet => _localizedValues['learnTheAlphabet']!;
+  String get yourProgress => _localizedValues['yourProgress']!;
+  String get completed => _localizedValues['completed']!;
+  String get currentScore => _localizedValues['currentScore']!;
+  String get continueGame => _localizedValues['continueGame']!;
+  String get correct => _localizedValues['correct']!;
+  String get tryAgain => _localizedValues['tryAgain']!;
+  String get nextWord => _localizedValues['nextWord']!;
+  String get complete => _localizedValues['complete']!;
+  String get congratulations => _localizedValues['congratulations']!;
+  String get youCompletedAllWords => _localizedValues['youCompletedAllWords']!;
+  String get finalScore => _localizedValues['finalScore']!;
+  String get done => _localizedValues['done']!;
+  String get pauseGame => _localizedValues['pauseGame']!;
+  String get doYouWantToExit => _localizedValues['doYouWantToExit']!;
+  String get progress => _localizedValues['progress']!;
+  String get yourProgressWillBeSaved =>
+      _localizedValues['yourProgressWillBeSaved']!;
+  String get resume => _localizedValues['resume']!;
+  String get exitAndSave => _localizedValues['exitAndSave']!;
+  String get changeLanguage => _localizedValues['changeLanguage']!;
+  String get translateToArabic => _localizedValues['translateToArabic']!;
+  String get translateToEnglish => _localizedValues['translateToEnglish']!;
+  String get yes => _localizedValues['yes']!;
+  String get no => _localizedValues['no']!;
+
+  // ColorLearn Game translations
+  String get colorLearn => _localizedValues['colorLearn']!;
+
+  // Level Map and Games translations
+  String get readyToPlay => _localizedValues['readyToPlay']!;
+  String get funGames => _localizedValues['funGames']!;
+  String get flappyBird => _localizedValues['flappyBird']!;
+  String get game2048 => _localizedValues['game2048']!;
+  String get crossword => _localizedValues['crossword']!;
+
+  // Learning Activities translations
+  String get numbers => _localizedValues['numbers']!;
+  String get alphabet => _localizedValues['alphabet']!;
+  String get learningActivities => _localizedValues['learningActivities']!;
+
+  // Maze Game translations
+  String get mazeGame => _localizedValues['mazeGame']!;
+  String get startPlaying => _localizedValues['startPlaying']!;
+  String get difficulty => _localizedValues['difficulty']!;
+  String get reason => _localizedValues['reason']!;
+  String get touchedWall => _localizedValues['touchedWall']!;
+  String get timeUp => _localizedValues['timeUp']!;
+  String get mazeInstruction1 => _localizedValues['mazeInstruction1']!;
+  String get mazeInstruction2 => _localizedValues['mazeInstruction2']!;
+  String get mazeInstruction3 => _localizedValues['mazeInstruction3']!;
+  String mazeInstruction4(int count) => _localizedValues['mazeInstruction4']!
+      .replaceAll('{count}', count.toString());
+  String get mazeInstruction5 => _localizedValues['mazeInstruction5']!;
+  String get mazeGameOver => _localizedValues['mazeGameOver']!;
+  String get mazeCongratulations => _localizedValues['mazeCongratulations']!;
+  String get mazeYouWon => _localizedValues['mazeYouWon']!;
+  String get mazeTryAgain => _localizedValues['mazeTryAgain']!;
 }
 
 class _AppLocalizationsDelegate

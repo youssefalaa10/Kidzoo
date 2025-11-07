@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 
@@ -42,7 +43,7 @@ class _GamesScreenState extends State<GamesScreen> with BackgroundMusicMixin {
                       ),
                       HeaderSection(
                         mq: mq,
-                        title: 'Fun Games',
+                        title: AppLocalizations.of(context).funGames,
                         textColor: Colors.blue[800]!,
                       ),
                     ],

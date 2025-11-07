@@ -22,29 +22,61 @@ class MathGameCubit extends Cubit<MathGameState> {
     final int maxNumber = level == 1 ? 10 : (level == 2 ? 20 : 30);
     final int minNumber = level == 1 ? 1 : (level == 2 ? 5 : 10);
 
+    // Operations list: addition, subtraction, multiplication, division
+    final List<String> operations = ['addition', 'subtraction', 'multiplication', 'division'];
+
     for (int i = 0; i < 5; i++) {
+      // Randomly select an operation
+      final selectedOperation = operations[random.nextInt(operations.length)];
+      
       int correctAnswer;
       String questionText;
-      if (operation == 'addition') {
-        final int a = random.nextInt(maxNumber) + minNumber;
-        final int b = random.nextInt(maxNumber) + minNumber;
-        correctAnswer = a + b;
-        questionText = '$a + $b = ?';
-      } else if (operation == 'subtraction') {
-        final int a = random.nextInt(maxNumber) + minNumber + 5;
-        final int b = random.nextInt(a - minNumber) + minNumber;
-        correctAnswer = a - b;
-        questionText = '$a - $b = ?';
-      } else {
-        final int a = random.nextInt(level * 3) + 1;
-        final int b = random.nextInt(level * 3) + 1;
-        correctAnswer = a * b;
-        questionText = '$a × $b = ?';
+      int a, b;
+      
+      switch (selectedOperation) {
+        case 'addition':
+          a = random.nextInt(maxNumber - minNumber + 1) + minNumber;
+          b = random.nextInt(maxNumber - minNumber + 1) + minNumber;
+          correctAnswer = a + b;
+          questionText = '$a + $b = ?';
+          break;
+        case 'subtraction':
+          a = random.nextInt(maxNumber - minNumber + 1) + minNumber + 5;
+          b = random.nextInt(a - minNumber) + minNumber;
+          correctAnswer = a - b;
+          questionText = '$a - $b = ?';
+          break;
+        case 'multiplication':
+          a = random.nextInt(level * 3) + 1;
+          b = random.nextInt(level * 3) + 1;
+          correctAnswer = a * b;
+          questionText = '$a × $b = ?';
+          break;
+        case 'division':
+          // For division, generate a * b first, then use a * b as dividend and a or b as divisor
+          final divisor = random.nextInt(level * 3) + 1;
+          final quotient = random.nextInt(level * 3) + 1;
+          a = divisor * quotient;
+          b = divisor;
+          correctAnswer = quotient;
+          questionText = '$a ÷ $b = ?';
+          break;
+        default:
+          a = random.nextInt(maxNumber) + minNumber;
+          b = random.nextInt(maxNumber) + minNumber;
+          correctAnswer = a + b;
+          questionText = '$a + $b = ?';
       }
 
       final List<int> options = [correctAnswer];
       while (options.length < 4) {
-        final int wrongAnswer = correctAnswer + random.nextInt(10) - 5;
+        int wrongAnswer;
+        if (selectedOperation == 'division') {
+          // For division, generate wrong answers close to the correct quotient
+          wrongAnswer = correctAnswer + random.nextInt(5) - 2;
+        } else {
+          wrongAnswer = correctAnswer + random.nextInt(10) - 5;
+        }
         if (wrongAnswer != correctAnswer &&
             !options.contains(wrongAnswer) &&
             wrongAnswer >= 0) {
@@ -57,6 +89,7 @@ class MathGameCubit extends Cubit<MathGameState> {
         'question': questionText,
         'correctAnswer': correctAnswer,
         'options': options,
+        'operation': selectedOperation,
       });
     }
 

@@ -339,7 +339,7 @@ class SmartToolBar extends StatelessWidget {
   }
 
   void _showColorPicker(BuildContext context) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(
@@ -432,7 +432,7 @@ class SmartToolBar extends StatelessWidget {
   }
 
   void _showSettingsBottomSheet(BuildContext context) {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => Container(

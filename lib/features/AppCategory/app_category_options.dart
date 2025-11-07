@@ -5,6 +5,8 @@ import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzoo/features/ColorLearn/UI/color_learn_screen.dart';
+import 'package:kidzoo/features/ColorLearn/data/logic/color_learn_cubit.dart';
 import 'package:kidzoo/features/CrosswordGame/UI/crossword_game_screen.dart';
 import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_cubit.dart';
 import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_loader.dart';
@@ -56,7 +58,7 @@ class OptionsGrid extends StatelessWidget {
       case AppCategory.games:
         return _getGameOptions(context);
       case AppCategory.education:
-        return _getEducationOptions();
+        return _getEducationOptions(context);
     }
   }
 
@@ -71,19 +73,19 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.flappyBird,
-        title: 'Flappy Bird',
+        title: l10n.flappyBird,
         screen: const FlappyBirdScreen(),
         flipImage: ImageManager.birdAnimal,
       ),
       OptionItem(
         icon: ImageManager.letterL,
-        title: 'Missing Letter',
+        title: l10n.missingLetter,
         screen: const MissingLetterHome(),
         flipImage: ImageManager.brain,
       ),
       OptionItem(
         icon: ImageManager.i2048,
-        title: '2048 Game',
+        title: l10n.game2048,
         screen: BlocProvider(
           create: (context) => GameCubit(),
           child: const Game2048Home(),
@@ -98,7 +100,7 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.letterW,
-        title: 'Crossword',
+        title: l10n.crossword,
         screen: const _CrosswordGameWrapper(),
         flipImage: ImageManager.flipLetters,
       ),
@@ -111,11 +113,12 @@ class OptionsGrid extends StatelessWidget {
     ];
   }
 
-  List<OptionItem> _getEducationOptions() {
+  List<OptionItem> _getEducationOptions(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return [
       OptionItem(
         icon: ImageManager.numbers,
-        title: 'Numbers',
+        title: l10n.numbers,
         screen: BlocProvider(
           create: (context) => NumberBloc(),
           child: const NumberScreen(),
@@ -124,7 +127,7 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.letters,
-        title: 'Alphabet',
+        title: l10n.alphabet,
         screen: BlocProvider(
           create: (context) => AlphabetBloc(),
           child: const AlphabetScreen(),
@@ -133,12 +136,21 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.shapes,
-        title: 'Shapes',
+        title: l10n.shapes,
         screen: BlocProvider(
           create: (context) => ShapeCubit(),
           child: const ShapeScreen(),
         ),
         flipImage: ImageManager.flipShapes,
+      ),
+      OptionItem(
+        icon: ImageManager.colorLearn,
+        title: l10n.colorLearn,
+        screen: BlocProvider(
+          create: (context) => ColorLearnCubit(),
+          child: const ColorLearnScreen(),
+        ),
+        flipImage: ImageManager.colorLearn,
       ),
     ];
   }

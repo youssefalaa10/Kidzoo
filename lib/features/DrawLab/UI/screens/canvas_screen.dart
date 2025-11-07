@@ -127,7 +127,7 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   void _clearCanvas() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -474,7 +474,7 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   void _showSettings() {
-    showModalBottomSheet(
+    showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,

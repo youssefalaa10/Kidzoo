@@ -40,7 +40,6 @@ class ImageManager {
   static const String learningBg = 'assets/images/home/learn_bg.png';
   static const String techBg = 'assets/images/home/tech_bg.jpeg';
 
-
   static const String numbers = 'assets/images/home/numbers.png';
   static const String flipNumbers = 'assets/images/home/one.png';
 
@@ -150,4 +149,7 @@ class ImageManager {
   static const String pen = 'assets/images/icons/pen.png';
   static const String simle = 'assets/images/icons/simle.png';
   static const String xo = 'assets/images/icons/xo.png';
+
+  // ColorLearn icon (using shapes icon as placeholder, can be replaced with custom icon)
+  static const String colorLearn = 'assets/images/home/shapes.png';
 }

@@ -58,22 +58,12 @@ class SettingsCubit extends Cubit<SettingsState> {
     }
   }
 
-  // Set sound enabled
-  Future<void> setSoundEnabled(bool value) async {
-    emit(state.copyWith(soundEnabled: value));
-    await _saveSettings();
-  }
 
   // Set music enabled (handled by MusicCubit globally)
   Future<void> setMusicEnabled(bool value) async {
     await _saveSettings();
   }
 
-  // Set notifications enabled
-  Future<void> setNotificationsEnabled(bool value) async {
-    emit(state.copyWith(notificationsEnabled: value));
-    await _saveSettings();
-  }
 
   // Set volume (handled by MusicCubit globally)
   Future<void> setVolume(double value) async {

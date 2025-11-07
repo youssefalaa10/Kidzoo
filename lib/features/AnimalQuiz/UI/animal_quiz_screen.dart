@@ -341,7 +341,8 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                     animals.remove(receivedAnimal.data);
                                     chooseAnimals.remove(animalLetter);
                                     score += pointsPerCorrectMatch;
-                                    speak('Correct! Excellent');
+                                    speak(
+                                        ' ${animalLetter.animalName}');
 
                                     // Check if level is complete
                                     checkLevelCompletion();

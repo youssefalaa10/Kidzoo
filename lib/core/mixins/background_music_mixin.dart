@@ -40,6 +40,7 @@ mixin BackgroundMusicMixin<T extends StatefulWidget> on State<T> {
 /// This completely stops background music to avoid تداخل (interference)
 mixin TTSMusicMixin<T extends StatefulWidget> on State<T> {
   MusicCubit? _musicCubit;
+  bool _hasRequestedPause = false;
 
   @override
   void didChangeDependencies() {
@@ -50,27 +51,35 @@ mixin TTSMusicMixin<T extends StatefulWidget> on State<T> {
   @override
   void initState() {
     super.initState();
+    // Request pause immediately to stop music
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _stopBackgroundMusic();
+      _requestPause();
     });
   }
 
   @override
   void dispose() {
-    // Resume music when leaving educational screen
-    _resumeBackgroundMusic();
+    // Release pause when leaving educational screen
+    _releasePause();
     super.dispose();
   }
 
-  /// Stop background music completely for TTS screens
-  void _stopBackgroundMusic() {
-    print('🎵 TTSMusicMixin: Stopping background music');
-    _musicCubit?.stopMusic();
+  /// Request pause for background music (increments counter)
+  void _requestPause() {
+    if (!_hasRequestedPause) {
+      print('🎵 TTSMusicMixin: Requesting pause for background music');
+      _musicCubit?.requestPause();
+      _hasRequestedPause = true;
+    }
   }
 
-  /// Resume background music after leaving TTS screen
-  void _resumeBackgroundMusic() {
-    _musicCubit?.resumeMusic();
+  /// Release pause for background music (decrements counter)
+  void _releasePause() {
+    if (_hasRequestedPause) {
+      print('🎵 TTSMusicMixin: Releasing pause for background music');
+      _musicCubit?.releasePause();
+      _hasRequestedPause = false;
+    }
   }
 
   /// Stop music completely for TTS speech (no interference)
@@ -78,8 +87,14 @@ mixin TTSMusicMixin<T extends StatefulWidget> on State<T> {
     _musicCubit?.stopMusic();
   }
 
-  /// Resume music after speech is done
+  /// Resume music after speech is done (only if no other screens need pause)
   void resumeAfterSpeech() {
-    _musicCubit?.resumeMusic();
+    // Don't resume if we still have pause requests
+    // The releasePause will handle resuming when all screens are gone
+    // This method is kept for compatibility but won't resume if pause is active
+    final state = _musicCubit?.state;
+    if (state != null && state.pauseRequestCount == 0) {
+      _musicCubit?.resumeMusic();
+    }
   }
 }

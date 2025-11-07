@@ -35,10 +35,12 @@ class CompleteScreen extends StatelessWidget {
                 CustomButton(
                   title: 'Exit',
                   onPressed: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: (context) {
-                      return const EducationScreen();
-                    }));
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => const EducationScreen()),
+                      (route) => false,
+                    );
                   },
                   color: Colors.red,
                 ),

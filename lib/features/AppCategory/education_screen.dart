@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 
@@ -47,7 +48,7 @@ class _EducationScreenState extends State<EducationScreen> with TTSMusicMixin {
                       ),
                       HeaderSection(
                         mq: mq,
-                        title: 'Learning Activities',
+                        title: AppLocalizations.of(context).learningActivities,
                         textColor: Colors.green[800]!,
                       ),
                     ],
