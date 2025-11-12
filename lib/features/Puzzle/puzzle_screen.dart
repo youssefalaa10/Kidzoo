@@ -168,33 +168,36 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
                             fit: BoxFit.cover,
                           ),
                         ),
-                        child: GridView(
-                          gridDelegate:
-                              const SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2,
+                        child: Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: GridView(
+                            gridDelegate:
+                                const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                            ),
+                            children: [
+                              DraggableItem(
+                                  puzzle: cubit.puzzle,
+                                  choosePiece: cubit.choosePiece,
+                                  index: 0,
+                                  score: cubit.score),
+                              DraggableItem(
+                                  puzzle: cubit.puzzle,
+                                  choosePiece: cubit.choosePiece,
+                                  index: 1,
+                                  score: cubit.score),
+                              DraggableItem(
+                                  puzzle: cubit.puzzle,
+                                  choosePiece: cubit.choosePiece,
+                                  index: 2,
+                                  score: cubit.score),
+                              DraggableItem(
+                                  puzzle: cubit.puzzle,
+                                  choosePiece: cubit.choosePiece,
+                                  index: 3,
+                                  score: cubit.score),
+                            ],
                           ),
-                          children: [
-                            DraggableItem(
-                                puzzle: cubit.puzzle,
-                                choosePiece: cubit.choosePiece,
-                                index: 0,
-                                score: cubit.score),
-                            DraggableItem(
-                                puzzle: cubit.puzzle,
-                                choosePiece: cubit.choosePiece,
-                                index: 1,
-                                score: cubit.score),
-                            DraggableItem(
-                                puzzle: cubit.puzzle,
-                                choosePiece: cubit.choosePiece,
-                                index: 2,
-                                score: cubit.score),
-                            DraggableItem(
-                                puzzle: cubit.puzzle,
-                                choosePiece: cubit.choosePiece,
-                                index: 3,
-                                score: cubit.score),
-                          ],
                         ),
                       ),
                       SizedBox(

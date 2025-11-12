@@ -300,166 +300,172 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                         const SizedBox(height: 60),
 
                         // Word display
-                        AnimatedBuilder(
-                          animation: _shakeController,
-                          builder: (context, child) {
-                            return Transform.translate(
-                              offset: Offset(
-                                state.isIncorrect ? _shakeAnimation.value : 0,
-                                0,
-                              ),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 20),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(24),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.1),
-                                      blurRadius: 20,
-                                      offset: const Offset(0, 10),
-                                    ),
-                                  ],
+                        Directionality(
+                          textDirection: isArabic ? TextDirection.ltr : TextDirection.ltr,
+                          child: AnimatedBuilder(
+                            animation: _shakeController,
+                            builder: (context, child) {
+                              return Transform.translate(
+                                offset: Offset(
+                                  state.isIncorrect ? _shakeAnimation.value : 0,
+                                  0,
                                 ),
-                                child: LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    final letterCount = word.word.length;
-                                    final availableWidth = constraints.maxWidth;
-                                    final fontSize =
-                                        (availableWidth / letterCount * 0.6)
-                                            .clamp(20.0, 40.0);
-                                    final horizontalPadding =
-                                        (availableWidth / letterCount * 0.1)
-                                            .clamp(2.0, 8.0);
-
-                                    return Wrap(
-                                      alignment: WrapAlignment.center,
-                                      spacing: horizontalPadding,
-                                      children: List.generate(word.word.length,
-                                          (index) {
-                                        final bool isMissingLetter =
-                                            word.missingIndices.contains(index);
-                                        final filledLetter =
-                                            state.filledLetters[index];
-                                        final isFilled = filledLetter != null;
-
-                                        final Widget letterWidget = Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: horizontalPadding),
-                                          child: Text(
-                                            isMissingLetter
-                                                ? (isFilled
-                                                    ? filledLetter
-                                                    : '_')
-                                                : word.word[index],
-                                            style: GoogleFonts.comicNeue(
-                                              fontSize: fontSize,
-                                              fontWeight: FontWeight.bold,
-                                              color: isMissingLetter
-                                                  ? (isFilled
-                                                      ? Colors.green
-                                                      : Colors.orange)
-                                                  : const Color(0xFF6C63FF),
-                                            ),
-                                          ),
-                                        );
-
-                                        if (isMissingLetter &&
-                                            isFilled &&
-                                            state.allLettersFilled) {
-                                          return AnimatedBuilder(
-                                            animation: _letterBounceController,
-                                            builder: (context, child) {
-                                              return Transform.scale(
-                                                scale:
-                                                    Curves.elasticOut.transform(
-                                                  _letterBounceController.value,
-                                                ),
-                                                child: letterWidget,
-                                              );
-                                            },
-                                          );
-                                        }
-
-                                        return letterWidget;
-                                      }),
-                                    );
-                                  },
-                                ),
-                              ),
-                            );
-                          },
-                        )
-                            .animate()
-                            .fadeIn(duration: 800.ms)
-                            .slideY(begin: 0.2, end: 0),
-                        const SizedBox(height: 60),
-
-                        // Letter options
-                        Wrap(
-                          spacing: 16,
-                          runSpacing: 16,
-                          alignment: WrapAlignment.center,
-                          children: word.options.asMap().entries.map((entry) {
-                            final int index = entry.key;
-                            final String option = entry.value;
-
-                            return AnimatedOpacity(
-                              opacity: state.isCorrect ? 0.5 : 1.0,
-                              duration: const Duration(milliseconds: 300),
-                              child: GestureDetector(
-                                onTap: state.isCorrect
-                                    ? null
-                                    : () => gameCubit.selectOption(option),
                                 child: Container(
-                                  width: 80,
-                                  height: 80,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 20),
                                   decoration: BoxDecoration(
-                                    gradient: const LinearGradient(
-                                      begin: Alignment.topLeft,
-                                      end: Alignment.bottomRight,
-                                      colors: [
-                                        Color(0xFFFF9800),
-                                        Color(0xFFFF5722),
-                                      ],
-                                    ),
-                                    borderRadius: BorderRadius.circular(20),
+                                    color: Colors.white,
+                                    borderRadius: BorderRadius.circular(24),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.orange
-                                            .withValues(alpha: 0.3),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 4),
+                                        color:
+                                            Colors.black.withValues(alpha: 0.1),
+                                        blurRadius: 20,
+                                        offset: const Offset(0, 10),
                                       ),
                                     ],
                                   ),
-                                  child: Center(
-                                    child: Text(
-                                      option,
-                                      style: GoogleFonts.daiBannaSil(
-                                        fontSize: 36,
-                                        color: Colors.white,
+                                  child: LayoutBuilder(
+                                    builder: (context, constraints) {
+                                      final letterCount = word.word.length;
+                                      final availableWidth = constraints.maxWidth;
+                                      final fontSize =
+                                          (availableWidth / letterCount * 0.6)
+                                              .clamp(20.0, 40.0);
+                                      final horizontalPadding =
+                                          (availableWidth / letterCount * 0.1)
+                                              .clamp(2.0, 8.0);
+                          
+                                      return Wrap(
+                                        alignment: WrapAlignment.center,
+                                        spacing: horizontalPadding,
+                                        children: List.generate(word.word.length,
+                                            (index) {
+                                          final bool isMissingLetter =
+                                              word.missingIndices.contains(index);
+                                          final filledLetter =
+                                              state.filledLetters[index];
+                                          final isFilled = filledLetter != null;
+                          
+                                          final Widget letterWidget = Padding(
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: horizontalPadding),
+                                            child: Text(
+                                              isMissingLetter
+                                                  ? (isFilled
+                                                      ? filledLetter
+                                                      : '_')
+                                                  : word.word[index],
+                                              style: GoogleFonts.comicNeue(
+                                                fontSize: fontSize,
+                                                fontWeight: FontWeight.bold,
+                                                color: isMissingLetter
+                                                    ? (isFilled
+                                                        ? Colors.green
+                                                        : Colors.orange)
+                                                    : const Color(0xFF6C63FF),
+                                              ),
+                                            ),
+                                          );
+                          
+                                          if (isMissingLetter &&
+                                              isFilled &&
+                                              state.allLettersFilled) {
+                                            return AnimatedBuilder(
+                                              animation: _letterBounceController,
+                                              builder: (context, child) {
+                                                return Transform.scale(
+                                                  scale:
+                                                      Curves.elasticOut.transform(
+                                                    _letterBounceController.value,
+                                                  ),
+                                                  child: letterWidget,
+                                                );
+                                              },
+                                            );
+                                          }
+                          
+                                          return letterWidget;
+                                        }),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                              .animate()
+                              .fadeIn(duration: 800.ms)
+                              .slideY(begin: 0.2, end: 0),
+                        ),
+                        const SizedBox(height: 60),
+
+                        // Letter options
+                        Directionality(
+                          textDirection: isArabic ? TextDirection.ltr : TextDirection.ltr,
+                          child: Wrap(
+                            spacing: 16,
+                            runSpacing: 16,
+                            alignment: WrapAlignment.center,
+                            children: word.options.asMap().entries.map((entry) {
+                              final int index = entry.key;
+                              final String option = entry.value;
+                          
+                              return AnimatedOpacity(
+                                opacity: state.isCorrect ? 0.5 : 1.0,
+                                duration: const Duration(milliseconds: 300),
+                                child: GestureDetector(
+                                  onTap: state.isCorrect
+                                      ? null
+                                      : () => gameCubit.selectOption(option),
+                                  child: Container(
+                                    width: 80,
+                                    height: 80,
+                                    decoration: BoxDecoration(
+                                      gradient: const LinearGradient(
+                                        begin: Alignment.topLeft,
+                                        end: Alignment.bottomRight,
+                                        colors: [
+                                          Color(0xFFFF9800),
+                                          Color(0xFFFF5722),
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.orange
+                                              .withValues(alpha: 0.3),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 4),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        option,
+                                        style: GoogleFonts.daiBannaSil(
+                                          fontSize: 36,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            )
-                                .animate()
-                                .fadeIn(
-                                  delay: Duration(milliseconds: 100 * index),
-                                  duration: const Duration(milliseconds: 400),
-                                )
-                                .slideY(
-                                  begin: 0.5,
-                                  end: 0,
-                                  delay: Duration(milliseconds: 100 * index),
-                                  duration: const Duration(milliseconds: 400),
-                                  curve: Curves.easeOutQuad,
-                                );
-                          }).toList(),
+                              )
+                                  .animate()
+                                  .fadeIn(
+                                    delay: Duration(milliseconds: 100 * index),
+                                    duration: const Duration(milliseconds: 400),
+                                  )
+                                  .slideY(
+                                    begin: 0.5,
+                                    end: 0,
+                                    delay: Duration(milliseconds: 100 * index),
+                                    duration: const Duration(milliseconds: 400),
+                                    curve: Curves.easeOutQuad,
+                                  );
+                            }).toList(),
+                          ),
                         ),
 
                         const SizedBox(height: 50),
