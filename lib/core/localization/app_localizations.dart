@@ -297,7 +297,6 @@ class AppLocalizations {
   String get funGames => _localizedValues['funGames']!;
   String get flappyBird => _localizedValues['flappyBird']!;
   String get game2048 => _localizedValues['game2048']!;
-  String get crossword => _localizedValues['crossword']!;
 
   // Learning Activities translations
   String get numbers => _localizedValues['numbers']!;
@@ -321,6 +320,16 @@ class AppLocalizations {
   String get mazeCongratulations => _localizedValues['mazeCongratulations']!;
   String get mazeYouWon => _localizedValues['mazeYouWon']!;
   String get mazeTryAgain => _localizedValues['mazeTryAgain']!;
+
+  // Paddle Bounce Game translations
+  String get paddleBounce => _localizedValues['paddleBounce']!;
+  String get player1 => _localizedValues['player1']!;
+  String get player2 => _localizedValues['player2']!;
+  String get player1Wins => _localizedValues['player1Wins']!;
+  String get player2Wins => _localizedValues['player2Wins']!;
+  String get pause => _localizedValues['pause']!;
+  String get mainMenu => _localizedValues['mainMenu']!;
+  String get tapToStart => _localizedValues['tapToStart']!;
 }
 
 class _AppLocalizationsDelegate

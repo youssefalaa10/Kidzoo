@@ -94,7 +94,7 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 160,
           positionY: 530),
 
-      // Stage 6: Crossword Level 1
+      // Stage 6: Maze Game Level 1
       Level(
           id: 6,
           phase: 1,
@@ -142,7 +142,7 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 110,
           positionY: 1200),
 
-      // Stage 12: Crossword Level 2
+      // Stage 12: Maze Game Level 2
       Level(
           id: 12,
           phase: 2,
@@ -190,7 +190,7 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 150,
           positionY: 1960),
 
-      // Stage 18: Crossword Level 3 (Final Stage)
+      // Stage 18: Maze Game Level 3 (Final Stage)
       Level(
           id: 18,
           phase: 3,

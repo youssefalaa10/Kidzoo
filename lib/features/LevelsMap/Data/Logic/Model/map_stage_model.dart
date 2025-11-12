@@ -32,7 +32,7 @@ class MapStage {
 /// Utility class to manage the fixed stage mapping
 class StageMapping {
   /// Get all stages with their fixed game types and levels
-  /// Level progression: Animal Quiz -> Memory (Cards) -> Color Memory -> Puzzle -> Math Game -> Crossword
+  /// Level progression: Animal Quiz -> Memory (Cards) -> Color Memory -> Puzzle -> Math Game -> Maze Game
   /// Then repeat with level 2 and level 3
   static List<MapStage> getAllStages() {
     return [

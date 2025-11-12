@@ -262,7 +262,6 @@
   "flappyBird": "Flappy Bird",
   "missingLetter": "Missing Letter",
   "game2048": "2048 Game",
-  "crossword": "Crossword",
   
   "numbers": "Numbers",
   "alphabet": "Alphabet",
@@ -283,5 +282,27 @@
   "mazeGameOver": "Game Over",
   "mazeCongratulations": "Congratulations!",
   "mazeYouWon": "You Won!",
-  "mazeTryAgain": "Try Again"
+  "mazeTryAgain": "Try Again",
+  
+  "paddleBounce": "Paddle Bounce",
+  "playVsFriend": "Play vs Friend",
+  "playVsAI": "Play vs AI",
+  "playWithAFriend": "Play with a friend on the same device",
+  "challengeTheComputer": "Challenge the computer AI",
+  "selectAIDifficulty": "Select AI Difficulty",
+  "easy": "Easy",
+  "hard": "Hard",
+  "player1": "Player 1",
+  "player2": "Player 2",
+  "player1Wins": "Player 1 Wins!",
+  "player2Wins": "Player 2 Wins!",
+  "youWin": "You Win!",
+  "aiWins": "AI Wins!",
+  "pause": "Pause",
+  "resume": "Resume",
+  "restart": "Restart",
+  "mainMenu": "Main Menu",
+  "gameOver": "Game Over",
+  "score": "Score",
+  "tapToStart": "Tap to Start"
 }

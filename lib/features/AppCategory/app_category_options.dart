@@ -7,10 +7,6 @@ import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzoo/features/ColorLearn/UI/color_learn_screen.dart';
 import 'package:kidzoo/features/ColorLearn/data/logic/color_learn_cubit.dart';
-import 'package:kidzoo/features/CrosswordGame/UI/crossword_game_screen.dart';
-import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_cubit.dart';
-import 'package:kidzoo/features/CrosswordGame/data/logic/crossword_loader.dart';
-import 'package:kidzoo/features/CrosswordGame/data/models/crossword_models.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzoo/features/DrawLab/UI/screens/drawlab_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
@@ -19,6 +15,7 @@ import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzoo/features/MissingLetterGame/Ui/missing_letter_home.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/number_screen.dart';
+import 'package:kidzoo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
 import 'package:kidzoo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzoo/features/Shapes/shape_screen.dart';
 import 'package:kidzoo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
@@ -99,10 +96,10 @@ class OptionsGrid extends StatelessWidget {
         flipImage: ImageManager.flipShapes,
       ),
       OptionItem(
-        icon: ImageManager.letterW,
-        title: l10n.crossword,
-        screen: const _CrosswordGameWrapper(),
-        flipImage: ImageManager.flipLetters,
+        icon: ImageManager.gamepad,
+        title: l10n.paddleBounce,
+        screen: const PaddleBounceMenuScreen(),
+        flipImage: ImageManager.brain,
       ),
       OptionItem(
         icon: ImageManager.simle,
@@ -333,44 +330,5 @@ class OptionCardState extends State<OptionCard>
         fit: BoxFit.contain,
       ),
     );
-  }
-}
-
-// Crossword game wrapper for fun games
-class _CrosswordGameWrapper extends StatelessWidget {
-  const _CrosswordGameWrapper();
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<CrosswordPuzzle?>(
-      future: _loadPuzzle(),
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
-        }
-
-        if (snapshot.hasError || snapshot.data == null) {
-          return Scaffold(
-            body: Center(
-              child: Text('Error loading puzzle: ${snapshot.error}'),
-            ),
-          );
-        }
-
-        return BlocProvider(
-          create: (context) => CrosswordCubit(snapshot.data!),
-          child: const CrosswordGameScreen(),
-        );
-      },
-    );
-  }
-
-  Future<CrosswordPuzzle?> _loadPuzzle() async {
-    // Load a random medium difficulty puzzle for fun games
-    final puzzles =
-        await CrosswordLoader.loadPuzzlesByDifficulty(Difficulty.medium);
-    return puzzles.isNotEmpty ? puzzles[0] : null;
   }
 }
