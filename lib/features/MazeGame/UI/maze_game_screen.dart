@@ -376,32 +376,23 @@ class _MazeGameContentState extends State<_MazeGameContent> {
       }
     }
 
-    // Use a simple AlertDialog first to test
-    showDialog<void>(
-      context: context,
-      barrierDismissible: false,
-      builder: (dialogContext) => AlertDialog(
-        title: Text(won ? '🎉 You Won!' : '😔 Game Over'),
-        content: Text(
-            won ? 'Congratulations! You completed the maze!' : 'Try again!'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(dialogContext);
-              Navigator.pop(context, won);
-            },
-            child: const Text('Back to Map'),
-          ),
-          if (won)
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                context.read<MazeCubit>().resetGame();
-              },
-              child: const Text('Play Again'),
-            ),
-        ],
-      ),
+    // Use kid-friendly dialog
+    showMazeResultDialog(
+      context,
+      won: won,
+      difficulty: state.difficulty,
+      starsCollected: state.starsCollected,
+      requiredStars: state.requiredStars,
+      timeElapsed: state.timeElapsed,
+      touchedWall: state.touchedWall,
+      onPlayAgain: () {
+        Navigator.pop(context); // Close dialog
+        context.read<MazeCubit>().resetGame();
+      },
+      onExit: () {
+        Navigator.pop(context); // Close dialog
+        Navigator.pop(context, won); // Return to map
+      },
     );
   }
 
