@@ -276,21 +276,21 @@ void showMazeResultDialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(30),
       ),
-      child: Container(
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.9,
+        child: Container(
+          constraints: BoxConstraints(
+            maxWidth: MediaQuery.of(context).size.width * 0.9,
           maxHeight: MediaQuery.of(context).size.height * 0.8,
-        ),
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
+          ),
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [
               primaryColor.withValues(alpha: 0.1),
               primaryColor.withValues(alpha: 0.05),
-              Colors.white,
-            ],
-          ),
+                Colors.white,
+              ],
+            ),
           borderRadius: BorderRadius.circular(30),
         ),
         child: Padding(
@@ -305,31 +305,31 @@ void showMazeResultDialog(
               final messageFontSize = isSmallDialog ? 18.0 : 22.0;
 
               return SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
                     // Large emoji icon
                     Container(
                       width: emojiIconSize,
                       height: emojiIconSize,
-                      decoration: BoxDecoration(
+                          decoration: BoxDecoration(
                         color: primaryColor.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
                             color: primaryColor.withValues(alpha: 0.3),
                             blurRadius: 15,
                             spreadRadius: 2,
+                              ),
+                            ],
                           ),
-                        ],
-                      ),
                       child: Center(
                         child: Text(
                           gameEmoji,
                           style: TextStyle(fontSize: emojiFontSize),
+                          ),
                         ),
                       ),
-                    ),
                     SizedBox(height: isSmallDialog ? 16 : 20),
                     // Title with stars
                     Padding(
@@ -349,17 +349,17 @@ void showMazeResultDialog(
                               won ? l10n.congratulations : l10n.gameOver,
                               style: TextStyle(
                                 fontSize: titleFontSize,
-                                fontWeight: FontWeight.bold,
+                    fontWeight: FontWeight.bold,
                                 color: primaryColor,
                                 letterSpacing: isSmallDialog ? 0.8 : 1.2,
-                              ),
-                              textAlign: TextAlign.center,
+                  ),
+                  textAlign: TextAlign.center,
                               overflow: TextOverflow.ellipsis,
                               maxLines: 2,
                             ),
-                          ),
+                ),
                           SizedBox(width: isSmallDialog ? 6 : 8),
-                          Text(
+                Text(
                             '⭐',
                             style: TextStyle(fontSize: starSize),
                           ),
@@ -381,14 +381,14 @@ void showMazeResultDialog(
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: Text(
-                          won ? l10n.youWin : l10n.tryAgain,
+                  won ? l10n.youWin : l10n.tryAgain,
                           style: TextStyle(
                             fontSize: messageFontSize,
                             fontWeight: FontWeight.w600,
                             color: primaryColor,
-                          ),
-                          textAlign: TextAlign.center,
-                        ),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
                       ),
                     ),
                     SizedBox(height: isSmallDialog ? 16 : 20),
@@ -402,23 +402,23 @@ void showMazeResultDialog(
 
                         return Container(
                           padding: EdgeInsets.all(isSmallScreen ? 12 : 16),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.8),
-                            borderRadius: BorderRadius.circular(20),
-                            border: Border.all(
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.8),
+                    borderRadius: BorderRadius.circular(20),
+                    border: Border.all(
                               color: primaryColor.withValues(alpha: 0.2),
-                              width: 2,
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withValues(alpha: 0.05),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
+                      width: 2,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.05),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    children: [
                               // Difficulty badge
                               Container(
                                 width: double.infinity,
@@ -458,8 +458,8 @@ void showMazeResultDialog(
                                     ),
                                   ],
                                 ),
-                              ),
-                              if (requiredStars > 0) ...[
+                      ),
+                      if (requiredStars > 0) ...[
                                 const SizedBox(height: 12),
                                 // Stars collected
                                 Container(
@@ -576,24 +576,24 @@ void showMazeResultDialog(
                                       ),
                                     ],
                                   ),
-                                ),
-                              ],
-                            ],
-                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                         );
                       },
-                    ),
-                    const SizedBox(height: 24),
+                ),
+                const SizedBox(height: 24),
                     // Action buttons - Made responsive
-                    LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isSmallScreen = constraints.maxWidth < 300;
-                        return isSmallScreen
-                            ? Column(
-                                children: [
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isSmallScreen = constraints.maxWidth < 300;
+                    return isSmallScreen
+                        ? Column(
+                            children: [
                                   // Back to Map button
-                                  SizedBox(
-                                    width: double.infinity,
+                              SizedBox(
+                                width: double.infinity,
                                     height: 55,
                                     child: Container(
                                       decoration: BoxDecoration(
@@ -643,15 +643,15 @@ void showMazeResultDialog(
                                               ],
                                             ),
                                           ),
-                                        ),
-                                      ),
                                     ),
                                   ),
+                                ),
+                              ),
                                   if (won) ...[
-                                    const SizedBox(height: 12),
+                              const SizedBox(height: 12),
                                     // Play Again button
-                                    SizedBox(
-                                      width: double.infinity,
+                              SizedBox(
+                                width: double.infinity,
                                       height: 55,
                                       child: Container(
                                         decoration: BoxDecoration(
@@ -709,17 +709,17 @@ void showMazeResultDialog(
                                               ),
                                             ),
                                           ),
-                                        ),
-                                      ),
-                                    ),
+                                  ),
+                                ),
+                              ),
                                   ],
-                                ],
-                              )
-                            : Row(
+                            ],
+                          )
+                        : Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
+                            children: [
                                   // Back to Map button
-                                  Expanded(
+                              Expanded(
                                     child: Container(
                                       height: 55,
                                       decoration: BoxDecoration(
@@ -770,14 +770,14 @@ void showMazeResultDialog(
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ),
                                   ),
+                                ),
+                              ),
                                   if (won) ...[
-                                    const SizedBox(width: 16),
+                              const SizedBox(width: 16),
                                     // Play Again button
-                                    Expanded(
-                                      flex: 2,
+                              Expanded(
+                                flex: 2,
                                       child: Container(
                                         height: 55,
                                         decoration: BoxDecoration(
@@ -835,22 +835,22 @@ void showMazeResultDialog(
                                                 ],
                                               ),
                                             ),
-                                          ),
-                                        ),
-                                      ),
                                     ),
+                                  ),
+                                ),
+                              ),
                                   ],
-                                ],
-                              );
-                      },
-                    ),
-                  ],
+                            ],
+                          );
+                  },
                 ),
-              );
-            },
+              ],
+        ),
+      );
+    },
+            ),
           ),
         ),
-      ),
     ),
   );
 }
