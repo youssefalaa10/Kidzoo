@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/widgets.dart';
 
 // Music State
 class MusicState {
@@ -49,9 +50,35 @@ class MusicState {
 }
 
 // Music Cubit
-class MusicCubit extends Cubit<MusicState> {
+class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
   MusicCubit() : super(const MusicState()) {
     _initialize();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState appState) {
+    super.didChangeAppLifecycleState(appState);
+    if (appState == AppLifecycleState.paused ||
+        appState == AppLifecycleState.hidden ||
+        appState == AppLifecycleState.inactive ||
+        appState == AppLifecycleState.detached) {
+      if (state.isPlaying) {
+        _audioPlayer.pause();
+      }
+    } else if (appState == AppLifecycleState.resumed) {
+      if (state.isMusicEnabled &&
+          state.pauseRequestCount == 0 &&
+          !state.shouldPause &&
+          state.isPlaying) {
+        _audioPlayer.resume();
+      } else if (state.isMusicEnabled &&
+          state.pauseRequestCount == 0 &&
+          !state.shouldPause &&
+          !state.isPlaying) {
+        _playBackgroundMusic();
+      }
+    }
   }
 
   late AudioPlayer _audioPlayer;
@@ -388,6 +415,7 @@ class MusicCubit extends Cubit<MusicState> {
   // Dispose resources
   @override
   Future<void> close() {
+    WidgetsBinding.instance.removeObserver(this);
     _musicTimer?.cancel();
     _audioPlayer.dispose();
     return super.close();

@@ -1,3 +1,4 @@
+import 'package:kidzoo/core/utils/assets.dart';
 class NumberModel {
   NumberModel({
     required this.num,
@@ -10,24 +11,24 @@ class NumberModel {
 
   static final List<NumberModel> numbers = [
     NumberModel(
-        num: '1', imagePath: 'assets/images/numbers/1.png', example: 'One'),
+        num: '1', imagePath: Assets.genImagesNumbers1, example: 'One'),
     NumberModel(
-        num: '2', imagePath: 'assets/images/numbers/2.png', example: 'Two'),
+        num: '2', imagePath: Assets.genImagesNumbers2, example: 'Two'),
     NumberModel(
-        num: '3', imagePath: 'assets/images/numbers/3.png', example: 'Three'),
+        num: '3', imagePath: Assets.genImagesNumbers3, example: 'Three'),
     NumberModel(
-        num: '4', imagePath: 'assets/images/numbers/4.png', example: 'Four'),
+        num: '4', imagePath: Assets.genImagesNumbers4, example: 'Four'),
     NumberModel(
-        num: '5', imagePath: 'assets/images/numbers/5.png', example: 'Five'),
+        num: '5', imagePath: Assets.genImagesNumbers5, example: 'Five'),
     NumberModel(
-        num: '6', imagePath: 'assets/images/numbers/6.png', example: 'Six'),
+        num: '6', imagePath: Assets.genImagesNumbers6, example: 'Six'),
     NumberModel(
-        num: '7', imagePath: 'assets/images/numbers/7.png', example: 'Seven'),
+        num: '7', imagePath: Assets.genImagesNumbers7, example: 'Seven'),
     NumberModel(
-        num: '8', imagePath: 'assets/images/numbers/8.png', example: 'Eight'),
+        num: '8', imagePath: Assets.genImagesNumbers8, example: 'Eight'),
     NumberModel(
-        num: '9', imagePath: 'assets/images/numbers/9.png', example: 'Nine'),
+        num: '9', imagePath: Assets.genImagesNumbers9, example: 'Nine'),
     NumberModel(
-        num: '10', imagePath: 'assets/images/numbers/10.png', example: 'Ten'),
+        num: '10', imagePath: Assets.genImagesNumbers10, example: 'Ten'),
   ];
 }

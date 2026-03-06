@@ -8,6 +8,7 @@ import 'Data/Logic/Model/game_sequence_model.dart';
 import 'Data/Logic/Model/level_model.dart';
 import 'Data/Logic/cubit/levelmap_cubit.dart';
 import 'Widgets/level_button.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 
 // Global state for level completion
 class LevelCompletionManager {
@@ -48,7 +49,7 @@ class LevelMapScreen extends StatelessWidget {
                     Container(
                       decoration: const BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('assets/images/home/Fav.jpg'),
+                          image: AssetImage(Assets.genImagesHomeFav),
                           fit: BoxFit.cover,
                         ),
                       ),

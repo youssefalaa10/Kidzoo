@@ -4,6 +4,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/mixins/background_music_mixin.dart';
 import '../data/model/animal_quiz_model.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 
 class AnimalQuizScreen extends ProtectedGameScreen {
   const AnimalQuizScreen({required super.level, super.key});
@@ -31,131 +32,131 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     // Level 1 animals (easy)
     AnimalQuizModel(
       animalName: 'cat',
-      animalImage: 'assets/images/animal/cat.png',
+      animalImage: Assets.genImagesAnimalCat,
       value: 'cat',
     ),
     AnimalQuizModel(
       animalName: 'dog',
-      animalImage: 'assets/images/animal/dog.png',
+      animalImage: Assets.genImagesAnimalDog,
       value: 'dog',
     ),
     AnimalQuizModel(
       animalName: 'cow',
-      animalImage: 'assets/images/animal/cow.png',
+      animalImage: Assets.genImagesAnimalCow,
       value: 'cow',
     ),
     AnimalQuizModel(
       animalName: 'hen',
-      animalImage: 'assets/images/animal/hen.png',
+      animalImage: Assets.genImagesAnimalHen,
       value: 'hen',
     ),
     AnimalQuizModel(
       animalName: 'bird',
-      animalImage: 'assets/images/animal/bird.png',
+      animalImage: Assets.genImagesAnimalBird,
       value: 'bird',
     ),
 
     // Level 2 animals (medium)
     AnimalQuizModel(
       animalName: 'lion',
-      animalImage: 'assets/images/animal/lion.png',
+      animalImage: Assets.genImagesAnimalLion,
       value: 'lion',
     ),
     AnimalQuizModel(
       animalName: 'sheep',
-      animalImage: 'assets/images/animal/sheep.png',
+      animalImage: Assets.genImagesAnimalSheep,
       value: 'sheep',
     ),
     AnimalQuizModel(
       animalName: 'horse',
-      animalImage: 'assets/images/animal/horse.png',
+      animalImage: Assets.genImagesAnimalHorse,
       value: 'horse',
     ),
     AnimalQuizModel(
       animalName: 'elephant',
-      animalImage: 'assets/images/animal/elephant.png',
+      animalImage: Assets.genImagesAnimalElephant,
       value: 'elephant',
     ),
     AnimalQuizModel(
       animalName: 'giraffe',
-      animalImage: 'assets/images/animal/giraffe.png',
+      animalImage: Assets.genImagesAnimalGiraffe,
       value: 'giraffe',
     ),
     AnimalQuizModel(
       animalName: 'cow',
-      animalImage: 'assets/images/animal/cow.png',
+      animalImage: Assets.genImagesAnimalCow,
       value: 'cow',
     ),
     AnimalQuizModel(
       animalName: 'hen',
-      animalImage: 'assets/images/animal/hen.png',
+      animalImage: Assets.genImagesAnimalHen,
       value: 'hen',
     ),
     AnimalQuizModel(
       animalName: 'bird',
-      animalImage: 'assets/images/animal/bird.png',
+      animalImage: Assets.genImagesAnimalBird,
       value: 'bird',
     ),
 
     // Level 3 animals (hard)
     AnimalQuizModel(
       animalName: 'cat',
-      animalImage: 'assets/images/animal/cat.png',
+      animalImage: Assets.genImagesAnimalCat,
       value: 'cat',
     ),
     AnimalQuizModel(
       animalName: 'dog',
-      animalImage: 'assets/images/animal/dog.png',
+      animalImage: Assets.genImagesAnimalDog,
       value: 'dog',
     ),
     AnimalQuizModel(
       animalName: 'cow',
-      animalImage: 'assets/images/animal/cow.png',
+      animalImage: Assets.genImagesAnimalCow,
       value: 'cow',
     ),
     AnimalQuizModel(
       animalName: 'hen',
-      animalImage: 'assets/images/animal/hen.png',
+      animalImage: Assets.genImagesAnimalHen,
       value: 'hen',
     ),
     AnimalQuizModel(
       animalName: 'bird',
-      animalImage: 'assets/images/animal/bird.png',
+      animalImage: Assets.genImagesAnimalBird,
       value: 'bird',
     ),
     AnimalQuizModel(
       animalName: 'lion',
-      animalImage: 'assets/images/animal/lion.png',
+      animalImage: Assets.genImagesAnimalLion,
       value: 'lion',
     ),
     AnimalQuizModel(
       animalName: 'sheep',
-      animalImage: 'assets/images/animal/sheep.png',
+      animalImage: Assets.genImagesAnimalSheep,
       value: 'sheep',
     ),
     AnimalQuizModel(
       animalName: 'horse',
-      animalImage: 'assets/images/animal/horse.png',
+      animalImage: Assets.genImagesAnimalHorse,
       value: 'horse',
     ),
     AnimalQuizModel(
       animalName: 'elephant',
-      animalImage: 'assets/images/animal/elephant.png',
+      animalImage: Assets.genImagesAnimalElephant,
       value: 'elephant',
     ),
     AnimalQuizModel(
       animalName: 'giraffe',
-      animalImage: 'assets/images/animal/giraffe.png',
+      animalImage: Assets.genImagesAnimalGiraffe,
       value: 'giraffe',
     ),
     AnimalQuizModel(
       animalName: 'A',
-      animalImage: 'assets/images/alphabet/a.png',
+      animalImage: Assets.genImagesAlphabetA,
       value: 'A',
     ),
     AnimalQuizModel(
       animalName: 'B',
-      animalImage: 'assets/images/alphabet/b.png',
+      animalImage: Assets.genImagesAlphabetB,
       value: 'B',
     ),
   ];
@@ -243,7 +244,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
       body: Stack(
         children: [
           Image.asset(
-            'assets/images/home/Page Border in Green Illustrative Nature Pastels Jungle Themed Style.png',
+            Assets.genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle,
             height: MediaQuery.of(context).size.height,
             fit: BoxFit.cover,
           ),

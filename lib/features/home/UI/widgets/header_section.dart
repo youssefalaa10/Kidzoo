@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/helpers/media_query.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({required this.mq, super.key});
@@ -15,7 +16,7 @@ class HeaderSection extends StatelessWidget {
           children: [
             CircleAvatar(
               backgroundImage:
-                  const AssetImage('assets/images/home/shapes.png'),
+                  const AssetImage(Assets.genImagesHomeShapes),
               radius: mq.width(7),
             ),
             SizedBox(width: mq.width(3)),

@@ -1,3 +1,4 @@
+import 'package:kidzoo/core/utils/assets.dart';
 class AlphabetModel {
   AlphabetModel({
     required this.letter,
@@ -10,96 +11,96 @@ class AlphabetModel {
 
   static final List<AlphabetModel> alphabets = [
     AlphabetModel(
-        letter: 'A', imagePath: 'assets/images/alphabet/a.png', example: 'Axe'),
+        letter: 'A', imagePath: Assets.genImagesAlphabetA, example: 'Axe'),
     AlphabetModel(
         letter: 'B',
-        imagePath: 'assets/images/alphabet/b.png',
+        imagePath: Assets.genImagesAlphabetB,
         example: 'Ball'),
     AlphabetModel(
         letter: 'C',
-        imagePath: 'assets/images/alphabet/c.png',
+        imagePath: Assets.genImagesAlphabetC,
         example: 'Cold'),
     AlphabetModel(
         letter: 'D',
-        imagePath: 'assets/images/alphabet/d.png',
+        imagePath: Assets.genImagesAlphabetD,
         example: 'Dice'),
     AlphabetModel(
-        letter: 'E', imagePath: 'assets/images/alphabet/e.png', example: 'Egg'),
+        letter: 'E', imagePath: Assets.genImagesAlphabetE, example: 'Egg'),
     AlphabetModel(
         letter: 'F',
-        imagePath: 'assets/images/alphabet/f.png',
+        imagePath: Assets.genImagesAlphabetF,
         example: 'Fish'),
     AlphabetModel(
         letter: 'G',
-        imagePath: 'assets/images/alphabet/g.png',
+        imagePath: Assets.genImagesAlphabetG,
         example: 'Glasses'),
     AlphabetModel(
-        letter: 'H', imagePath: 'assets/images/alphabet/h.png', example: 'Hat'),
+        letter: 'H', imagePath: Assets.genImagesAlphabetH, example: 'Hat'),
     AlphabetModel(
         letter: 'I',
-        imagePath: 'assets/images/alphabet/i.png',
+        imagePath: Assets.genImagesAlphabetI,
         example: 'Ice cream'),
     AlphabetModel(
         letter: 'J',
-        imagePath: 'assets/images/alphabet/j.png',
+        imagePath: Assets.genImagesAlphabetJ,
         example: 'Juice'),
     AlphabetModel(
         letter: 'K',
-        imagePath: 'assets/images/alphabet/k.png',
+        imagePath: Assets.genImagesAlphabetK,
         example: 'Knife'),
     AlphabetModel(
         letter: 'L',
-        imagePath: 'assets/images/alphabet/l.png',
+        imagePath: Assets.genImagesAlphabetL,
         example: 'Light'),
     AlphabetModel(
         letter: 'M',
-        imagePath: 'assets/images/alphabet/m.png',
+        imagePath: Assets.genImagesAlphabetM,
         example: 'Music'),
     AlphabetModel(
-        letter: 'N', imagePath: 'assets/images/alphabet/n.png', example: 'Nut'),
+        letter: 'N', imagePath: Assets.genImagesAlphabetN, example: 'Nut'),
     AlphabetModel(
-        letter: 'O', imagePath: 'assets/images/alphabet/o.png', example: 'Owl'),
+        letter: 'O', imagePath: Assets.genImagesAlphabetO, example: 'Owl'),
     AlphabetModel(
         letter: 'P',
-        imagePath: 'assets/images/alphabet/p.png',
+        imagePath: Assets.genImagesAlphabetP,
         example: 'Pencil'),
     AlphabetModel(
         letter: 'Q',
-        imagePath: 'assets/images/alphabet/q.png',
+        imagePath: Assets.genImagesAlphabetQ,
         example: 'Queen'),
     AlphabetModel(
         letter: 'R',
-        imagePath: 'assets/images/alphabet/r.png',
+        imagePath: Assets.genImagesAlphabetR,
         example: 'Ruler'),
     AlphabetModel(
         letter: 'S',
-        imagePath: 'assets/images/alphabet/s.png',
+        imagePath: Assets.genImagesAlphabetS,
         example: 'Star'),
     AlphabetModel(
         letter: 'T',
-        imagePath: 'assets/images/alphabet/t.png',
+        imagePath: Assets.genImagesAlphabetT,
         example: 'Tree'),
     AlphabetModel(
         letter: 'U',
-        imagePath: 'assets/images/alphabet/u.png',
+        imagePath: Assets.genImagesAlphabetU,
         example: 'Umbrella'),
     AlphabetModel(
-        letter: 'V', imagePath: 'assets/images/alphabet/v.png', example: 'Van'),
+        letter: 'V', imagePath: Assets.genImagesAlphabetV, example: 'Van'),
     AlphabetModel(
         letter: 'W',
-        imagePath: 'assets/images/alphabet/w.png',
+        imagePath: Assets.genImagesAlphabetW,
         example: 'Watch'),
     AlphabetModel(
         letter: 'X',
-        imagePath: 'assets/images/alphabet/x.png',
+        imagePath: Assets.genImagesAlphabetX,
         example: 'X-ray'),
     AlphabetModel(
         letter: 'Y',
-        imagePath: 'assets/images/alphabet/y.png',
+        imagePath: Assets.genImagesAlphabetY,
         example: 'Yellow'),
     AlphabetModel(
         letter: 'Z',
-        imagePath: 'assets/images/alphabet/z.png',
+        imagePath: Assets.genImagesAlphabetZ,
         example: 'Zoom'),
   ];
 }
