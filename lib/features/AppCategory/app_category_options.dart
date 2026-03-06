@@ -5,6 +5,7 @@ import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzoo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
 import 'package:kidzoo/features/ColorLearn/UI/color_learn_screen.dart';
 import 'package:kidzoo/features/ColorLearn/data/logic/color_learn_cubit.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
@@ -148,6 +149,12 @@ class OptionsGrid extends StatelessWidget {
           child: const ColorLearnScreen(),
         ),
         flipImage: ImageManager.colorLearn,
+      ),
+      OptionItem(
+        icon: ImageManager.lion,
+        title: l10n.animalNameGame,
+        screen: const AnimalNameGameScreen(),
+        flipImage: ImageManager.elephant,
       ),
     ];
   }

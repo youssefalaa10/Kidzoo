@@ -292,6 +292,9 @@ class AppLocalizations {
   // ColorLearn Game translations
   String get colorLearn => _localizedValues['colorLearn']!;
 
+  // Animal Name Game translations
+  String get animalNameGame => _localizedValues['animalNameGame']!;
+
   // Level Map and Games translations
   String get readyToPlay => _localizedValues['readyToPlay']!;
   String get funGames => _localizedValues['funGames']!;

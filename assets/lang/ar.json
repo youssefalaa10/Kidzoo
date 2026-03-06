@@ -49,8 +49,6 @@
   "addText": "إضافة نص",
   "enterText": "أدخل النص...",
   "ticTacToe": "اكس او",
-
-
   "add": "إضافة",
   "today": "اليوم",
   "yesterday": "أمس",
@@ -68,7 +66,6 @@
   "pencil": "رصاص",
   "eraser": "ممحاة",
   "highlighter": "قلم تمييز",
-
   "square": "مربع",
   "calligraphy": "خط",
   "line": "خط",
@@ -91,8 +88,6 @@
   "switchToEnglish": "Switch to English",
   "english": "English",
   "arabic": "العربية",
-
-
   "improveYourSkills": "حسّن مهاراتك",
   "games": "الألعاب",
   "education": "التعليم",
@@ -103,8 +98,6 @@
   "play": "العب",
   "learn": "تعلم",
   "compete": "تنافس",
-
-
   "colorMemory": "ذاكرة الألوان",
   "getReady": "استعد...",
   "watchCarefully": "راقب بعناية!",
@@ -123,8 +116,6 @@
   "restart": "إعادة تشغيل",
   "continue": "متابعة",
   "exit": "خروج",
-
-
   "mathMagic": "سحر الرياضيات!",
   "superDuper": "رائع جداً! 🌟",
   "mathWizard": "🎉 أنت ساحر الرياضيات! 🧙‍♂️",
@@ -133,8 +124,6 @@
   "playAgain": "العب مرة أخرى! ",
   "continueToNextLevel": "انتقل للمستوى التالي! 🎯",
   "oopsieTryAgain": "أوبس! جرب مرة أخرى! 🙈",
-
-
   "epicTicTacToe": "اكس او",
   "playerXTurn": "دور اللاعب X",
   "playerOTurn": "دور اللاعب O",
@@ -151,8 +140,6 @@
   "you": "أنت",
   "ai": "الذكاء الاصطناعي",
   "draws": "التعادلات",
-
-
   "dotsAndBoxes": "النقاط والمربعات",
   "chooseGameMode": "اختر وضع اللعبة",
   "whoWouldYouLikeToPlayAgainst": "ضد من تريد أن تلعب؟",
@@ -186,8 +173,6 @@
   "easyDescription": "شبكة 3x3 - مثالية للمبتدئين",
   "mediumDescription": "شبكة 4x4 - تحدي متوازن",
   "hardDescription": "شبكة 5x5 - مستوى صعوبة خبير",
-
-
   "settings": "الإعدادات",
   "funSettings": "إعدادات ممتعة",
   "language": "اللغة",
@@ -223,7 +208,6 @@
   "resetSettings": "إعادة تعيين الإعدادات",
   "settingsSaved": "تم حفظ الإعدادات بنجاح!",
   "settingsReset": "تم إعادة تعيين الإعدادات للافتراضي!",
-  
   "missingLetter": "الحرف المفقود",
   "learnTheAlphabet": "تعلم الحروف الأبجدية!",
   "yourProgress": "تقدمك",
@@ -250,18 +234,15 @@
   "translateToEnglish": "هل تريد ترجمة اللعبة بالكامل إلى الإنجليزية؟",
   "yes": "نعم",
   "no": "لا",
-  
   "colorLearn": "تعلم الألوان",
-  
+  "animalNameGame": "أسماء الحيوانات",
   "readyToPlay": "هل أنت مستعد للعب؟ 🎮",
   "funGames": "ألعاب ممتعة",
   "flappyBird": "طائر فليبي",
   "game2048": "لعبة 2048",
-  
   "numbers": "الأرقام",
   "alphabet": "الأبجدية",
   "learningActivities": "أنشطة التعلم",
-  
   "mazeGame": "لعبة المتاهة",
   "startPlaying": "ابدأ اللعب",
   "difficulty": "الصعوبة",
@@ -277,7 +258,6 @@
   "mazeCongratulations": "تهانينا!",
   "mazeYouWon": "فزت!",
   "mazeTryAgain": "حاول مرة أخرى",
-  
   "paddleBounce": "كرة المضرب",
   "playVsFriend": "العب ضد صديق",
   "playVsAI": "العب ضد الذكاء الاصطناعي",

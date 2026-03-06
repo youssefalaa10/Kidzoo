@@ -36,38 +36,63 @@ class Assets {
   static const String genImagesAnimalCat = 'assets/gen/images/animal/cat.png';
   static const String genImagesAnimalCow = 'assets/gen/images/animal/cow.png';
   static const String genImagesAnimalDog = 'assets/gen/images/animal/dog.png';
-  static const String genImagesAnimalElephant = 'assets/gen/images/animal/elephant.png';
-  static const String genImagesAnimalGiraffe = 'assets/gen/images/animal/giraffe.png';
+  static const String genImagesAnimalElephant =
+      'assets/gen/images/animal/elephant.png';
+  static const String genImagesAnimalGiraffe =
+      'assets/gen/images/animal/giraffe.png';
   static const String genImagesAnimalHen = 'assets/gen/images/animal/hen.png';
-  static const String genImagesAnimalHorse = 'assets/gen/images/animal/horse.png';
+  static const String genImagesAnimalHorse =
+      'assets/gen/images/animal/horse.png';
   static const String genImagesAnimalLion = 'assets/gen/images/animal/lion.png';
-  static const String genImagesAnimalPanda = 'assets/gen/images/animal/panda.png';
-  static const String genImagesAnimalSheep = 'assets/gen/images/animal/sheep.png';
-  static const String genImagesFlappyBackgroundflappy = 'assets/gen/images/flappy/backgroundflappy.png';
-  static const String genImagesFlappyBackgroundflappy2 = 'assets/gen/images/flappy/backgroundflappy2.png';
-  static const String genImagesFlappyFlappybird = 'assets/gen/images/flappy/flappybird.png';
-  static const String genImagesFlappyGroundflappy = 'assets/gen/images/flappy/groundflappy.png';
-  static const String genImagesFlappyPipedown = 'assets/gen/images/flappy/pipedown.png';
-  static const String genImagesFlappyPipeup = 'assets/gen/images/flappy/pipeup.png';
-  static const String genImagesHomeAbcBlock = 'assets/gen/images/home/abc-block.png';
+  static const String genImagesAnimalPanda =
+      'assets/gen/images/animal/panda.png';
+  static const String genImagesAnimalSheep =
+      'assets/gen/images/animal/sheep.png';
+  static const String genImagesFlappyBackgroundflappy =
+      'assets/gen/images/flappy/backgroundflappy.png';
+  static const String genImagesFlappyBackgroundflappy2 =
+      'assets/gen/images/flappy/backgroundflappy2.png';
+  static const String genImagesFlappyFlappybird =
+      'assets/gen/images/flappy/flappybird.png';
+  static const String genImagesFlappyGroundflappy =
+      'assets/gen/images/flappy/groundflappy.png';
+  static const String genImagesFlappyPipedown =
+      'assets/gen/images/flappy/pipedown.png';
+  static const String genImagesFlappyPipeup =
+      'assets/gen/images/flappy/pipeup.png';
+  static const String genImagesHomeAbcBlock =
+      'assets/gen/images/home/abc-block.png';
   static const String genImagesHomeBrain = 'assets/gen/images/home/brain.png';
-  static const String genImagesHomeBrainstorming = 'assets/gen/images/home/brainstorming.png';
+  static const String genImagesHomeBoard = 'assets/gen/images/home/board.jpg';
+  static const String genImagesHomeBrainstorming =
+      'assets/gen/images/home/brainstorming.png';
   static const String genImagesHomeCalc = 'assets/gen/images/home/calc.png';
-  static const String genImagesHomeCatsBg = 'assets/gen/images/home/cats_bg.png';
-  static const String genImagesHomeCloudyBg = 'assets/gen/images/home/cloudy_bg.png';
+  static const String genImagesHomeCatsBg =
+      'assets/gen/images/home/cats_bg.png';
+  static const String genImagesHomeCloudyBg =
+      'assets/gen/images/home/cloudy_bg.png';
   static const String genImagesHomeFav = 'assets/gen/images/home/Fav.jpg';
-  static const String genImagesHomeGamepad = 'assets/gen/images/home/gamepad.png';
-  static const String genImagesHomeLearnBg = 'assets/gen/images/home/learn_bg.png';
+  static const String genImagesHomeGamepad =
+      'assets/gen/images/home/gamepad.png';
+  static const String genImagesHomeLearnBg =
+      'assets/gen/images/home/learn_bg.png';
   static const String genImagesHomeMath = 'assets/gen/images/home/math.png';
-  static const String genImagesHomeMathBg = 'assets/gen/images/home/math_bg.png';
-  static const String genImagesHomeNumbers = 'assets/gen/images/home/numbers.png';
+  static const String genImagesHomeMathBg =
+      'assets/gen/images/home/math_bg.png';
+  static const String genImagesHomeNumbers =
+      'assets/gen/images/home/numbers.png';
   static const String genImagesHomeOne = 'assets/gen/images/home/one.png';
-  static const String genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle = 'assets/gen/images/home/Page Border in Green Illustrative Nature Pastels Jungle Themed Style.png';
-  static const String genImagesHomePuzzle1 = 'assets/gen/images/home/puzzle1.png';
+  static const String
+      genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle =
+      'assets/gen/images/home/Page Border in Green Illustrative Nature Pastels Jungle Themed Style.png';
+  static const String genImagesHomePuzzle1 =
+      'assets/gen/images/home/puzzle1.png';
   static const String genImagesHomeRule = 'assets/gen/images/home/rule.png';
-  static const String genImagesHomeSetting = 'assets/gen/images/home/setting.png';
+  static const String genImagesHomeSetting =
+      'assets/gen/images/home/setting.png';
   static const String genImagesHomeShapes = 'assets/gen/images/home/shapes.png';
-  static const String genImagesHomeTechBg = 'assets/gen/images/home/tech_bg.jpeg';
+  static const String genImagesHomeTechBg =
+      'assets/gen/images/home/tech_bg.jpeg';
   static const String genImagesNumbers1 = 'assets/gen/images/numbers/1.png';
   static const String genImagesNumbers10 = 'assets/gen/images/numbers/10.png';
   static const String genImagesNumbers2 = 'assets/gen/images/numbers/2.png';
@@ -80,42 +105,79 @@ class Assets {
   static const String genImagesNumbers9 = 'assets/gen/images/numbers/9.png';
   static const String genImagesPuzzle4 = 'assets/gen/images/puzzle/4.png';
   static const String genImagesPuzzleBird = 'assets/gen/images/puzzle/bird.png';
-  static const String genImagesPuzzleEgypt = 'assets/gen/images/puzzle/egypt.png';
-  static const String genImagesPuzzleGazelle = 'assets/gen/images/puzzle/gazelle.jpg';
-  static const String genImagesPuzzleGhost = 'assets/gen/images/puzzle/ghost.png';
-  static const String genImagesPuzzleBlocks41 = 'assets/gen/images/puzzle/blocks4/1.png';
-  static const String genImagesPuzzleBlocks42 = 'assets/gen/images/puzzle/blocks4/2.png';
-  static const String genImagesPuzzleBlocks43 = 'assets/gen/images/puzzle/blocks4/3.png';
-  static const String genImagesPuzzleBlocks44 = 'assets/gen/images/puzzle/blocks4/4.png';
-  static const String genImagesPuzzleBlocks45 = 'assets/gen/images/puzzle/blocks4/5.png';
-  static const String genImagesPuzzleBlocks46 = 'assets/gen/images/puzzle/blocks4/6.png';
-  static const String genImagesPuzzleBlocks47 = 'assets/gen/images/puzzle/blocks4/7.png';
-  static const String genImagesPuzzleBlocks48 = 'assets/gen/images/puzzle/blocks4/8.png';
-  static const String genImagesPuzzleBlocks49 = 'assets/gen/images/puzzle/blocks4/9.png';
-  static const String genImagesPuzzleGazelleBlock1 = 'assets/gen/images/puzzle/gazelle block/1.jpg';
-  static const String genImagesPuzzleGazelleBlock2 = 'assets/gen/images/puzzle/gazelle block/2.jpg';
-  static const String genImagesPuzzleGazelleBlock3 = 'assets/gen/images/puzzle/gazelle block/3.jpg';
-  static const String genImagesPuzzleGazelleBlock4 = 'assets/gen/images/puzzle/gazelle block/4.jpg';
-  static const String genImagesPuzzleGhostBlock1 = 'assets/gen/images/puzzle/ghost block/1.png';
-  static const String genImagesPuzzleGhostBlock2 = 'assets/gen/images/puzzle/ghost block/2.png';
-  static const String genImagesPuzzleGhostBlock3 = 'assets/gen/images/puzzle/ghost block/3.png';
-  static const String genImagesPuzzleGhostBlock4 = 'assets/gen/images/puzzle/ghost block/4.png';
-  static const String genImagesShapesChecked = 'assets/gen/images/shapes/checked.png';
-  static const String genImagesShapesCircleTemp = 'assets/gen/images/shapes/circle-temp.png';
-  static const String genImagesShapesCircle = 'assets/gen/images/shapes/circle.png';
-  static const String genImagesShapesColorfulCuteKidsStationaryPageBorder = 'assets/gen/images/shapes/Colorful Cute Kids Stationary Page Border.png';
-  static const String genImagesShapesCylinderTemp = 'assets/gen/images/shapes/cylinder-temp.png';
-  static const String genImagesShapesCylinder = 'assets/gen/images/shapes/cylinder.png';
-  static const String genImagesShapesDiamondTemp = 'assets/gen/images/shapes/diamond-temp.png';
-  static const String genImagesShapesDiamond = 'assets/gen/images/shapes/diamond.png';
-  static const String genImagesShapesHexagonTemp = 'assets/gen/images/shapes/hexagon-temp.png';
-  static const String genImagesShapesHexagon = 'assets/gen/images/shapes/hexagon.png';
-  static const String genImagesShapesPentagonTemp = 'assets/gen/images/shapes/pentagon-temp.png';
-  static const String genImagesShapesPentagon = 'assets/gen/images/shapes/pentagon.png';
-  static const String genImagesShapesSquareTemp = 'assets/gen/images/shapes/square-temp.png';
-  static const String genImagesShapesSquare = 'assets/gen/images/shapes/square.png';
-  static const String genImagesShapesStarTemp = 'assets/gen/images/shapes/star-temp.png';
+  static const String genImagesPuzzleEgypt =
+      'assets/gen/images/puzzle/egypt.png';
+  static const String genImagesPuzzleGazelle =
+      'assets/gen/images/puzzle/gazelle.jpg';
+  static const String genImagesPuzzleGhost =
+      'assets/gen/images/puzzle/ghost.png';
+  static const String genImagesPuzzleBlocks41 =
+      'assets/gen/images/puzzle/blocks4/1.png';
+  static const String genImagesPuzzleBlocks42 =
+      'assets/gen/images/puzzle/blocks4/2.png';
+  static const String genImagesPuzzleBlocks43 =
+      'assets/gen/images/puzzle/blocks4/3.png';
+  static const String genImagesPuzzleBlocks44 =
+      'assets/gen/images/puzzle/blocks4/4.png';
+  static const String genImagesPuzzleBlocks45 =
+      'assets/gen/images/puzzle/blocks4/5.png';
+  static const String genImagesPuzzleBlocks46 =
+      'assets/gen/images/puzzle/blocks4/6.png';
+  static const String genImagesPuzzleBlocks47 =
+      'assets/gen/images/puzzle/blocks4/7.png';
+  static const String genImagesPuzzleBlocks48 =
+      'assets/gen/images/puzzle/blocks4/8.png';
+  static const String genImagesPuzzleBlocks49 =
+      'assets/gen/images/puzzle/blocks4/9.png';
+  static const String genImagesPuzzleGazelleBlock1 =
+      'assets/gen/images/puzzle/gazelle block/1.jpg';
+  static const String genImagesPuzzleGazelleBlock2 =
+      'assets/gen/images/puzzle/gazelle block/2.jpg';
+  static const String genImagesPuzzleGazelleBlock3 =
+      'assets/gen/images/puzzle/gazelle block/3.jpg';
+  static const String genImagesPuzzleGazelleBlock4 =
+      'assets/gen/images/puzzle/gazelle block/4.jpg';
+  static const String genImagesPuzzleGhostBlock1 =
+      'assets/gen/images/puzzle/ghost block/1.png';
+  static const String genImagesPuzzleGhostBlock2 =
+      'assets/gen/images/puzzle/ghost block/2.png';
+  static const String genImagesPuzzleGhostBlock3 =
+      'assets/gen/images/puzzle/ghost block/3.png';
+  static const String genImagesPuzzleGhostBlock4 =
+      'assets/gen/images/puzzle/ghost block/4.png';
+  static const String genImagesShapesChecked =
+      'assets/gen/images/shapes/checked.png';
+  static const String genImagesShapesCircleTemp =
+      'assets/gen/images/shapes/circle-temp.png';
+  static const String genImagesShapesCircle =
+      'assets/gen/images/shapes/circle.png';
+  static const String genImagesShapesColorfulCuteKidsStationaryPageBorder =
+      'assets/gen/images/shapes/Colorful Cute Kids Stationary Page Border.png';
+  static const String genImagesShapesCylinderTemp =
+      'assets/gen/images/shapes/cylinder-temp.png';
+  static const String genImagesShapesCylinder =
+      'assets/gen/images/shapes/cylinder.png';
+  static const String genImagesShapesDiamondTemp =
+      'assets/gen/images/shapes/diamond-temp.png';
+  static const String genImagesShapesDiamond =
+      'assets/gen/images/shapes/diamond.png';
+  static const String genImagesShapesHexagonTemp =
+      'assets/gen/images/shapes/hexagon-temp.png';
+  static const String genImagesShapesHexagon =
+      'assets/gen/images/shapes/hexagon.png';
+  static const String genImagesShapesPentagonTemp =
+      'assets/gen/images/shapes/pentagon-temp.png';
+  static const String genImagesShapesPentagon =
+      'assets/gen/images/shapes/pentagon.png';
+  static const String genImagesShapesSquareTemp =
+      'assets/gen/images/shapes/square-temp.png';
+  static const String genImagesShapesSquare =
+      'assets/gen/images/shapes/square.png';
+  static const String genImagesShapesStarTemp =
+      'assets/gen/images/shapes/star-temp.png';
   static const String genImagesShapesStar = 'assets/gen/images/shapes/star.png';
-  static const String genImagesShapesTriangleTemp = 'assets/gen/images/shapes/triangle-temp.png';
-  static const String genImagesShapesTriangle = 'assets/gen/images/shapes/triangle.png';
+  static const String genImagesShapesTriangleTemp =
+      'assets/gen/images/shapes/triangle-temp.png';
+  static const String genImagesShapesTriangle =
+      'assets/gen/images/shapes/triangle.png';
 }
