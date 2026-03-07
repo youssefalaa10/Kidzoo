@@ -18,7 +18,7 @@ class PaddleBounceGameScreen extends StatefulWidget {
 
 class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
     with BackgroundMusicMixin {
-  double? _lastTouchX;
+  final Map<int, double> _touchStates = {};
 
   @override
   Widget build(BuildContext context) {
@@ -54,19 +54,19 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
           }
         },
         builder: (context, state) {
-          return GestureDetector(
+          return Listener(
             behavior: HitTestBehavior.opaque,
-            onPanStart: (details) {
+            onPointerDown: (event) {
               if (state.status != PaddleBounceGameStatus.playing) return;
-              _lastTouchX = details.globalPosition.dx;
+              _touchStates[event.pointer] = event.position.dx;
             },
-            onPanUpdate: (details) {
+            onPointerMove: (event) {
               if (state.status != PaddleBounceGameStatus.playing) return;
 
               final screenHeight = MediaQuery.of(context).size.height;
               final screenWidth = MediaQuery.of(context).size.width;
-              final touchY = details.globalPosition.dy;
-              final touchX = details.globalPosition.dx;
+              final touchY = event.position.dy;
+              final touchX = event.position.dx;
 
               // Ignore touches in the center where pause button is (approximately)
               final centerY = screenHeight / 2;
@@ -75,6 +75,12 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                   (touchX - centerX).abs() < 40) {
                 return; // Ignore touches in pause button area
               }
+
+              if (!_touchStates.containsKey(event.pointer)) {
+                _touchStates[event.pointer] = touchX;
+                return;
+              }
+              final lastX = _touchStates[event.pointer]!;
 
               // Determine which paddle to move based on touch position
               if (state.gameMode == PaddleBounceGameMode.vsFriend) {
@@ -85,45 +91,40 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
 
                 if (touchY < topZone) {
                   // Top paddle - top 40% of screen
-                  if (_lastTouchX != null) {
-                    final deltaX = (touchX - _lastTouchX!) / screenSize.width;
-                    context.read<PaddleBounceCubit>().moveTopPaddle(deltaX);
-                  }
+                  final deltaX = (touchX - lastX) / screenSize.width;
+                  context.read<PaddleBounceCubit>().moveTopPaddle(deltaX);
                 } else if (touchY > bottomZone) {
                   // Bottom paddle - bottom 40% of screen
-                  if (_lastTouchX != null) {
-                    final deltaX = (touchX - _lastTouchX!) / screenSize.width;
-                    context.read<PaddleBounceCubit>().moveBottomPaddle(deltaX);
-                  }
+                  final deltaX = (touchX - lastX) / screenSize.width;
+                  context.read<PaddleBounceCubit>().moveBottomPaddle(deltaX);
                 }
-                // Middle 20% is neutral - no paddle movement
               } else {
                 // AI mode: player only controls bottom paddle (bottom 50% of screen)
                 if (touchY > screenHeight / 2) {
-                  if (_lastTouchX != null) {
-                    final deltaX = (touchX - _lastTouchX!) / screenSize.width;
-                    context.read<PaddleBounceCubit>().moveBottomPaddle(deltaX);
-                  }
+                  final deltaX = (touchX - lastX) / screenSize.width;
+                  context.read<PaddleBounceCubit>().moveBottomPaddle(deltaX);
                 }
               }
-              _lastTouchX = touchX;
+              _touchStates[event.pointer] = touchX;
             },
-            onPanEnd: (_) {
-              _lastTouchX = null;
+            onPointerUp: (event) {
+              _touchStates.remove(event.pointer);
             },
-            onPanCancel: () {
-              _lastTouchX = null;
+            onPointerCancel: (event) {
+              _touchStates.remove(event.pointer);
             },
-            onTap: () {
-              if (state.status == PaddleBounceGameStatus.waiting) {
-                context.read<PaddleBounceCubit>().startGame();
-              } else if (state.status == PaddleBounceGameStatus.playing) {
-                context.read<PaddleBounceCubit>().pauseGame();
-              } else if (state.status == PaddleBounceGameStatus.paused) {
-                context.read<PaddleBounceCubit>().pauseGame();
-              }
-            },
-            child: Container(
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () {
+                if (state.status == PaddleBounceGameStatus.waiting) {
+                  context.read<PaddleBounceCubit>().startGame();
+                } else if (state.status == PaddleBounceGameStatus.playing) {
+                  context.read<PaddleBounceCubit>().pauseGame();
+                } else if (state.status == PaddleBounceGameStatus.paused) {
+                  context.read<PaddleBounceCubit>().pauseGame();
+                }
+              },
+              child: Container(
               decoration: BoxDecoration(
                 gradient: LinearGradient(
                   begin: Alignment.topCenter,
@@ -354,7 +355,9 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                 ],
               ),
             ),
+          ),
           );
+
         },
       ),
     );

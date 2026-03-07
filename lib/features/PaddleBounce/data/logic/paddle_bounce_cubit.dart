@@ -25,8 +25,8 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       const Duration(milliseconds: 16), // ~60 FPS
       (_) => _updateGame(),
     );
-    _soundPlayer = AudioPlayer();
-    _soundPlayer.setPlayerMode(PlayerMode.lowLatency);
+    _boopPlayer = AudioPlayer();
+    _boopPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
   Timer? _gameLoopTimer;
   static const double _ballSpeed = 4.0;
@@ -35,23 +35,20 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
   static const double _topPaddlePaddingFriend =
       80.0; // Extra padding for top paddle in friend mode to avoid appbar
 
-  late AudioPlayer _soundPlayer;
-  final bool _soundEnabled = true;
+  late AudioPlayer _boopPlayer;
 
   @override
   Future<void> close() {
     _gameLoopTimer?.cancel();
-    _soundPlayer.dispose();
+    _boopPlayer.dispose();
     return super.close();
   }
 
-  Future<void> _playSound(String soundName) async {
-    if (!_soundEnabled) return;
+  Future<void> _playBoop() async {
     try {
-      await _soundPlayer.play(AssetSource('audio/$soundName.mp3'));
-    } catch (e) {
-      // Sound file not found, ignore
-    }
+      await _boopPlayer.stop();
+      await _boopPlayer.play(AssetSource('audio/boop.wav'));
+    } catch (_) {}
   }
 
   void startGame() {
@@ -68,7 +65,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           velocityY: _ballSpeed * math.sin(angle),
         ),
       ));
-      _playSound('game_start');
+      // no sound for game_start
     }
   }
 
@@ -83,10 +80,9 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
   void moveTopPaddle(double deltaX) {
     if (state.status != PaddleBounceGameStatus.playing) return;
 
-    // deltaX is normalized (-1 to 1), multiply by screen width and speed factor
+    // deltaX is difference from last touch position, multiply by screen width and speed factor
     // Use smoother movement with interpolation for better control
-    final movementSpeed =
-        _paddleSpeed * 0.15; // Increased for smoother response
+    final movementSpeed = _paddleSpeed * 0.4; // Increased for smoother response
     final newX =
         (state.topPaddle.x + deltaX * state.screenWidth * movementSpeed).clamp(
             _paddlePadding,
@@ -103,10 +99,9 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
   void moveBottomPaddle(double deltaX) {
     if (state.status != PaddleBounceGameStatus.playing) return;
 
-    // deltaX is normalized (-1 to 1), multiply by screen width and speed factor
+    // deltaX is difference from last touch position, multiply by screen width and speed factor
     // Use smoother movement with interpolation for better control
-    final movementSpeed =
-        _paddleSpeed * 0.15; // Increased for smoother response
+    final movementSpeed = _paddleSpeed * 0.4; // Increased for smoother response
     final newX =
         (state.bottomPaddle.x + deltaX * state.screenWidth * movementSpeed)
             .clamp(_paddlePadding,
@@ -146,7 +141,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
         state.ball.radius + _paddlePadding,
         state.screenWidth - state.ball.radius - _paddlePadding,
       );
-      _playSound('bounce');
+      _playBoop();
     }
 
     // Check top paddle collision (account for padding from top)
@@ -168,7 +163,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       newVelocityX = speed * math.sin(angle);
       newVelocityY = speed * math.cos(angle);
       newBallY = state.topPaddle.height + state.ball.radius + topPaddlePadding;
-      _playSound('paddle_hit');
+      _playBoop();
     }
 
     // Check bottom paddle collision (account for padding from bottom)
@@ -188,7 +183,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           state.bottomPaddle.height -
           state.ball.radius -
           _paddlePadding;
-      _playSound('paddle_hit');
+      _playBoop();
     }
 
     // Check scoring (account for paddle padding)
@@ -201,7 +196,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
     if (newBallY - state.ball.radius < topPaddlePaddingForScoring) {
       // Player 1 (bottom) scores
       newPlayer1Score = state.player1Score + 1;
-      _playSound('score');
+      _playBoop();
       if (newPlayer1Score >= state.winningScore) {
         newStatus = PaddleBounceGameStatus.gameOver;
         newWinner = 1;
@@ -212,7 +207,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           status: newStatus,
           winner: newWinner,
         ));
-        _playSound('game_win');
+        // no sound for game_win
         return;
       } else {
         // Emit score update first, then reset ball
@@ -227,7 +222,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
         state.screenHeight - _paddlePadding) {
       // Player 2 (top) scores
       newPlayer2Score = state.player2Score + 1;
-      _playSound('score');
+      _playBoop();
       if (newPlayer2Score >= state.winningScore) {
         newStatus = PaddleBounceGameStatus.gameOver;
         newWinner = 2;
@@ -238,7 +233,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           status: newStatus,
           winner: newWinner,
         ));
-        _playSound('game_win');
+        // no sound for game_win
         return;
       } else {
         // Emit score update first, then reset ball

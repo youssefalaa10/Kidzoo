@@ -16,6 +16,7 @@ class MusicState {
     this.isLoading = false,
     this.error,
     this.pauseRequestCount = 0,
+    this.musicTrack = 'audio/ton.mp3',
   });
   final bool isInitialized;
   final bool isMusicEnabled;
@@ -24,7 +25,8 @@ class MusicState {
   final double volume;
   final bool isLoading;
   final String? error;
-  final int pauseRequestCount; // Track how many screens need music paused
+  final int pauseRequestCount;
+  final String musicTrack;
 
   MusicState copyWith({
     bool? isInitialized,
@@ -35,6 +37,7 @@ class MusicState {
     bool? isLoading,
     String? error,
     int? pauseRequestCount,
+    String? musicTrack,
   }) {
     return MusicState(
       isInitialized: isInitialized ?? this.isInitialized,
@@ -45,6 +48,7 @@ class MusicState {
       isLoading: isLoading ?? this.isLoading,
       error: error ?? this.error,
       pauseRequestCount: pauseRequestCount ?? this.pauseRequestCount,
+      musicTrack: musicTrack ?? this.musicTrack,
     );
   }
 }
@@ -84,6 +88,7 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
   late AudioPlayer _audioPlayer;
   static const String _musicEnabledKey = 'music_enabled';
   static const String _volumeKey = 'music_volume';
+  static const String _musicTrackKey = 'music_track';
   bool _hasPlayerListener = false;
   Timer? _musicTimer;
 
@@ -168,10 +173,12 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
       final prefs = await SharedPreferences.getInstance();
       final musicEnabled = prefs.getBool(_musicEnabledKey) ?? true;
       final volume = prefs.getDouble(_volumeKey) ?? 0.3;
+      final musicTrack = prefs.getString(_musicTrackKey) ?? 'audio/ton.mp3';
 
       emit(state.copyWith(
         isMusicEnabled: musicEnabled,
         volume: volume,
+        musicTrack: musicTrack,
       ));
     } catch (e) {
       // Use default values if loading fails
@@ -184,8 +191,19 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_musicEnabledKey, state.isMusicEnabled);
       await prefs.setDouble(_volumeKey, state.volume);
+      await prefs.setString(_musicTrackKey, state.musicTrack);
     } catch (e) {
       emit(state.copyWith(error: 'Failed to save music settings: $e'));
+    }
+  }
+
+  // Set background music track and restart playback
+  Future<void> setMusicTrack(String track) async {
+    emit(state.copyWith(musicTrack: track, isPlaying: false));
+    await _saveSettings();
+    if (state.isMusicEnabled) {
+      await _audioPlayer.stop();
+      await _playBackgroundMusic();
     }
   }
 
@@ -245,16 +263,16 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
       print('🎵 MusicCubit: Volume set to ${state.volume}');
 
       // Play the audio
-      print('🎵 MusicCubit: Playing AssetSource: audio/ton.mp3');
+      print('🎵 MusicCubit: Playing AssetSource: ${state.musicTrack}');
       try {
-        await _audioPlayer.play(AssetSource('audio/ton.mp3'));
+        await _audioPlayer.play(AssetSource(state.musicTrack));
         print('🎵 MusicCubit: Audio playback started successfully');
       } catch (playError) {
         print('🎵 MusicCubit: Play error: $playError');
         // Try alternative path
         print('🎵 MusicCubit: Trying alternative path...');
         try {
-          await _audioPlayer.play(AssetSource('assets/audio/ton.mp3'));
+          await _audioPlayer.play(AssetSource('assets/${state.musicTrack}'));
           print('🎵 MusicCubit: Alternative play successful');
         } catch (altError) {
           print('🎵 MusicCubit: Alternative play error: $altError');

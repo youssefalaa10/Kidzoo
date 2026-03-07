@@ -1,3 +1,4 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,9 +28,28 @@ class ColorMemoryScreen extends ProtectedGameScreen {
 class _ColorMemoryScreenState
     extends ProtectedGameScreenState<ColorMemoryScreen> {
   late ColorMemoryBloc _bloc;
+  late AudioPlayer _sfxPlayer;
+
+  static const List<String> _pianoNotes = [
+    'audio/piano-a.wav',
+    'audio/piano-c.wav',
+    'audio/piano-d.wav',
+    'audio/piano-e.wav',
+    'audio/piano-f.wav',
+  ];
+
+  Future<void> _playSound(int colorIndex) async {
+    try {
+      final note = _pianoNotes[colorIndex % _pianoNotes.length];
+      await _sfxPlayer.stop();
+      await _sfxPlayer.play(AssetSource(note));
+    } catch (_) {}
+  }
 
   @override
   void onGameInit() {
+    _sfxPlayer = AudioPlayer();
+    _sfxPlayer.setPlayerMode(PlayerMode.lowLatency);
     _bloc = ColorMemoryBloc();
     // Start game with classic mode
     _bloc.add(StartGameEvent(
@@ -40,6 +60,7 @@ class _ColorMemoryScreenState
 
   @override
   void dispose() {
+    _sfxPlayer.dispose();
     _bloc.close();
     super.dispose();
   }
@@ -51,10 +72,10 @@ class _ColorMemoryScreenState
         HapticFeedback.lightImpact();
       }
 
-      // Play sound (if sound assets are available)
-      // if (state.settings.soundEnabled) {
-      //   _playSound(colorIndex);
-      // }
+      // Play piano note for this color
+      if (state.settings.soundEnabled) {
+        _playSound(colorIndex);
+      }
 
       _bloc.add(PlayerTapColorEvent(colorIndex));
     }
@@ -66,6 +87,12 @@ class _ColorMemoryScreenState
       value: _bloc,
       child: BlocConsumer<ColorMemoryBloc, ColorMemoryGameState>(
         listener: (context, state) {
+          // Play piano note during sequence display
+          if (state.phase == GamePhase.showingSequence &&
+              state.highlightedColorIndex >= 0 &&
+              state.settings.soundEnabled) {
+            _playSound(state.highlightedColorIndex);
+          }
           // Show level complete dialog
           if (state.phase == GamePhase.levelComplete) {
             Future.delayed(const Duration(milliseconds: 500), () {

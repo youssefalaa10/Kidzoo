@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
@@ -36,8 +37,35 @@ class FlappyBirdGame extends FlameGame
 
   GameState gameState = GameState.waiting;
 
+  final AudioPlayer _flapPlayer = AudioPlayer();
+  final AudioPlayer _scorePlayer = AudioPlayer();
+
+  Future<void> playFlap() async {
+    try {
+      await _flapPlayer.stop();
+      await _flapPlayer.play(AssetSource('audio/boop.wav'));
+    } catch (_) {}
+  }
+
+  Future<void> playScore() async {
+    try {
+      await _scorePlayer.stop();
+      await _scorePlayer.play(AssetSource('audio/boop.wav'));
+    } catch (_) {}
+  }
+
   @override
-  FutureOr<void> onLoad() {
+  void onRemove() {
+    _flapPlayer.dispose();
+    _scorePlayer.dispose();
+    super.onRemove();
+  }
+
+  @override
+  Future<void> onLoad() async {
+    await _flapPlayer.setPlayerMode(PlayerMode.lowLatency);
+    await _scorePlayer.setPlayerMode(PlayerMode.lowLatency);
+    images.prefix = '';
     background = Background(size);
     add(background);
     bird = Bird();

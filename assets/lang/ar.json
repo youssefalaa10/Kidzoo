@@ -235,6 +235,7 @@
   "yes": "نعم",
   "no": "لا",
   "colorLearn": "تعلم الألوان",
+  "colorSwitch": "تبديل الألوان",
   "animalNameGame": "أسماء الحيوانات",
   "readyToPlay": "هل أنت مستعد للعب؟ 🎮",
   "funGames": "ألعاب ممتعة",
@@ -259,24 +260,15 @@
   "mazeYouWon": "فزت!",
   "mazeTryAgain": "حاول مرة أخرى",
   "paddleBounce": "كرة المضرب",
-  "playVsFriend": "العب ضد صديق",
-  "playVsAI": "العب ضد الذكاء الاصطناعي",
-  "playWithAFriend": "العب مع صديق على نفس الجهاز",
-  "challengeTheComputer": "تحدى ذكاء الكمبيوتر الاصطناعي",
-  "selectAIDifficulty": "اختر صعوبة الذكاء الاصطناعي",
-  "easy": "سهل",
-  "hard": "صعب",
+
   "player1": "اللاعب 1",
   "player2": "اللاعب 2",
   "player1Wins": "فاز اللاعب 1!",
   "player2Wins": "فاز اللاعب 2!",
-  "youWin": "فزت!",
-  "aiWins": "فاز الذكاء الاصطناعي!",
+
   "pause": "إيقاف مؤقت",
-  "resume": "متابعة",
-  "restart": "إعادة التشغيل",
+
   "mainMenu": "القائمة الرئيسية",
-  "gameOver": "انتهت اللعبة",
-  "score": "النقاط",
+
   "tapToStart": "اضغط للبدء"
 }

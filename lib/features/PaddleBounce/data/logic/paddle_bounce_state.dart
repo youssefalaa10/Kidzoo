@@ -8,8 +8,8 @@ class PaddleBounceState {
     required double screenHeight,
     int winningScore = 5,
   }) {
-    final paddleWidth = screenWidth * 0.2;
-    final paddleHeight = 15.0;
+    final paddleWidth = screenWidth * 0.35;
+    final paddleHeight = 20.0;
     final ballRadius = 10.0;
 
     return PaddleBounceState(

@@ -87,6 +87,18 @@ class _SettingsScreenState extends State<SettingsScreen>
                           ),
                           SizedBox(height: mq.height(2)),
 
+                          // Background Music Track Card
+                          _buildSettingsCard(
+                            context,
+                            mq,
+                            icon: Icons.album,
+                            title: 'Background Music',
+                            description:
+                                'Choose which music track plays in the background',
+                            child: _buildMusicTrackSelector(context),
+                            color: Colors.deepPurple,
+                          ),
+                          SizedBox(height: mq.height(2)),
 
                           // Volume Settings Card
                           _buildSettingsCard(
@@ -99,8 +111,6 @@ class _SettingsScreenState extends State<SettingsScreen>
                             color: Colors.teal,
                           ),
                           SizedBox(height: mq.height(3)),
-
-
                         ],
                       ),
                     ),
@@ -265,8 +275,6 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-
-
   Widget _buildMusicSettings(BuildContext context, AppLocalizations l10n) {
     return BlocBuilder<MusicCubit, MusicState>(
       builder: (context, musicState) {
@@ -329,6 +337,76 @@ class _SettingsScreenState extends State<SettingsScreen>
           ],
         );
       },
+    );
+  }
+
+  Widget _buildMusicTrackSelector(BuildContext context) {
+    return BlocBuilder<MusicCubit, MusicState>(
+      builder: (context, musicState) {
+        return Row(
+          children: [
+            Expanded(
+              child: _buildTrackOption(
+                context,
+                label: 'Track 1',
+                icon: '🎵',
+                track: 'audio/ton.mp3',
+                isSelected: musicState.musicTrack == 'audio/ton.mp3',
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildTrackOption(
+                context,
+                label: 'Track 2',
+                icon: '🎶',
+                track: 'audio/ton2.mp3',
+                isSelected: musicState.musicTrack == 'audio/ton2.mp3',
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Widget _buildTrackOption(
+    BuildContext context, {
+    required String label,
+    required String icon,
+    required String track,
+    required bool isSelected,
+  }) {
+    return GestureDetector(
+      onTap: () => context.read<MusicCubit>().setMusicTrack(track),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 250),
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? Colors.deepPurple.withValues(alpha: 0.1)
+              : Colors.grey[100],
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? Colors.deepPurple : Colors.grey[300]!,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 20)),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: TextStyle(
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+                color: isSelected ? Colors.deepPurple : Colors.grey[700],
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

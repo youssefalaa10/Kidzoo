@@ -50,7 +50,7 @@
   "enterText": "Enter text...",
   "ticTacToe": "Tic Tac Toe",
   "dotsAndBoxes": "Dots & Boxes",
-  "drawLab": "DrawLab",
+
   "add": "Add",
   "today": "Today",
   "yesterday": "Yesterday",
@@ -90,8 +90,6 @@
   "switchToEnglish": "التبديل إلى الإنجليزية",
   "english": "English",
   "arabic": "العربية",
-
-
   "improveYourSkills": "Improve Your Skills",
   "games": "Games",
   "education": "Education",
@@ -102,8 +100,6 @@
   "play": "Play",
   "learn": "Learn",
   "compete": "compete",
-
-
   "colorMemory": "Color Memory",
   "getReady": "Get ready...",
   "watchCarefully": "Watch carefully!",
@@ -122,18 +118,14 @@
   "restart": "Restart",
   "continue": "Continue",
   "exit": "Exit",
-
-
   "mathMagic": "Math Magic!",
   "superDuper": "Super Duper! 🌟",
   "mathWizard": "🎉 You're a Math Wizard! 🧙‍♂️",
   "youEarned": "You earned",
   "stars": "stars! 🌟",
-  "playAgain": "Play Again! 🚀",
+
   "continueToNextLevel": "Continue to Next Level! 🎯",
   "oopsieTryAgain": "Oopsie! Try Again! 🙈",
-
-
   "epicTicTacToe": "EPIC TIC TAC TOE",
   "playerXTurn": "Player X's Turn",
   "playerOTurn": "Player O's Turn",
@@ -144,7 +136,7 @@
   "playerXWins": "Player X Wins!",
   "playerOWins": "Player O Wins!",
   "itsADraw": "It's a Draw!",
-  "newGame": "New Game",
+
   "vsPlayer": "VS Player",
   "vsAI": "VS AI",
   "playerX": "Player X",
@@ -153,18 +145,9 @@
   "ai": "AI",
   "draws": "Draws",
 
-
-  "dotsAndBoxes": "Dots & Boxes",
   "chooseGameMode": "Choose Game Mode",
   "whoWouldYouLikeToPlayAgainst": "Who would you like to play against?",
-  "playVsAI": "Play vs AI",
-  "challengeTheComputer": "Challenge the computer",
-  "playVsFriend": "Play vs Friend",
-  "playWithAFriend": "Play with a friend",
-  "selectAIDifficulty": "Select AI Difficulty",
-  "easy": "Easy",
 
-  "hard": "Hard",
   "gridSize": "Grid Size",
   "gameMode": "Game Mode",
   "aiDifficulty": "AI Difficulty",
@@ -186,8 +169,6 @@
   "easyDescription": "3x3 grid - Perfect for beginners",
   "mediumDescription": "4x4 grid - Balanced challenge",
   "hardDescription": "5x5 grid - Expert level difficulty",
-
-
   "settings": "Settings",
   "funSettings": "Fun Settings",
   "language": "Language",
@@ -224,11 +205,10 @@
   "resetSettings": "Reset Settings",
   "settingsSaved": "Settings saved successfully!",
   "settingsReset": "Settings reset to default!",
-  
-  "missingLetter": "Missing Letter",
+
   "learnTheAlphabet": "Learn the Alphabet!",
   "yourProgress": "Your Progress",
-  "bestScore": "Best Score",
+
   "completed": "Completed",
   "currentScore": "Current Score:",
   "continueGame": "Continue",
@@ -239,36 +219,33 @@
   "complete": "Complete!",
   "congratulations": "Congratulations!",
   "youCompletedAllWords": "You completed all 25 words!",
-  "finalScore": "Final Score:",
+
   "done": "Done",
   "playAgain": "Play Again",
   "pauseGame": "Pause Game",
   "doYouWantToExit": "Do you want to exit and continue later?",
   "progress": "Progress:",
   "yourProgressWillBeSaved": "Your progress will be saved automatically.",
-  "resume": "Resume",
+
   "exitAndSave": "Exit & Save",
   "changeLanguage": "Change Language",
   "translateToArabic": "Do you want to translate the game completely to Arabic?",
   "translateToEnglish": "Do you want to translate the game completely to English?",
   "yes": "Yes",
   "no": "No",
-  
   "colorLearn": "ColorLearn",
+  "colorSwitch": "Color Switch",
   "animalNameGame": "Animal Names",
   "finalScore": "Final Score",
-  
   "readyToPlay": "Ready to play? 🎮",
   "funGames": "Fun Games",
   "flappyBird": "Flappy Bird",
   "missingLetter": "Missing Letter",
   "game2048": "2048 Game",
-  
   "numbers": "Numbers",
   "alphabet": "Alphabet",
-  "shapes": "Shapes",
+
   "learningActivities": "Learning Activities",
-  
   "mazeGame": "Maze Game",
   "startPlaying": "Start Playing",
   "difficulty": "Difficulty",
@@ -284,7 +261,6 @@
   "mazeCongratulations": "Congratulations!",
   "mazeYouWon": "You Won!",
   "mazeTryAgain": "Try Again",
-  
   "paddleBounce": "Paddle Bounce",
   "playVsFriend": "Play vs Friend",
   "playVsAI": "Play vs AI",
@@ -297,13 +273,11 @@
   "player2": "Player 2",
   "player1Wins": "Player 1 Wins!",
   "player2Wins": "Player 2 Wins!",
-  "youWin": "You Win!",
-  "aiWins": "AI Wins!",
+
   "pause": "Pause",
   "resume": "Resume",
-  "restart": "Restart",
+
   "mainMenu": "Main Menu",
-  "gameOver": "Game Over",
-  "score": "Score",
+
   "tapToStart": "Tap to Start"
 }

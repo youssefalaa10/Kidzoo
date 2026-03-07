@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/components/ground.dart';
 import 'package:kidzoo/features/FlappyBird/components/pipe.dart';
@@ -27,7 +28,7 @@ Init Bird
 
   @override
   FutureOr<void> onLoad() async {
-    sprite = await Sprite.load("flappy/flappybird.png");
+    sprite = await Sprite.load(Assets.genImagesFlappyFlappybird);
 
     add(RectangleHitbox());
   }
@@ -38,6 +39,7 @@ Init Bird
 
   void flap() {
     velocity = jumpStrength;
+    (parent as FlappyBirdGame).playFlap();
   }
 
   /*
@@ -54,7 +56,7 @@ Init Bird
 
       //update bird's position based on current velocity
       position.y += velocity * dt;
-      
+
       // Prevent bird from going above screen
       if (position.y < 0) {
         position.y = 0;

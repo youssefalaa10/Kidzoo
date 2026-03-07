@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
 
@@ -14,8 +15,9 @@ class Pipe extends SpriteComponent
 
   @override
   FutureOr<void> onLoad() async {
-    sprite = await Sprite.load(
-        isUpPipe ? 'flappy/pipedown.png' : 'flappy/pipeup.png');
+    sprite = await Sprite.load(isUpPipe
+        ? Assets.genImagesFlappyPipedown
+        : Assets.genImagesFlappyPipeup);
     add(RectangleHitbox());
   }
 
@@ -29,9 +31,9 @@ class Pipe extends SpriteComponent
       if (!isScored && position.x + size.x < gameRef.bird.position.x) {
         isScored = true;
         // avoid double scoring
-
         if (isUpPipe) {
           gameRef.incrementScore();
+          gameRef.playScore();
         }
       }
 
