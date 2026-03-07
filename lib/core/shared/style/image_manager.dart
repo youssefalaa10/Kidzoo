@@ -158,4 +158,5 @@ class ImageManager {
 
   // ColorLearn icon (using shapes icon as placeholder, can be replaced with custom icon)
   static const String colorLearn = Assets.genImagesHomeShapes;
+  static const String worldMap = Assets.genImagesPuzzleEgypt;
 }

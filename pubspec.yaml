@@ -60,6 +60,7 @@ flutter:
     - assets/data/
     - assets/lang/
     - assets/audio/
+    - assets/flags/
 
 flutter_assets:
   assets_path: assets/gen/

@@ -237,6 +237,7 @@
   "colorLearn": "تعلم الألوان",
   "colorSwitch": "تبديل الألوان",
   "animalNameGame": "أسماء الحيوانات",
+  "flagGame": "تعلم الأعلام",
   "readyToPlay": "هل أنت مستعد للعب؟ 🎮",
   "funGames": "ألعاب ممتعة",
   "flappyBird": "طائر فليبي",
@@ -260,15 +261,11 @@
   "mazeYouWon": "فزت!",
   "mazeTryAgain": "حاول مرة أخرى",
   "paddleBounce": "كرة المضرب",
-
   "player1": "اللاعب 1",
   "player2": "اللاعب 2",
   "player1Wins": "فاز اللاعب 1!",
   "player2Wins": "فاز اللاعب 2!",
-
   "pause": "إيقاف مؤقت",
-
   "mainMenu": "القائمة الرئيسية",
-
   "tapToStart": "اضغط للبدء"
 }

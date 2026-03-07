@@ -295,6 +295,7 @@ class AppLocalizations {
 
   // Animal Name Game translations
   String get animalNameGame => _localizedValues['animalNameGame']!;
+  String get flagGame => _localizedValues['flagGame']!;
 
   // Level Map and Games translations
   String get readyToPlay => _localizedValues['readyToPlay']!;

@@ -13,6 +13,7 @@ import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzoo/features/MissingLetterGame/Ui/missing_letter_home.dart';
+import 'package:kidzoo/features/FlagGame/pages/flag_game_menu_screen.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/number_screen.dart';
 import 'package:kidzoo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
@@ -151,6 +152,12 @@ class OptionsGrid extends StatelessWidget {
         title: l10n.animalNameGame,
         screen: const AnimalNameGameScreen(),
         flipImage: ImageManager.elephant,
+      ),
+      OptionItem(
+        icon: ImageManager.egypt,
+        title: l10n.flagGame,
+        screen: const FlagGameMenuScreen(),
+        flipImage: ImageManager.worldMap,
       ),
     ];
   }

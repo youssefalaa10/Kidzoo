@@ -50,7 +50,6 @@
   "enterText": "Enter text...",
   "ticTacToe": "Tic Tac Toe",
   "dotsAndBoxes": "Dots & Boxes",
-
   "add": "Add",
   "today": "Today",
   "yesterday": "Yesterday",
@@ -123,7 +122,6 @@
   "mathWizard": "🎉 You're a Math Wizard! 🧙‍♂️",
   "youEarned": "You earned",
   "stars": "stars! 🌟",
-
   "continueToNextLevel": "Continue to Next Level! 🎯",
   "oopsieTryAgain": "Oopsie! Try Again! 🙈",
   "epicTicTacToe": "EPIC TIC TAC TOE",
@@ -136,7 +134,6 @@
   "playerXWins": "Player X Wins!",
   "playerOWins": "Player O Wins!",
   "itsADraw": "It's a Draw!",
-
   "vsPlayer": "VS Player",
   "vsAI": "VS AI",
   "playerX": "Player X",
@@ -144,10 +141,8 @@
   "you": "You",
   "ai": "AI",
   "draws": "Draws",
-
   "chooseGameMode": "Choose Game Mode",
   "whoWouldYouLikeToPlayAgainst": "Who would you like to play against?",
-
   "gridSize": "Grid Size",
   "gameMode": "Game Mode",
   "aiDifficulty": "AI Difficulty",
@@ -205,10 +200,8 @@
   "resetSettings": "Reset Settings",
   "settingsSaved": "Settings saved successfully!",
   "settingsReset": "Settings reset to default!",
-
   "learnTheAlphabet": "Learn the Alphabet!",
   "yourProgress": "Your Progress",
-
   "completed": "Completed",
   "currentScore": "Current Score:",
   "continueGame": "Continue",
@@ -219,14 +212,12 @@
   "complete": "Complete!",
   "congratulations": "Congratulations!",
   "youCompletedAllWords": "You completed all 25 words!",
-
   "done": "Done",
   "playAgain": "Play Again",
   "pauseGame": "Pause Game",
   "doYouWantToExit": "Do you want to exit and continue later?",
   "progress": "Progress:",
   "yourProgressWillBeSaved": "Your progress will be saved automatically.",
-
   "exitAndSave": "Exit & Save",
   "changeLanguage": "Change Language",
   "translateToArabic": "Do you want to translate the game completely to Arabic?",
@@ -237,6 +228,7 @@
   "colorSwitch": "Color Switch",
   "animalNameGame": "Animal Names",
   "finalScore": "Final Score",
+  "flagGame": "Learn Flags",
   "readyToPlay": "Ready to play? 🎮",
   "funGames": "Fun Games",
   "flappyBird": "Flappy Bird",
@@ -244,7 +236,6 @@
   "game2048": "2048 Game",
   "numbers": "Numbers",
   "alphabet": "Alphabet",
-
   "learningActivities": "Learning Activities",
   "mazeGame": "Maze Game",
   "startPlaying": "Start Playing",
@@ -273,11 +264,8 @@
   "player2": "Player 2",
   "player1Wins": "Player 1 Wins!",
   "player2Wins": "Player 2 Wins!",
-
   "pause": "Pause",
   "resume": "Resume",
-
   "mainMenu": "Main Menu",
-
   "tapToStart": "Tap to Start"
 }
