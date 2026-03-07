@@ -6,8 +6,7 @@ import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzoo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
-import 'package:kidzoo/features/ColorLearn/UI/color_learn_screen.dart';
-import 'package:kidzoo/features/ColorLearn/data/logic/color_learn_cubit.dart';
+import 'package:kidzoo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzoo/features/DrawLab/UI/screens/drawlab_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
@@ -143,11 +142,8 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.colorLearn,
-        title: l10n.colorLearn,
-        screen: BlocProvider(
-          create: (context) => ColorLearnCubit(),
-          child: const ColorLearnScreen(),
-        ),
+        title: l10n.colorSwitch,
+        screen: const ColorSwitchScreen(),
         flipImage: ImageManager.colorLearn,
       ),
       OptionItem(
