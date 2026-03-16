@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:kidzoo/core/localization/app_localizations.dart';
+
 import '../bloc/alphabet_bloc.dart';
 import '../bloc/alphabet_state.dart';
 import '../data/model/alphabet_model.dart';
@@ -10,12 +12,16 @@ class AlphabetDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocBuilder<AlphabetBloc, AlphabetState>(
       builder: (context, state) {
         if (state is AlphabetInitialState) {
-          return const Padding(
-            padding: EdgeInsets.only(left: 30.0),
-            child: Text('Select a letter',style: TextStyle(fontSize: 20,color: Colors.grey),),
+          return Padding(
+            padding: const EdgeInsets.only(left: 30.0),
+            child: Text(
+              l10n.selectALetter,
+              style: const TextStyle(fontSize: 20, color: Colors.grey),
+            ),
           );
         } else if (state is AlphabetLoadingState) {
           return const Center(child: CircularProgressIndicator());
@@ -40,7 +46,10 @@ class AlphabetDisplay extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 '${state.alphabet} = ${state.example}',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.redAccent),
               ),
             ],
           );

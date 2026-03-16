@@ -8,6 +8,7 @@ import 'package:kidzoo/core/helpers/media_query.dart';
 import 'package:kidzoo/core/helpers/tts_helper.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/services/cubit/music_cubit.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import '../data/flag_data_manager.dart';
 import '../models/country_model.dart';
 
@@ -50,7 +51,8 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
       _targetCountry = countries[Random().nextInt(4)];
       _options = countries;
     });
-    _ttsHelper.speak("Which flag is ${_targetCountry!.name}?");
+    _ttsHelper
+        .speak(AppLocalizations.of(context).whichFlagIs(_targetCountry!.name));
   }
 
   void _checkAnswer(Country selected) {
@@ -62,7 +64,8 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
         _score += 10;
       });
       _confettiController.play();
-      _ttsHelper.speak("Great job! That's ${_targetCountry!.name}!");
+      _ttsHelper.speak(
+          AppLocalizations.of(context).greatJobThats(_targetCountry!.name));
 
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) _generateQuestion();
@@ -71,7 +74,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
       setState(() {
         _isCorrect = false;
       });
-      _ttsHelper.speak("Try again!");
+      _ttsHelper.speak(AppLocalizations.of(context).tryAgain);
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           setState(() {
@@ -85,6 +88,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
   @override
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);
+    final l10n = AppLocalizations.of(context);
 
     if (_targetCountry == null)
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -92,7 +96,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
     return Scaffold(
       backgroundColor: Colors.orange[50],
       appBar: AppBar(
-        title: const Text('Guess the Flag'),
+        title: Text(l10n.guessTheFlag),
         backgroundColor: Colors.orange,
         foregroundColor: Colors.white,
       ),
@@ -103,7 +107,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Score: $_score',
+                  '${l10n.score}: $_score',
                   style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -111,7 +115,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
                 ),
                 SizedBox(height: mq.height(5)),
                 Text(
-                  "Which flag is ${_targetCountry!.name}?",
+                  l10n.whichFlagIs(_targetCountry!.name),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 28, fontWeight: FontWeight.bold),

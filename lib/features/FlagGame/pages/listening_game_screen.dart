@@ -8,6 +8,7 @@ import 'package:kidzoo/core/helpers/media_query.dart';
 import 'package:kidzoo/core/helpers/tts_helper.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/services/cubit/music_cubit.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import '../data/flag_data_manager.dart';
 import '../models/country_model.dart';
 
@@ -54,7 +55,8 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
   }
 
   void _playPrompt() {
-    _ttsHelper.speak("Find the flag of ${_targetCountry!.name}!");
+    _ttsHelper.speak(
+        AppLocalizations.of(context).findTheFlagOf(_targetCountry!.name));
   }
 
   void _checkAnswer(Country selected) {
@@ -66,7 +68,8 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
         _score += 10;
       });
       _confettiController.play();
-      _ttsHelper.speak("Correct! You found ${_targetCountry!.name}!");
+      _ttsHelper.speak(
+          AppLocalizations.of(context).correctYouFound(_targetCountry!.name));
 
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) _generateQuestion();
@@ -75,7 +78,7 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
       setState(() {
         _isCorrect = false;
       });
-      _ttsHelper.speak("That's not it. Listen again!");
+      _ttsHelper.speak(AppLocalizations.of(context).thatsNotItListenAgain);
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           setState(() {
@@ -90,6 +93,7 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
   @override
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);
+    final l10n = AppLocalizations.of(context);
 
     if (_targetCountry == null)
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
@@ -97,7 +101,7 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
     return Scaffold(
       backgroundColor: Colors.purple[50],
       appBar: AppBar(
-        title: const Text('Listening Game'),
+        title: Text(l10n.listeningGame),
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
       ),
@@ -108,7 +112,7 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Score: $_score',
+                  '${l10n.score}: $_score',
                   style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
@@ -146,9 +150,9 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
                         duration: 1000.ms,
                         curve: Curves.easeInOut),
                 SizedBox(height: mq.height(3)),
-                const Text(
-                  "Tap the speaker to hear again",
-                  style: TextStyle(
+                Text(
+                  l10n.tapSpeakerToHearAgain,
+                  style: const TextStyle(
                       fontSize: 18,
                       fontStyle: FontStyle.italic,
                       color: Colors.grey),

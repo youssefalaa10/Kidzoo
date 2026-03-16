@@ -1,5 +1,6 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class GameDialog extends StatefulWidget {
   const GameDialog({
@@ -129,13 +130,15 @@ class _GameDialogState extends State<GameDialog>
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        _buildStatItem('Score', widget.score.toString()),
+                        _buildStatItem(AppLocalizations.of(context).score,
+                            widget.score.toString()),
                         Container(
                           width: 1,
                           height: 40,
                           color: Colors.grey.shade300,
                         ),
-                        _buildStatItem('Max Tile', widget.maxTile.toString()),
+                        _buildStatItem(AppLocalizations.of(context).maxTile,
+                            widget.maxTile.toString()),
                       ],
                     ),
                   ),
@@ -145,7 +148,7 @@ class _GameDialogState extends State<GameDialog>
                     children: [
                       if (widget.onContinue != null)
                         _buildButton(
-                          'Continue Playing',
+                          AppLocalizations.of(context).continuePlaying,
                           Colors.green,
                           Icons.play_arrow_rounded,
                           widget.onContinue!,
@@ -153,7 +156,7 @@ class _GameDialogState extends State<GameDialog>
                       if (widget.onContinue != null) const SizedBox(height: 12),
                       if (widget.onRetry != null)
                         _buildButton(
-                          'Try Again',
+                          AppLocalizations.of(context).tryAgain,
                           Colors.orange,
                           Icons.refresh_rounded,
                           widget.onRetry!,
@@ -161,7 +164,7 @@ class _GameDialogState extends State<GameDialog>
                       if (widget.onRetry != null) const SizedBox(height: 12),
                       if (widget.onNewGame != null)
                         _buildButton(
-                          'New Game',
+                          AppLocalizations.of(context).newGame,
                           Colors.blue,
                           Icons.add_rounded,
                           widget.onNewGame!,
@@ -265,8 +268,8 @@ void showWinDialog(
   showDialog<void>(
     context: context,
     builder: (context) => GameDialog(
-      title: 'You Win!',
-      message: 'Congratulations! You reached $maxTile!',
+      title: AppLocalizations.of(context).youWin,
+      message: AppLocalizations.of(context).youWinReached(maxTile),
       score: score,
       maxTile: maxTile,
       showConfetti: true,
@@ -287,8 +290,8 @@ void showLoseDialog(
     context: context,
     barrierDismissible: false,
     builder: (context) => GameDialog(
-      title: 'Game Over',
-      message: 'No more moves available!',
+      title: AppLocalizations.of(context).gameOver,
+      message: AppLocalizations.of(context).noMoreMoves,
       score: score,
       maxTile: maxTile,
       onNewGame: onNewGame,

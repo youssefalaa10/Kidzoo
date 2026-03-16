@@ -335,6 +335,75 @@ class AppLocalizations {
   String get pause => _localizedValues['pause']!;
   String get mainMenu => _localizedValues['mainMenu']!;
   String get tapToStart => _localizedValues['tapToStart']!;
+  String get selectALetter => _localizedValues['selectALetter']!;
+  String get selectANumber => _localizedValues['selectANumber']!;
+  String get guessTheFlag => _localizedValues['guessTheFlag']!;
+  String get tapToLearnFlags => _localizedValues['tapToLearnFlags']!;
+  String get listeningGame => _localizedValues['listeningGame']!;
+  String whichFlagIs(String country) =>
+      _localizedValues['whichFlagIs']!.replaceAll('{country}', country);
+  String greatJobThats(String country) =>
+      _localizedValues['greatJobThats']!.replaceAll('{country}', country);
+  String findTheFlagOf(String country) =>
+      _localizedValues['findTheFlagOf']!.replaceAll('{country}', country);
+  String correctYouFound(String country) =>
+      _localizedValues['correctYouFound']!.replaceAll('{country}', country);
+  String get thatsNotItListenAgain =>
+      _localizedValues['thatsNotItListenAgain']!;
+  String get tapSpeakerToHearAgain =>
+      _localizedValues['tapSpeakerToHearAgain']!;
+  String get searchCountries => _localizedValues['searchCountries']!;
+  String get continent => _localizedValues['continent']!;
+  String get capital => _localizedValues['capital']!;
+  String get close => _localizedValues['close']!;
+  String get newMaze => _localizedValues['newMaze']!;
+  String get exitGame => _localizedValues['exitGame']!;
+  String get exitGameConfirm => _localizedValues['exitGameConfirm']!;
+  String get reachedEnd => _localizedValues['reachedEnd']!;
+  String get keepDragging => _localizedValues['keepDragging']!;
+
+  // Added getters
+  String get hello => _localizedValues['hello']!;
+  String get animalNames => _localizedValues['animalNames']!;
+  String get cat => _localizedValues['cat']!;
+  String get dog => _localizedValues['dog']!;
+  String get cow => _localizedValues['cow']!;
+  String get hen => _localizedValues['hen']!;
+  String get bird => _localizedValues['bird']!;
+  String get lion => _localizedValues['lion']!;
+  String get sheep => _localizedValues['sheep']!;
+  String get horse => _localizedValues['horse']!;
+  String get elephant => _localizedValues['elephant']!;
+  String get giraffe => _localizedValues['giraffe']!;
+  String get panda => _localizedValues['panda']!;
+  String welcomeToAnimalQuiz(int level) =>
+      _localizedValues['welcomeToAnimalQuiz']!
+          .replaceAll('{level}', level.toString());
+  String get excellent => _localizedValues['excellent']!;
+  String get greatJob => _localizedValues['greatJob']!;
+  String yourFinalScore(int score) => _localizedValues['yourFinalScore']!
+      .replaceAll('{score}', score.toString());
+  String get selectAnImage => _localizedValues['selectAnImage']!;
+  String get puzzleFrame => _localizedValues['puzzleFrame']!;
+  String get noImageAvailable => _localizedValues['noImageAvailable']!;
+  String get scoreLabel => _localizedValues['scoreLabel']!;
+  String get bestLabel => _localizedValues['bestLabel']!;
+  String get maxTile => _localizedValues['maxTile']!;
+  String get continuePlaying => _localizedValues['continuePlaying']!;
+  String youWinReached(int maxTile) => _localizedValues['youWinReached']!
+      .replaceAll('{maxTile}', maxTile.toString());
+  String get noMoreMoves => _localizedValues['noMoreMoves']!;
+  String get red => _localizedValues['red']!;
+  String get green => _localizedValues['green']!;
+  String get blue => _localizedValues['blue']!;
+  String get yellow => _localizedValues['yellow']!;
+  String get goal2048 => _localizedValues['goal2048']!;
+  String levelText(int level) =>
+      _localizedValues['levelText']!.replaceAll('{level}', level.toString());
+  String get oopsTryAgain => _localizedValues['oopsTryAgain']!;
+  String get tryAgainToGetBetterScore =>
+      _localizedValues['tryAgainToGetBetterScore']!;
+  String get gameComplete => _localizedValues['gameComplete']!;
 }
 
 class _AppLocalizationsDelegate

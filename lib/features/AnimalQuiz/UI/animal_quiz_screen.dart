@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
+import '../../../core/localization/app_localizations.dart';
 
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/mixins/background_music_mixin.dart';
@@ -202,8 +203,9 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
 
   void checkLevelCompletion() {
     if (animals.isEmpty && chooseAnimals.isEmpty) {
+      final l10n = AppLocalizations.of(context);
       // Show a brief congratulations message
-      speak('Congratulations! Level complete!');
+      speak(l10n.levelComplete);
 
       // Add a small delay to allow the speech to be heard
       Future.delayed(const Duration(milliseconds: 1500), () {
@@ -233,18 +235,21 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
 
   @override
   void onGameInit() {
+    final l10n = AppLocalizations.of(context);
     level = widget.level;
     initGame();
-    speak('Welcome to Animal Quiz Level $level');
+    speak(l10n.welcomeToAnimalQuiz(level));
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Stack(
         children: [
           Image.asset(
-            Assets.genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle,
+            Assets
+                .genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle,
             height: MediaQuery.of(context).size.height,
             fit: BoxFit.cover,
           ),
@@ -261,7 +266,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                           TextSpan(
                             children: [
                               TextSpan(
-                                text: 'Score: ',
+                                text: '${l10n.score}: ',
                                 style: Theme.of(context).textTheme.bodySmall,
                               ),
                               TextSpan(
@@ -278,11 +283,11 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withValues(alpha: 0.2),
+                            color: Colors.teal.withOpacity(0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
-                            'Level $level',
+                            l10n.levelText(level),
                             style: Theme.of(context)
                                 .textTheme
                                 .bodyMedium
@@ -342,8 +347,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                     animals.remove(receivedAnimal.data);
                                     chooseAnimals.remove(animalLetter);
                                     score += pointsPerCorrectMatch;
-                                    speak(
-                                        ' ${animalLetter.animalName}');
+                                    speak(' ${animalLetter.animalName}');
 
                                     // Check if level is complete
                                     checkLevelCompletion();
@@ -353,7 +357,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                     score = score > penaltyPerWrongMatch
                                         ? score - penaltyPerWrongMatch
                                         : 0;
-                                    speak('Oops! Try again.');
+                                    speak(l10n.oopsTryAgain);
                                   });
                                 }
                               },
@@ -374,7 +378,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   color: animalLetter.accepting
-                                      ? Colors.teal.withValues(alpha: 0.3)
+                                      ? Colors.teal.withOpacity(0.3)
                                       : Colors.grey[200],
                                 ),
                                 alignment: Alignment.center,
@@ -400,11 +404,11 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white.withValues(alpha: 0.8),
+                              color: Colors.white.withOpacity(0.8),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.1),
+                                  color: Colors.black.withOpacity(0.1),
                                   blurRadius: 10,
                                   spreadRadius: 5,
                                 ),
@@ -413,7 +417,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                             child: Column(
                               children: [
                                 Text(
-                                  'Game Complete!',
+                                  l10n.gameComplete,
                                   style: Theme.of(context)
                                       .textTheme
                                       .headlineMedium
@@ -424,7 +428,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                 ),
                                 const SizedBox(height: 20),
                                 Text(
-                                  'Your final score: $score',
+                                  l10n.yourFinalScore(score),
                                   style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                                 const SizedBox(height: 10),
@@ -451,7 +455,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.teal.withValues(alpha: 0.4),
+                                  color: Colors.teal.withOpacity(0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),
@@ -465,7 +469,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                 });
                               },
                               child: Text(
-                                'Play Again',
+                                l10n.playAgain,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -489,12 +493,13 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
   }
 
   String result() {
+    final l10n = AppLocalizations.of(context);
     if (score >= targetScoreForLevel * maxLevel) {
-      return 'Excellent!';
+      return l10n.excellent;
     } else if (score >= (targetScoreForLevel * maxLevel * 0.7)) {
-      return 'Great Job!';
+      return l10n.greatJob;
     } else {
-      return 'Try Again to get a better score!';
+      return l10n.tryAgainToGetBetterScore;
     }
   }
 

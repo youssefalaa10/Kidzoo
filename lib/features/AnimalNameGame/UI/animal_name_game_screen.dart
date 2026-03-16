@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/services/cubit/music_cubit.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/utils/assets.dart';
 
 import '../data/model/animal_name_model.dart';
@@ -22,20 +23,24 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   // How many animals per round
   static const int _roundSize = 3;
 
-  static const List<AnimalNameModel> _allAnimals = [
-    AnimalNameModel(name: 'cat', imagePath: Assets.genImagesAnimalCat),
-    AnimalNameModel(name: 'dog', imagePath: Assets.genImagesAnimalDog),
-    AnimalNameModel(name: 'cow', imagePath: Assets.genImagesAnimalCow),
-    AnimalNameModel(name: 'hen', imagePath: Assets.genImagesAnimalHen),
-    AnimalNameModel(name: 'bird', imagePath: Assets.genImagesAnimalBird),
-    AnimalNameModel(name: 'lion', imagePath: Assets.genImagesAnimalLion),
-    AnimalNameModel(name: 'sheep', imagePath: Assets.genImagesAnimalSheep),
-    AnimalNameModel(name: 'horse', imagePath: Assets.genImagesAnimalHorse),
-    AnimalNameModel(
-        name: 'elephant', imagePath: Assets.genImagesAnimalElephant),
-    AnimalNameModel(name: 'giraffe', imagePath: Assets.genImagesAnimalGiraffe),
-    AnimalNameModel(name: 'panda', imagePath: Assets.genImagesAnimalPanda),
-  ];
+  List<AnimalNameModel> _getAnimals(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    return [
+      AnimalNameModel(name: l10n.cat, imagePath: Assets.genImagesAnimalCat),
+      AnimalNameModel(name: l10n.dog, imagePath: Assets.genImagesAnimalDog),
+      AnimalNameModel(name: l10n.cow, imagePath: Assets.genImagesAnimalCow),
+      AnimalNameModel(name: l10n.hen, imagePath: Assets.genImagesAnimalHen),
+      AnimalNameModel(name: l10n.bird, imagePath: Assets.genImagesAnimalBird),
+      AnimalNameModel(name: l10n.lion, imagePath: Assets.genImagesAnimalLion),
+      AnimalNameModel(name: l10n.sheep, imagePath: Assets.genImagesAnimalSheep),
+      AnimalNameModel(name: l10n.horse, imagePath: Assets.genImagesAnimalHorse),
+      AnimalNameModel(
+          name: l10n.elephant, imagePath: Assets.genImagesAnimalElephant),
+      AnimalNameModel(
+          name: l10n.giraffe, imagePath: Assets.genImagesAnimalGiraffe),
+      AnimalNameModel(name: l10n.panda, imagePath: Assets.genImagesAnimalPanda),
+    ];
+  }
 
   // Current round animals in board order (drop targets)
   late List<AnimalNameModel> _boardAnimals;
@@ -57,7 +62,9 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
     super.initState();
     _flutterTts = FlutterTts();
     _initTts();
-    _startNewRound();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _startNewRound();
+    });
   }
 
   Future<void> _initTts() async {
@@ -67,9 +74,10 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   }
 
   void _startNewRound() {
+    final l10n = AppLocalizations.of(context);
     final Random rng = Random();
-    final List<AnimalNameModel> pool = List<AnimalNameModel>.of(_allAnimals)
-      ..shuffle(rng);
+    final List<AnimalNameModel> pool =
+        List<AnimalNameModel>.of(_getAnimals(context))..shuffle(rng);
     final List<AnimalNameModel> round = pool.take(_roundSize).toList();
 
     setState(() {
@@ -158,9 +166,9 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
             onTap: () => Navigator.pop(context),
           ),
           const Spacer(),
-          const Text(
-            'Animal Names 🐾',
-            style: TextStyle(
+          Text(
+            '${AppLocalizations.of(context).animalNames} 🐾',
+            style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
               color: Colors.white,

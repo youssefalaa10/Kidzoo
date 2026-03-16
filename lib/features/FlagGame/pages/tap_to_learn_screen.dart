@@ -5,6 +5,7 @@ import 'package:kidzoo/core/helpers/tts_helper.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import '../data/flag_data_manager.dart';
 import '../models/country_model.dart';
 
@@ -54,11 +55,11 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
               ),
               const SizedBox(height: 10),
               Text(
-                'Continent: ${country.continent}',
+                '${AppLocalizations.of(context).continent}: ${country.continent}',
                 style: const TextStyle(fontSize: 18, color: Colors.grey),
               ),
               Text(
-                'Capital: ${country.capital}',
+                '${AppLocalizations.of(context).capital}: ${country.capital}',
                 style: const TextStyle(fontSize: 18, color: Colors.grey),
               ),
               const SizedBox(height: 20),
@@ -69,8 +70,8 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10)),
                 ),
-                child:
-                    const Text('Close', style: TextStyle(color: Colors.white)),
+                child: Text(AppLocalizations.of(context).close,
+                    style: const TextStyle(color: Colors.white)),
               ),
             ],
           ),
@@ -81,13 +82,14 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final filteredCountries = countries
         .where((c) => c.name.toLowerCase().contains(searchQuery.toLowerCase()))
         .toList();
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Tap to Learn Flags'),
+        title: Text(l10n.tapToLearnFlags),
         backgroundColor: Colors.blue,
         foregroundColor: Colors.white,
       ),
@@ -97,7 +99,7 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
             padding: const EdgeInsets.all(8.0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search countries...',
+                hintText: l10n.searchCountries,
                 prefixIcon: const Icon(Icons.search),
                 border:
                     OutlineInputBorder(borderRadius: BorderRadius.circular(20)),

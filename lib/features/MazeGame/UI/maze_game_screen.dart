@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import '../../LevelsMap/levelmap_screen.dart';
 import '../data/logic/maze_cubit.dart';
 import '../data/models/maze_models.dart';
@@ -103,6 +104,7 @@ class _MazeGameContentState extends State<_MazeGameContent> {
   }
 
   Widget _buildHeader(BuildContext context, MazeState state) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -115,9 +117,10 @@ class _MazeGameContentState extends State<_MazeGameContent> {
           Expanded(
             child: Column(
               children: [
-                const Text(
-                  'Maze Game - لعبة المتاهة',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Text(
+                  l10n.mazeGame,
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                 ),
                 Container(
@@ -143,23 +146,23 @@ class _MazeGameContentState extends State<_MazeGameContent> {
           PopupMenuButton<String>(
             icon: const Icon(Icons.more_vert, color: Colors.black87),
             itemBuilder: (context) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'restart',
                 child: Row(
                   children: [
-                    Icon(Icons.refresh, size: 20),
-                    SizedBox(width: 8),
-                    Text('New Maze'),
+                    const Icon(Icons.refresh, size: 20),
+                    const SizedBox(width: 8),
+                    Text(l10n.newMaze),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'instructions',
                 child: Row(
                   children: [
-                    Icon(Icons.help_outline, size: 20),
-                    SizedBox(width: 8),
-                    Text('How to Play'),
+                    const Icon(Icons.help_outline, size: 20),
+                    const SizedBox(width: 8),
+                    Text(l10n.howToPlay),
                   ],
                 ),
               ),
@@ -180,15 +183,16 @@ class _MazeGameContentState extends State<_MazeGameContent> {
   Widget _buildHelpText(MazeState state) {
     String message;
     Color color;
+    final l10n = AppLocalizations.of(context);
 
     if (state.currentPosition == null) {
-      message = 'Tap and drag from Start (green) - اسحب من البداية';
+      message = l10n.mazeInstruction1;
       color = Colors.green.shade700;
     } else if (state.currentPosition == state.endPosition) {
-      message = 'You reached the end! - وصلت للنهاية!';
+      message = l10n.reachedEnd;
       color = Colors.green.shade700;
     } else {
-      message = 'Keep dragging to Finish (red) - استمر للنهاية';
+      message = l10n.keepDragging;
       color = Colors.blue.shade700;
     }
 
@@ -221,16 +225,17 @@ class _MazeGameContentState extends State<_MazeGameContent> {
   }
 
   void _showExitConfirmation(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Exit Game?'),
-        content: const Text('Your progress will be lost. Are you sure?'),
+        title: Text(l10n.exitGame),
+        content: Text(l10n.exitGameConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -241,7 +246,7 @@ class _MazeGameContentState extends State<_MazeGameContent> {
               backgroundColor: Colors.red,
               foregroundColor: Colors.white,
             ),
-            child: const Text('Exit'),
+            child: Text(l10n.exit),
           ),
         ],
       ),
@@ -337,6 +342,7 @@ class _MazeGameContentState extends State<_MazeGameContent> {
   }
 
   Widget _buildControls(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Row(
@@ -345,7 +351,7 @@ class _MazeGameContentState extends State<_MazeGameContent> {
             child: ElevatedButton.icon(
               onPressed: () => context.read<MazeCubit>().resetGame(),
               icon: const Icon(Icons.refresh),
-              label: const Text('New Maze - متاهة جديدة'),
+              label: Text(l10n.newMaze),
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.blue.shade600,
                 foregroundColor: Colors.white,

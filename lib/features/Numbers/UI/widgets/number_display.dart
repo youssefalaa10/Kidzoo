@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_state.dart';
 import 'package:kidzoo/features/Numbers/data/model/number_model.dart';
@@ -9,10 +10,15 @@ class NumberDisplay extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return BlocBuilder<NumberBloc, NumberState>(
       builder: (context, state) {
         if (state is NumberInitialState) {
-          return const Center(child: Text('Select a number',style: TextStyle(fontSize: 20,color: Colors.grey),));
+          return Center(
+              child: Text(
+            l10n.selectANumber,
+            style: const TextStyle(fontSize: 20, color: Colors.grey),
+          ));
         } else if (state is NumberLoadingState) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is NumberLoadedState) {
@@ -24,7 +30,6 @@ class NumberDisplay extends StatelessWidget {
           return Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-       
               if (numberModel.imagePath.isNotEmpty)
                 Image.asset(
                   numberModel.imagePath,
@@ -34,7 +39,10 @@ class NumberDisplay extends StatelessWidget {
               const SizedBox(height: 20),
               Text(
                 '${state.number} = ${state.example}',
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.redAccent),
+                style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.redAccent),
               ),
             ],
           );

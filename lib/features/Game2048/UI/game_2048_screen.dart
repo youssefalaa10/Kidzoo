@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../data/logic/game_cubit.dart';
 import '../data/logic/game_logic.dart';
 import '../data/models/game_state_model.dart';
+import '../../../core/localization/app_localizations.dart';
 import 'widgets/game_board.dart';
 import 'widgets/game_dialog.dart';
 
@@ -155,9 +156,11 @@ class _Game2048ScreenState extends State<Game2048Screen> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildScoreCard('SCORE', state.currentScore, Colors.orange),
+          _buildScoreCard(AppLocalizations.of(context).scoreLabel,
+              state.currentScore, Colors.orange),
           const SizedBox(width: 16),
-          _buildScoreCard('BEST', state.bestScore, Colors.amber),
+          _buildScoreCard(AppLocalizations.of(context).bestLabel,
+              state.bestScore, Colors.amber),
         ],
       ),
     );
@@ -210,7 +213,7 @@ class _Game2048ScreenState extends State<Game2048Screen> {
         children: [
           _buildControlButton(
             icon: Icons.refresh_rounded,
-            label: 'New',
+            label: AppLocalizations.of(context).newGame,
             color: Colors.blue,
             onPressed: () => _showNewGameConfirmation(),
           ),
@@ -218,7 +221,7 @@ class _Game2048ScreenState extends State<Game2048Screen> {
           if (_gameCubit.settings.undoEnabled)
             _buildControlButton(
               icon: Icons.undo_rounded,
-              label: 'Undo',
+              label: AppLocalizations.of(context).undo,
               color: Colors.purple,
               onPressed: () => _gameCubit.undo(),
             ),
@@ -259,14 +262,14 @@ class _Game2048ScreenState extends State<Game2048Screen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Start New Game?'),
-        content: const Text(
-          'Your current progress will be lost. Are you sure?',
+        title: Text(AppLocalizations.of(context).startNewGame),
+        content: Text(
+          AppLocalizations.of(context).currentGameProgressWillBeLost,
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -277,7 +280,7 @@ class _Game2048ScreenState extends State<Game2048Screen> {
               backgroundColor: Colors.blue,
               foregroundColor: Colors.white,
             ),
-            child: const Text('New Game'),
+            child: Text(AppLocalizations.of(context).newGame),
           ),
         ],
       ),
@@ -288,26 +291,21 @@ class _Game2048ScreenState extends State<Game2048Screen> {
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('How to Play'),
-        content: const Column(
+        title: Text(AppLocalizations.of(context).howToPlay),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              '🎯 Goal: Reach the 2048 tile!\n\n'
-              '📱 Swipe to move tiles\n'
-              '⌨️ Use arrow keys (desktop)\n'
-              '🔄 Tiles with same number merge\n'
-              '✨ Create higher numbers!\n\n'
-              'Good luck! 🍀',
-              style: TextStyle(fontSize: 14),
+              AppLocalizations.of(context).goal2048,
+              style: const TextStyle(fontSize: 14),
             ),
           ],
         ),
         actions: [
           ElevatedButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Got it!'),
+            child: Text(AppLocalizations.of(context).gotIt),
           ),
         ],
       ),
