@@ -91,9 +91,9 @@ enum MazeDifficulty {
       case MazeDifficulty.easy:
         return 5;
       case MazeDifficulty.medium:
-        return 10;
+        return 7;
       case MazeDifficulty.hard:
-        return 20;
+        return 12;
     }
   }
 

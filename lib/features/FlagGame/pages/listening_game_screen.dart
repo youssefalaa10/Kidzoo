@@ -68,13 +68,21 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
       _isCorrect = null;
       _selectedCountryCode = null;
       var countries = FlagDataManager.getRandomCountries(4);
-      _targetCountry = countries[Random().nextInt(4)];
+      if (countries.isEmpty) {
+        // If still loading or empty, try again in a bit
+        Future.delayed(const Duration(milliseconds: 500), () {
+          if (mounted) _generateQuestion();
+        });
+        return;
+      }
       _options = countries;
+      _targetCountry = countries[Random().nextInt(countries.length)];
     });
     _playPrompt();
   }
 
   void _playPrompt() {
+    if (_targetCountry == null) return;
     _ttsHelper.speak(AppLocalizations.of(context)
         .findTheFlagOf(_targetCountry!.localizedName(context)));
   }
@@ -153,7 +161,7 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                            color: Colors.purple.withOpacity(0.3),
+                            color: Colors.purple.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5),
                       ],

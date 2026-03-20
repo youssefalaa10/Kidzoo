@@ -1,15 +1,16 @@
 import 'dart:async';
 
 import 'package:audioplayers/audioplayers.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/widgets.dart';
 
 // Music State
 class MusicState {
   const MusicState({
     this.isInitialized = false,
     this.isMusicEnabled = true,
+    this.isSoundEnabled = true,
     this.isPlaying = false,
     this.shouldPause = false,
     this.volume = 0.3,
@@ -20,6 +21,7 @@ class MusicState {
   });
   final bool isInitialized;
   final bool isMusicEnabled;
+  final bool isSoundEnabled;
   final bool isPlaying;
   final bool shouldPause;
   final double volume;
@@ -31,6 +33,7 @@ class MusicState {
   MusicState copyWith({
     bool? isInitialized,
     bool? isMusicEnabled,
+    bool? isSoundEnabled,
     bool? isPlaying,
     bool? shouldPause,
     double? volume,
@@ -42,6 +45,7 @@ class MusicState {
     return MusicState(
       isInitialized: isInitialized ?? this.isInitialized,
       isMusicEnabled: isMusicEnabled ?? this.isMusicEnabled,
+      isSoundEnabled: isSoundEnabled ?? this.isSoundEnabled,
       isPlaying: isPlaying ?? this.isPlaying,
       shouldPause: shouldPause ?? this.shouldPause,
       volume: volume ?? this.volume,
@@ -87,6 +91,7 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
 
   late AudioPlayer _audioPlayer;
   static const String _musicEnabledKey = 'music_enabled';
+  static const String _soundEnabledKey = 'sound_enabled';
   static const String _volumeKey = 'music_volume';
   static const String _musicTrackKey = 'music_track';
   bool _hasPlayerListener = false;
@@ -177,6 +182,7 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
 
       emit(state.copyWith(
         isMusicEnabled: musicEnabled,
+        isSoundEnabled: prefs.getBool(_soundEnabledKey) ?? true,
         volume: volume,
         musicTrack: musicTrack,
       ));
@@ -190,6 +196,7 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
     try {
       final prefs = await SharedPreferences.getInstance();
       await prefs.setBool(_musicEnabledKey, state.isMusicEnabled);
+      await prefs.setBool(_soundEnabledKey, state.isSoundEnabled);
       await prefs.setDouble(_volumeKey, state.volume);
       await prefs.setString(_musicTrackKey, state.musicTrack);
     } catch (e) {
@@ -217,6 +224,12 @@ class MusicCubit extends Cubit<MusicState> with WidgetsBindingObserver {
     } else {
       await _stopMusic();
     }
+  }
+
+  // Set sound enabled (SFX)
+  Future<void> setSoundEnabled(bool value) async {
+    emit(state.copyWith(isSoundEnabled: value));
+    await _saveSettings();
   }
 
   // Set volume

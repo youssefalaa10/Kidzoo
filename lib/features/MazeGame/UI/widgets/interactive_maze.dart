@@ -20,48 +20,52 @@ class InteractiveMaze extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
+        final height = constraints.maxHeight;
 
-    final maxSize =
-        screenWidth < screenHeight ? screenWidth * 0.9 : screenHeight * 0.6;
-    final cellSize = maxSize / state.gridSize;
-    final mazeSize = cellSize * state.gridSize;
+        // Use 98% of available space to be as large as possible without overflowing
+        final maxSize = width < height ? width * 0.98 : height * 0.98;
+        final cellSize = maxSize / state.gridSize;
+        final mazeSize = cellSize * state.gridSize;
 
-    return Center(
-      child: Container(
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade400, width: 2),
-          borderRadius: BorderRadius.circular(8),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withValues(alpha: 0.1),
-              blurRadius: 8,
-              offset: const Offset(0, 2),
+        return Center(
+          child: Container(
+            decoration: BoxDecoration(
+              border: Border.all(color: Colors.grey.shade400, width: 2),
+              borderRadius: BorderRadius.circular(8),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.1),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: GestureDetector(
-            onPanStart: (details) {
-              final pos =
-                  _getPositionFromOffset(details.localPosition, cellSize);
-              if (pos != null) onStartDrawing(pos);
-            },
-            onPanUpdate: (details) {
-              final pos =
-                  _getPositionFromOffset(details.localPosition, cellSize);
-              if (pos != null) onContinueDrawing(pos);
-            },
-            onPanEnd: (_) => onEndDrawing(),
-            child: CustomPaint(
-              painter: MazePainter(state: state, cellSize: cellSize),
-              size: Size(mazeSize, mazeSize),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(6),
+              child: GestureDetector(
+                onPanStart: (details) {
+                  final pos =
+                      _getPositionFromOffset(details.localPosition, cellSize);
+                  if (pos != null) onStartDrawing(pos);
+                },
+                onPanUpdate: (details) {
+                  final pos =
+                      _getPositionFromOffset(details.localPosition, cellSize);
+                  if (pos != null) onContinueDrawing(pos);
+                },
+                onPanEnd: (_) => onEndDrawing(),
+                child: CustomPaint(
+                  painter: MazePainter(state: state, cellSize: cellSize),
+                  size: Size(mazeSize, mazeSize),
+                ),
+              ),
             ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 

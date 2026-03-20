@@ -71,14 +71,19 @@ class MazeCubit extends Cubit<MazeState> {
 
     // Check if there's a wall between current and next position
     if (_hasWallBetween(current, position)) {
-      // Touched a wall - game over
-      emit(state.copyWith(touchedWall: true));
-      gameOver(false);
+      // Prevent moving through the wall, but don't end the game immediately for better gameplay
       return;
     }
 
     // Valid move
-    final newPath = List<MazePosition>.from(state.path)..add(position);
+    final newPath = List<MazePosition>.from(state.path);
+    
+    // Check if backtracking
+    if (newPath.length > 1 && newPath[newPath.length - 2] == position) {
+      newPath.removeLast(); // Remove current position, move back
+    } else {
+      newPath.add(position);
+    }
     final newCollected = List<MazePosition>.from(state.collectedStars);
 
     // Check if collecting a star

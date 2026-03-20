@@ -33,8 +33,14 @@ class _PuzzleScreenState extends ProtectedGameScreenState<PuzzleScreen> {
       child: widget.level == 1
           // Level 1: auto-select default image (index 0) and go straight to the puzzle
           ? const PuzzleFrame(index: 0)
-          // Other levels: let the user choose the image
-          : ImageSelectionPage(gridSize: gridSize, level: widget.level),
+          : widget.level == 2
+              // Level 2: auto-select ghost image (index 1)
+              ? const PuzzleFrame(index: 1)
+              : widget.level == 3
+                  // Level 3: auto-select party image (index 2)
+                  ? const PuzzleFrame(index: 2)
+                  // Other levels: let the user choose the image
+                  : ImageSelectionPage(gridSize: gridSize, level: widget.level),
     );
   }
 }
@@ -124,7 +130,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
     final l10n = AppLocalizations.of(context);
     // Extra guard: if already completed, return true
     final cubitPre = context.read<PuzzleCubit>();
-    if (!_completionReturned && cubitPre.score >= 100) {
+    if (!_completionReturned && cubitPre.choosePiece.isEmpty && cubitPre.puzzle.isNotEmpty) {
       _completionReturned = true;
       cubitPre.gameOver = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -137,7 +143,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
     return BlocListener<PuzzleCubit, PuzzleState>(
       listener: (context, state) {
         final cubit = context.read<PuzzleCubit>();
-        if (!_completionReturned && cubit.score >= 100) {
+        if (!_completionReturned && cubit.choosePiece.isEmpty && cubit.puzzle.isNotEmpty) {
           _completionReturned = true;
           cubit.gameOver = true;
           Navigator.of(context).pop(true);
@@ -162,8 +168,8 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
                     padding: const EdgeInsets.all(8.0),
                     child: Column(children: [
                       Container(
-                        height: 200,
-                        width: 200,
+                        height: widget.index == 2 ? 300 : 200,
+                        width: widget.index == 2 ? 300 : 200,
                         decoration: BoxDecoration(
                           image: DecorationImage(
                             opacity: .5,
@@ -173,67 +179,60 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
                         ),
                         child: Directionality(
                           textDirection: TextDirection.ltr,
-                          child: GridView(
+                          child: GridView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
                             gridDelegate:
-                                const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: widget.index == 2 ? 3 : 2,
                             ),
-                            children: [
-                              DraggableItem(
+                            itemCount: cubit.puzzle.length,
+                            itemBuilder: (context, i) {
+                              return DraggableItem(
                                   puzzle: cubit.puzzle,
                                   choosePiece: cubit.choosePiece,
-                                  index: 0,
-                                  score: cubit.score),
-                              DraggableItem(
-                                  puzzle: cubit.puzzle,
-                                  choosePiece: cubit.choosePiece,
-                                  index: 1,
-                                  score: cubit.score),
-                              DraggableItem(
-                                  puzzle: cubit.puzzle,
-                                  choosePiece: cubit.choosePiece,
-                                  index: 2,
-                                  score: cubit.score),
-                              DraggableItem(
-                                  puzzle: cubit.puzzle,
-                                  choosePiece: cubit.choosePiece,
-                                  index: 3,
-                                  score: cubit.score),
-                            ],
+                                  index: i,
+                                  score: cubit.score);
+                            },
                           ),
                         ),
                       ),
-                      SizedBox(
-                        height: 200,
-                        width: 400,
-                        child: Row(
-                          children: cubit.choosePiece.map((puzzleItem) {
-                            return Draggable<PuzzleModel>(
-                              data: puzzleItem,
-                              childWhenDragging: Container(
-                                height: 50,
-                                width: 50,
-                                decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                    opacity: .5,
-                                    image: AssetImage(puzzleItem.image),
-                                    fit: BoxFit.cover,
+                      Expanded(
+                        child: SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: SingleChildScrollView(
+                            child: Wrap(
+                              alignment: WrapAlignment.center,
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: cubit.choosePiece.map((puzzleItem) {
+                                return Draggable<PuzzleModel>(
+                                  data: puzzleItem,
+                                  childWhenDragging: Container(
+                                    height: widget.index == 2 ? 60 : 80,
+                                    width: widget.index == 2 ? 60 : 80,
+                                    decoration: BoxDecoration(
+                                      image: DecorationImage(
+                                        opacity: .5,
+                                        image: AssetImage(puzzleItem.image),
+                                        fit: BoxFit.cover,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                              feedback: SizedBox(
-                                  height: 100,
-                                  width: 100,
-                                  child: Image.asset(puzzleItem.image)),
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SizedBox(
-                                    height: 50,
-                                    width: 50,
-                                    child: Image.asset(puzzleItem.image)),
-                              ),
-                            );
-                          }).toList(),
+                                  feedback: SizedBox(
+                                      height: widget.index == 2 ? 80 : 100,
+                                      width: widget.index == 2 ? 80 : 100,
+                                      child: Image.asset(puzzleItem.image)),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(4.0),
+                                    child: SizedBox(
+                                        height: widget.index == 2 ? 60 : 80,
+                                        width: widget.index == 2 ? 60 : 80,
+                                        child: Image.asset(puzzleItem.image)),
+                                  ),
+                                );
+                              }).toList(),
+                            ),
+                          ),
                         ),
                       ),
                       Text('${l10n.yourScore} ${cubit.score}',
@@ -323,4 +322,4 @@ class _DraggableItemState extends State<DraggableItem> {
   }
 }
 
-final List<String> sampleImages = [ImageManager.gazelle, ImageManager.ghost];
+final List<String> sampleImages = [ImageManager.gazelle, ImageManager.ghost, ImageManager.party];

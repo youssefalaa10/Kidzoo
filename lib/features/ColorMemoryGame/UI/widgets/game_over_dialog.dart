@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/models/color_memory_constants.dart';
 
 class GameOverDialog extends StatelessWidget {
@@ -22,6 +23,7 @@ class GameOverDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     final isNewBest = score >= bestScore && score > 0;
 
     return Dialog(
@@ -76,7 +78,7 @@ class GameOverDialog extends StatelessWidget {
 
                       // Title
                       Text(
-                        isNewBest ? 'New Best Score!' : 'Game Over',
+                        isNewBest ? l10n.newBestScore : l10n.gameOver,
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -87,7 +89,7 @@ class GameOverDialog extends StatelessWidget {
                       const SizedBox(height: 6),
 
                       Text(
-                        'You reached Round $round',
+                        '${l10n.youReachedRound} $round',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey.shade600,
@@ -99,7 +101,7 @@ class GameOverDialog extends StatelessWidget {
                       // Your score only
                       _StatCard(
                         icon: Icons.emoji_events,
-                        label: 'Your Score',
+                        label: l10n.yourScore,
                         value: score.toString(),
                         color: Colors.blue.shade600,
                       ),
@@ -122,9 +124,9 @@ class GameOverDialog extends StatelessWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              child: const Text(
-                                'Exit',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.exit,
+                                style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -145,9 +147,9 @@ class GameOverDialog extends StatelessWidget {
                                 ),
                                 elevation: 2,
                               ),
-                              child: const Text(
-                                'Restart',
-                                style: TextStyle(
+                              child: Text(
+                                l10n.restart,
+                                style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold,
                                 ),

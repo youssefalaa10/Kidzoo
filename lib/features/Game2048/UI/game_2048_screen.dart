@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../core/localization/app_localizations.dart';
 import '../data/logic/game_cubit.dart';
 import '../data/logic/game_logic.dart';
 import '../data/models/game_state_model.dart';
-import '../../../core/localization/app_localizations.dart';
 import 'widgets/game_board.dart';
 import 'widgets/game_dialog.dart';
 

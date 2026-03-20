@@ -21,7 +21,7 @@ class AnimalNameGameScreen extends StatefulWidget {
 class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
     with TTSMusicMixin {
   // How many animals per round
-  static const int _roundSize = 3;
+  static const int _roundSize = 6;
 
   List<AnimalNameModel> _getAnimals(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -181,7 +181,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
-              color: Colors.white,
+
               shadows: [
                 Shadow(
                   color: Colors.black45,
@@ -230,16 +230,13 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   // Game area: chalkboard on top, tray on bottom
   // ──────────────────────────────────────────────
   Widget _buildGameArea() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          _buildChalkboard(),
-          const SizedBox(height: 16),
-          _buildTray(),
-        ],
-      ),
+    return Column(
+      children: [
+        Expanded(child: _buildChalkboard()),
+        const SizedBox(height: 8),
+        Expanded(child: _buildTray()),
+        const SizedBox(height: 8),
+      ],
     );
   }
 
@@ -249,7 +246,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   Widget _buildChalkboard() {
     return Container(
       width: double.infinity,
-      height: 190,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         image: DecorationImage(
           image: AssetImage(Assets.genImagesHomeBoard),
@@ -265,17 +262,20 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
         ],
       ),
       child: Center(
-        child: Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 24,
-          runSpacing: 16,
-          children: List.generate(_roundSize, (i) {
-            return _BoardSlot(
-              animal: _boardAnimals![i],
-              isFilled: _isFilled[i],
-              onCorrectDrop: () => _onCorrectMatch(_boardAnimals![i]),
-            );
-          }),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(_roundSize, (i) {
+              return _BoardSlot(
+                animal: _boardAnimals![i],
+                isFilled: _isFilled[i],
+                onCorrectDrop: () => _onCorrectMatch(_boardAnimals![i]),
+              );
+            }),
+          ),
         ),
       ),
     );
@@ -287,7 +287,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   Widget _buildTray() {
     return Container(
       width: double.infinity,
-      height: 130,
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.black87.withValues(alpha: 0.75),
         border: Border.all(
@@ -304,16 +304,19 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
         ],
       ),
       child: Center(
-        child: Wrap(
-          alignment: WrapAlignment.center,
-          spacing: 16,
-          runSpacing: 8,
-          children: List.generate(_roundSize, (i) {
-            return _TrayItem(
-              animal: _trayAnimals![i],
-              isPlaced: _isPlaced[i],
-            );
-          }),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            spacing: 12,
+            runSpacing: 12,
+            children: List.generate(_roundSize, (i) {
+              return _TrayItem(
+                animal: _trayAnimals![i],
+                isPlaced: _isPlaced[i],
+              );
+            }),
+          ),
         ),
       ),
     );
@@ -345,7 +348,7 @@ class _BoardSlotState extends State<_BoardSlot>
   late AnimationController _popController;
   late Animation<double> _popAnimation;
 
-  static const double _slotSize = 80.0;
+  static const double _slotSize = 90.0;
 
   @override
   void initState() {
@@ -465,8 +468,8 @@ class _TrayItem extends StatelessWidget {
   final AnimalNameModel animal;
   final bool isPlaced;
 
-  static const double _itemSize = 72.0;
-  static const double _feedbackSize = 85.0;
+  static const double _itemSize = 75.0;
+  static const double _feedbackSize = 90.0;
 
   @override
   Widget build(BuildContext context) {

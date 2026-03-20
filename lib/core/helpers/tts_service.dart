@@ -7,9 +7,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// A robust TTS service that handles Arabic voice data installation.
 /// It is a singleton so it can be shared across the app.
 class TtsService {
+  factory TtsService() => _instance;
   TtsService._internal();
   static final TtsService _instance = TtsService._internal();
-  factory TtsService() => _instance;
 
   final FlutterTts _tts = FlutterTts();
   String _currentLanguage = 'en';
@@ -143,8 +143,8 @@ class TtsService {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
           ),
-          title: Row(
-            children: const [
+          title: const Row(
+            children: [
               Icon(Icons.record_voice_over, color: Color(0xFF6C63FF), size: 28),
               SizedBox(width: 10),
               Text(
@@ -206,7 +206,8 @@ class TtsService {
     return false;
   }
 
-  static const MethodChannel _channel = MethodChannel('dev.annotex.kidzoo/tts_settings');
+  static const MethodChannel _channel =
+      MethodChannel('dev.annotex.kidzoo/tts_settings');
 
   static Future<void> _openTtsSettings(FlutterTts tts) async {
     try {

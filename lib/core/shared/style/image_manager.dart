@@ -150,6 +150,18 @@ class ImageManager {
   static const String ghost3 = Assets.genImagesPuzzleGhostBlock3;
   static const String ghost4 = Assets.genImagesPuzzleGhostBlock4;
 
+  // party
+  static const String party = 'assets/gen/images/puzzle/party.png';
+  static const String party1 = 'assets/gen/images/puzzle/party block/1.png';
+  static const String party2 = 'assets/gen/images/puzzle/party block/2.png';
+  static const String party3 = 'assets/gen/images/puzzle/party block/3.png';
+  static const String party4 = 'assets/gen/images/puzzle/party block/4.png';
+  static const String party5 = 'assets/gen/images/puzzle/party block/5.png';
+  static const String party6 = 'assets/gen/images/puzzle/party block/6.png';
+  static const String party7 = 'assets/gen/images/puzzle/party block/7.png';
+  static const String party8 = 'assets/gen/images/puzzle/party block/8.png';
+  static const String party9 = 'assets/gen/images/puzzle/party block/9.png';
+
   // icons
   static const String i2048 = Assets.genIcons2048;
   static const String pen = Assets.genIconsPen;

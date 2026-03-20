@@ -1,32 +1,50 @@
-import 'package:flame/camera.dart';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/helpers/tts_service.dart';
 import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 
-import 'components/player.dart';
-import 'components/ground.dart';
 import 'components/circle_rotator.dart';
 import 'components/color_switcher.dart';
+import 'components/ground.dart';
+import 'components/player.dart';
 import 'components/star_component.dart';
 
 class ColorSwitchGame extends FlameGame
     with TapCallbacks, HasCollisionDetection {
+
+  ColorSwitchGame() : super();
   late Player myPlayer;
   TextComponent? colorNameText;
   TextComponent? scoreText;
   TextComponent? startText;
 
+  final TtsService _ttsService = TtsService();
+  final AudioPlayer sfxPlayer = AudioPlayer();
+
+  /// Called by the screen when the start overlay is tapped
+  VoidCallback? onGameStarted;
+
   bool isGameOver = false;
   bool isStarted = false;
   int score = 0;
 
-  final List<Color> gameColors = const [
+  List<Color> gameColors = [
     Colors.redAccent,
     Colors.greenAccent,
     Colors.blueAccent,
     Colors.yellowAccent,
+  ];
+
+  static const List<Color> _advancedColors = [
+    Colors.cyanAccent,
+    Colors.purpleAccent,
+    Colors.orangeAccent,
+    Colors.pinkAccent,
   ];
 
   String _getColorName(BuildContext context, Color color) {
@@ -35,10 +53,12 @@ class ColorSwitchGame extends FlameGame
     if (color == Colors.greenAccent) return l10n.green;
     if (color == Colors.blueAccent) return l10n.blue;
     if (color == Colors.yellowAccent) return l10n.yellow;
+    if (color == Colors.cyanAccent) return l10n.cyan;
+    if (color == Colors.purpleAccent) return l10n.purple;
+    if (color == Colors.orangeAccent) return l10n.orange;
+    if (color == Colors.pinkAccent) return l10n.pink;
     return 'Unknown';
   }
-
-  ColorSwitchGame() : super();
 
   @override
   Color backgroundColor() => const Color(0xff222222);
@@ -49,10 +69,10 @@ class ColorSwitchGame extends FlameGame
     camera.viewfinder.anchor = Anchor.topLeft;
 
     // Add ground
-    world.add(Ground(position: Vector2(size.x / 2, size.y - 100)));
+    world.add(Ground(position: Vector2(size.x / 2, size.y - 50)));
 
     // Add player
-    myPlayer = Player(position: Vector2(size.x / 2, size.y - 250));
+    myPlayer = Player(position: Vector2(size.x / 2, size.y - 100));
     world.add(myPlayer);
 
     // Initial color
@@ -91,14 +111,13 @@ class ColorSwitchGame extends FlameGame
       add(scoreText!);
 
       startText = TextComponent(
-        text: l10n.tapToStart,
+        text: '...', // placeholder – real start is the Flutter overlay
         position: Vector2(size.x / 2, size.y / 2),
         anchor: Anchor.center,
         textRenderer: TextPaint(
           style: const TextStyle(
-            color: Colors.white,
+            color: Colors.transparent, // hidden; the Flutter overlay takes over
             fontSize: 48,
-            fontWeight: FontWeight.bold,
           ),
         ),
       );
@@ -111,7 +130,8 @@ class ColorSwitchGame extends FlameGame
   void updateColorName() {
     try {
       if (!isLoaded || colorNameText == null) return;
-      colorNameText!.text = _getColorName(buildContext!, myPlayer.color);
+      final name = _getColorName(buildContext!, myPlayer.color);
+      colorNameText!.text = name;
       colorNameText!.textRenderer = TextPaint(
         style: TextStyle(
           color: myPlayer.color,
@@ -119,13 +139,48 @@ class ColorSwitchGame extends FlameGame
           fontWeight: FontWeight.bold,
         ),
       );
+      // Speak immediately using the already-resolved name
+      _speakColorName(name);
     } catch (_) {}
+  }
+
+  Future<void> _speakColorName(String name) async {
+    if (buildContext == null) return;
+    try {
+      final lang = Localizations.localeOf(buildContext!).languageCode;
+      await _ttsService.init(languageCode: lang);
+      await _ttsService.speak(name);
+    } catch (_) {}
+  }
+
+  /// Called by [ColorSwitchScreen] when the start overlay is dismissed
+  void startGame() {
+    if (isStarted) return;
+    isStarted = true;
+    startText?.removeFromParent();
+    myPlayer.jump();
+    onGameStarted?.call();
+    _speakColorName(_getColorName(buildContext!, myPlayer.color));
   }
 
   void incrementScore() {
     score++;
+    
+    if (buildContext != null) {
+      final isSoundEnabled = buildContext!.read<MusicCubit>().state.isSoundEnabled;
+      if (isSoundEnabled) {
+        sfxPlayer.play(AssetSource('audio/score.mp3'));
+      }
+    }
+
+    if (score == 10) {
+      gameColors = List.from(_advancedColors);
+      // Let the Player update its color to match advanced colors
+    }
+
     if (scoreText != null && buildContext != null) {
-      scoreText!.text = '${AppLocalizations.of(buildContext!).scoreLabel}: $score';
+      scoreText!.text =
+          '${AppLocalizations.of(buildContext!).scoreLabel}: $score';
     }
   }
 
@@ -147,13 +202,11 @@ class ColorSwitchGame extends FlameGame
 
   @override
   void onTapDown(TapDownEvent event) {
-    if (isGameOver) {
-      return;
-    }
+    if (isGameOver) return;
     if (!isStarted) {
-      isStarted = true;
-      startText?.removeFromParent();
-      myPlayer.jump();
+      // First tap handled by the Flutter overlay (startGame()).
+      // Guard here in case the overlay was skipped.
+      startGame();
     } else {
       myPlayer.jump();
     }
@@ -233,7 +286,15 @@ class ColorSwitchGame extends FlameGame
   }
 
   void resetGame() {
+    isGameOver = false;
+    isStarted = false;
     score = 0;
+    gameColors = [
+      Colors.redAccent,
+      Colors.greenAccent,
+      Colors.blueAccent,
+      Colors.yellowAccent,
+    ];
     if (scoreText != null && buildContext != null) {
       scoreText!.text = '${AppLocalizations.of(buildContext!).scoreLabel}: 0';
     }
@@ -270,9 +331,9 @@ class ColorSwitchGame extends FlameGame
   double lastComponentY = 100;
 
   void generateGameComponents() {
-    lastComponentY = size.y / 2 - 200;
+    lastComponentY = size.y - 350;
     for (int i = 0; i < 5; i++) {
-      _generateBlock(lastComponentY - 400);
+      _generateBlock(lastComponentY);
       lastComponentY -= 400;
     }
   }

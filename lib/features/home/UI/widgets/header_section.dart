@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 
 import '../../../../core/helpers/media_query.dart';
-import 'package:kidzoo/core/utils/assets.dart';
 
 class HeaderSection extends StatelessWidget {
   const HeaderSection({required this.mq, super.key});

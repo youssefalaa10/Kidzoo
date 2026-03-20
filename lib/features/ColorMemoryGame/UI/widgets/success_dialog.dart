@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../core/localization/app_localizations.dart';
 import '../../data/models/color_memory_constants.dart';
 
 class SuccessDialog extends StatelessWidget {
@@ -18,6 +19,7 @@ class SuccessDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Dialog(
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(ColorMemoryConstants.borderRadius),
@@ -49,7 +51,7 @@ class SuccessDialog extends StatelessWidget {
 
             // Title
             Text(
-              'Perfect!',
+              l10n.perfect,
               style: TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.bold,
@@ -60,7 +62,7 @@ class SuccessDialog extends StatelessWidget {
             const SizedBox(height: 8),
 
             Text(
-              'You completed Round $round',
+              '${l10n.youCompletedRound} $round',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.grey.shade600,
@@ -75,13 +77,13 @@ class SuccessDialog extends StatelessWidget {
               children: [
                 _StatItem(
                   icon: Icons.emoji_events,
-                  label: 'Score',
+                  label: l10n.score,
                   value: score.toString(),
                   color: Colors.amber.shade600,
                 ),
                 _StatItem(
                   icon: Icons.layers,
-                  label: 'Sequence',
+                  label: l10n.sequence,
                   value: sequenceLength.toString(),
                   color: Colors.blue.shade600,
                 ),
@@ -104,9 +106,9 @@ class SuccessDialog extends StatelessWidget {
                   ),
                   elevation: 2,
                 ),
-                child: const Text(
-                  'Continue',
-                  style: TextStyle(
+                child: Text(
+                  l10n.continueText,
+                  style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
                   ),

@@ -50,6 +50,18 @@ class PuzzleCubit extends Cubit<PuzzleState> {
           index: 3,
         ),
       ];
+    } else if (index == 2) {
+      puzzle = [
+        PuzzleModel(image: ImageManager.party1, index: 0),
+        PuzzleModel(image: ImageManager.party2, index: 1),
+        PuzzleModel(image: ImageManager.party3, index: 2),
+        PuzzleModel(image: ImageManager.party4, index: 3),
+        PuzzleModel(image: ImageManager.party5, index: 4),
+        PuzzleModel(image: ImageManager.party6, index: 5),
+        PuzzleModel(image: ImageManager.party7, index: 6),
+        PuzzleModel(image: ImageManager.party8, index: 7),
+        PuzzleModel(image: ImageManager.party9, index: 8),
+      ];
     }
     emit(PuzzleImageSelected());
   }
@@ -58,7 +70,7 @@ class PuzzleCubit extends Cubit<PuzzleState> {
     gameOver = false;
     score = 0;
     choosePiece = List<PuzzleModel>.from(puzzle);
-    //puzzle.shuffle();
+    //puzzle.shuffle(); // We want puzzle pieces to stay in order as targets
     choosePiece.shuffle();
   }
 

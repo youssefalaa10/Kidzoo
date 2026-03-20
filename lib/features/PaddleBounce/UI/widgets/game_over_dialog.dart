@@ -63,7 +63,7 @@ class GameOverDialog extends StatelessWidget {
                 boxShadow: [
                   BoxShadow(
                     color: (isPlayer1Winner ? Colors.pink : Colors.cyan)
-                        .withOpacity(0.3),
+                        .withValues(alpha: 0.3),
                     blurRadius: 20,
                     spreadRadius: 5,
                   ),

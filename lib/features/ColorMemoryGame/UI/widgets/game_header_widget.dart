@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 import '../../data/models/color_memory_constants.dart';
 import '../../data/models/game_state_model.dart';
@@ -17,6 +18,7 @@ class GameHeaderWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -46,7 +48,7 @@ class GameHeaderWidget extends StatelessWidget {
 
               // Title
               Text(
-                'Color Memory',
+                l10n.colorMemory,
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -83,25 +85,25 @@ class GameHeaderWidget extends StatelessWidget {
             children: [
               _StatCard(
                 icon: Icons.emoji_events,
-                label: 'Score',
+                label: l10n.score,
                 value: state.score.currentScore.toString(),
                 color: Colors.amber.shade600,
               ),
               _StatCard(
                 icon: Icons.psychology,
-                label: 'Round',
+                label: l10n.roundText,
                 value: state.score.currentRound.toString(),
                 color: Colors.blue.shade600,
               ),
               _StatCard(
                 icon: Icons.layers,
-                label: 'Length',
+                label: l10n.sequence,
                 value: state.sequence.length.toString(),
                 color: Colors.purple.shade600,
               ),
               _StatCard(
                 icon: Icons.stars,
-                label: 'Best',
+                label: l10n.bestScore,
                 value: state.bestScore.toString(),
                 color: Colors.green.shade600,
               ),

@@ -192,13 +192,17 @@ class AppLocalizations {
   String get time => _localizedValues['time']!;
   String get showing => _localizedValues['showing']!;
   String get score => _localizedValues['score']!;
+  String get sequence => _localizedValues['sequence']!;
+  String get newBestScore => _localizedValues['newBestScore']!;
+  String get youCompletedRound => _localizedValues['youCompletedRound']!;
+  String get youReachedRound => _localizedValues['youReachedRound']!;
   String get memoryGame => _localizedValues['memoryGame']!;
   String get pairs => _localizedValues['pairs']!;
   String get bestScore => _localizedValues['bestScore']!;
   String get roundText => _localizedValues['round']!;
   String get longestSequence => _localizedValues['longestSequence']!;
   String get restart => _localizedValues['restart']!;
-  String get continueText => _localizedValues['continue']!;
+  String get continueText => _localizedValues['continueButton']!;
   String get exit => _localizedValues['exit']!;
 
   // Math Game
@@ -430,6 +434,16 @@ class AppLocalizations {
   String get exitGameConfirm => _localizedValues['exitGameConfirm']!;
   String get reachedEnd => _localizedValues['reachedEnd']!;
   String get keepDragging => _localizedValues['keepDragging']!;
+  String get statistics => _localizedValues['statistics']!;
+  String get gamesPlayedLabel => _localizedValues['gamesPlayedLabel']!;
+  String get totalPlayTime => _localizedValues['totalPlayTime']!;
+  String get viewHistory => _localizedValues['viewHistory']!;
+  String get history => _localizedValues['history']!;
+  String get noHistory => _localizedValues['noHistory']!;
+  String get enableSoundToggle => _localizedValues['enableSoundToggle']!;
+  String get enableMusicToggle => _localizedValues['enableMusicToggle']!;
+  String get soundSettings => _localizedValues['soundSettings']!;
+  String get wins => _localizedValues['wins']!;
 
   // Added getters
   String get hello => _localizedValues['hello']!;
@@ -450,6 +464,8 @@ class AppLocalizations {
           .replaceAll('{level}', level.toString());
   String get excellent => _localizedValues['excellent']!;
   String get greatJob => _localizedValues['greatJob']!;
+  String get youMatchedAllAnimals => _localizedValues['youMatchedAllAnimals']!;
+  String get tapToPlayKeepTapping => _localizedValues['tapToPlayKeepTapping']!;
   String yourFinalScore(int score) => _localizedValues['yourFinalScore']!
       .replaceAll('{score}', score.toString());
   String get selectAnImage => _localizedValues['selectAnImage']!;
@@ -466,6 +482,10 @@ class AppLocalizations {
   String get green => _localizedValues['green']!;
   String get blue => _localizedValues['blue']!;
   String get yellow => _localizedValues['yellow']!;
+  String get cyan => _localizedValues['cyan']!;
+  String get purple => _localizedValues['purple']!;
+  String get orange => _localizedValues['orange']!;
+  String get pink => _localizedValues['pink']!;
   String get goal2048 => _localizedValues['goal2048']!;
   String levelText(int level) =>
       _localizedValues['levelText']!.replaceAll('{level}', level.toString());

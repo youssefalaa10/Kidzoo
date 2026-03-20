@@ -7,7 +7,7 @@ class CustomButton extends StatelessWidget {
       required this.color,
       super.key});
   final String title;
-  final Function() onPressed;
+  final VoidCallback onPressed;
   final Color color;
 
   @override

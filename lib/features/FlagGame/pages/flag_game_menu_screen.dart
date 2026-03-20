@@ -145,11 +145,11 @@ class _MenuButton extends StatelessWidget {
         width: double.infinity,
         padding: EdgeInsets.all(mq.width(6)),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.9),
+          color: color.withValues(alpha: 0.9),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.4),
+              color: color.withValues(alpha: 0.4),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -180,7 +180,7 @@ class _MenuButton extends StatelessWidget {
                 Text(
                   subtitle,
                   style: TextStyle(
-                    color: Colors.white.withOpacity(0.8),
+                    color: Colors.white.withValues(alpha: 0.8),
                     fontSize: 16,
                   ),
                 ),

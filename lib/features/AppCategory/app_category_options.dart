@@ -9,11 +9,12 @@ import 'package:kidzoo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
 import 'package:kidzoo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzoo/features/DrawLab/UI/screens/drawlab_screen.dart';
+import 'package:kidzoo/features/FlagGame/pages/flag_game_menu_screen.dart';
+import 'package:kidzoo/features/FlagGame/pages/listening_game_screen.dart';
 import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzoo/features/MissingLetterGame/Ui/missing_letter_home.dart';
-import 'package:kidzoo/features/FlagGame/pages/flag_game_menu_screen.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/number_screen.dart';
 import 'package:kidzoo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
@@ -23,16 +24,21 @@ import 'package:kidzoo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 
 // Define the option data structure
 class OptionItem {
+  final String icon;
+  final String title;
+  final Widget screen;
+  final String flipImage;
+  final IconData? backIcon;
+  final IconData? frontIcon;
+
   OptionItem({
     required this.icon,
     required this.title,
     required this.screen,
     required this.flipImage,
+    this.backIcon,
+    this.frontIcon,
   });
-  final String icon;
-  final String title;
-  final Widget screen;
-  final String flipImage;
 }
 
 // Define app categories
@@ -68,6 +74,7 @@ class OptionsGrid extends StatelessWidget {
         title: l10n.ticTacToe,
         screen: const TicTacToeGame(),
         flipImage: ImageManager.brain,
+        backIcon: Icons.grid_3x3_rounded,
       ),
       OptionItem(
         icon: ImageManager.flappyBird,
@@ -80,6 +87,7 @@ class OptionsGrid extends StatelessWidget {
         title: l10n.missingLetter,
         screen: const MissingLetterHome(),
         flipImage: ImageManager.brain,
+        backIcon: Icons.spellcheck_rounded,
       ),
       OptionItem(
         icon: ImageManager.i2048,
@@ -101,6 +109,7 @@ class OptionsGrid extends StatelessWidget {
         title: l10n.paddleBounce,
         screen: const PaddleBounceMenuScreen(),
         flipImage: ImageManager.brain,
+        backIcon: Icons.sports_esports_rounded,
       ),
       OptionItem(
         icon: ImageManager.simle,
@@ -146,6 +155,8 @@ class OptionsGrid extends StatelessWidget {
         title: l10n.colorSwitch,
         screen: const ColorSwitchScreen(),
         flipImage: ImageManager.colorLearn,
+        backIcon: Icons.palette_rounded,
+        frontIcon: Icons.color_lens_rounded,
       ),
       OptionItem(
         icon: ImageManager.lion,
@@ -158,27 +169,36 @@ class OptionsGrid extends StatelessWidget {
         title: l10n.flagGame,
         screen: const FlagGameMenuScreen(),
         flipImage: ImageManager.worldMap,
+        backIcon: Icons.flag_rounded,
+        frontIcon: Icons.public_rounded,
       ),
     ];
   }
 
   @override
   Widget build(BuildContext context) {
+    final options = getOptions(context);
     return GridView.builder(
+      padding: EdgeInsets.symmetric(
+        horizontal: mq.width(4),
+        vertical: mq.height(2),
+      ),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         crossAxisSpacing: mq.width(4),
         mainAxisSpacing: mq.height(2),
         childAspectRatio: 3 / 2.5,
       ),
-      itemCount: getOptions(context).length,
+      itemCount: options.length,
       itemBuilder: (context, index) {
-        final option = getOptions(context)[index];
+        final option = options[index];
         return OptionCard(
           icon: option.icon,
           title: option.title,
           screen: option.screen,
           flipImage: option.flipImage,
+          backIcon: option.backIcon,
+          frontIcon: option.frontIcon,
           mq: mq,
         );
       },
@@ -193,6 +213,8 @@ class OptionCard extends StatefulWidget {
     required this.flipImage,
     required this.screen,
     required this.mq,
+    this.backIcon,
+    this.frontIcon,
     super.key,
   });
   final String icon;
@@ -200,41 +222,28 @@ class OptionCard extends StatefulWidget {
   final String flipImage;
   final Widget screen;
   final CustomMQ mq;
+  final IconData? backIcon;
+  final IconData? frontIcon;
 
   @override
-  OptionCardState createState() => OptionCardState();
+  State<OptionCard> createState() => _OptionCardState();
 }
 
-class OptionCardState extends State<OptionCard>
+class _OptionCardState extends State<OptionCard>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  bool _flipped = false;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 500),
+      duration: const Duration(milliseconds: 600),
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(
       CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
-  }
-
-  void _flipCard() {
-    if (_flipped) {
-      Navigator.push<void>(
-        context,
-        MaterialPageRoute(builder: (context) => widget.screen),
-      );
-    } else {
-      _controller.forward();
-      setState(() {
-        _flipped = true;
-      });
-    }
   }
 
   @override
@@ -246,7 +255,21 @@ class OptionCardState extends State<OptionCard>
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _flipCard,
+      onTap: () {
+        if (_controller.value == 1) {
+          _controller.reverse();
+          Future.delayed(const Duration(milliseconds: 300), () {
+            if (mounted) {
+              Navigator.push(
+                context,
+                MaterialPageRoute<void>(builder: (context) => widget.screen),
+              );
+            }
+          });
+        } else {
+          _controller.forward();
+        }
+      },
       child: AnimatedBuilder(
         animation: _animation,
         builder: (context, child) {
@@ -270,10 +293,10 @@ class OptionCardState extends State<OptionCard>
   }
 
   Widget _buildFrontSide() {
-    // Check if this is one of the specific icons that need larger size
     final isSpecialIcon = widget.icon == ImageManager.simle ||
         widget.icon == ImageManager.pen ||
-        widget.icon == ImageManager.xo;
+        widget.icon == ImageManager.xo ||
+        widget.frontIcon != null;
 
     final iconSize = isSpecialIcon ? widget.mq.width(16) : widget.mq.width(12);
 
@@ -289,23 +312,33 @@ class OptionCardState extends State<OptionCard>
           ),
         ],
       ),
-      padding: EdgeInsets.all(widget.mq.width(4)),
+      padding: EdgeInsets.all(widget.mq.width(2)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Image.asset(
-            widget.icon,
-            width: iconSize,
-            height: iconSize,
-            fit: BoxFit.contain,
-          ),
+          if (widget.frontIcon != null)
+            Icon(
+              widget.frontIcon,
+              size: iconSize,
+              color: const Color(0xFFe2c9b5),
+            )
+          else
+            Image.asset(
+              widget.icon,
+              width: iconSize,
+              height: iconSize,
+              fit: BoxFit.contain,
+            ),
           SizedBox(height: widget.mq.height(1)),
           Text(
             widget.title,
             style: TextStyle(
-              fontSize: widget.mq.width(4),
+              fontSize: widget.mq.width(3.5),
               fontWeight: FontWeight.bold,
             ),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),
@@ -313,12 +346,7 @@ class OptionCardState extends State<OptionCard>
   }
 
   Widget _buildBackSide() {
-    // Check if this is one of the specific icons that need larger size
-    final isSpecialIcon = widget.icon == ImageManager.simle ||
-        widget.icon == ImageManager.pen ||
-        widget.icon == ImageManager.xo;
-
-    final iconSize = isSpecialIcon ? widget.mq.width(16) : widget.mq.width(12);
+    final iconSize = widget.mq.width(12);
 
     return Container(
       decoration: BoxDecoration(
@@ -333,12 +361,18 @@ class OptionCardState extends State<OptionCard>
         ],
       ),
       alignment: Alignment.center,
-      child: Image.asset(
-        widget.flipImage,
-        width: iconSize,
-        height: iconSize,
-        fit: BoxFit.contain,
-      ),
+      child: widget.backIcon != null
+          ? Icon(
+              widget.backIcon,
+              size: iconSize,
+              color: const Color(0xFF776E65),
+            )
+          : Image.asset(
+              widget.flipImage,
+              width: iconSize,
+              height: iconSize,
+              fit: BoxFit.contain,
+            ),
     );
   }
 }

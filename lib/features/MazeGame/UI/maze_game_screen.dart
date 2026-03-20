@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kidzoo/core/localization/app_localizations.dart';
@@ -38,10 +39,12 @@ class _MazeGameContent extends StatefulWidget {
 
 class _MazeGameContentState extends State<_MazeGameContent> {
   bool _hasShownInstructions = false;
+  bool _isFullScreen = false;
 
   @override
   void initState() {
     super.initState();
+    _enableFullScreen();
     // Show instructions after a short delay
     Future.delayed(const Duration(milliseconds: 500), () {
       if (mounted && !_hasShownInstructions) {
@@ -49,6 +52,38 @@ class _MazeGameContentState extends State<_MazeGameContent> {
         _hasShownInstructions = true;
       }
     });
+  }
+
+  void _enableFullScreen() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+    if (mounted) {
+      setState(() {
+        _isFullScreen = true;
+      });
+    }
+  }
+
+  void _disableFullScreen({bool isDisposing = false}) {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    if (!isDisposing && mounted) {
+      setState(() {
+        _isFullScreen = false;
+      });
+    }
+  }
+
+  void _toggleFullScreen() {
+    if (_isFullScreen) {
+      _disableFullScreen(isDisposing: false);
+    } else {
+      _enableFullScreen();
+    }
+  }
+
+  @override
+  void dispose() {
+    _disableFullScreen(isDisposing: true);
+    super.dispose();
   }
 
   void _showInstructionsDialog() {
@@ -62,44 +97,68 @@ class _MazeGameContentState extends State<_MazeGameContent> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5),
-      body: BlocConsumer<MazeCubit, MazeState>(
-        listener: (context, state) {
-          if (state.status == MazeGameStatus.won) {
-            _showResultDialog(state, true);
-          } else if (state.status == MazeGameStatus.lost) {
-            _showResultDialog(state, false);
-          }
-        },
-        builder: (context, state) {
-          return SafeArea(
-            child: Column(
+    return BlocConsumer<MazeCubit, MazeState>(
+      listener: (context, state) {
+        if (state.status == MazeGameStatus.won) {
+          _showResultDialog(state, true);
+        } else if (state.status == MazeGameStatus.lost) {
+          _showResultDialog(state, false);
+        }
+      },
+      builder: (context, state) {
+        return Scaffold(
+          backgroundColor: const Color(0xFFF5F5F5),
+          body: SafeArea(
+            top: !_isFullScreen,
+            bottom: !_isFullScreen,
+            child: Stack(
               children: [
-                _buildHeader(context, state),
-                const SizedBox(height: 8),
-                _buildGameInfo(state),
-                const SizedBox(height: 8),
-                _buildHelpText(state),
-                const SizedBox(height: 8),
-                Expanded(
-                  child: InteractiveMaze(
-                    state: state,
-                    onStartDrawing: (pos) =>
-                        context.read<MazeCubit>().startDrawing(pos),
-                    onContinueDrawing: (pos) =>
-                        context.read<MazeCubit>().continueDrawing(pos),
-                    onEndDrawing: () => context.read<MazeCubit>().endDrawing(),
-                  ),
+                Column(
+                  children: [
+                    if (!_isFullScreen) _buildHeader(context, state),
+                    if (!_isFullScreen) const SizedBox(height: 8),
+                    if (!_isFullScreen) _buildGameInfo(state),
+                    if (!_isFullScreen) const SizedBox(height: 8),
+                    if (!_isFullScreen) _buildHelpText(state),
+                    if (!_isFullScreen) const SizedBox(height: 8),
+                    Expanded(
+                      child: InteractiveMaze(
+                        state: state,
+                        onStartDrawing: (pos) =>
+                            context.read<MazeCubit>().startDrawing(pos),
+                        onContinueDrawing: (pos) =>
+                            context.read<MazeCubit>().continueDrawing(pos),
+                        onEndDrawing: () => context.read<MazeCubit>().endDrawing(),
+                      ),
+                    ),
+                    if (!_isFullScreen) const SizedBox(height: 8),
+                    if (!_isFullScreen) _buildControls(context),
+                    if (!_isFullScreen) const SizedBox(height: 16),
+                  ],
                 ),
-                const SizedBox(height: 8),
-                _buildControls(context),
-                const SizedBox(height: 16),
+                if (_isFullScreen)
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: SafeArea(
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white.withValues(alpha: 0.8),
+                          shape: BoxShape.circle,
+                        ),
+                        child: IconButton(
+                          icon: const Icon(Icons.fullscreen_exit,
+                              color: Colors.black87),
+                          onPressed: _toggleFullScreen,
+                        ),
+                      ),
+                    ),
+                  ),
               ],
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -166,12 +225,28 @@ class _MazeGameContentState extends State<_MazeGameContent> {
                   ],
                 ),
               ),
+              PopupMenuItem(
+                value: 'fullscreen',
+                child: Row(
+                  children: [
+                    Icon(
+                        _isFullScreen
+                            ? Icons.fullscreen_exit
+                            : Icons.fullscreen,
+                        size: 20),
+                    const SizedBox(width: 8),
+                    Text(_isFullScreen ? "Exit Fullscreen" : "Fullscreen"),
+                  ],
+                ),
+              ),
             ],
             onSelected: (value) {
               if (value == 'restart') {
                 context.read<MazeCubit>().resetGame();
               } else if (value == 'instructions') {
                 _showInstructionsDialog();
+              } else if (value == 'fullscreen') {
+                _toggleFullScreen();
               }
             },
           ),
@@ -408,9 +483,9 @@ class _MazeGameContentState extends State<_MazeGameContent> {
       case 1:
         return 6;
       case 2:
-        return 12;
+        return 8;
       case 3:
-        return 18;
+        return 10;
       default:
         return null;
     }

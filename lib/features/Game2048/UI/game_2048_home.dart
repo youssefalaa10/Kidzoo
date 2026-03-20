@@ -3,24 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../data/logic/game_cubit.dart';
 import '../data/models/game_state_model.dart';
+import '../../../core/localization/app_localizations.dart';
 import 'game_2048_screen.dart';
 
 class Game2048Home extends StatelessWidget {
   const Game2048Home({super.key});
-
-  String _formatDuration(int seconds) {
-    final hours = seconds ~/ 3600;
-    final minutes = (seconds % 3600) ~/ 60;
-    final secs = seconds % 60;
-
-    if (hours > 0) {
-      return '${hours}h ${minutes}m';
-    } else if (minutes > 0) {
-      return '${minutes}m ${secs}s';
-    } else {
-      return '${secs}s';
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,36 +48,7 @@ class Game2048Home extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 30),
-                  // Logo/Icon
-                  Center(
-                    child: Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEDC22E),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 12,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Text(
-                          '2048',
-                          style: TextStyle(
-                            fontSize: 40,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 40),
-                  // Best Score Card
+ // Best Score Card
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(
@@ -110,15 +68,15 @@ class Game2048Home extends StatelessWidget {
                     ),
                     child: Column(
                       children: [
-                        const Row(
+                        Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.emoji_events,
+                            const Icon(Icons.emoji_events,
                                 color: Colors.white, size: 28),
-                            SizedBox(width: 8),
+                            const SizedBox(width: 8),
                             Text(
-                              'Best Score',
-                              style: TextStyle(
+                              AppLocalizations.of(context).bestScore,
+                              style: const TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
@@ -148,7 +106,7 @@ class Game2048Home extends StatelessWidget {
                         children: [
                           _buildActionButton(
                             context: context,
-                            label: 'New Game',
+                            label: AppLocalizations.of(context).newGame,
                             icon: Icons.add_circle_outline,
                             color: Colors.blue,
                             onPressed: () {
@@ -169,7 +127,7 @@ class Game2048Home extends StatelessWidget {
                           if (hasSaved)
                             _buildActionButton(
                               context: context,
-                              label: 'Continue',
+                              label: AppLocalizations.of(context).continueGame,
                               icon: Icons.play_arrow_rounded,
                               color: Colors.green,
                               onPressed: () async {
@@ -194,24 +152,24 @@ class Game2048Home extends StatelessWidget {
                   ),
                   const SizedBox(height: 40),
                   // Statistics
-                  const Text(
-                    'Statistics',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).statistics,
+                    style: const TextStyle(
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                       color: Color(0xFF776E65),
                     ),
                   ),
                   const SizedBox(height: 16),
-                  _buildStatisticsGrid(state),
+                  _buildStatisticsGrid(context, state),
                   const SizedBox(height: 30),
                   // History Button
                   OutlinedButton.icon(
                     onPressed: () => _showGameHistory(context),
                     icon: const Icon(Icons.history),
-                    label: const Text(
-                      'View Game History',
-                      style: TextStyle(
+                    label: Text(
+                      AppLocalizations.of(context).viewHistory,
+                      style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
@@ -267,7 +225,7 @@ class Game2048Home extends StatelessWidget {
     );
   }
 
-  Widget _buildStatisticsGrid(GameState state) {
+  Widget _buildStatisticsGrid(BuildContext context, GameState state) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -278,25 +236,25 @@ class Game2048Home extends StatelessWidget {
       children: [
         _buildStatCard(
           icon: Icons.sports_esports,
-          label: 'Games Played',
+          label: AppLocalizations.of(context).gamesPlayedLabel,
           value: '${state.gamesPlayed}',
           color: Colors.blue,
         ),
         _buildStatCard(
           icon: Icons.star,
-          label: 'Max Tile',
+          label: AppLocalizations.of(context).maxTile,
           value: '${state.maxTileAchieved}',
           color: Colors.purple,
         ),
         _buildStatCard(
           icon: Icons.access_time,
-          label: 'Total Time',
-          value: _formatDuration(state.totalPlayTimeSeconds),
+          label: AppLocalizations.of(context).totalPlayTime,
+          value: _formatDuration(context, state.totalPlayTimeSeconds),
           color: Colors.teal,
         ),
         _buildStatCard(
           icon: Icons.emoji_events,
-          label: 'Wins',
+          label: AppLocalizations.of(context).wins,
           value: '${state.winCount}',
           color: Colors.amber,
         ),
@@ -385,9 +343,9 @@ class Game2048Home extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Game History',
-              style: TextStyle(
+            Text(
+              AppLocalizations.of(context).history,
+              style: const TextStyle(
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color(0xFF776E65),
@@ -396,10 +354,10 @@ class Game2048Home extends StatelessWidget {
             const SizedBox(height: 20),
             Expanded(
               child: history.isEmpty
-                  ? const Center(
+                  ? Center(
                       child: Text(
-                        'No games played yet',
-                        style: TextStyle(
+                        AppLocalizations.of(context).noHistory,
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Colors.grey,
                         ),
@@ -410,7 +368,7 @@ class Game2048Home extends StatelessWidget {
                       itemCount: history.length,
                       itemBuilder: (context, index) {
                         final game = history[index];
-                        return _buildHistoryItem(game, index);
+                        return _buildHistoryItem(context, game, index);
                       },
                     ),
             ),
@@ -420,7 +378,8 @@ class Game2048Home extends StatelessWidget {
     );
   }
 
-  Widget _buildHistoryItem(Map<String, dynamic> game, int index) {
+  Widget _buildHistoryItem(
+      BuildContext context, Map<String, dynamic> game, int index) {
     final won = game['won'] as bool;
     final score = game['score'] as int;
     final maxTile = game['maxTile'] as int;
@@ -463,14 +422,14 @@ class Game2048Home extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Score: $score',
+                      '${AppLocalizations.of(context).scoreLabel}: $score',
                       style: const TextStyle(
                         fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     Text(
-                      'Max: $maxTile',
+                      '${AppLocalizations.of(context).maxTile}: $maxTile',
                       style: TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -481,7 +440,7 @@ class Game2048Home extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$moves moves • ${_formatDuration(duration)}',
+                  '$moves ${AppLocalizations.of(context).moves} • ${_formatDuration(context, duration)}',
                   style: TextStyle(
                     fontSize: 12,
                     color: Colors.grey.shade600,
@@ -493,5 +452,19 @@ class Game2048Home extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatDuration(BuildContext context, int seconds) {
+    final hours = seconds ~/ 3600;
+    final minutes = (seconds % 3600) ~/ 60;
+    final secs = seconds % 60;
+
+    if (hours > 0) {
+      return '${hours}h ${minutes}m';
+    } else if (minutes > 0) {
+      return '${minutes}m ${secs}s';
+    } else {
+      return '${secs}s';
+    }
   }
 }

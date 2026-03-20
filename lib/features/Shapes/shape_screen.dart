@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 import 'package:kidzoo/features/Shapes/bloc/shape_cubit.dart';
@@ -7,7 +8,6 @@ import 'package:kidzoo/features/Shapes/bloc/shape_states.dart';
 import 'package:kidzoo/features/Shapes/widgets/complete_screen.dart';
 import 'package:kidzoo/features/Shapes/widgets/shape_app_bar.dart';
 import 'package:kidzoo/features/Shapes/widgets/shape_display.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/features/Shapes/widgets/shape_selection.dart';
 
 import '../../core/helpers/tts_helper.dart';

@@ -5,7 +5,7 @@ import 'package:kidzoo/features/Shapes/widgets/custom_button.dart';
 
 class CompleteScreen extends StatelessWidget {
   const CompleteScreen({required this.onPressedGameOVer, super.key});
-  final Function() onPressedGameOVer;
+  final VoidCallback onPressedGameOVer;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +37,7 @@ class CompleteScreen extends StatelessWidget {
                   onPressed: () {
                     Navigator.pushAndRemoveUntil(
                       context,
-                      MaterialPageRoute(
+                      MaterialPageRoute<void>(
                           builder: (context) => const EducationScreen()),
                       (route) => false,
                     );

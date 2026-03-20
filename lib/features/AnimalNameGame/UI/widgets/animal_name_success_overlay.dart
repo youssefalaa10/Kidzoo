@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 class AnimalNameSuccessOverlay extends StatefulWidget {
   const AnimalNameSuccessOverlay({
@@ -77,9 +78,9 @@ class _AnimalNameSuccessOverlayState extends State<AnimalNameSuccessOverlay>
                     style: TextStyle(fontSize: 64),
                   ),
                   const SizedBox(height: 16),
-                  const Text(
-                    'Great Job!',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).greatJob,
+                    style: const TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.w900,
                       color: Colors.white,
@@ -93,10 +94,10 @@ class _AnimalNameSuccessOverlayState extends State<AnimalNameSuccessOverlay>
                     ),
                   ),
                   const SizedBox(height: 8),
-                  const Text(
-                    'You matched all the animals! 🐾',
+                  Text(
+                    AppLocalizations.of(context).youMatchedAllAnimals,
                     textAlign: TextAlign.center,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 16,
                       color: Colors.white,
                       fontWeight: FontWeight.w500,
@@ -106,9 +107,9 @@ class _AnimalNameSuccessOverlayState extends State<AnimalNameSuccessOverlay>
                   ElevatedButton.icon(
                     onPressed: widget.onPlayAgain,
                     icon: const Icon(Icons.replay_rounded),
-                    label: const Text(
-                      'Play Again',
-                      style: TextStyle(
+                    label: Text(
+                      AppLocalizations.of(context).playAgain,
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                       ),

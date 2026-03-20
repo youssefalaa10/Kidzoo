@@ -1,8 +1,10 @@
 import 'dart:async';
 import 'dart:math';
+
 import 'package:flutter/material.dart';
-import '../../../core/localization/app_localizations.dart';
+
 import '../../../core/base/protected_game_screen.dart';
+import '../../../core/localization/app_localizations.dart';
 
 enum GameLevel {
   easy,
@@ -200,7 +202,9 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
 
       // Check for a match
       Future.delayed(const Duration(milliseconds: 800), () {
-        _checkForMatch();
+        if (mounted) {
+          _checkForMatch();
+        }
       });
     }
   }
@@ -249,16 +253,6 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     });
   }
 
-  void _changeLevel(GameLevel level) {
-    setState(() {
-      _stopwatch.reset();
-      if (_gameCompleted) {
-        _gameCompletedController.reset();
-      }
-      _timer?.cancel();
-      _initGame(level);
-    });
-  }
 
   int _getCrossAxisCount() {
     switch (_currentLevel) {

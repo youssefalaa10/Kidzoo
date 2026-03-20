@@ -5,7 +5,7 @@ class ShapeAppBar extends StatelessWidget {
   const ShapeAppBar(
       {required this.score, required this.onTapGameOVer, super.key});
   final String score;
-  final Function() onTapGameOVer;
+  final VoidCallback onTapGameOVer;
 
   @override
   Widget build(BuildContext context) {

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzoo/core/utils/assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/localization/app_localizations.dart';
@@ -8,7 +9,6 @@ import 'Data/Logic/Model/game_sequence_model.dart';
 import 'Data/Logic/Model/level_model.dart';
 import 'Data/Logic/cubit/levelmap_cubit.dart';
 import 'Widgets/level_button.dart';
-import 'package:kidzoo/core/utils/assets.dart';
 
 // Global state for level completion
 class LevelCompletionManager {

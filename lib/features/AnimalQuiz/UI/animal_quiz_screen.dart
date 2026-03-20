@@ -233,13 +233,13 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     final l10n = AppLocalizations.of(context);
     level = widget.level;
     initGame();
-    
+
     // Check if Arabic voice is installed, and request if not (if in Arabic mode)
     final locale = Localizations.localeOf(context);
     if (locale.languageCode == 'ar') {
       TtsService.checkAndRequestArabicVoice(context);
     }
-    
+
     // Initialize TTS completion handler
     _ttsService.setCompletionHandler(() {
       if (mounted) resumeAfterSpeech();
@@ -247,7 +247,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     _ttsService.setErrorHandler((msg) {
       if (mounted) resumeAfterSpeech();
     });
-    
+
     speak(l10n.welcomeToAnimalQuiz(level));
   }
 
@@ -326,7 +326,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.teal.withOpacity(0.2),
+                            color: Colors.teal.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Text(
@@ -390,7 +390,8 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                     animals.remove(receivedAnimal.data);
                                     chooseAnimals.remove(animalLetter);
                                     score += pointsPerCorrectMatch;
-                                    speak(getLocalizedName(animalLetter.animalName, l10n));
+                                    speak(getLocalizedName(
+                                        animalLetter.animalName, l10n));
 
                                     // Check if level is complete
                                     checkLevelCompletion();
@@ -421,7 +422,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(8),
                                   color: animalLetter.accepting
-                                      ? Colors.teal.withOpacity(0.3)
+                                      ? Colors.teal.withValues(alpha: 0.3)
                                       : Colors.grey[200],
                                 ),
                                 alignment: Alignment.center,
@@ -429,7 +430,8 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                 width: MediaQuery.of(context).size.width / 3,
                                 margin: const EdgeInsets.all(8),
                                 child: Text(
-                                  getLocalizedName(animalLetter.animalName, l10n),
+                                  getLocalizedName(
+                                      animalLetter.animalName, l10n),
                                   style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),
@@ -447,11 +449,11 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                           Container(
                             padding: const EdgeInsets.all(20),
                             decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.8),
+                              color: Colors.white.withValues(alpha: 0.8),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
+                                  color: Colors.black.withValues(alpha: 0.1),
                                   blurRadius: 10,
                                   spreadRadius: 5,
                                 ),
@@ -498,7 +500,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.teal.withOpacity(0.4),
+                                  color: Colors.teal.withValues(alpha: 0.4),
                                   blurRadius: 8,
                                   offset: const Offset(0, 4),
                                 ),

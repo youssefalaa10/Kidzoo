@@ -5,11 +5,11 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/features/FlappyBird/components/background.dart';
 import 'package:kidzoo/features/FlappyBird/components/bird.dart';
 import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/components/pipemanager.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
 
 import 'components/ground.dart';
 import 'components/pipe.dart';
@@ -37,11 +37,13 @@ class FlappyBirdGame extends FlameGame
   TextComponent? startText;
 
   GameState gameState = GameState.waiting;
+  bool isSoundEnabled = true;
 
   final AudioPlayer _flapPlayer = AudioPlayer();
   final AudioPlayer _scorePlayer = AudioPlayer();
 
   Future<void> playFlap() async {
+    if (!isSoundEnabled) return;
     try {
       await _flapPlayer.stop();
       await _flapPlayer.play(AssetSource('audio/boop.wav'));
@@ -49,6 +51,7 @@ class FlappyBirdGame extends FlameGame
   }
 
   Future<void> playScore() async {
+    if (!isSoundEnabled) return;
     try {
       await _scorePlayer.stop();
       await _scorePlayer.play(AssetSource('audio/boop.wav'));
@@ -79,8 +82,15 @@ class FlappyBirdGame extends FlameGame
     add(scoreText!);
 
     // Add start instruction text
+    String startMsg = 'Tap to Start';
+    if (buildContext != null) {
+      try {
+        startMsg = AppLocalizations.of(buildContext!).tapToStart;
+      } catch (_) {}
+    }
+
     startText = TextComponent(
-      text: AppLocalizations.of(buildContext!).tapToStart,
+      text: startMsg,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 48,
@@ -215,8 +225,15 @@ class FlappyBirdGame extends FlameGame
     children.whereType<Pipe>().forEach((pipe) => pipe.removeFromParent());
 
     // Re-add start text
+    String startMsg = "Tap to Start";
+    if (buildContext != null) {
+      try {
+        startMsg = AppLocalizations.of(buildContext!).tapToStart;
+      } catch (_) {}
+    }
+
     startText = TextComponent(
-      text: AppLocalizations.of(buildContext!).tapToStart,
+      text: startMsg,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 48,
