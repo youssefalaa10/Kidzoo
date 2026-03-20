@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gal/gal.dart';
+import '../../../../core/localization/app_localizations.dart';
 
 class DrawLabScreen extends StatefulWidget {
   const DrawLabScreen({super.key});
@@ -282,13 +283,12 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Clear Canvas'),
-        content: const Text(
-            'Are you sure you want to clear the canvas? This action cannot be undone.'),
+        title: Text(AppLocalizations.of(context).clearCanvas),
+        content: Text(AppLocalizations.of(context).clearCanvasConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           TextButton(
             onPressed: () {
@@ -305,7 +305,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                 _hasUnsavedChanges = false;
               });
             },
-            child: const Text('Clear'),
+            child: Text(AppLocalizations.of(context).clear),
           ),
         ],
       ),
@@ -348,24 +348,24 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('حفظ الرسم؟'),
-        content: const Text('هل تريد حفظ رسمك قبل الخروج؟'),
+        title: Text(AppLocalizations.of(context).saveDrawing),
+        content: Text(AppLocalizations.of(context).saveDrawingConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop('discard'),
-            child: const Text('خروج بدون حفظ',
-                style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context).exitWithoutSaving,
+                style: const TextStyle(color: Colors.red)),
           ),
           TextButton(
             onPressed: () => Navigator.of(context).pop('cancel'),
-            child: const Text('إلغاء'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () => Navigator.of(context).pop('save'),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF10B981),
             ),
-            child: const Text('حفظ والخروج'),
+            child: Text(AppLocalizations.of(context).saveAndExit),
           ),
         ],
       ),
@@ -552,9 +552,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
             icon: const Icon(Icons.arrow_back_ios),
             color: const Color(0xFF6B7280),
           ),
-          const Text(
-            'DrawLab',
-            style: TextStyle(
+          Text(
+            AppLocalizations.of(context).drawLab,
+            style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
               color: Color(0xFF1F2937),
@@ -667,7 +667,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
             ),
             const SizedBox(width: 8),
             Text(
-              _getToolName(_currentTool),
+              _getToolName(context, _currentTool),
               style: const TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -882,9 +882,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
               child: Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const Text(
-                    'Quick Actions',
-                    style: TextStyle(
+                  Text(
+                    AppLocalizations.of(context).quickActions,
+                    style: const TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       color: Color(0xFF1F2937),
@@ -918,7 +918,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                 children: [
                   _buildActionItem(
                     icon: _showGrid ? Icons.grid_off : Icons.grid_on,
-                    label: _showGrid ? 'Hide Grid' : 'Show Grid',
+                    label: _showGrid
+                        ? AppLocalizations.of(context).hideGrid
+                        : AppLocalizations.of(context).showGrid,
                     color: const Color(0xFFF59E0B),
                     onTap: () {
                       setState(() {
@@ -930,7 +932,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                   const SizedBox(height: 8),
                   _buildActionItem(
                     icon: Icons.delete_outline,
-                    label: 'Clear',
+                    label: AppLocalizations.of(context).clear,
                     color: const Color(0xFFEF4444),
                     onTap: () {
                       _clearCanvas();
@@ -1003,22 +1005,24 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     }
   }
 
-  String _getToolName(String tool) {
+  String _getToolName(BuildContext context, String tool) {
     switch (tool) {
       case 'brush':
-        return 'Brush';
+        return AppLocalizations.of(context).brush;
+      case 'pen':
+        return AppLocalizations.of(context).pen;
       case 'pencil':
-        return 'Pencil';
+        return AppLocalizations.of(context).pencil;
       case 'eraser':
-        return 'Eraser';
+        return AppLocalizations.of(context).eraser;
       case 'shape':
-        return 'Shape';
+        return AppLocalizations.of(context).shape;
       case 'text':
-        return 'Text';
+        return AppLocalizations.of(context).text;
       case 'select':
-        return 'Select';
+        return AppLocalizations.of(context).select;
       default:
-        return 'Brush';
+        return AppLocalizations.of(context).brush;
     }
   }
 
@@ -1036,9 +1040,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Choose Color',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context).chooseColor,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1F2937),
@@ -1157,9 +1161,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         if (!await Gal.hasAccess()) {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Gallery access denied'),
-                backgroundColor: Color(0xFFEF4444),
+              SnackBar(
+                content: Text(AppLocalizations.of(context).galleryAccessDenied),
+                backgroundColor: const Color(0xFFEF4444),
               ),
             );
           }
@@ -1211,9 +1215,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           _hasUnsavedChanges = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Drawing saved to gallery successfully!'),
-            backgroundColor: Color(0xFF10B981),
+          SnackBar(
+            content: Text(AppLocalizations.of(context).drawingSaved),
+            backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
           ),
         );
@@ -1245,9 +1249,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Select Tool',
-                style: TextStyle(
+              Text(
+                AppLocalizations.of(context).selectTool,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1F2937),
@@ -1258,12 +1262,18 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                 spacing: 12,
                 runSpacing: 12,
                 children: [
-                  _buildToolOption('brush', Icons.brush, 'Brush'),
-                  _buildToolOption('pen', Icons.create, 'Pen'),
-                  _buildToolOption('pencil', Icons.edit, 'Pencil'),
-                  _buildToolOption('eraser', Icons.cleaning_services, 'Eraser'),
-                  _buildToolOption('shape', Icons.category, 'Shape'),
-                  _buildToolOption('text', Icons.text_fields, 'Text'),
+                  _buildToolOption(
+                      'brush', Icons.brush, AppLocalizations.of(context).brush),
+                  _buildToolOption(
+                      'pen', Icons.create, AppLocalizations.of(context).pen),
+                  _buildToolOption('pencil', Icons.edit,
+                      AppLocalizations.of(context).pencil),
+                  _buildToolOption('eraser', Icons.cleaning_services,
+                      AppLocalizations.of(context).eraser),
+                  _buildToolOption('shape', Icons.category,
+                      AppLocalizations.of(context).shape),
+                  _buildToolOption('text', Icons.text_fields,
+                      AppLocalizations.of(context).text),
                 ],
               ),
               const SizedBox(height: 20),
@@ -1339,7 +1349,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         builder: (context, setDialogState) => AlertDialog(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-          title: const Text('Select Shape'),
+          title: Text(AppLocalizations.of(context).selectShape),
           content: SingleChildScrollView(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -1349,24 +1359,24 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                   spacing: 8,
                   runSpacing: 8,
                   children: [
-                    _buildShapeOption('circle', Icons.circle_outlined, 'Circle',
-                        setDialogState),
-                    _buildShapeOption(
-                        'square', Icons.crop_square, 'Square', setDialogState),
-                    _buildShapeOption('rectangle', Icons.crop_16_9, 'Rectangle',
-                        setDialogState),
+                    _buildShapeOption('circle', Icons.circle_outlined,
+                        AppLocalizations.of(context).circle, setDialogState),
+                    _buildShapeOption('square', Icons.crop_square,
+                        AppLocalizations.of(context).square, setDialogState),
+                    _buildShapeOption('rectangle', Icons.crop_16_9,
+                        AppLocalizations.of(context).rectangle, setDialogState),
                     _buildShapeOption('triangle', Icons.change_history,
-                        'Triangle', setDialogState),
+                        AppLocalizations.of(context).triangle, setDialogState),
                     _buildShapeOption('pentagon', Icons.pentagon_outlined,
-                        'Pentagon', setDialogState),
-                    _buildShapeOption('heart', Icons.favorite_border, 'Heart',
-                        setDialogState),
+                        AppLocalizations.of(context).pentagon, setDialogState),
+                    _buildShapeOption('heart', Icons.favorite_border,
+                        AppLocalizations.of(context).heart, setDialogState),
                     _buildShapeOption('diamond', Icons.diamond_outlined,
-                        'Diamond', setDialogState),
-                    _buildShapeOption(
-                        'star', Icons.star_border, 'Star', setDialogState),
+                        AppLocalizations.of(context).diamond, setDialogState),
+                    _buildShapeOption('star', Icons.star_border,
+                        AppLocalizations.of(context).star, setDialogState),
                     _buildShapeOption('cylinder', Icons.view_in_ar_outlined,
-                        'Cylinder', setDialogState),
+                        AppLocalizations.of(context).cylinder, setDialogState),
                   ],
                 ),
                 const SizedBox(height: 20),
@@ -1375,7 +1385,8 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text('Size: ${_shapeSize.toInt()}px'),
+                    Text(
+                        '${AppLocalizations.of(context).size}: ${_shapeSize.toInt()}px'),
                     Slider(
                       value: _shapeSize,
                       min: 20,
@@ -1396,7 +1407,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
 
                 // Filled toggle
                 SwitchListTile(
-                  title: const Text('Filled'),
+                  title: Text(AppLocalizations.of(context).filled),
                   value: _shapeFilled,
                   activeThumbColor: const Color(0xFF6366F1),
                   onChanged: (value) {
@@ -1414,15 +1425,15 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
-              child: const Text('Cancel'),
+              child: Text(AppLocalizations.of(context).cancel),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content:
-                        Text('$_selectedShape selected - Tap canvas to place'),
+                    content: Text(
+                        '${_getToolName(context, _selectedShape)} ${AppLocalizations.of(context).select} - ${AppLocalizations.of(context).textAdded}'),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -1430,7 +1441,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color(0xFF6366F1),
               ),
-              child: const Text('OK'),
+              child: Text(AppLocalizations.of(context).ok),
             ),
           ],
         ),
@@ -1489,13 +1500,13 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Pen Options'),
+        title: Text(AppLocalizations.of(context).penOptions),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             SwitchListTile(
-              title: const Text('Straight Line Mode'),
-              subtitle: const Text('Draw straight lines between points'),
+              title: Text(AppLocalizations.of(context).straightLineMode),
+              subtitle: Text(AppLocalizations.of(context).straightLineModeDesc),
               value: _penStraightLineMode,
               activeThumbColor: const Color(0xFF6366F1),
               onChanged: (value) {
@@ -1506,8 +1517,8 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text(value
-                        ? 'Straight line mode enabled'
-                        : 'Freehand mode enabled'),
+                        ? AppLocalizations.of(context).straightLineModeEnabled
+                        : AppLocalizations.of(context).freehandModeEnabled),
                     duration: const Duration(seconds: 2),
                   ),
                 );
@@ -1518,7 +1529,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('OK'),
+            child: Text(AppLocalizations.of(context).ok),
           ),
         ],
       ),
@@ -1531,13 +1542,13 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Add Text'),
+        title: Text(AppLocalizations.of(context).addText),
         content: TextField(
           controller: textController,
           autofocus: true,
-          decoration: const InputDecoration(
-            hintText: 'Enter your text',
-            border: OutlineInputBorder(),
+          decoration: InputDecoration(
+            hintText: AppLocalizations.of(context).enterYourText,
+            border: const OutlineInputBorder(),
           ),
           maxLines: 3,
         ),
@@ -1559,9 +1570,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                 });
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Text added - Drag to reposition'),
-                    duration: Duration(seconds: 2),
+                  SnackBar(
+                    content: Text(AppLocalizations.of(context).textAdded),
+                    duration: const Duration(seconds: 2),
                   ),
                 );
               }
@@ -1569,7 +1580,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6366F1),
             ),
-            child: const Text('Add'),
+            child: Text(AppLocalizations.of(context).add),
           ),
         ],
       ),
@@ -1584,16 +1595,16 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Edit Text'),
+        title: Text(AppLocalizations.of(context).editText),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             TextField(
               controller: textController,
               autofocus: true,
-              decoration: const InputDecoration(
-                hintText: 'Enter your text',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: AppLocalizations.of(context).enterYourText,
+                border: const OutlineInputBorder(),
               ),
               maxLines: 3,
             ),
@@ -1608,11 +1619,12 @@ class _DrawLabScreenState extends State<DrawLabScreen>
               });
               Navigator.pop(context);
             },
-            child: const Text('Delete', style: TextStyle(color: Colors.red)),
+            child: Text(AppLocalizations.of(context).delete,
+                style: const TextStyle(color: Colors.red)),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () {
@@ -1626,7 +1638,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF6366F1),
             ),
-            child: const Text('Save'),
+            child: Text(AppLocalizations.of(context).save),
           ),
         ],
       ),

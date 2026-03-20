@@ -3,6 +3,7 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 import 'components/player.dart';
 import 'components/ground.dart';
@@ -28,12 +29,14 @@ class ColorSwitchGame extends FlameGame
     Colors.yellowAccent,
   ];
 
-  final Map<Color, String> colorNames = {
-    Colors.redAccent: 'Red',
-    Colors.greenAccent: 'Green',
-    Colors.blueAccent: 'Blue',
-    Colors.yellowAccent: 'Yellow',
-  };
+  String _getColorName(BuildContext context, Color color) {
+    final l10n = AppLocalizations.of(context);
+    if (color == Colors.redAccent) return l10n.red;
+    if (color == Colors.greenAccent) return l10n.green;
+    if (color == Colors.blueAccent) return l10n.blue;
+    if (color == Colors.yellowAccent) return l10n.yellow;
+    return 'Unknown';
+  }
 
   ColorSwitchGame() : super();
 
@@ -58,7 +61,7 @@ class ColorSwitchGame extends FlameGame
 
     // UI overlays
     colorNameText = TextComponent(
-      text: colorNames[myPlayer.color]!,
+      text: _getColorName(buildContext!, myPlayer.color),
       position: Vector2(size.x / 2, 50),
       anchor: Anchor.topCenter,
       textRenderer: TextPaint(
@@ -72,7 +75,7 @@ class ColorSwitchGame extends FlameGame
     add(colorNameText);
 
     scoreText = TextComponent(
-      text: 'Score: $score',
+      text: '${AppLocalizations.of(buildContext!).scoreLabel}: $score',
       position: Vector2(20, 50),
       anchor: Anchor.topLeft,
       textRenderer: TextPaint(
@@ -86,7 +89,7 @@ class ColorSwitchGame extends FlameGame
     add(scoreText);
 
     startText = TextComponent(
-      text: 'Tap to Start!',
+      text: AppLocalizations.of(buildContext!).tapToStart,
       position: Vector2(size.x / 2, size.y / 2),
       anchor: Anchor.center,
       textRenderer: TextPaint(
@@ -105,7 +108,7 @@ class ColorSwitchGame extends FlameGame
   void updateColorName() {
     try {
       if (!isLoaded) return;
-      colorNameText.text = colorNames[myPlayer.color] ?? 'Unknown';
+      colorNameText.text = _getColorName(buildContext!, myPlayer.color);
       colorNameText.textRenderer = TextPaint(
         style: TextStyle(
           color: myPlayer.color,
@@ -118,7 +121,7 @@ class ColorSwitchGame extends FlameGame
 
   void incrementScore() {
     score++;
-    scoreText.text = 'Score: $score';
+    scoreText.text = '${AppLocalizations.of(buildContext!).scoreLabel}: $score';
   }
 
   @override
@@ -165,9 +168,9 @@ class ColorSwitchGame extends FlameGame
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20),
         ),
-        title: const Text(
-          'Game Over!',
-          style: TextStyle(
+        title: Text(
+          AppLocalizations.of(context).gameOver,
+          style: const TextStyle(
             fontSize: 32,
             fontWeight: FontWeight.bold,
             color: Colors.deepOrange,
@@ -184,7 +187,7 @@ class ColorSwitchGame extends FlameGame
             ),
             const SizedBox(height: 10),
             Text(
-              'Score: $score',
+              '${AppLocalizations.of(context).scoreLabel}: $score',
               style: const TextStyle(
                 fontSize: 28,
                 fontWeight: FontWeight.w600,
@@ -210,9 +213,9 @@ class ColorSwitchGame extends FlameGame
                   borderRadius: BorderRadius.circular(25),
                 ),
               ),
-              child: const Text(
-                'Play Again',
-                style: TextStyle(
+              child: Text(
+                AppLocalizations.of(context).playAgain,
+                style: const TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -227,7 +230,7 @@ class ColorSwitchGame extends FlameGame
 
   void resetGame() {
     score = 0;
-    scoreText.text = 'Score: 0';
+    scoreText.text = '${AppLocalizations.of(buildContext!).scoreLabel}: 0';
 
     final rotators = world.children.whereType<CircleRotator>().toList();
     for (var r in rotators) {

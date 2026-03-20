@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidzoo/core/helpers/media_query.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import '../data/flag_data_manager.dart';
@@ -46,9 +47,9 @@ class _FlagGameMenuScreenState extends State<FlagGameMenuScreen>
                         icon: const Icon(Icons.arrow_back_ios_new,
                             color: Colors.green),
                       ),
-                      const Text(
-                        'Learn Country Flags',
-                        style: TextStyle(
+                      Text(
+                        AppLocalizations.of(context).learnCountryFlags,
+                        style: const TextStyle(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
                           color: Colors.green,
@@ -65,8 +66,9 @@ class _FlagGameMenuScreenState extends State<FlagGameMenuScreen>
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           _MenuButton(
-                            title: 'Guess the Flag',
-                            subtitle: 'Match flag to country',
+                            title: AppLocalizations.of(context).guessTheFlag,
+                            subtitle:
+                                AppLocalizations.of(context).matchFlagSubtitle,
                             icon: Icons.flag,
                             color: Colors.orange,
                             onTap: () => Navigator.push<void>(
@@ -78,8 +80,9 @@ class _FlagGameMenuScreenState extends State<FlagGameMenuScreen>
                           ),
                           SizedBox(height: mq.height(3)),
                           _MenuButton(
-                            title: 'Tap to Learn',
-                            subtitle: 'Explore world flags',
+                            title: AppLocalizations.of(context).tapToLearnFlags,
+                            subtitle: AppLocalizations.of(context)
+                                .exploreFlagsSubtitle,
                             icon: Icons.menu_book,
                             color: Colors.blue,
                             onTap: () => Navigator.push<void>(
@@ -91,8 +94,9 @@ class _FlagGameMenuScreenState extends State<FlagGameMenuScreen>
                           ),
                           SizedBox(height: mq.height(3)),
                           _MenuButton(
-                            title: 'Listening Game',
-                            subtitle: 'Hear and find the flag',
+                            title: AppLocalizations.of(context).listeningGame,
+                            subtitle: AppLocalizations.of(context)
+                                .listeningGameSubtitle,
                             icon: Icons.hearing,
                             color: Colors.purple,
                             onTap: () => Navigator.push<void>(

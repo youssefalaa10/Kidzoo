@@ -125,239 +125,243 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                 }
               },
               child: Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Colors.black,
-                    Colors.grey.shade900,
-                    Colors.black,
-                  ],
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black,
+                      Colors.grey.shade900,
+                      Colors.black,
+                    ],
+                  ),
                 ),
-              ),
-              child: Stack(
-                children: [
-                  // Center line
-                  Positioned(
-                    left: 0,
-                    right: 0,
-                    top: 0,
-                    bottom: 0,
-                    child: CustomPaint(
-                      painter: _CenterLinePainter(),
-                    ),
-                  ),
-                  // Top paddle
-                  Positioned(
-                    top: state.gameMode == PaddleBounceGameMode.vsFriend
-                        ? 80 // Extra padding for friend mode to avoid appbar
-                        : 20, // Normal padding for AI mode
-                    left: state.topPaddle.x,
-                    child: Container(
-                      width: state.topPaddle.width,
-                      height: state.topPaddle.height,
-                      decoration: BoxDecoration(
-                        color: Colors.cyan,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.cyan.withOpacity(0.8),
-                            blurRadius: 15,
-                            spreadRadius: 2,
-                          ),
-                        ],
+                child: Stack(
+                  children: [
+                    // Center line
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      top: 0,
+                      bottom: 0,
+                      child: CustomPaint(
+                        painter: _CenterLinePainter(),
                       ),
                     ),
-                  ),
-                  // Bottom paddle
-                  Positioned(
-                    bottom: 20, // Add padding from bottom
-                    left: state.bottomPaddle.x,
-                    child: Container(
-                      width: state.bottomPaddle.width,
-                      height: state.bottomPaddle.height,
-                      decoration: BoxDecoration(
-                        color: Colors.pink,
-                        borderRadius: BorderRadius.circular(8),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.pink.withOpacity(0.8),
-                            blurRadius: 15,
-                            spreadRadius: 2,
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                  // Ball
-                  Positioned(
-                    left: state.ball.x - state.ball.radius,
-                    top: state.ball.y - state.ball.radius,
-                    child: Container(
-                      width: state.ball.radius * 2,
-                      height: state.ball.radius * 2,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: const RadialGradient(
-                          colors: [
-                            Colors.yellow,
-                            Colors.orange,
+                    // Top paddle
+                    Positioned(
+                      top: state.gameMode == PaddleBounceGameMode.vsFriend
+                          ? 80 // Extra padding for friend mode to avoid appbar
+                          : 20, // Normal padding for AI mode
+                      left: state.topPaddle.x,
+                      child: Container(
+                        width: state.topPaddle.width,
+                        height: state.topPaddle.height,
+                        decoration: BoxDecoration(
+                          color: Colors.cyan,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.cyan.withOpacity(0.8),
+                              blurRadius: 15,
+                              spreadRadius: 2,
+                            ),
                           ],
                         ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.yellow.withOpacity(0.8),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                          ),
-                        ],
                       ),
                     ),
-                  ),
-                  // Score display - centered vertically
-                  Center(
-                    child: SafeArea(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          // Top player score (Player 2 or AI)
-                          Column(
-                            children: [
-                              Text(
-                                state.gameMode == PaddleBounceGameMode.vsAI
-                                    ? 'AI'
-                                    : l10n.player2,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  color: Colors.cyan,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '${state.player2Score}',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.cyan,
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 20),
-                          // Pause button - centered
-                          Material(
-                            color: Colors.transparent,
-                            child: InkWell(
-                              onTap: () {
-                                context.read<PaddleBounceCubit>().pauseGame();
-                              },
-                              borderRadius: BorderRadius.circular(24),
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: Colors.black.withOpacity(0.5),
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  state.isPaused
-                                      ? Icons.play_arrow
-                                      : Icons.pause,
-                                  color: Colors.white,
-                                  size: 24,
-                                ),
-                              ),
+                    // Bottom paddle
+                    Positioned(
+                      bottom: 20, // Add padding from bottom
+                      left: state.bottomPaddle.x,
+                      child: Container(
+                        width: state.bottomPaddle.width,
+                        height: state.bottomPaddle.height,
+                        decoration: BoxDecoration(
+                          color: Colors.pink,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.pink.withOpacity(0.8),
+                              blurRadius: 15,
+                              spreadRadius: 2,
                             ),
-                          ),
-                          const SizedBox(height: 20),
-                          // Bottom player score (Player 1)
-                          Column(
-                            children: [
-                              Text(
-                                l10n.player1,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 16,
-                                  color: Colors.pink,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '${state.player1Score}',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 32,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.pink,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ),
-                  ),
-                  // Waiting/Paused overlay
-                  if (state.status == PaddleBounceGameStatus.waiting ||
-                      state.status == PaddleBounceGameStatus.paused)
-                    Container(
-                      color: Colors.black.withOpacity(0.7),
-                      child: Center(
+                    // Ball
+                    Positioned(
+                      left: state.ball.x - state.ball.radius,
+                      top: state.ball.y - state.ball.radius,
+                      child: Container(
+                        width: state.ball.radius * 2,
+                        height: state.ball.radius * 2,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: const RadialGradient(
+                            colors: [
+                              Colors.yellow,
+                              Colors.orange,
+                            ],
+                          ),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.yellow.withOpacity(0.8),
+                              blurRadius: 20,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    // Score display - centered vertically
+                    Center(
+                      child: SafeArea(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            if (state.status == PaddleBounceGameStatus.waiting)
-                              Text(
-                                l10n.tapToStart,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            // Top player score (Player 2 or AI)
+                            Column(
+                              children: [
+                                Text(
+                                  state.gameMode == PaddleBounceGameMode.vsAI
+                                      ? l10n.ai
+                                      : l10n.player2,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    color: Colors.cyan,
+                                    fontWeight: FontWeight.bold,
+                                  ),
                                 ),
-                              )
-                            else
-                              Text(
-                                l10n.pause,
-                                style: GoogleFonts.poppins(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                                Text(
+                                  '${state.player2Score}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.cyan,
+                                  ),
                                 ),
-                              ),
+                              ],
+                            ),
                             const SizedBox(height: 20),
-                            ElevatedButton.icon(
-                              onPressed: () {
-                                if (state.status ==
-                                    PaddleBounceGameStatus.waiting) {
-                                  context.read<PaddleBounceCubit>().startGame();
-                                } else {
+                            // Pause button - centered
+                            Material(
+                              color: Colors.transparent,
+                              child: InkWell(
+                                onTap: () {
                                   context.read<PaddleBounceCubit>().pauseGame();
-                                }
-                              },
-                              icon: Icon(
-                                state.status == PaddleBounceGameStatus.waiting
-                                    ? Icons.play_arrow
-                                    : Icons.play_arrow,
+                                },
+                                borderRadius: BorderRadius.circular(24),
+                                child: Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.5),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: Icon(
+                                    state.isPaused
+                                        ? Icons.play_arrow
+                                        : Icons.pause,
+                                    color: Colors.white,
+                                    size: 24,
+                                  ),
+                                ),
                               ),
-                              label: Text(
-                                state.status == PaddleBounceGameStatus.waiting
-                                    ? l10n.tapToStart
-                                    : l10n.resume,
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.green,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 24, vertical: 12),
-                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            // Bottom player score (Player 1)
+                            Column(
+                              children: [
+                                Text(
+                                  l10n.player1,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 16,
+                                    color: Colors.pink,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '${state.player1Score}',
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.pink,
+                                  ),
+                                ),
+                              ],
                             ),
                           ],
                         ),
                       ),
                     ),
-                ],
+                    // Waiting/Paused overlay
+                    if (state.status == PaddleBounceGameStatus.waiting ||
+                        state.status == PaddleBounceGameStatus.paused)
+                      Container(
+                        color: Colors.black.withOpacity(0.7),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              if (state.status ==
+                                  PaddleBounceGameStatus.waiting)
+                                Text(
+                                  l10n.tapToStart,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                )
+                              else
+                                Text(
+                                  l10n.pause,
+                                  style: GoogleFonts.poppins(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              const SizedBox(height: 20),
+                              ElevatedButton.icon(
+                                onPressed: () {
+                                  if (state.status ==
+                                      PaddleBounceGameStatus.waiting) {
+                                    context
+                                        .read<PaddleBounceCubit>()
+                                        .startGame();
+                                  } else {
+                                    context
+                                        .read<PaddleBounceCubit>()
+                                        .pauseGame();
+                                  }
+                                },
+                                icon: Icon(
+                                  state.status == PaddleBounceGameStatus.waiting
+                                      ? Icons.play_arrow
+                                      : Icons.play_arrow,
+                                ),
+                                label: Text(
+                                  state.status == PaddleBounceGameStatus.waiting
+                                      ? l10n.tapToStart
+                                      : l10n.resume,
+                                ),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 24, vertical: 12),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
-          ),
           );
-
         },
       ),
     );

@@ -9,6 +9,7 @@ import 'package:kidzoo/features/FlappyBird/components/background.dart';
 import 'package:kidzoo/features/FlappyBird/components/bird.dart';
 import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
 import 'package:kidzoo/features/FlappyBird/components/pipemanager.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 import 'components/ground.dart';
 import 'components/pipe.dart';
@@ -79,7 +80,7 @@ class FlappyBirdGame extends FlameGame
 
     // Add start instruction text
     startText = TextComponent(
-      text: 'Tap to Start!',
+      text: AppLocalizations.of(buildContext!).tapToStart,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 48,
@@ -144,9 +145,9 @@ class FlappyBirdGame extends FlameGame
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(20),
               ),
-              title: const Text(
-                'Game Over!',
-                style: TextStyle(
+              title: Text(
+                AppLocalizations.of(context).gameOver,
+                style: const TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
                   color: Colors.deepOrange,
@@ -163,7 +164,7 @@ class FlappyBirdGame extends FlameGame
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Score: $score',
+                    '${AppLocalizations.of(context).score}: $score',
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w600,
@@ -189,9 +190,9 @@ class FlappyBirdGame extends FlameGame
                         borderRadius: BorderRadius.circular(25),
                       ),
                     ),
-                    child: const Text(
-                      'Play Again',
-                      style: TextStyle(
+                    child: Text(
+                      AppLocalizations.of(context).playAgain,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
@@ -213,7 +214,7 @@ class FlappyBirdGame extends FlameGame
 
     // Re-add start text
     startText = TextComponent(
-      text: 'Tap to Start!',
+      text: AppLocalizations.of(buildContext!).tapToStart,
       textRenderer: TextPaint(
         style: const TextStyle(
           fontSize: 48,

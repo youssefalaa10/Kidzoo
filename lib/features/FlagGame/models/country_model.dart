@@ -1,3 +1,6 @@
+import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
+
 class Country {
   final String code;
   final String name;
@@ -21,4 +24,8 @@ class Country {
   }
 
   String get flagAsset => 'assets/flags/${code.toLowerCase()}.svg';
+
+  String localizedName(BuildContext context) {
+    return AppLocalizations.of(context).getCountryName(code);
+  }
 }

@@ -51,8 +51,8 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
       _targetCountry = countries[Random().nextInt(4)];
       _options = countries;
     });
-    _ttsHelper
-        .speak(AppLocalizations.of(context).whichFlagIs(_targetCountry!.name));
+    _ttsHelper.speak(AppLocalizations.of(context)
+        .whichFlagIs(_targetCountry!.localizedName(context)));
   }
 
   void _checkAnswer(Country selected) {
@@ -64,8 +64,8 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
         _score += 10;
       });
       _confettiController.play();
-      _ttsHelper.speak(
-          AppLocalizations.of(context).greatJobThats(_targetCountry!.name));
+      _ttsHelper.speak(AppLocalizations.of(context)
+          .greatJobThats(_targetCountry!.localizedName(context)));
 
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) _generateQuestion();
@@ -115,7 +115,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
                 ),
                 SizedBox(height: mq.height(5)),
                 Text(
-                  l10n.whichFlagIs(_targetCountry!.name),
+                  l10n.whichFlagIs(_targetCountry!.localizedName(context)),
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                       fontSize: 28, fontWeight: FontWeight.bold),

@@ -55,8 +55,8 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
   }
 
   void _playPrompt() {
-    _ttsHelper.speak(
-        AppLocalizations.of(context).findTheFlagOf(_targetCountry!.name));
+    _ttsHelper.speak(AppLocalizations.of(context)
+        .findTheFlagOf(_targetCountry!.localizedName(context)));
   }
 
   void _checkAnswer(Country selected) {
@@ -68,8 +68,8 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
         _score += 10;
       });
       _confettiController.play();
-      _ttsHelper.speak(
-          AppLocalizations.of(context).correctYouFound(_targetCountry!.name));
+      _ttsHelper.speak(AppLocalizations.of(context)
+          .correctYouFound(_targetCountry!.localizedName(context)));
 
       Future.delayed(const Duration(seconds: 3), () {
         if (mounted) _generateQuestion();

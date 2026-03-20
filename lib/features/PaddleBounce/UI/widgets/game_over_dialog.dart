@@ -105,7 +105,7 @@ class GameOverDialog extends StatelessWidget {
                         children: [
                           Text(
                             gameMode == PaddleBounceGameMode.vsAI
-                                ? 'AI'
+                                ? l10n.ai
                                 : l10n.player2,
                             style: GoogleFonts.poppins(
                               fontSize: 14,

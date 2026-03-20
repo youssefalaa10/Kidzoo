@@ -340,6 +340,11 @@ class AppLocalizations {
   String get guessTheFlag => _localizedValues['guessTheFlag']!;
   String get tapToLearnFlags => _localizedValues['tapToLearnFlags']!;
   String get listeningGame => _localizedValues['listeningGame']!;
+  String get learnCountryFlags => _localizedValues['learnCountryFlags']!;
+  String get matchFlagSubtitle => _localizedValues['matchFlagSubtitle']!;
+  String get exploreFlagsSubtitle => _localizedValues['exploreFlagsSubtitle']!;
+  String get listeningGameSubtitle =>
+      _localizedValues['listeningGameSubtitle']!;
   String whichFlagIs(String country) =>
       _localizedValues['whichFlagIs']!.replaceAll('{country}', country);
   String greatJobThats(String country) =>
@@ -403,7 +408,39 @@ class AppLocalizations {
   String get oopsTryAgain => _localizedValues['oopsTryAgain']!;
   String get tryAgainToGetBetterScore =>
       _localizedValues['tryAgainToGetBetterScore']!;
+  String get pentagon => _localizedValues['pentagon']!;
+  String get heart => _localizedValues['heart']!;
+  String get diamond => _localizedValues['diamond']!;
+  String get star => _localizedValues['star']!;
+  String get cylinder => _localizedValues['cylinder']!;
+  String get straightLineModeEnabled =>
+      _localizedValues['straightLineModeEnabled']!;
+  String get freehandModeEnabled => _localizedValues['freehandModeEnabled']!;
   String get gameComplete => _localizedValues['gameComplete']!;
+  String get saveDrawingConfirm => _localizedValues['saveDrawingConfirm']!;
+  String get exitWithoutSaving => _localizedValues['exitWithoutSaving']!;
+  String get saveAndExit => _localizedValues['saveAndExit']!;
+  String get quickActions => _localizedValues['quickActions']!;
+  String get brush => _localizedValues['brush']!;
+  String get chooseColor => _localizedValues['chooseColor']!;
+  String get selectTool => _localizedValues['selectTool']!;
+  String get selectShape => _localizedValues['selectShape']!;
+  String get size => _localizedValues['size']!;
+  String get filled => _localizedValues['filled']!;
+  String get ok => _localizedValues['ok']!;
+  String get penOptions => _localizedValues['penOptions']!;
+  String get straightLineMode => _localizedValues['straightLineMode']!;
+  String get straightLineModeDesc => _localizedValues['straightLineModeDesc']!;
+  String get enterYourText => _localizedValues['enterYourText']!;
+  String get textAdded => _localizedValues['textAdded']!;
+  String get editText => _localizedValues['editText']!;
+  String get shape => _localizedValues['shape']!;
+  String get text => _localizedValues['text']!;
+  String get galleryAccessDenied => _localizedValues['galleryAccessDenied']!;
+
+  String getCountryName(String code) {
+    return _localizedValues[code.toLowerCase()] ?? code;
+  }
 }
 
 class _AppLocalizationsDelegate

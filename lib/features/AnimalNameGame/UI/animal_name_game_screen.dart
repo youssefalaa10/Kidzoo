@@ -74,7 +74,6 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   }
 
   void _startNewRound() {
-    final l10n = AppLocalizations.of(context);
     final Random rng = Random();
     final List<AnimalNameModel> pool =
         List<AnimalNameModel>.of(_getAnimals(context))..shuffle(rng);

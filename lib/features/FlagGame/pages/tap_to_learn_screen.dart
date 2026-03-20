@@ -30,7 +30,7 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
   }
 
   void _showCountryDialog(Country country) {
-    _ttsHelper.speak(country.name);
+    _ttsHelper.speak(country.localizedName(context));
 
     showDialog<void>(
       context: context,
@@ -49,7 +49,7 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
               ).animate().shake(),
               const SizedBox(height: 20),
               Text(
-                country.name,
+                country.localizedName(context),
                 style:
                     const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
@@ -84,7 +84,10 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final filteredCountries = countries
-        .where((c) => c.name.toLowerCase().contains(searchQuery.toLowerCase()))
+        .where((c) => c
+            .localizedName(context)
+            .toLowerCase()
+            .contains(searchQuery.toLowerCase()))
         .toList();
 
     return Scaffold(
@@ -138,7 +141,7 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            country.name,
+                            country.localizedName(context),
                             textAlign: TextAlign.center,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
