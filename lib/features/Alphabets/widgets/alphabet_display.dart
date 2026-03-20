@@ -28,7 +28,7 @@ class AlphabetDisplay extends StatelessWidget {
         } else if (state is AlphabetLoadedState) {
           final alphabetModel = AlphabetModel.alphabets.firstWhere(
             (model) => model.letter == state.alphabet,
-            orElse: () => AlphabetModel(letter: '', imagePath: '', example: ''),
+            orElse: () => AlphabetModel(letter: '', imagePath: '', example: '', exampleKey: ''),
           );
 
           return Column(
@@ -45,7 +45,7 @@ class AlphabetDisplay extends StatelessWidget {
                 ),
               const SizedBox(height: 20),
               Text(
-                '${state.alphabet} = ${state.example}',
+                '${state.alphabet} = ${alphabetModel.getLocalizedExample(context)}',
                 style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

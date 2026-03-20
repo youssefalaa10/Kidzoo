@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 class SmartToolBar extends StatelessWidget {
   const SmartToolBar({
@@ -432,6 +433,7 @@ class SmartToolBar extends StatelessWidget {
   }
 
   void _showSettingsBottomSheet(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
@@ -445,9 +447,9 @@ class SmartToolBar extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Text(
-                'Tool Settings',
-                style: TextStyle(
+              Text(
+                l10n.toolSettings,
+                style: const TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.w600,
                   color: Color(0xFF1F2937),
@@ -458,7 +460,7 @@ class SmartToolBar extends StatelessWidget {
               // Grid toggle
               ListTile(
                 leading: const Icon(Icons.grid_on, color: Color(0xFF6B7280)),
-                title: const Text('Show Grid'),
+                title: Text(l10n.showGrid),
                 trailing: Switch(
                   value: showGrid,
                   onChanged: (value) {
@@ -476,7 +478,7 @@ class SmartToolBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Brush Width: ${currentWidth.toInt()}px',
+                      '${l10n.strokeWidth}: ${currentWidth.toInt()}px',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF6B7280),
@@ -501,7 +503,7 @@ class SmartToolBar extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Opacity: ${(currentOpacity * 100).toInt()}%',
+                      '${l10n.opacity}: ${(currentOpacity * 100).toInt()}%',
                       style: const TextStyle(
                         fontSize: 14,
                         color: Color(0xFF6B7280),

@@ -7,16 +7,39 @@ import '../bloc/alphabet_bloc.dart';
 import '../bloc/alphabet_event.dart';
 import '../data/model/alphabet_model.dart';
 
-class AlphabetSelection extends StatelessWidget {
+class AlphabetSelection extends StatefulWidget {
   const AlphabetSelection({super.key});
 
   @override
+  State<AlphabetSelection> createState() => _AlphabetSelectionState();
+}
+
+class _AlphabetSelectionState extends State<AlphabetSelection> {
+  TtsHelper? _ttsHelper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ttsHelper == null) {
+      final musicCubit = context.read<MusicCubit>();
+      final languageCode = Localizations.localeOf(context).languageCode;
+      _ttsHelper = TtsHelper(
+        musicCubit: musicCubit,
+        languageCode: languageCode,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _ttsHelper?.stop();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final musicCubit = context.read<MusicCubit>();
-    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
-
+    final languageCode = Localizations.localeOf(context).languageCode;
     final List<AlphabetModel> alphabets = AlphabetModel.alphabets;
-
     final screenWidth = MediaQuery.of(context).size.width;
 
     final int crossAxisCount = screenWidth < 600
@@ -43,7 +66,10 @@ class AlphabetSelection extends StatelessWidget {
           onTap: () {
             BlocProvider.of<AlphabetBloc>(context)
                 .add(SelectAlphabetEvent(alphabet.letter));
-            ttsHelper.speak('${alphabet.letter}  ${alphabet.example}');
+            final textToSpeak = languageCode == 'ar'
+                ? '${alphabet.letter} ${alphabet.getLocalizedExample(context)}'
+                : '${alphabet.letter} ${alphabet.getLocalizedExample(context)}';
+            _ttsHelper?.speak(textToSpeak);
           },
           child: Padding(
             padding: const EdgeInsets.all(3.0),

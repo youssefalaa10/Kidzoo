@@ -22,6 +22,11 @@ class AppLocalizations {
 
   // DrawLab translations
   String get drawLab => _localizedValues['drawLab']!;
+  String get navigationNotAllowed => _localizedValues['navigationNotAllowed']!;
+  String get gamesOnlyThroughLevelMap => _localizedValues['gamesOnlyThroughLevelMap']!;
+  String get goBack => _localizedValues['goBack']!;
+  String get toolSettings => _localizedValues['toolSettings']!;
+  String get failedToShare => _localizedValues['failedToShare']!;
   String get brushSettings => _localizedValues['brushSettings']!;
   String get brushType => _localizedValues['brushType']!;
   String get brushShape => _localizedValues['brushShape']!;
@@ -43,6 +48,7 @@ class AppLocalizations {
   String get clearCanvas => _localizedValues['clearCanvas']!;
   String get saveDrawing => _localizedValues['saveDrawing']!;
   String get exportImage => _localizedValues['exportImage']!;
+  String get saveToGallery => _localizedValues['saveToGallery']!;
   String get openGallery => _localizedValues['openGallery']!;
   String get enterDrawingName => _localizedValues['enterDrawingName']!;
   String get cancel => _localizedValues['cancel']!;
@@ -123,6 +129,43 @@ class AppLocalizations {
   String get english => _localizedValues['english']!;
   String get arabic => _localizedValues['arabic']!;
 
+  // Alphabet examples
+  String get axe => _localizedValues['axe']!;
+  String get ball => _localizedValues['ball']!;
+  String get cold => _localizedValues['cold']!;
+  String get dice => _localizedValues['dice']!;
+  String get egg => _localizedValues['egg']!;
+  String get fish => _localizedValues['fish']!;
+  String get glasses => _localizedValues['glasses']!;
+  String get hat => _localizedValues['hat']!;
+  String get iceCream => _localizedValues['iceCream']!;
+  String get juice => _localizedValues['juice']!;
+  String get knife => _localizedValues['knife']!;
+  String get lightExample => _localizedValues['lightExample']!;
+  String get musicExample => _localizedValues['musicExample']!;
+  String get nut => _localizedValues['nut']!;
+  String get owl => _localizedValues['owl']!;
+  String get queen => _localizedValues['queen']!;
+  String get ruler => _localizedValues['ruler']!;
+  String get tree => _localizedValues['tree']!;
+  String get umbrella => _localizedValues['umbrella']!;
+  String get van => _localizedValues['van']!;
+  String get watch => _localizedValues['watch']!;
+  String get xRay => _localizedValues['xRay']!;
+  String get zoom => _localizedValues['zoom']!;
+
+  // Numbers
+  String get one => _localizedValues['one']!;
+  String get two => _localizedValues['two']!;
+  String get three => _localizedValues['three']!;
+  String get four => _localizedValues['four']!;
+  String get five => _localizedValues['five']!;
+  String get six => _localizedValues['six']!;
+  String get seven => _localizedValues['seven']!;
+  String get eight => _localizedValues['eight']!;
+  String get nine => _localizedValues['nine']!;
+  String get ten => _localizedValues['ten']!;
+
   // Home Screen
   String get improveYourSkills => _localizedValues['improveYourSkills']!;
   String get games => _localizedValues['games']!;
@@ -149,6 +192,8 @@ class AppLocalizations {
   String get time => _localizedValues['time']!;
   String get showing => _localizedValues['showing']!;
   String get score => _localizedValues['score']!;
+  String get memoryGame => _localizedValues['memoryGame']!;
+  String get pairs => _localizedValues['pairs']!;
   String get bestScore => _localizedValues['bestScore']!;
   String get roundText => _localizedValues['round']!;
   String get longestSequence => _localizedValues['longestSequence']!;
@@ -267,6 +312,7 @@ class AppLocalizations {
   String get yourProgress => _localizedValues['yourProgress']!;
   String get completed => _localizedValues['completed']!;
   String get currentScore => _localizedValues['currentScore']!;
+  String get yourScore => _localizedValues['yourScore']!;
   String get continueGame => _localizedValues['continueGame']!;
   String get correct => _localizedValues['correct']!;
   String get tryAgain => _localizedValues['tryAgain']!;
@@ -302,6 +348,24 @@ class AppLocalizations {
   String get funGames => _localizedValues['funGames']!;
   String get flappyBird => _localizedValues['flappyBird']!;
   String get game2048 => _localizedValues['game2048']!;
+
+  String currentLevelLabel(int level) => _localizedValues['currentLevelLabel']!
+      .replaceAll('{level}', level.toString());
+  String levelLabel(int level) =>
+      _localizedValues['levelLabel']!.replaceAll('{level}', level.toString());
+  String difficultyLevel(int level) => _localizedValues['difficultyLevel']!
+      .replaceAll('{level}', level.toString());
+  String get gameTypesLabel => _localizedValues['gameTypesLabel']!;
+  String get memoryGameCongrats => _localizedValues['memoryGameCongrats']!;
+  String get memoryGameTimeResult => _localizedValues['memoryGameTimeResult']!;
+  String totalMovesLabel(int moves) => _localizedValues['totalMovesLabel']!
+      .replaceAll('{moves}', moves.toString());
+  String pairsLabel(int current, int total) =>
+      _localizedValues['pairsLabel']!
+          .replaceAll('{current}', current.toString())
+          .replaceAll('{total}', total.toString());
+  String lockedLevelMessage(int level) => _localizedValues['lockedLevelMessage']!
+      .replaceAll('{level}', level.toString());
 
   // Learning Activities translations
   String get numbers => _localizedValues['numbers']!;
@@ -412,6 +476,7 @@ class AppLocalizations {
   String get heart => _localizedValues['heart']!;
   String get diamond => _localizedValues['diamond']!;
   String get star => _localizedValues['star']!;
+  String get hexagon => _localizedValues['hexagon']!;
   String get cylinder => _localizedValues['cylinder']!;
   String get straightLineModeEnabled =>
       _localizedValues['straightLineModeEnabled']!;

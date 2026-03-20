@@ -15,12 +15,13 @@ class AlphabetLoadingState extends AlphabetState {
 }
 
 class AlphabetLoadedState extends AlphabetState {
-  const AlphabetLoadedState(this.alphabet, this.example);
+  const AlphabetLoadedState(this.alphabet, this.example, this.exampleKey);
   final String alphabet;
   final String example;
+  final String exampleKey;
 
   @override
-  List<Object> get props => [alphabet, example];
+  List<Object> get props => [alphabet, example, exampleKey];
 }
 
 class AlphabetErrorState extends AlphabetState {

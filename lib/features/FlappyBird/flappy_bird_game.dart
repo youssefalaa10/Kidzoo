@@ -33,8 +33,8 @@ class FlappyBirdGame extends FlameGame
   late Background background;
   late Ground ground;
   late PipeManager pipeManager;
-  late ScoreText scoreText;
-  late TextComponent startText;
+  ScoreText? scoreText;
+  TextComponent? startText;
 
   GameState gameState = GameState.waiting;
 
@@ -76,7 +76,7 @@ class FlappyBirdGame extends FlameGame
     pipeManager = PipeManager();
     add(pipeManager);
     scoreText = ScoreText();
-    add(scoreText);
+    add(scoreText!);
 
     // Add start instruction text
     startText = TextComponent(
@@ -97,7 +97,9 @@ class FlappyBirdGame extends FlameGame
       anchor: Anchor.center,
       position: Vector2(size.x / 2, size.y / 2 - 100),
     );
-    add(startText);
+    if (startText != null) {
+      add(startText!);
+    }
   }
 
   @override
@@ -105,7 +107,7 @@ class FlappyBirdGame extends FlameGame
     if (gameState == GameState.waiting) {
       // Start the game on first tap
       gameState = GameState.playing;
-      startText.removeFromParent();
+      startText?.removeFromParent();
       bird.flap();
     } else if (gameState == GameState.playing) {
       // Flap during gameplay
@@ -231,7 +233,7 @@ class FlappyBirdGame extends FlameGame
       anchor: Anchor.center,
       position: Vector2(size.x / 2, size.y / 2 - 100),
     );
-    add(startText);
+    add(startText!);
 
     resumeEngine();
   }

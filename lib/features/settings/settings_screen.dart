@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../core/helpers/media_query.dart';
+import '../../core/helpers/tts_service.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/localization/language_provider.dart';
 import '../../core/mixins/background_music_mixin.dart';
@@ -225,9 +226,13 @@ class _SettingsScreenState extends State<SettingsScreen>
                 l10n.arabic,
                 '🇸🇦',
                 currentLocale.languageCode == 'ar',
-                () => context.read<LanguageCubit>().setLanguage(
-                      const Locale('ar', ''),
-                    ),
+                () {
+                  context.read<LanguageCubit>().setLanguage(
+                    const Locale('ar', ''),
+                  );
+                  // Check and request Arabic TTS data when switching to Arabic
+                  TtsService.checkAndRequestArabicVoice(context);
+                },
               ),
             ),
           ],

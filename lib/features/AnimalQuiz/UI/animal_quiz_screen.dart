@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 
 import '../../../core/base/protected_game_screen.dart';
@@ -26,7 +26,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
   int penaltyPerWrongMatch = 5;
   int targetScoreForLevel = 100;
 
-  final FlutterTts flutterTts = FlutterTts();
+  final TtsService _ttsService = TtsService();
 
   // All available animals across levels
   final List<AnimalQuizModel> allAnimals = [
@@ -223,14 +223,9 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     // Stop background music completely for TTS to avoid تداخل
     stopForSpeech();
 
-    await flutterTts.setLanguage('en-US');
-    await flutterTts.setPitch(1.0);
-    await flutterTts.speak(text);
-
-    // Resume background music after a delay
-    Future.delayed(const Duration(seconds: 3), () {
-      resumeAfterSpeech();
-    });
+    final languageCode = Localizations.localeOf(context).languageCode;
+    await _ttsService.setLanguage(languageCode);
+    await _ttsService.speak(text);
   }
 
   @override
@@ -238,7 +233,55 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     final l10n = AppLocalizations.of(context);
     level = widget.level;
     initGame();
+    
+    // Check if Arabic voice is installed, and request if not (if in Arabic mode)
+    final locale = Localizations.localeOf(context);
+    if (locale.languageCode == 'ar') {
+      TtsService.checkAndRequestArabicVoice(context);
+    }
+    
+    // Initialize TTS completion handler
+    _ttsService.setCompletionHandler(() {
+      if (mounted) resumeAfterSpeech();
+    });
+    _ttsService.setErrorHandler((msg) {
+      if (mounted) resumeAfterSpeech();
+    });
+    
     speak(l10n.welcomeToAnimalQuiz(level));
+  }
+
+  String getLocalizedName(String name, AppLocalizations l10n) {
+    switch (name.toLowerCase()) {
+      case 'cat':
+        return l10n.cat;
+      case 'dog':
+        return l10n.dog;
+      case 'cow':
+        return l10n.cow;
+      case 'hen':
+        return l10n.hen;
+      case 'bird':
+        return l10n.bird;
+      case 'lion':
+        return l10n.lion;
+      case 'sheep':
+        return l10n.sheep;
+      case 'horse':
+        return l10n.horse;
+      case 'elephant':
+        return l10n.elephant;
+      case 'giraffe':
+        return l10n.giraffe;
+      case 'panda':
+        return l10n.panda;
+      case 'a':
+        return 'A';
+      case 'b':
+        return 'B';
+      default:
+        return name;
+    }
   }
 
   @override
@@ -347,7 +390,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                     animals.remove(receivedAnimal.data);
                                     chooseAnimals.remove(animalLetter);
                                     score += pointsPerCorrectMatch;
-                                    speak(' ${animalLetter.animalName}');
+                                    speak(getLocalizedName(animalLetter.animalName, l10n));
 
                                     // Check if level is complete
                                     checkLevelCompletion();
@@ -386,7 +429,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                                 width: MediaQuery.of(context).size.width / 3,
                                 margin: const EdgeInsets.all(8),
                                 child: Text(
-                                  animalLetter.animalName,
+                                  getLocalizedName(animalLetter.animalName, l10n),
                                   style: Theme.of(context).textTheme.bodyLarge,
                                 ),
                               ),

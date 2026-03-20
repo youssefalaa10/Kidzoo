@@ -1,5 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/helpers/tts_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:confetti/confetti.dart';
@@ -27,15 +28,33 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
   Country? _targetCountry;
   List<Country> _options = [];
   bool? _isCorrect;
+  String? _selectedCountryCode;
   int _score = 0;
 
   @override
   void initState() {
     super.initState();
-    _ttsHelper = TtsHelper(musicCubit: context.read<MusicCubit>());
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 2));
-    _generateQuestion();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final lang = Localizations.localeOf(context).languageCode;
+        if (lang == 'ar') {
+          TtsService.checkAndRequestArabicVoice(context);
+        }
+        _generateQuestion();
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageCode = Localizations.localeOf(context).languageCode;
+    _ttsHelper = TtsHelper(
+      musicCubit: context.read<MusicCubit>(),
+      languageCode: languageCode,
+    );
   }
 
   @override
@@ -47,6 +66,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
   void _generateQuestion() {
     setState(() {
       _isCorrect = null;
+      _selectedCountryCode = null;
       var countries = FlagDataManager.getRandomCountries(4);
       _targetCountry = countries[Random().nextInt(4)];
       _options = countries;
@@ -57,6 +77,10 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
 
   void _checkAnswer(Country selected) {
     if (_isCorrect != null) return;
+
+    setState(() {
+      _selectedCountryCode = selected.code;
+    });
 
     if (selected.code == _targetCountry!.code) {
       setState(() {
@@ -79,6 +103,7 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
         if (mounted) {
           setState(() {
             _isCorrect = null;
+            _selectedCountryCode = null;
           });
         }
       });
@@ -148,9 +173,10 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
                             ),
                           ],
                           border: Border.all(
-                            color: _isCorrect != null &&
-                                    country.code == _targetCountry!.code
-                                ? Colors.green
+                            color: _selectedCountryCode == country.code
+                                ? (_isCorrect == true
+                                    ? Colors.green
+                                    : Colors.red)
                                 : Colors.transparent,
                             width: 3,
                           ),

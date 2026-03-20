@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 class AlphabetAppBar extends StatelessWidget {
   const AlphabetAppBar({super.key});
@@ -15,9 +16,9 @@ class AlphabetAppBar extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: const Icon(Icons.arrow_back, size: 30,)),
-          const Text(
-            'Letters',
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          Text(
+            AppLocalizations.of(context).alphabet,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
           ),
         ],
       ),

@@ -14,9 +14,9 @@ import 'components/star_component.dart';
 class ColorSwitchGame extends FlameGame
     with TapCallbacks, HasCollisionDetection {
   late Player myPlayer;
-  late TextComponent colorNameText;
-  late TextComponent scoreText;
-  late TextComponent startText;
+  TextComponent? colorNameText;
+  TextComponent? scoreText;
+  TextComponent? startText;
 
   bool isGameOver = false;
   bool isStarted = false;
@@ -60,56 +60,59 @@ class ColorSwitchGame extends FlameGame
     myPlayer.color = initialColors.first;
 
     // UI overlays
-    colorNameText = TextComponent(
-      text: _getColorName(buildContext!, myPlayer.color),
-      position: Vector2(size.x / 2, 50),
-      anchor: Anchor.topCenter,
-      textRenderer: TextPaint(
-        style: TextStyle(
-          color: myPlayer.color,
-          fontSize: 48,
-          fontWeight: FontWeight.bold,
+    if (buildContext != null) {
+      final l10n = AppLocalizations.of(buildContext!);
+      colorNameText = TextComponent(
+        text: _getColorName(buildContext!, myPlayer.color),
+        position: Vector2(size.x / 2, 50),
+        anchor: Anchor.topCenter,
+        textRenderer: TextPaint(
+          style: TextStyle(
+            color: myPlayer.color,
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-    );
-    add(colorNameText);
+      );
+      add(colorNameText!);
 
-    scoreText = TextComponent(
-      text: '${AppLocalizations.of(buildContext!).scoreLabel}: $score',
-      position: Vector2(20, 50),
-      anchor: Anchor.topLeft,
-      textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
+      scoreText = TextComponent(
+        text: '${l10n.scoreLabel}: $score',
+        position: Vector2(20, 50),
+        anchor: Anchor.topLeft,
+        textRenderer: TextPaint(
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-    );
-    add(scoreText);
+      );
+      add(scoreText!);
 
-    startText = TextComponent(
-      text: AppLocalizations.of(buildContext!).tapToStart,
-      position: Vector2(size.x / 2, size.y / 2),
-      anchor: Anchor.center,
-      textRenderer: TextPaint(
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 48,
-          fontWeight: FontWeight.bold,
+      startText = TextComponent(
+        text: l10n.tapToStart,
+        position: Vector2(size.x / 2, size.y / 2),
+        anchor: Anchor.center,
+        textRenderer: TextPaint(
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 48,
+            fontWeight: FontWeight.bold,
+          ),
         ),
-      ),
-    );
-    add(startText);
+      );
+      add(startText!);
+    }
 
     generateGameComponents();
   }
 
   void updateColorName() {
     try {
-      if (!isLoaded) return;
-      colorNameText.text = _getColorName(buildContext!, myPlayer.color);
-      colorNameText.textRenderer = TextPaint(
+      if (!isLoaded || colorNameText == null) return;
+      colorNameText!.text = _getColorName(buildContext!, myPlayer.color);
+      colorNameText!.textRenderer = TextPaint(
         style: TextStyle(
           color: myPlayer.color,
           fontSize: 48,
@@ -121,7 +124,9 @@ class ColorSwitchGame extends FlameGame
 
   void incrementScore() {
     score++;
-    scoreText.text = '${AppLocalizations.of(buildContext!).scoreLabel}: $score';
+    if (scoreText != null && buildContext != null) {
+      scoreText!.text = '${AppLocalizations.of(buildContext!).scoreLabel}: $score';
+    }
   }
 
   @override
@@ -147,7 +152,7 @@ class ColorSwitchGame extends FlameGame
     }
     if (!isStarted) {
       isStarted = true;
-      startText.removeFromParent();
+      startText?.removeFromParent();
       myPlayer.jump();
     } else {
       myPlayer.jump();
@@ -183,7 +188,6 @@ class ColorSwitchGame extends FlameGame
             const Icon(
               Icons.emoji_events,
               size: 60,
-              color: Colors.amber,
             ),
             const SizedBox(height: 10),
             Text(
@@ -230,7 +234,9 @@ class ColorSwitchGame extends FlameGame
 
   void resetGame() {
     score = 0;
-    scoreText.text = '${AppLocalizations.of(buildContext!).scoreLabel}: 0';
+    if (scoreText != null && buildContext != null) {
+      scoreText!.text = '${AppLocalizations.of(buildContext!).scoreLabel}: 0';
+    }
 
     final rotators = world.children.whereType<CircleRotator>().toList();
     for (var r in rotators) {
@@ -254,7 +260,9 @@ class ColorSwitchGame extends FlameGame
     isStarted = false;
     isGameOver = false;
 
-    add(startText);
+    if (startText != null) {
+      add(startText!);
+    }
 
     resumeEngine();
   }

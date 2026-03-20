@@ -19,7 +19,7 @@ class AlphabetBloc extends Bloc<AlphabetEvent, AlphabetState> {
 
         if (alphabetMap.containsKey(event.alphabet)) {
           final selectedModel = alphabetMap[event.alphabet]!;
-          emit(AlphabetLoadedState(selectedModel.letter, selectedModel.example));
+          emit(AlphabetLoadedState(selectedModel.letter, selectedModel.example, selectedModel.exampleKey));
         } else {
           emit(const AlphabetErrorState('Example not found for the selected alphabet.'));
         }

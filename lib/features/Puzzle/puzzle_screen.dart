@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/base/protected_game_screen.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/shared/style/image_manager.dart';
 import 'package:kidzoo/features/Puzzle/bloc/cubit.dart';
 import 'package:kidzoo/features/Puzzle/bloc/state.dart';
@@ -48,9 +49,10 @@ class ImageSelectionPage extends StatelessWidget {
     // In a real app, you would fetch images from assets or network
     // For this example, we'll use placeholder URLs
 
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Select an Image'),
+        title: Text(l10n.selectAnImage),
       ),
       body: GridView.builder(
         padding: const EdgeInsets.all(16),
@@ -119,6 +121,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     // Extra guard: if already completed, return true
     final cubitPre = context.read<PuzzleCubit>();
     if (!_completionReturned && cubitPre.score >= 100) {
@@ -142,7 +145,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
       },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Puzzle Frame'),
+          title: Text(l10n.puzzleFrame),
         ),
         body: BlocBuilder<PuzzleCubit, PuzzleState>(
           builder: (context, state) {
@@ -233,7 +236,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
                           }).toList(),
                         ),
                       ),
-                      Text('Your Score: ${cubit.score}',
+                      Text('${l10n.yourScore} ${cubit.score}',
                           style: const TextStyle(fontSize: 20)),
                     ])));
           },

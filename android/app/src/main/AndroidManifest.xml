@@ -44,5 +44,12 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Required for TTS language data installation checks -->
+        <intent>
+            <action android:name="android.speech.tts.engine.CHECK_TTS_DATA"/>
+        </intent>
+        <intent>
+            <action android:name="android.speech.tts.engine.INSTALL_TTS_DATA"/>
+        </intent>
     </queries>
 </manifest>

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/helpers/tts_service.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/features/Alphabets/widgets/alphabet_app_bar.dart';
 
@@ -13,6 +14,17 @@ class AlphabetScreen extends StatefulWidget {
 }
 
 class _AlphabetScreenState extends State<AlphabetScreen> with TTSMusicMixin {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final lang = Localizations.localeOf(context).languageCode;
+      if (lang == 'ar') {
+        TtsService.checkAndRequestArabicVoice(context);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -7,6 +7,7 @@ import 'package:kidzoo/features/Shapes/bloc/shape_states.dart';
 import 'package:kidzoo/features/Shapes/widgets/complete_screen.dart';
 import 'package:kidzoo/features/Shapes/widgets/shape_app_bar.dart';
 import 'package:kidzoo/features/Shapes/widgets/shape_display.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/features/Shapes/widgets/shape_selection.dart';
 
 import '../../core/helpers/tts_helper.dart';
@@ -20,11 +21,43 @@ class ShapeScreen extends StatefulWidget {
 }
 
 class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
+  TtsHelper? _ttsHelper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ttsHelper == null) {
+      final musicCubit = context.read<MusicCubit>();
+      final languageCode = Localizations.localeOf(context).languageCode;
+      _ttsHelper = TtsHelper(
+        musicCubit: musicCubit,
+        languageCode: languageCode,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _ttsHelper?.stop();
+    super.dispose();
+  }
+  String _localizedShapeName(BuildContext context, String shape) {
+    final l10n = AppLocalizations.of(context);
+    final map = {
+      'Square': l10n.square,
+      'Triangle': l10n.triangle,
+      'Circle': l10n.circle,
+      'Cylinder': l10n.cylinder,
+      'Diamond': l10n.diamond,
+      'Pentagon': l10n.pentagon,
+      'Hexagon': l10n.hexagon,
+      'Star': l10n.star,
+    };
+    return map[shape] ?? shape;
+  }
+
   @override
   Widget build(BuildContext context) {
-    final musicCubit = context.read<MusicCubit>();
-    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
-
     final screenWidth = MediaQuery.of(context).size.width;
 
     final int crossAxisCount = screenWidth < 600
@@ -40,9 +73,9 @@ class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
         listener: (context, state) {},
         builder: (context, state) {
           final cubit = context.watch<ShapeCubit>();
-          if (cubit.score == 80) ttsHelper.speak('Excellent!.');
+          final l10n = AppLocalizations.of(context);
+          if (cubit.score == 80) _ttsHelper?.speak(l10n.excellent);
           final matchedShapes = cubit.matchedShapes;
-          cubit.init();
           return cubit.score == 80
               ? CompleteScreen(
                   onPressedGameOVer: () {
@@ -97,7 +130,7 @@ class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
                                                 context
                                                     .read<ShapeCubit>()
                                                     .addMatch(temp);
-                                                ttsHelper.speak(data.shape);
+                                                _ttsHelper?.speak(_localizedShapeName(context, data.shape));
                                                 if (cubit.shapes.isEmpty) {
                                                   cubit.init();
                                                 }

@@ -1,54 +1,49 @@
-import 'package:flutter_tts/flutter_tts.dart';
-
 import '../services/cubit/music_cubit.dart';
+import 'tts_service.dart';
 
 class TtsHelper {
-  TtsHelper({required this.musicCubit}) {
+  TtsHelper({required this.musicCubit, this.languageCode = 'en'}) {
     _initTts();
   }
-  final FlutterTts _flutterTts = FlutterTts();
+
   final MusicCubit musicCubit;
+  final String languageCode;
+  
+  final TtsService _ttsService = TtsService();
 
-  Future<void> _initTts() async {
-    await _flutterTts.setLanguage('en-US');
-    await _flutterTts.setPitch(1.0);
+  bool _isInitCalled = false;
 
-    // Set up completion handler to resume music after TTS completes
-    _flutterTts.setCompletionHandler(() {
+  void _initTts() {
+    if (_isInitCalled) return;
+    _isInitCalled = true;
+    
+    _ttsService.init(languageCode: languageCode);
+
+    _ttsService.setCompletionHandler(() {
+      musicCubit.resumeMusic();
+    });
+
+    _ttsService.setErrorHandler((msg) {
       musicCubit.resumeMusic();
     });
   }
 
   Future<void> speak(String text) async {
+    if (text.isEmpty) return;
     try {
-      // Stop background music completely before speaking to avoid تداخل
       await musicCubit.stopMusic();
-
-      await _flutterTts.speak(text);
+      // Ensure language is correct for this specific speak call
+      await _ttsService.setLanguage(languageCode);
+      await _ttsService.speak(text);
     } catch (e) {
-      // Resume music even if TTS fails
       musicCubit.resumeMusic();
-      throw Exception('Error with TTS: $e');
     }
   }
 
   Future<void> stop() async {
     try {
-      await _flutterTts.stop();
-      // Resume music when TTS is stopped
+      await _ttsService.stop();
       musicCubit.resumeMusic();
-    } catch (e) {
-      throw Exception('Error stopping TTS: $e');
-    }
-  }
-
-  Future<void> getVoices() async {
-    try {
-      _flutterTts.getVoices.then((voices) {
-        throw Exception('Available Voices: $voices');
-      });
-    } catch (e) {
-      throw Exception('Error fetching voices: $e');
-    }
+    } catch (_) {}
   }
 }

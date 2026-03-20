@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 
 class NumberAppBar extends StatelessWidget {
   const NumberAppBar({super.key});
@@ -15,9 +16,9 @@ class NumberAppBar extends StatelessWidget {
                 Navigator.pop(context);
               },
               child: const Icon(Icons.arrow_back, size: 30,)),
-          const Text(
-            'Numbers',
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          Text(
+            AppLocalizations.of(context).numbers,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
           ),
         ],
       ),

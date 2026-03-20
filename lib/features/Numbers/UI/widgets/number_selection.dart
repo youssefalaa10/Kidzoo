@@ -6,16 +6,38 @@ import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzoo/features/Numbers/bloc/number_event.dart';
 import 'package:kidzoo/features/Numbers/data/model/number_model.dart';
 
-class NumberSelection extends StatelessWidget {
+class NumberSelection extends StatefulWidget {
   const NumberSelection({super.key});
 
   @override
+  State<NumberSelection> createState() => _NumberSelectionState();
+}
+
+class _NumberSelectionState extends State<NumberSelection> {
+  TtsHelper? _ttsHelper;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ttsHelper == null) {
+      final musicCubit = context.read<MusicCubit>();
+      final languageCode = Localizations.localeOf(context).languageCode;
+      _ttsHelper = TtsHelper(
+        musicCubit: musicCubit,
+        languageCode: languageCode,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _ttsHelper?.stop();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final musicCubit = context.read<MusicCubit>();
-    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
-
     final List<NumberModel> numbers = NumberModel.numbers;
-
     final screenWidth = MediaQuery.of(context).size.width;
 
     final int crossAxisCount = screenWidth < 600
@@ -42,7 +64,7 @@ class NumberSelection extends StatelessWidget {
           onTap: () {
             BlocProvider.of<NumberBloc>(context)
                 .add(SelectNumberEvent(number.num));
-            ttsHelper.speak(number.num);
+            _ttsHelper?.speak(number.getLocalizedName(context));
           },
           child: Padding(
             padding: const EdgeInsets.all(3.0),

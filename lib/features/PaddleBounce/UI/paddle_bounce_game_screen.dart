@@ -372,8 +372,8 @@ class _CenterLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.3)
-      ..strokeWidth = 2
+      ..color = Colors.white.withOpacity(0.15)
+      ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 
     // Draw dashed center line

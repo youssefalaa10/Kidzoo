@@ -1021,6 +1021,24 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         return AppLocalizations.of(context).text;
       case 'select':
         return AppLocalizations.of(context).select;
+      case 'circle':
+        return AppLocalizations.of(context).circle;
+      case 'square':
+        return AppLocalizations.of(context).square;
+      case 'rectangle':
+        return AppLocalizations.of(context).rectangle;
+      case 'triangle':
+        return AppLocalizations.of(context).triangle;
+      case 'pentagon':
+        return AppLocalizations.of(context).pentagon;
+      case 'heart':
+        return AppLocalizations.of(context).heart;
+      case 'diamond':
+        return AppLocalizations.of(context).diamond;
+      case 'star':
+        return AppLocalizations.of(context).star;
+      case 'cylinder':
+        return AppLocalizations.of(context).cylinder;
       default:
         return AppLocalizations.of(context).brush;
     }
@@ -1130,18 +1148,18 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           color: const Color(0xFF10B981),
           borderRadius: BorderRadius.circular(8),
         ),
-        child: const Row(
+        child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(
+            const Icon(
               Icons.save,
               color: Colors.white,
               size: 16,
             ),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             Text(
-              'Save',
-              style: TextStyle(
+              AppLocalizations.of(context).save,
+              style: const TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w600,
                 color: Colors.white,
@@ -1226,7 +1244,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save: $e'),
+            content: Text('${AppLocalizations.of(context).failedToSave}: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
           ),
@@ -1386,7 +1404,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                        '${AppLocalizations.of(context).size}: ${_shapeSize.toInt()}px'),
+                        '${AppLocalizations.of(context).size}: ${_shapeSize.toInt()}'),
                     Slider(
                       value: _shapeSize,
                       min: 20,
@@ -1555,7 +1573,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            child: Text(AppLocalizations.of(context).cancel),
           ),
           ElevatedButton(
             onPressed: () {

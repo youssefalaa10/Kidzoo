@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../localization/app_localizations.dart';
 
 /// A service to manage navigation protection for game screens
 class NavigationService {
@@ -52,21 +53,20 @@ class NavigationService {
   /// Check if navigation is allowed and show warning if not
   bool checkNavigationAllowed(BuildContext context) {
     if (!_isNavigatingFromLevelMap) {
+      final l10n = AppLocalizations.of(context);
       // Show warning dialog
-      showDialog(
+      showDialog<void>(
         context: context,
         builder: (context) => AlertDialog(
-          title: const Text('Navigation Not Allowed'),
-          content:
-              const Text('Games can only be accessed through the Level Map. '
-                  'Please go to the Level Map to play games.'),
+          title: Text(l10n.navigationNotAllowed),
+          content: Text(l10n.gamesOnlyThroughLevelMap),
           actions: [
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(context); // Close dialog
                 Navigator.pop(context); // Go back to previous screen
               },
-              child: const Text('Go Back'),
+              child: Text(l10n.goBack),
             ),
           ],
         ),

@@ -24,7 +24,7 @@ class NumberDisplay extends StatelessWidget {
         } else if (state is NumberLoadedState) {
           final numberModel = NumberModel.numbers.firstWhere(
             (model) => model.num == state.number,
-            orElse: () => NumberModel(num: '', imagePath: '', example: ''),
+            orElse: () => NumberModel(num: '', imagePath: '', example: '', exampleKey: ''),
           );
 
           return Column(
@@ -38,7 +38,7 @@ class NumberDisplay extends StatelessWidget {
                 ),
               const SizedBox(height: 20),
               Text(
-                '${state.number} = ${state.example}',
+                '${state.number} = ${numberModel.getLocalizedName(context)}',
                 style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,

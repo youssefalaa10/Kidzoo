@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:kidzoo/core/localization/app_localizations.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/features/DrawLab/data/models/drawing_model.dart';
 
@@ -127,17 +128,17 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   void _clearCanvas() {
+    final l10n = AppLocalizations.of(context);
     showDialog<void>(
       context: context,
       builder: (context) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: const Text('Clear Canvas'),
-        content: const Text(
-            'Are you sure you want to clear the canvas? This action cannot be undone.'),
+        title: Text(l10n.clearCanvas),
+        content: Text(l10n.clearCanvasConfirm),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Cancel'),
+            child: Text(l10n.cancel),
           ),
           TextButton(
             onPressed: () {
@@ -156,7 +157,7 @@ class _CanvasScreenState extends State<CanvasScreen>
               });
               _addToHistory(_drawingData);
             },
-            child: const Text('Clear'),
+            child: Text(l10n.clear),
           ),
         ],
       ),
@@ -164,15 +165,16 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   Future<void> _saveDrawing() async {
+    final l10n = AppLocalizations.of(context);
     try {
       // Implementation for saving drawing
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Drawing saved successfully!'),
-            backgroundColor: Color(0xFF10B981),
+          SnackBar(
+            content: Text(l10n.drawingSaved),
+            backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
           ),
@@ -182,7 +184,7 @@ class _CanvasScreenState extends State<CanvasScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save drawing: $e'),
+            content: Text('${l10n.failedToSave}: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape: const RoundedRectangleBorder(
@@ -195,15 +197,16 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   Future<void> _shareDrawing() async {
+    final l10n = AppLocalizations.of(context);
     try {
       // Implementation for sharing drawing
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Drawing shared successfully!'),
-            backgroundColor: Color(0xFF10B981),
+          SnackBar(
+            content: Text(l10n.drawingSaved),
+            backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
           ),
@@ -213,7 +216,7 @@ class _CanvasScreenState extends State<CanvasScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to share drawing: $e'),
+            content: Text('${l10n.failedToShare}: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape: const RoundedRectangleBorder(
@@ -515,7 +518,7 @@ class _CanvasScreenState extends State<CanvasScreen>
                   ListTile(
                     leading:
                         const Icon(Icons.grid_on, color: Color(0xFF6B7280)),
-                    title: const Text('Show Grid'),
+                    title: Text(AppLocalizations.of(context).showGrid),
                     trailing: Switch(
                       value: _showGrid,
                       onChanged: (value) {
@@ -573,7 +576,7 @@ class _CanvasScreenState extends State<CanvasScreen>
 
                   ListTile(
                     leading: const Icon(Icons.image, color: Color(0xFF6B7280)),
-                    title: const Text('Export as PNG'),
+                    title: Text(AppLocalizations.of(context).exportImage),
                     onTap: () async {
                       Navigator.of(context).pop();
                       await _exportAsPng();
@@ -583,7 +586,7 @@ class _CanvasScreenState extends State<CanvasScreen>
                   ListTile(
                     leading:
                         const Icon(Icons.save_alt, color: Color(0xFF6B7280)),
-                    title: const Text('Save to Gallery'),
+                    title: Text(AppLocalizations.of(context).saveToGallery),
                     onTap: () async {
                       Navigator.of(context).pop();
                       await _saveToGallery();
@@ -599,15 +602,16 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   Future<void> _exportAsPng() async {
+    final l10n = AppLocalizations.of(context);
     try {
       // Implementation for PNG export
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Image exported successfully!'),
-            backgroundColor: Color(0xFF10B981),
+          SnackBar(
+            content: Text(l10n.drawingExported),
+            backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
           ),
@@ -617,7 +621,7 @@ class _CanvasScreenState extends State<CanvasScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to export image: $e'),
+            content: Text('${l10n.failedToExport}: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape: const RoundedRectangleBorder(
@@ -630,15 +634,16 @@ class _CanvasScreenState extends State<CanvasScreen>
   }
 
   Future<void> _saveToGallery() async {
+    final l10n = AppLocalizations.of(context);
     try {
       // Implementation for saving to gallery
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Image saved to gallery!'),
-            backgroundColor: Color(0xFF10B981),
+          SnackBar(
+            content: Text(l10n.drawingSaved),
+            backgroundColor: const Color(0xFF10B981),
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
+            shape: const RoundedRectangleBorder(
               borderRadius: BorderRadius.all(Radius.circular(12)),
             ),
           ),
@@ -648,7 +653,7 @@ class _CanvasScreenState extends State<CanvasScreen>
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to save image: $e'),
+            content: Text('${l10n.failedToSave}: $e'),
             backgroundColor: const Color(0xFFEF4444),
             behavior: SnackBarBehavior.floating,
             shape: const RoundedRectangleBorder(

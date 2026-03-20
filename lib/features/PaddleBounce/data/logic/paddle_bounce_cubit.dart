@@ -29,7 +29,9 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
     _boopPlayer.setPlayerMode(PlayerMode.lowLatency);
   }
   Timer? _gameLoopTimer;
-  static const double _ballSpeed = 4.0;
+  static const double _initialBallSpeed = 4.0;
+  static const double _maxBallSpeed = 10.0;
+  static const double _speedIncreaseFactor = 1.05; // 5% increase per bounce
   static const double _paddleSpeed = 6.0;
   static const double _paddlePadding = 20.0; // Padding from screen edges
   static const double _topPaddlePaddingFriend =
@@ -61,8 +63,8 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       emit(state.copyWith(
         status: PaddleBounceGameStatus.playing,
         ball: state.ball.copyWith(
-          velocityX: direction * _ballSpeed * math.cos(angle),
-          velocityY: _ballSpeed * math.sin(angle),
+          velocityX: direction * _initialBallSpeed * math.cos(angle),
+          velocityY: _initialBallSpeed * math.sin(angle),
         ),
       ));
       // no sound for game_start
@@ -158,10 +160,13 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       final hitPosition = newBallX - state.topPaddle.x;
       final angle =
           state.ball.calculateBounceAngle(hitPosition, state.topPaddle.width);
-      final speed =
+      final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
-      newVelocityX = speed * math.sin(angle);
-      newVelocityY = speed * math.cos(angle);
+      // Increase speed on each bounce up to max
+      final nextSpeed = (currentSpeed * _speedIncreaseFactor).clamp(_initialBallSpeed, _maxBallSpeed);
+      
+      newVelocityX = nextSpeed * math.sin(angle);
+      newVelocityY = nextSpeed * math.cos(angle);
       newBallY = state.topPaddle.height + state.ball.radius + topPaddlePadding;
       _playBoop();
     }
@@ -175,10 +180,13 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       final hitPosition = newBallX - state.bottomPaddle.x;
       final angle = state.ball
           .calculateBounceAngle(hitPosition, state.bottomPaddle.width);
-      final speed =
+      final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
-      newVelocityX = speed * math.sin(angle);
-      newVelocityY = -speed * math.cos(angle);
+      // Increase speed on each bounce up to max
+      final nextSpeed = (currentSpeed * _speedIncreaseFactor).clamp(_initialBallSpeed, _maxBallSpeed);
+
+      newVelocityX = nextSpeed * math.sin(angle);
+      newVelocityY = -nextSpeed * math.cos(angle);
       newBallY = state.screenHeight -
           state.bottomPaddle.height -
           state.ball.radius -
@@ -273,7 +281,11 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
     final distance = targetX - currentCenter;
     final moveDistance = distance * reactionDelay * accuracy;
 
-    final newX = (aiPaddle.x + moveDistance * 0.3).clamp(
+    // Scale AI reaction speed based on current ball speed to keep it challenging
+    final currentBallSpeed = math.sqrt(state.ball.velocityX * state.ball.velocityX + state.ball.velocityY * state.ball.velocityY);
+    final speedMultiplier = (currentBallSpeed / _initialBallSpeed).clamp(1.0, 1.5);
+    
+    final newX = (aiPaddle.x + moveDistance * 0.3 * speedMultiplier).clamp(
         _paddlePadding, state.screenWidth - aiPaddle.width - _paddlePadding);
 
     if ((newX - aiPaddle.x).abs() > 0.5) {

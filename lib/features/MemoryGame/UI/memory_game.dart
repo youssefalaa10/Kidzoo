@@ -1,8 +1,7 @@
 import 'dart:async';
 import 'dart:math';
-
 import 'package:flutter/material.dart';
-
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/base/protected_game_screen.dart';
 
 enum GameLevel {
@@ -274,6 +273,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Container(
         decoration: const BoxDecoration(
@@ -293,7 +293,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Memory Game',
+                      l10n.memoryGame,
                       style: TextStyle(
                         color: Colors.blueGrey[800],
                         fontSize: 24,
@@ -328,9 +328,9 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildInfoCard('Time', _timeElapsed),
-                    _buildInfoCard('Moves', _moves.toString()),
-                    _buildInfoCard('Pairs', '$_pairs/$_totalPairs'),
+                    _buildInfoCard(l10n.time, _timeElapsed),
+                    _buildInfoCard(l10n.moves, _moves.toString()),
+                    _buildInfoCard(l10n.pairs, '$_pairs/$_totalPairs'),
                   ],
                 ),
               ),
@@ -379,7 +379,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 Text(
-                                  '🎉 Congratulations! 🎉',
+                                  l10n.memoryGameCongrats,
                                   style: TextStyle(
                                     color: Colors.blueGrey[800],
                                     fontSize: 24,
@@ -388,7 +388,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                 ),
                                 const SizedBox(height: 16),
                                 Text(
-                                  'You completed the game in:',
+                                  l10n.memoryGameTimeResult,
                                   style: TextStyle(
                                     color: Colors.blueGrey[600],
                                     fontSize: 16,
@@ -405,7 +405,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Total Moves: $_moves',
+                                  l10n.totalMovesLabel(_moves),
                                   style: TextStyle(
                                     color: Colors.blueGrey[600],
                                     fontSize: 16,
@@ -428,9 +428,9 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                                 BorderRadius.circular(30),
                                           ),
                                         ),
-                                        child: const Text(
-                                          'Play Again',
-                                          style: TextStyle(fontSize: 14),
+                                        child: Text(
+                                          l10n.playAgain,
+                                          style: const TextStyle(fontSize: 14),
                                         ),
                                       ),
                                     ),
@@ -451,9 +451,9 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                                 BorderRadius.circular(30),
                                           ),
                                         ),
-                                        child: const Text(
-                                          'Continue',
-                                          style: TextStyle(fontSize: 14),
+                                        child: Text(
+                                          l10n.continueText,
+                                          style: const TextStyle(fontSize: 14),
                                         ),
                                       ),
                                     ),

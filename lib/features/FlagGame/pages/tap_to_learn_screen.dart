@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:kidzoo/core/helpers/tts_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzoo/core/helpers/tts_helper.dart';
@@ -25,8 +26,25 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
   @override
   void initState() {
     super.initState();
-    _ttsHelper = TtsHelper(musicCubit: context.read<MusicCubit>());
     countries = FlagDataManager.countries;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final lang = Localizations.localeOf(context).languageCode;
+        if (lang == 'ar') {
+          TtsService.checkAndRequestArabicVoice(context);
+        }
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageCode = Localizations.localeOf(context).languageCode;
+    _ttsHelper = TtsHelper(
+      musicCubit: context.read<MusicCubit>(),
+      languageCode: languageCode,
+    );
   }
 
   void _showCountryDialog(Country country) {

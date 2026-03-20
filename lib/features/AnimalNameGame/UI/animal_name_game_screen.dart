@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tts/flutter_tts.dart';
+import 'package:kidzoo/core/helpers/tts_service.dart';
 import 'package:kidzoo/core/mixins/background_music_mixin.dart';
 import 'package:kidzoo/core/services/cubit/music_cubit.dart';
 import 'package:kidzoo/core/localization/app_localizations.dart';
@@ -43,35 +43,43 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   }
 
   // Current round animals in board order (drop targets)
-  late List<AnimalNameModel> _boardAnimals;
+  List<AnimalNameModel>? _boardAnimals;
 
   // Which board slots are filled (matched)
-  late List<bool> _isFilled;
+  List<bool> _isFilled = [];
 
   // Which draggable items have been placed (hide them from the tray)
-  late List<bool> _isPlaced;
+  List<bool> _isPlaced = [];
 
   // Shuffled draggable order (same set, different order)
-  late List<AnimalNameModel> _trayAnimals;
+  List<AnimalNameModel>? _trayAnimals;
 
-  late FlutterTts _flutterTts;
   bool _isComplete = false;
+  final TtsService _ttsService = TtsService();
 
   @override
   void initState() {
     super.initState();
-    _flutterTts = FlutterTts();
-    _initTts();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _startNewRound();
+      if (mounted) {
+        final lang = Localizations.localeOf(context).languageCode;
+        if (lang == 'ar') {
+          // Check if Arabic voice is installed, and request if not
+          TtsService.checkAndRequestArabicVoice(context);
+        }
+        _ttsService.init(languageCode: lang);
+        _ttsService.setCompletionHandler(() {
+          if (mounted) context.read<MusicCubit>().resumeMusic();
+        });
+        _ttsService.setErrorHandler((msg) {
+          if (mounted) context.read<MusicCubit>().resumeMusic();
+          print("TTS Error: $msg");
+        });
+        _startNewRound();
+      }
     });
   }
 
-  Future<void> _initTts() async {
-    await _flutterTts.setLanguage('en-US');
-    await _flutterTts.setPitch(1.0);
-    await _flutterTts.setSpeechRate(0.5);
-  }
 
   void _startNewRound() {
     final Random rng = Random();
@@ -90,18 +98,18 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   }
 
   Future<void> _speakAnimalName(String name) async {
-    final MusicCubit musicCubit = context.read<MusicCubit>();
+    final musicCubit = context.read<MusicCubit>();
     await musicCubit.stopMusic();
-    await _flutterTts.speak(name);
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) musicCubit.resumeMusic();
-    });
+    
+    final languageCode = Localizations.localeOf(context).languageCode;
+    await _ttsService.setLanguage(languageCode);
+    await _ttsService.speak(name);
   }
 
   void _onCorrectMatch(AnimalNameModel animal) {
     _speakAnimalName(animal.name);
-    final int boardIdx = _boardAnimals.indexOf(animal);
-    final int trayIdx = _trayAnimals.indexOf(animal);
+    final int boardIdx = _boardAnimals!.indexOf(animal);
+    final int trayIdx = _trayAnimals!.indexOf(animal);
     setState(() {
       _isFilled[boardIdx] = true;
       _isPlaced[trayIdx] = true;
@@ -113,7 +121,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
 
   @override
   void dispose() {
-    _flutterTts.stop();
+    _ttsService.stop();
     super.dispose();
   }
 
@@ -123,15 +131,18 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
       body: Stack(
         children: [
           _buildBackground(),
-          SafeArea(
-            child: Column(
-              children: [
-                _buildAppBar(),
-                const SizedBox(height: 12),
-                Expanded(child: _buildGameArea()),
-              ],
+          if (_boardAnimals == null)
+            const Center(child: CircularProgressIndicator())
+          else
+            SafeArea(
+              child: Column(
+                children: [
+                  _buildAppBar(),
+                  const SizedBox(height: 12),
+                  Expanded(child: _buildGameArea()),
+                ],
+              ),
             ),
-          ),
           if (_isComplete)
             AnimalNameSuccessOverlay(onPlayAgain: _startNewRound),
         ],
@@ -260,9 +271,9 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
           runSpacing: 16,
           children: List.generate(_roundSize, (i) {
             return _BoardSlot(
-              animal: _boardAnimals[i],
+              animal: _boardAnimals![i],
               isFilled: _isFilled[i],
-              onCorrectDrop: () => _onCorrectMatch(_boardAnimals[i]),
+              onCorrectDrop: () => _onCorrectMatch(_boardAnimals![i]),
             );
           }),
         ),
@@ -299,7 +310,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
           runSpacing: 8,
           children: List.generate(_roundSize, (i) {
             return _TrayItem(
-              animal: _trayAnimals[i],
+              animal: _trayAnimals![i],
               isPlaced: _isPlaced[i],
             );
           }),

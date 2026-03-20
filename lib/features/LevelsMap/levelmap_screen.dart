@@ -34,6 +34,7 @@ class LevelMapScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: BlocProvider(
         create: (context) => LevelCubit(),
@@ -73,7 +74,7 @@ class LevelMapScreen extends StatelessWidget {
                           ],
                         ),
                         child: Text(
-                          'Current Level: ${state.currentLevelId}',
+                          l10n.currentLevelLabel(state.currentLevelId),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
@@ -138,7 +139,7 @@ class LevelMapScreen extends StatelessWidget {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
                                       content: Text(
-                                          'Level ${level.id} is locked! Complete previous levels first.'),
+                                          l10n.lockedLevelMessage(level.id)),
                                     ),
                                   );
                                 }
@@ -166,18 +167,18 @@ class LevelMapScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text(
-                              'Game Types:',
-                              style: TextStyle(fontWeight: FontWeight.bold),
+                            Text(
+                              l10n.gameTypesLabel,
+                              style: const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
-                            _buildLegendItem(Colors.red, 'Animal Quiz'),
-                            _buildLegendItem(Colors.blue, 'Memory Game'),
-                            _buildLegendItem(Colors.purple, 'Color Memory'),
-                            _buildLegendItem(Colors.green, 'Puzzle'),
-                            _buildLegendItem(Colors.orange, 'Math Game'),
+                            _buildLegendItem(Colors.red, l10n.animalNameGame),
+                            _buildLegendItem(Colors.blue, l10n.memoryGame),
+                            _buildLegendItem(Colors.purple, l10n.colorMemory),
+                            _buildLegendItem(Colors.green, l10n.puzzleFrame),
+                            _buildLegendItem(Colors.orange, l10n.mathMagic),
                             _buildLegendItem(
-                                const Color(0xFF8B4513), 'Maze Game'),
+                                const Color(0xFF8B4513), l10n.mazeGame),
                           ],
                         ),
                       ),
@@ -322,7 +323,7 @@ class LevelMapScreen extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      'Level ${level.id}',
+                      l10n.levelLabel(level.id),
                       style: TextStyle(
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
@@ -381,7 +382,7 @@ class LevelMapScreen extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        'Difficulty: Level ${gameSequenceItem.level}',
+                        l10n.difficultyLevel(gameSequenceItem.level),
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,

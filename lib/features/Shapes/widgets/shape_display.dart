@@ -11,7 +11,8 @@ class ShapeDisplay extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final musicCubit = context.read<MusicCubit>();
-    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit);
+    final languageCode = Localizations.localeOf(context).languageCode;
+    final TtsHelper ttsHelper = TtsHelper(musicCubit: musicCubit, languageCode: languageCode);
     final screenWidth = MediaQuery.of(context).size.width;
     final int selectionCrossAxisCount = screenWidth < 600
         ? 1
