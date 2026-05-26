@@ -16,6 +16,9 @@ class TtsService {
   bool _isInitialized = false;
   bool _isInitializing = false;
 
+  bool get isInitialized => _isInitialized;
+  String get currentLanguage => _currentLanguage;
+
   Future<void> init({String languageCode = 'en'}) async {
     if (_isInitialized && _currentLanguage == languageCode) return;
     if (_isInitializing) return;
@@ -72,12 +75,6 @@ class TtsService {
   Future<void> speak(String text) async {
     if (text.isEmpty) return;
     try {
-      // Stop any ongoing speech first
-      await _tts.stop();
-
-      // Re-apply language before every speak call to be safe
-      await _applyLanguage(_currentLanguage);
-
       await _tts.speak(text);
     } catch (e) {
       debugPrint('TTS speak error: $e');

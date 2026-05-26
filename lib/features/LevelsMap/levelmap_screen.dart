@@ -22,7 +22,10 @@ class LevelCompletionManager {
 
     // Save progress to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('highest_unlocked_level', nextLevelId);
+    final currentHighest = prefs.getInt('highest_unlocked_level') ?? 1;
+    if (nextLevelId > currentHighest) {
+      await prefs.setInt('highest_unlocked_level', nextLevelId);
+    }
   }
 }
 
@@ -74,7 +77,7 @@ class LevelMapScreen extends StatelessWidget {
                           ],
                         ),
                         child: Text(
-                          l10n.currentLevelLabel(state.currentLevelId),
+                          l10n.currentLevelLabel(state.highestUnlockedLevelId),
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,

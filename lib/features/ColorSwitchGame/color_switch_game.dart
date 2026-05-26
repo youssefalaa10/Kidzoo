@@ -127,6 +127,8 @@ class ColorSwitchGame extends FlameGame
     generateGameComponents();
   }
 
+  String _lastSpokenColor = '';
+
   void updateColorName() {
     try {
       if (!isLoaded || colorNameText == null) return;
@@ -139,8 +141,11 @@ class ColorSwitchGame extends FlameGame
           fontWeight: FontWeight.bold,
         ),
       );
-      // Speak immediately using the already-resolved name
-      _speakColorName(name);
+      // Always speak the new color name (even if TTS needs re-init)
+      if (name != _lastSpokenColor) {
+        _lastSpokenColor = name;
+        _speakColorName(name);
+      }
     } catch (_) {}
   }
 
@@ -148,9 +153,12 @@ class ColorSwitchGame extends FlameGame
     if (buildContext == null) return;
     try {
       final lang = Localizations.localeOf(buildContext!).languageCode;
+      // Let TtsService handle redundant init checks internally
       await _ttsService.init(languageCode: lang);
       await _ttsService.speak(name);
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Error speaking color name: $e');
+    }
   }
 
   /// Called by [ColorSwitchScreen] when the start overlay is dismissed
@@ -165,23 +173,47 @@ class ColorSwitchGame extends FlameGame
 
   void incrementScore() {
     score++;
-    
+
     if (buildContext != null) {
-      final isSoundEnabled = buildContext!.read<MusicCubit>().state.isSoundEnabled;
+      final isSoundEnabled =
+          buildContext!.read<MusicCubit>().state.isSoundEnabled;
       if (isSoundEnabled) {
         sfxPlayer.play(AssetSource('audio/score.mp3'));
       }
     }
 
     if (score == 10) {
-      gameColors = List.from(_advancedColors);
-      // Let the Player update its color to match advanced colors
+      _switchToAdvancedColors();
     }
 
     if (scoreText != null && buildContext != null) {
       scoreText!.text =
           '${AppLocalizations.of(buildContext!).scoreLabel}: $score';
     }
+  }
+
+  /// Transitions gameplay to advanced colors:
+  /// - Updates the gameColors palette.
+  /// - Rebuilds all existing CircleRotators with new colors.
+  /// - Reassigns the player to a color from the new palette.
+  void _switchToAdvancedColors() {
+    gameColors = List.from(_advancedColors);
+
+    // Rebuild all existing CircleRotators so they show advanced colors
+    final rotators = world.children.whereType<CircleRotator>().toList();
+    for (final rotator in rotators) {
+      rotator.removeFromParent();
+      world.add(CircleRotator(
+        position: rotator.position,
+        size: Vector2(200, 200),
+      ));
+    }
+
+    // Assign player a valid advanced color immediately
+    final shuffled = List<Color>.from(_advancedColors)..shuffle();
+    myPlayer.color = shuffled.first;
+    _lastSpokenColor = '';
+    updateColorName();
   }
 
   @override
