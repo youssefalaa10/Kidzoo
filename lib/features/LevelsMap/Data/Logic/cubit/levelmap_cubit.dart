@@ -1,9 +1,10 @@
+import 'dart:math' as math;
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Model/game_sequence_model.dart';
 import '../Model/level_model.dart';
-import '../Model/map_stage_model.dart';
 
 class LevelMapState {
   LevelMapState({
@@ -43,154 +44,116 @@ class LevelCubit extends Cubit<LevelMapState> {
   static const String _prefKeyCurrentLevel = 'current_level';
 
   Future<void> _initializeLevels() async {
-    // Load saved progress from SharedPreferences
     final prefs = await SharedPreferences.getInstance();
     final highestUnlockedLevelId = prefs.getInt(_prefKeyHighestLevel) ?? 1;
     final currentLevelId = prefs.getInt(_prefKeyCurrentLevel) ?? 1;
 
-    // Get all stages with their fixed mapping
-    final allStages = StageMapping.getAllStages();
+    emit(LevelMapState(
+      levels: _buildLevels(highestUnlockedLevelId),
+      currentLevelId: currentLevelId,
+      highestUnlockedLevelId: highestUnlockedLevelId,
+    ));
+  }
 
-    // Update stages lock status based on highest unlocked level
-    for (var stage in allStages) {
-      if (stage.stageNumber <= highestUnlockedLevelId) {
-        stage = stage.copyWith(isLocked: false);
-      }
-    }
-
-    final initialLevels = [
-      // Stage 1: Animal Quiz Level 1
+  List<Level> _buildLevels(int highestUnlockedLevelId) {
+    return [
       Level(id: 1, phase: 1, isLocked: false, positionX: 180, positionY: 70),
-
-      // Stage 2: Memory Game Level 1
       Level(
           id: 2,
           phase: 1,
           isLocked: highestUnlockedLevelId < 2,
           positionX: 160,
           positionY: 170),
-
-      // Stage 3: Color Memory Level 1
       Level(
           id: 3,
           phase: 1,
           isLocked: highestUnlockedLevelId < 3,
           positionX: 100,
           positionY: 300),
-
-      // Stage 4: Puzzle Level 1
       Level(
           id: 4,
           phase: 1,
           isLocked: highestUnlockedLevelId < 4,
           positionX: 110,
           positionY: 400),
-
-      // Stage 5: Math Game Level 1
       Level(
           id: 5,
           phase: 1,
           isLocked: highestUnlockedLevelId < 5,
           positionX: 160,
           positionY: 530),
-
-      // Stage 6: Maze Game Level 1
       Level(
           id: 6,
           phase: 1,
           isLocked: highestUnlockedLevelId < 6,
           positionX: 150,
           positionY: 650),
-
-      // Stage 7: Animal Quiz Level 2
       Level(
           id: 7,
           phase: 2,
           isLocked: highestUnlockedLevelId < 7,
           positionX: 130,
           positionY: 800),
-
-      // Stage 8: Memory Game Level 2
       Level(
           id: 8,
           phase: 2,
           isLocked: highestUnlockedLevelId < 8,
           positionX: 160,
           positionY: 900),
-
-      // Stage 9: Color Memory Level 2
       Level(
           id: 9,
           phase: 2,
           isLocked: highestUnlockedLevelId < 9,
           positionX: 160,
           positionY: 1000),
-
-      // Stage 10: Puzzle Level 2
       Level(
           id: 10,
           phase: 2,
           isLocked: highestUnlockedLevelId < 10,
           positionX: 160,
           positionY: 1100),
-
-      // Stage 11: Math Game Level 2
       Level(
           id: 11,
           phase: 2,
           isLocked: highestUnlockedLevelId < 11,
           positionX: 110,
           positionY: 1200),
-
-      // Stage 12: Maze Game Level 2
       Level(
           id: 12,
           phase: 2,
           isLocked: highestUnlockedLevelId < 12,
           positionX: 150,
           positionY: 1330),
-
-      // Stage 13: Animal Quiz Level 3
       Level(
           id: 13,
           phase: 3,
           isLocked: highestUnlockedLevelId < 13,
           positionX: 180,
           positionY: 1470),
-
-      // Stage 14: Memory Game Level 3
       Level(
           id: 14,
           phase: 3,
           isLocked: highestUnlockedLevelId < 14,
           positionX: 130,
           positionY: 1600),
-
-      // Stage 15: Color Memory Level 3
       Level(
           id: 15,
           phase: 3,
           isLocked: highestUnlockedLevelId < 15,
           positionX: 160,
           positionY: 1720),
-
-      // Stage 16: Puzzle Level 3
       Level(
           id: 16,
           phase: 3,
           isLocked: highestUnlockedLevelId < 16,
           positionX: 120,
           positionY: 1840),
-
-      // Stage 17: Math Game Level 3
       Level(
           id: 17,
           phase: 3,
           isLocked: highestUnlockedLevelId < 17,
           positionX: 150,
           positionY: 1960),
-
-      // Stage 18: Maze Game Level 3 (Final Stage)
       Level(
           id: 18,
           phase: 3,
@@ -198,12 +161,6 @@ class LevelCubit extends Cubit<LevelMapState> {
           positionX: 180,
           positionY: 2080),
     ];
-
-    emit(LevelMapState(
-      levels: initialLevels,
-      currentLevelId: currentLevelId,
-      highestUnlockedLevelId: highestUnlockedLevelId,
-    ));
   }
 
   // Get the current game sequence item based on the current level ID
@@ -265,32 +222,32 @@ class LevelCubit extends Cubit<LevelMapState> {
     return GameSequence.getTotalStages();
   }
 
-  // Unlock a specific level
+  // Unlock progress up to [levelId]; never regress saved progress.
   Future<void> unlockLevel(int levelId) async {
-    final updatedLevels = state.levels.map((level) {
-      if (level.id == levelId) {
-        return level.copyWith(isLocked: false);
-      }
-      return level;
-    }).toList();
+    final prefs = await SharedPreferences.getInstance();
+    final savedHighest = prefs.getInt(_prefKeyHighestLevel) ?? 1;
+    final highestUnlockedLevelId = math.max(
+      math.max(state.highestUnlockedLevelId, savedHighest),
+      levelId,
+    );
 
-    // Update highest unlocked level if needed
-    int highestUnlockedLevelId = state.highestUnlockedLevelId;
-    if (levelId > highestUnlockedLevelId) {
-      highestUnlockedLevelId = levelId;
-
-      // Save progress to SharedPreferences
-      final prefs = await SharedPreferences.getInstance();
+    if (highestUnlockedLevelId > savedHighest) {
       await prefs.setInt(_prefKeyHighestLevel, highestUnlockedLevelId);
     }
+
+    final updatedLevels = state.levels.isEmpty
+        ? _buildLevels(highestUnlockedLevelId)
+        : state.levels
+            .map(
+              (level) => level.copyWith(
+                isLocked: level.id > highestUnlockedLevelId,
+              ),
+            )
+            .toList();
 
     emit(state.copyWith(
       levels: updatedLevels,
       highestUnlockedLevelId: highestUnlockedLevelId,
     ));
-
-    // Verify the level is actually unlocked
-    final unlockedLevel =
-        updatedLevels.firstWhere((level) => level.id == levelId);
   }
 }

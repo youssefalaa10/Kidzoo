@@ -48,6 +48,13 @@ class ShapeCubit extends Cubit<ShapeStates> {
 
   void addMatch(String shapeTemp) {
     matchedShapes.add(shapeTemp);
+    shuffleLayout();
     emit(ShapeMatched());
+  }
+
+  /// Re-randomize drop targets and remaining draggable shapes after each match.
+  void shuffleLayout() {
+    temps.shuffle(Random());
+    shapes.shuffle(Random());
   }
 }

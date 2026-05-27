@@ -17,14 +17,16 @@ class LevelCompletionManager {
   static final LevelCompletionManager _instance =
       LevelCompletionManager._internal();
 
+  static const String _prefKeyHighestLevel = 'highest_unlocked_level';
+
   Future<void> completeLevel(int levelId) async {
     final nextLevelId = GameSequence.getNextStageNumber(levelId);
 
-    // Save progress to SharedPreferences
     final prefs = await SharedPreferences.getInstance();
-    final currentHighest = prefs.getInt('highest_unlocked_level') ?? 1;
+    final currentHighest = prefs.getInt(_prefKeyHighestLevel) ?? 1;
+    // Only advance progress — replaying an earlier level must not lower it.
     if (nextLevelId > currentHighest) {
-      await prefs.setInt('highest_unlocked_level', nextLevelId);
+      await prefs.setInt(_prefKeyHighestLevel, nextLevelId);
     }
   }
 }
@@ -446,11 +448,8 @@ class LevelMapScreen extends StatelessWidget {
                                                 stageNumber: level.id)
                                             .then((result) {
                                           if (result == true) {
-                                            LevelCompletionManager()
-                                                .completeLevel(level.id)
-                                                .then((_) {
-                                              levelCubit.completeLevel(level.id);
-                                            });
+                                            _onLevelCompleted(
+                                                level.id, levelCubit);
                                           }
                                         });
                                       },
@@ -622,15 +621,7 @@ class LevelMapScreen extends StatelessWidget {
                                   .then((result) {
                                 // Check if the game was completed (result == true)
                                 if (result == true) {
-                                  // Use the global completion manager
-                                  LevelCompletionManager()
-                                      .completeLevel(level.id)
-                                      .then((_) {
-                                    // Refresh the level map using the captured cubit
-                                    levelCubit.completeLevel(level.id);
-                                  });
-                                } else {
-                                  print('DEBUG: Game not completed');
+                                  _onLevelCompleted(level.id, levelCubit);
                                 }
                               });
                             },
@@ -677,5 +668,8 @@ class LevelMapScreen extends StatelessWidget {
     );
   }
 
-  // Unused dialogs removed to avoid warnings
+  Future<void> _onLevelCompleted(int levelId, LevelCubit cubit) async {
+    await LevelCompletionManager().completeLevel(levelId);
+    await cubit.completeLevel(levelId);
+  }
 }
