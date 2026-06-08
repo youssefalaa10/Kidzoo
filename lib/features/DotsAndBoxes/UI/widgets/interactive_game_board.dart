@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 
 import '../../data/models/dots_and_boxes_models.dart';
@@ -20,6 +22,9 @@ class InteractiveGameBoard extends StatefulWidget {
 
 class _InteractiveGameBoardState extends State<InteractiveGameBoard>
     with SingleTickerProviderStateMixin {
+  /// Minimum touch target (Material / kid-friendly).
+  static const double _minTouchTarget = 52;
+
   Line? _hoveredLine;
   late AnimationController _animationController;
   late Animation<double> _animation;
@@ -74,11 +79,12 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
         height: totalSize,
         padding: EdgeInsets.all(dotRadius),
         child: GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTapUp: (details) =>
               _handleTap(details.localPosition, cellSize, dotRadius),
           onPanUpdate: (details) =>
               _handleHover(details.localPosition, cellSize, dotRadius),
-          onPanEnd: (_) => _clearHover(),
+          onPanEnd: (_) => _handlePanEnd(),
           child: MouseRegion(
             onHover: (event) =>
                 _handleHover(event.localPosition, cellSize, dotRadius),
@@ -105,8 +111,15 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
   }
 
   void _handleTap(Offset position, double cellSize, double dotRadius) {
-    final line = _getLineFromPosition(position, cellSize, dotRadius);
+    _tryDrawLine(_getLineFromPosition(position, cellSize, dotRadius));
+  }
 
+  void _handlePanEnd() {
+    _tryDrawLine(_hoveredLine);
+    _clearHover();
+  }
+
+  void _tryDrawLine(Line? line) {
     if (line != null && !widget.state.isLineDrawn(line)) {
       widget.onLineTapped(line.start, line.end);
     }
@@ -130,23 +143,27 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
     }
   }
 
+  double _hitPadding(double cellSize, double dotRadius) {
+    return math.max(dotRadius * 4, _minTouchTarget / 2);
+  }
+
   Line? _getLineFromPosition(
       Offset position, double cellSize, double dotRadius) {
+    final padding = _hitPadding(cellSize, dotRadius);
     final dotsPerSide = widget.state.dotsPerSide;
 
-    // Check horizontal lines
+    // 1) Generous rectangular hit zones (easy for small fingers)
     for (int row = 0; row < dotsPerSide; row++) {
       for (int col = 0; col < dotsPerSide - 1; col++) {
         final lineStartX = col * cellSize;
         final lineEndX = (col + 1) * cellSize;
         final lineY = row * cellSize;
 
-        // Create a hit area around the line
         final hitArea = Rect.fromLTRB(
-          lineStartX - dotRadius,
-          lineY - dotRadius * 1.5,
-          lineEndX + dotRadius,
-          lineY + dotRadius * 1.5,
+          lineStartX - padding,
+          lineY - padding,
+          lineEndX + padding,
+          lineY + padding,
         );
 
         if (hitArea.contains(position)) {
@@ -158,19 +175,17 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
       }
     }
 
-    // Check vertical lines
     for (int row = 0; row < dotsPerSide - 1; row++) {
       for (int col = 0; col < dotsPerSide; col++) {
         final lineX = col * cellSize;
         final lineStartY = row * cellSize;
         final lineEndY = (row + 1) * cellSize;
 
-        // Create a hit area around the line
         final hitArea = Rect.fromLTRB(
-          lineX - dotRadius * 1.5,
-          lineStartY - dotRadius,
-          lineX + dotRadius * 1.5,
-          lineEndY + dotRadius,
+          lineX - padding,
+          lineStartY - padding,
+          lineX + padding,
+          lineEndY + padding,
         );
 
         if (hitArea.contains(position)) {
@@ -182,6 +197,61 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
       }
     }
 
-    return null;
+    // 2) Snap to the nearest undrawn line within reach
+    return _findNearestLine(position, cellSize, padding * 1.2);
+  }
+
+  Line? _findNearestLine(Offset position, double cellSize, double maxDistance) {
+    final dotsPerSide = widget.state.dotsPerSide;
+    Line? nearest;
+    var nearestDist = maxDistance;
+
+    for (int row = 0; row < dotsPerSide; row++) {
+      for (int col = 0; col < dotsPerSide - 1; col++) {
+        final line = Line(DotPosition(row, col), DotPosition(row, col + 1));
+        if (widget.state.isLineDrawn(line)) continue;
+
+        final dist = _distanceToSegment(
+          position,
+          Offset(col * cellSize, row * cellSize),
+          Offset((col + 1) * cellSize, row * cellSize),
+        );
+        if (dist < nearestDist) {
+          nearestDist = dist;
+          nearest = line;
+        }
+      }
+    }
+
+    for (int row = 0; row < dotsPerSide - 1; row++) {
+      for (int col = 0; col < dotsPerSide; col++) {
+        final line = Line(DotPosition(row, col), DotPosition(row + 1, col));
+        if (widget.state.isLineDrawn(line)) continue;
+
+        final dist = _distanceToSegment(
+          position,
+          Offset(col * cellSize, row * cellSize),
+          Offset(col * cellSize, (row + 1) * cellSize),
+        );
+        if (dist < nearestDist) {
+          nearestDist = dist;
+          nearest = line;
+        }
+      }
+    }
+
+    return nearest;
+  }
+
+  double _distanceToSegment(Offset point, Offset start, Offset end) {
+    final dx = end.dx - start.dx;
+    final dy = end.dy - start.dy;
+    final lengthSq = dx * dx + dy * dy;
+    if (lengthSq == 0) return (point - start).distance;
+
+    var t = ((point.dx - start.dx) * dx + (point.dy - start.dy) * dy) / lengthSq;
+    t = t.clamp(0.0, 1.0);
+    final projection = Offset(start.dx + t * dx, start.dy + t * dy);
+    return (point - projection).distance;
   }
 }

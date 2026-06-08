@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
 
 import '../../../core/helpers/media_query.dart';
 import 'widgets/header_section.dart';

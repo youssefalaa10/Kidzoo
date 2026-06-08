@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/helpers/media_query.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/helpers/media_query.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
 
 import 'app_category_options.dart';
 import 'header_section.dart';

@@ -1,6 +1,6 @@
 import 'dart:math';
 import 'package:bloc/bloc.dart';
-import 'package:kidzoo/features/MathGame/Data/Logic/cubit/math_game_state.dart';
+import 'package:kidzo/features/MathGame/Data/Logic/cubit/math_game_state.dart';
 
 class MathGameCubit extends Cubit<MathGameState> {
   MathGameCubit({this.operation = 'ayu', this.level = 1})
@@ -23,16 +23,21 @@ class MathGameCubit extends Cubit<MathGameState> {
     final int minNumber = level == 1 ? 1 : (level == 2 ? 5 : 10);
 
     // Operations list: addition, subtraction, multiplication, division
-    final List<String> operations = ['addition', 'subtraction', 'multiplication', 'division'];
+    final List<String> operations = [
+      'addition',
+      'subtraction',
+      'multiplication',
+      'division'
+    ];
 
     for (int i = 0; i < 5; i++) {
       // Randomly select an operation
       final selectedOperation = operations[random.nextInt(operations.length)];
-      
+
       int correctAnswer;
       String questionText;
       int a, b;
-      
+
       switch (selectedOperation) {
         case 'addition':
           a = random.nextInt(maxNumber - minNumber + 1) + minNumber;

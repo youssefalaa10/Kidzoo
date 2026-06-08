@@ -6,7 +6,7 @@ class HeaderSection extends StatelessWidget {
   const HeaderSection({
     required this.mq,
     super.key,
-    this.title = 'Welcome to KidZoo!',
+    this.title = 'Welcome to kidzo!',
     this.textColor = const Color(0xFF6A1B9A), // Purple by default
   });
   final CustomMQ mq;

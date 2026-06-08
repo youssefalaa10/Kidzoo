@@ -1,6 +1,6 @@
 # Dots and Boxes Game 🎮
 
-A classic strategy game implementation for the KidZoo app with enhanced gameplay features.
+A classic strategy game implementation for the kidzo app with enhanced gameplay features.
 
 ## Overview
 
@@ -161,7 +161,7 @@ The game is integrated into the **Fun Games** section and can be accessed from:
 
 ## 🎨 Design Philosophy
 
-The game follows KidZoo's design principles:
+The game follows kidzo's design principles:
 - **Kid-Friendly**: Bright colors and clear visual feedback
 - **Intuitive**: Easy to learn, hard to master
 - **Engaging**: Combos and animations keep players motivated

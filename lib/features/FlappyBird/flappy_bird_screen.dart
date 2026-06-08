@@ -1,9 +1,9 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
-import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/features/FlappyBird/flappy_bird_game.dart';
 
 class FlappyBirdScreen extends StatefulWidget {
   const FlappyBirdScreen({super.key});
@@ -32,7 +32,6 @@ class _FlappyBirdScreenState extends State<FlappyBirdScreen> {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-
                 SwitchListTile(
                   title: Text(l10n.enableSoundToggle),
                   value: state.isSoundEnabled,

@@ -228,8 +228,8 @@ class _SettingsScreenState extends State<SettingsScreen>
                 currentLocale.languageCode == 'ar',
                 () {
                   context.read<LanguageCubit>().setLanguage(
-                    const Locale('ar', ''),
-                  );
+                        const Locale('ar', ''),
+                      );
                   // Check and request Arabic TTS data when switching to Arabic
                   TtsService.checkAndRequestArabicVoice(context);
                 },
@@ -420,7 +420,7 @@ class HeaderSection extends StatelessWidget {
   const HeaderSection({
     required this.mq,
     super.key,
-    this.title = 'Welcome to KidZoo!',
+    this.title = 'Welcome to kidzo!',
     this.textColor = const Color(0xFF6A1B9A), // Purple by default
   });
   final CustomMQ mq;

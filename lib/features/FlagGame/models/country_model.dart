@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 
 class Country {
   final String code;

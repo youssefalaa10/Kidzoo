@@ -204,7 +204,7 @@ class TtsService {
   }
 
   static const MethodChannel _channel =
-      MethodChannel('dev.annotex.kidzoo/tts_settings');
+      MethodChannel('dev.annotex.kidzo/tts_settings');
 
   static Future<void> _openTtsSettings(FlutterTts tts) async {
     try {

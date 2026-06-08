@@ -2,11 +2,11 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/helpers/tts_service.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/utils/assets.dart';
+import 'package:kidzo/core/helpers/tts_service.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/utils/assets.dart';
 
 import '../data/model/animal_name_model.dart';
 import 'widgets/animal_name_success_overlay.dart';
@@ -80,7 +80,6 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
     });
   }
 
-
   void _startNewRound() {
     final Random rng = Random();
     final List<AnimalNameModel> pool =
@@ -100,7 +99,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   Future<void> _speakAnimalName(String name) async {
     final musicCubit = context.read<MusicCubit>();
     await musicCubit.stopMusic();
-    
+
     final languageCode = Localizations.localeOf(context).languageCode;
     await _ttsService.setLanguage(languageCode);
     await _ttsService.speak(name);
@@ -181,7 +180,6 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
             style: const TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
-
               shadows: [
                 Shadow(
                   color: Colors.black45,

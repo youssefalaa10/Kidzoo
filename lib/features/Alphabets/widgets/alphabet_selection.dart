@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/helpers/tts_helper.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/core/helpers/tts_helper.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
 
 import '../bloc/alphabet_bloc.dart';
 import '../bloc/alphabet_event.dart';

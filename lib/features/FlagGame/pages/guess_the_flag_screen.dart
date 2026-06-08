@@ -1,15 +1,15 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/helpers/tts_service.dart';
+import 'package:kidzo/core/helpers/tts_service.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:confetti/confetti.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:kidzoo/core/helpers/media_query.dart';
-import 'package:kidzoo/core/helpers/tts_helper.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/helpers/media_query.dart';
+import 'package:kidzo/core/helpers/tts_helper.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 import '../data/flag_data_manager.dart';
 import '../models/country_model.dart';
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 
 import '../bloc/alphabet_bloc.dart';
 import '../bloc/alphabet_state.dart';
@@ -28,7 +28,8 @@ class AlphabetDisplay extends StatelessWidget {
         } else if (state is AlphabetLoadedState) {
           final alphabetModel = AlphabetModel.alphabets.firstWhere(
             (model) => model.letter == state.alphabet,
-            orElse: () => AlphabetModel(letter: '', imagePath: '', example: '', exampleKey: ''),
+            orElse: () => AlphabetModel(
+                letter: '', imagePath: '', example: '', exampleKey: ''),
           );
 
           return Column(

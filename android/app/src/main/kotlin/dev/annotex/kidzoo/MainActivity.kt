@@ -1,4 +1,4 @@
-package dev.annotex.kidzoo
+package dev.annotex.kidzo
 
 import android.content.Intent
 import android.provider.Settings
@@ -8,7 +8,7 @@ import io.flutter.embedding.engine.FlutterEngine
 import io.flutter.plugin.common.MethodChannel
 
 class MainActivity: FlutterActivity() {
-    private val CHANNEL = "dev.annotex.kidzoo/tts_settings"
+    private val CHANNEL = "dev.annotex.kidzo/tts_settings"
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
         super.configureFlutterEngine(flutterEngine)

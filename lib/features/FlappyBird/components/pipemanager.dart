@@ -1,9 +1,9 @@
 import 'dart:math';
 
 import 'package:flame/components.dart';
-import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
-import 'package:kidzoo/features/FlappyBird/components/pipe.dart';
-import 'package:kidzoo/features/FlappyBird/flappy_bird_game.dart';
+import 'package:kidzo/features/FlappyBird/components/flappygame_constants.dart';
+import 'package:kidzo/features/FlappyBird/components/pipe.dart';
+import 'package:kidzo/features/FlappyBird/flappy_bird_game.dart';
 
 class PipeManager extends Component with HasGameRef<FlappyBirdGame> {
   double pipeSpawnTimer = 0;

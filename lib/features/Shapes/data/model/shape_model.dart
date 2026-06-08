@@ -1,4 +1,4 @@
-import 'package:kidzoo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
 
 class ShapeModel {
   ShapeModel({

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
-import 'package:kidzoo/features/Shapes/bloc/shape_cubit.dart';
-import 'package:kidzoo/features/Shapes/bloc/shape_states.dart';
-import 'package:kidzoo/features/Shapes/widgets/complete_screen.dart';
-import 'package:kidzoo/features/Shapes/widgets/shape_app_bar.dart';
-import 'package:kidzoo/features/Shapes/widgets/shape_display.dart';
-import 'package:kidzoo/features/Shapes/widgets/shape_selection.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
+import 'package:kidzo/features/Shapes/bloc/shape_states.dart';
+import 'package:kidzo/features/Shapes/widgets/complete_screen.dart';
+import 'package:kidzo/features/Shapes/widgets/shape_app_bar.dart';
+import 'package:kidzo/features/Shapes/widgets/shape_display.dart';
+import 'package:kidzo/features/Shapes/widgets/shape_selection.dart';
 
 import '../../core/helpers/tts_helper.dart';
 import 'data/model/shape_model.dart';
@@ -41,6 +41,7 @@ class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
     _ttsHelper?.stop();
     super.dispose();
   }
+
   String _localizedShapeName(BuildContext context, String shape) {
     final l10n = AppLocalizations.of(context);
     final map = {
@@ -130,7 +131,9 @@ class _ShapeScreenState extends State<ShapeScreen> with TTSMusicMixin {
                                                 context
                                                     .read<ShapeCubit>()
                                                     .addMatch(temp);
-                                                _ttsHelper?.speak(_localizedShapeName(context, data.shape));
+                                                _ttsHelper?.speak(
+                                                    _localizedShapeName(
+                                                        context, data.shape));
                                                 if (cubit.shapes.isEmpty) {
                                                   cubit.init();
                                                 }

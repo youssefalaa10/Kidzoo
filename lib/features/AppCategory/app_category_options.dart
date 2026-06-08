@@ -1,26 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/helpers/media_query.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
-import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzoo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
-import 'package:kidzoo/features/ColorSwitchGame/color_switch_screen.dart';
-import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
-import 'package:kidzoo/features/DrawLab/UI/screens/drawlab_screen.dart';
-import 'package:kidzoo/features/FlagGame/pages/flag_game_menu_screen.dart';
-import 'package:kidzoo/features/FlagGame/pages/listening_game_screen.dart';
-import 'package:kidzoo/features/FlappyBird/flappy_bird_screen.dart';
-import 'package:kidzoo/features/Game2048/UI/game_2048_home.dart';
-import 'package:kidzoo/features/Game2048/data/logic/game_cubit.dart';
-import 'package:kidzoo/features/MissingLetterGame/Ui/missing_letter_home.dart';
-import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
-import 'package:kidzoo/features/Numbers/number_screen.dart';
-import 'package:kidzoo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
-import 'package:kidzoo/features/Shapes/bloc/shape_cubit.dart';
-import 'package:kidzoo/features/Shapes/shape_screen.dart';
-import 'package:kidzoo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
+import 'package:kidzo/core/helpers/media_query.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
+import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
+import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
+import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
+import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
+import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
+import 'package:kidzo/features/FlagGame/pages/listening_game_screen.dart';
+import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
+import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
+import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
+import 'package:kidzo/features/MissingLetterGame/Ui/missing_letter_home.dart';
+import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
+import 'package:kidzo/features/Numbers/number_screen.dart';
+import 'package:kidzo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
+import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
+import 'package:kidzo/features/Shapes/shape_screen.dart';
+import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 
 // Define the option data structure
 class OptionItem {

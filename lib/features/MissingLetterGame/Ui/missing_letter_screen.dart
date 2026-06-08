@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:kidzoo/core/localization/language_provider.dart';
-import 'package:kidzoo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_cubit.dart';
-import 'package:kidzoo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
+import 'package:kidzo/core/localization/language_provider.dart';
+import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_cubit.dart';
+import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
 
 import '../../../core/localization/app_localizations.dart';
 

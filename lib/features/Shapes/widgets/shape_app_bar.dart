@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/features/Shapes/widgets/custom_icon.dart';
+import 'package:kidzo/features/Shapes/widgets/custom_icon.dart';
 
 class ShapeAppBar extends StatelessWidget {
   const ShapeAppBar(

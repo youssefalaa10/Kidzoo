@@ -1,8 +1,9 @@
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/core/helpers/tts_helper.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
 import 'color_switch_game.dart';
 
 class ColorSwitchScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class ColorSwitchScreen extends StatefulWidget {
 class _ColorSwitchScreenState extends State<ColorSwitchScreen> {
   late ColorSwitchGame _game;
   bool _showStartOverlay = true;
+  TtsHelper? _ttsHelper;
 
   @override
   void initState() {
@@ -27,6 +29,28 @@ class _ColorSwitchScreenState extends State<ColorSwitchScreen> {
         });
       }
     };
+    _game.onPlayerColorChanged = _speakColorName;
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_ttsHelper == null) {
+      _ttsHelper = TtsHelper(
+        musicCubit: context.read<MusicCubit>(),
+        languageCode: Localizations.localeOf(context).languageCode,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _ttsHelper?.stop();
+    super.dispose();
+  }
+
+  void _speakColorName(String colorName) {
+    _ttsHelper?.speak(colorName);
   }
 
   void _showSettings(BuildContext context) {
@@ -131,8 +155,7 @@ class _ColorSwitchScreenState extends State<ColorSwitchScreen> {
           // ─── TOP BAR ───────────────────────────────────────────────
           SafeArea(
             child: Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

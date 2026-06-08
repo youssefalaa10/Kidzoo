@@ -70,9 +70,8 @@ class GameBoardPainter extends CustomPainter {
     if (state.isLineDrawn(hoveredLine!)) return;
 
     final paint = Paint()
-      ..color =
-          state.currentPlayer.color.withValues(alpha: 0.15) // Reduced from 0.3
-      ..strokeWidth = cellSize * 0.06 // Thinner line
+      ..color = state.currentPlayer.color.withValues(alpha: 0.45)
+      ..strokeWidth = cellSize * 0.1
       ..strokeCap = StrokeCap.round
       ..style = PaintingStyle.stroke;
 

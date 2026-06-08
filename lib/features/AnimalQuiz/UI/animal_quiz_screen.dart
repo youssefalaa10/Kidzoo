@@ -5,7 +5,7 @@ import '../../../core/localization/app_localizations.dart';
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/mixins/background_music_mixin.dart';
 import '../data/model/animal_quiz_model.dart';
-import 'package:kidzoo/core/utils/assets.dart';
+import 'package:kidzo/core/utils/assets.dart';
 
 class AnimalQuizScreen extends ProtectedGameScreen {
   const AnimalQuizScreen({required super.level, super.key});

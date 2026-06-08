@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/AppCategory/education_screen.dart';
-import 'package:kidzoo/features/Shapes/widgets/custom_button.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/AppCategory/education_screen.dart';
+import 'package:kidzo/features/Shapes/widgets/custom_button.dart';
 
 class CompleteScreen extends StatelessWidget {
   const CompleteScreen({required this.onPressedGameOVer, super.key});

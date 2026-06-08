@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flame/collisions.dart';
 import 'package:flame/components.dart';
-import 'package:kidzoo/core/utils/assets.dart';
-import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
+import 'package:kidzo/core/utils/assets.dart';
+import 'package:kidzo/features/FlappyBird/components/flappygame_constants.dart';
 
 import '../flappy_bird_game.dart';
 

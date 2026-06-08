@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/Puzzle/bloc/state.dart';
-import 'package:kidzoo/features/Puzzle/data/model/puzzle_model.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/Puzzle/bloc/state.dart';
+import 'package:kidzo/features/Puzzle/data/model/puzzle_model.dart';
 
 class PuzzleCubit extends Cubit<PuzzleState> {
   PuzzleCubit() : super(PuzzleInitial());

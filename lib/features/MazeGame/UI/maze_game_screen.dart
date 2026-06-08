@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 import '../../LevelsMap/levelmap_screen.dart';
 import '../data/logic/maze_cubit.dart';
 import '../data/models/maze_models.dart';
@@ -128,7 +128,8 @@ class _MazeGameContentState extends State<_MazeGameContent> {
                             context.read<MazeCubit>().startDrawing(pos),
                         onContinueDrawing: (pos) =>
                             context.read<MazeCubit>().continueDrawing(pos),
-                        onEndDrawing: () => context.read<MazeCubit>().endDrawing(),
+                        onEndDrawing: () =>
+                            context.read<MazeCubit>().endDrawing(),
                       ),
                     ),
                     if (!_isFullScreen) const SizedBox(height: 8),

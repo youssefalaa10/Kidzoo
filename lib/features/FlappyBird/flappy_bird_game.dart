@@ -5,11 +5,11 @@ import 'package:flame/components.dart';
 import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/features/FlappyBird/components/background.dart';
-import 'package:kidzoo/features/FlappyBird/components/bird.dart';
-import 'package:kidzoo/features/FlappyBird/components/flappygame_constants.dart';
-import 'package:kidzoo/features/FlappyBird/components/pipemanager.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/features/FlappyBird/components/background.dart';
+import 'package:kidzo/features/FlappyBird/components/bird.dart';
+import 'package:kidzo/features/FlappyBird/components/flappygame_constants.dart';
+import 'package:kidzo/features/FlappyBird/components/pipemanager.dart';
 
 import 'components/ground.dart';
 import 'components/pipe.dart';

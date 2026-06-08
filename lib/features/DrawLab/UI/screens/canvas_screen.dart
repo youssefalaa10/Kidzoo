@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/features/DrawLab/data/models/drawing_model.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/features/DrawLab/data/models/drawing_model.dart';
 
 import '../widgets/drawing_gesture_detector.dart';
 import '../widgets/quick_actions_panel.dart';

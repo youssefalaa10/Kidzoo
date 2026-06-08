@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/utils/assets.dart';
+import 'package:kidzo/core/utils/assets.dart';
 
 import '../../../../core/helpers/media_query.dart';
 
@@ -15,8 +15,7 @@ class HeaderSection extends StatelessWidget {
         Row(
           children: [
             CircleAvatar(
-              backgroundImage:
-                  const AssetImage(Assets.genImagesHomeShapes),
+              backgroundImage: const AssetImage(Assets.genImagesHomeShapes),
               radius: mq.width(7),
             ),
             SizedBox(width: mq.width(3)),

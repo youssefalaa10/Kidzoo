@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 
 import '../../data/models/color_memory_constants.dart';
 import '../../data/models/game_state_model.dart';
@@ -167,5 +167,3 @@ class _StatCard extends StatelessWidget {
     );
   }
 }
-
-

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/utils/assets.dart';
+import 'package:kidzo/core/utils/assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/localization/app_localizations.dart';
@@ -174,7 +174,8 @@ class LevelMapScreen extends StatelessWidget {
                           children: [
                             Text(
                               l10n.gameTypesLabel,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 8),
                             _buildLegendItem(Colors.red, l10n.animalNameGame),
@@ -292,375 +293,395 @@ class LevelMapScreen extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Large emoji icon
-                Container(
-                  width: 100,
-                  height: 100,
-                  decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withValues(alpha: 0.3),
-                        blurRadius: 15,
-                        spreadRadius: 2,
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Text(
-                      gameEmoji,
-                      style: const TextStyle(fontSize: 60),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Large emoji icon
+                  Container(
+                    width: 100,
+                    height: 100,
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.2),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: primaryColor.withValues(alpha: 0.3),
+                          blurRadius: 15,
+                          spreadRadius: 2,
+                        ),
+                      ],
                     ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Level title with star
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      '⭐',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      l10n.levelLabel(level.id),
-                      style: TextStyle(
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
-                        color: primaryColor,
-                        letterSpacing: 1.2,
+                    child: Center(
+                      child: Text(
+                        gameEmoji,
+                        style: const TextStyle(fontSize: 60),
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    const Text(
-                      '⭐',
-                      style: TextStyle(fontSize: 24),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                // Game name
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 12,
                   ),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.15),
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  child: Text(
-                    gameSequenceItem.name,
-                    style: TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w600,
-                      color: primaryColor,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                // Difficulty badge
-                Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  decoration: BoxDecoration(
-                    color: Colors.amber.shade100,
-                    borderRadius: BorderRadius.circular(15),
-                    border: Border.all(
-                      color: Colors.amber.shade300,
-                      width: 2,
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  const SizedBox(height: 20),
+                  // Level title with star
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Text(
-                        '🎯',
-                        style: TextStyle(fontSize: 20),
+                        '⭐',
+                        style: TextStyle(fontSize: 24),
                       ),
                       const SizedBox(width: 8),
                       Text(
-                        l10n.difficultyLevel(gameSequenceItem.level),
+                        l10n.levelLabel(level.id),
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 32,
                           fontWeight: FontWeight.bold,
-                          color: Colors.amber.shade900,
+                          color: primaryColor,
+                          letterSpacing: 1.2,
                         ),
+                      ),
+                      const SizedBox(width: 8),
+                      const Text(
+                        '⭐',
+                        style: TextStyle(fontSize: 24),
                       ),
                     ],
                   ),
-                ),
-                const SizedBox(height: 24),
-                // Ready message
-                Text(
-                  l10n.readyToPlay,
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w500,
-                    color: Colors.grey.shade700,
+                  const SizedBox(height: 16),
+                  // Game name
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      gameSequenceItem.name,
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: primaryColor,
+                      ),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 24),
-                // Action buttons - Made responsive
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    final isSmallScreen = constraints.maxWidth < 300;
-                    return isSmallScreen
-                        ? Column(
-                            children: [
-                              // Play button
-                              SizedBox(
-                                width: double.infinity,
-                                height: 55,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    gradient: LinearGradient(
-                                      colors: [
-                                        primaryColor,
-                                        Color.lerp(primaryColor, Colors.black, 0.3) ??
-                                            primaryColor,
+                  const SizedBox(height: 20),
+                  // Difficulty badge
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.amber.shade100,
+                      borderRadius: BorderRadius.circular(15),
+                      border: Border.all(
+                        color: Colors.amber.shade300,
+                        width: 2,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Text(
+                          '🎯',
+                          style: TextStyle(fontSize: 20),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          l10n.difficultyLevel(gameSequenceItem.level),
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.amber.shade900,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Ready message
+                  Text(
+                    l10n.readyToPlay,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w500,
+                      color: Colors.grey.shade700,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  // Action buttons - Made responsive
+                  LayoutBuilder(
+                    builder: (context, constraints) {
+                      final isSmallScreen = constraints.maxWidth < 300;
+                      return isSmallScreen
+                          ? Column(
+                              children: [
+                                // Play button
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 55,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          primaryColor,
+                                          Color.lerp(primaryColor, Colors.black,
+                                                  0.3) ??
+                                              primaryColor,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryColor.withValues(
+                                              alpha: 0.5),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
                                       ],
                                     ),
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: primaryColor.withValues(alpha: 0.5),
-                                        blurRadius: 10,
-                                        offset: const Offset(0, 5),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () {
-                                        Navigator.pop(dialogContext);
-                                        navigationService
-                                            .navigateToGameScreen<bool>(
-                                                context, gameSequenceItem.gameScreen,
-                                                stageNumber: level.id)
-                                            .then((result) {
-                                          if (result == true) {
-                                            _onLevelCompleted(
-                                                level.id, levelCubit);
-                                          }
-                                        });
-                                      },
-                                      borderRadius: BorderRadius.circular(20),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Text(
-                                              '🎮',
-                                              style: TextStyle(fontSize: 20),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                l10n.play,
-                                                style: const TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.pop(dialogContext);
+                                          navigationService
+                                              .navigateToGameScreen<bool>(
+                                                  context,
+                                                  gameSequenceItem.gameScreen,
+                                                  stageNumber: level.id)
+                                              .then((result) {
+                                            if (result == true) {
+                                              _onLevelCompleted(
+                                                  level.id, levelCubit);
+                                            }
+                                          });
+                                        },
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                '🎮',
+                                                style: TextStyle(fontSize: 20),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: Text(
+                                                  l10n.play,
+                                                  style: const TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              const SizedBox(height: 12),
-                              // Cancel button
-                              SizedBox(
-                                width: double.infinity,
-                                height: 55,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey.shade200,
-                                    borderRadius: BorderRadius.circular(20),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black.withValues(alpha: 0.1),
-                                        blurRadius: 5,
-                                        offset: const Offset(0, 3),
-                                      ),
-                                    ],
-                                  ),
-                                  child: Material(
-                                    color: Colors.transparent,
-                                    child: InkWell(
-                                      onTap: () => Navigator.pop(dialogContext),
+                                const SizedBox(height: 12),
+                                // Cancel button
+                                SizedBox(
+                                  width: double.infinity,
+                                  height: 55,
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
                                       borderRadius: BorderRadius.circular(20),
-                                      child: Center(
-                                        child: Row(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            const Text(
-                                              '❌',
-                                              style: TextStyle(fontSize: 20),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                l10n.cancel,
-                                                style: TextStyle(
-                                                  fontSize: 18,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.grey.shade700,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () =>
+                                            Navigator.pop(dialogContext),
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                '❌',
+                                                style: TextStyle(fontSize: 20),
                                               ),
-                                            ),
-                                          ],
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: Text(
+                                                  l10n.cancel,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey.shade700,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          )
-                        : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // Cancel button
-                    Expanded(
-                      child: Container(
-                        height: 55,
-                        decoration: BoxDecoration(
-                          color: Colors.grey.shade200,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 5,
-                              offset: const Offset(0, 3),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () => Navigator.pop(dialogContext),
-                            borderRadius: BorderRadius.circular(20),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                          mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    '❌',
-                                    style: TextStyle(fontSize: 20),
-                                  ),
-                                  const SizedBox(width: 8),
-                                            Flexible(
-                                              child: Text(
-                                                l10n.cancel,
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey.shade700,
+                              ],
+                            )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Cancel button
+                                Expanded(
+                                  child: Container(
+                                    height: 55,
+                                    decoration: BoxDecoration(
+                                      color: Colors.grey.shade200,
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black
+                                              .withValues(alpha: 0.1),
+                                          blurRadius: 5,
+                                          offset: const Offset(0, 3),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () =>
+                                            Navigator.pop(dialogContext),
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                '❌',
+                                                style: TextStyle(fontSize: 20),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: Text(
+                                                  l10n.cancel,
+                                                  style: TextStyle(
+                                                    fontSize: 18,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.grey.shade700,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
-                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    // Play button
-                    Expanded(
-                      flex: 2,
-                      child: Container(
-                        height: 55,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              primaryColor,
-                              Color.lerp(primaryColor, Colors.black, 0.3) ??
-                                  primaryColor,
-                            ],
-                          ),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: primaryColor.withValues(alpha: 0.5),
-                              blurRadius: 10,
-                              offset: const Offset(0, 5),
-                            ),
-                          ],
-                        ),
-                        child: Material(
-                          color: Colors.transparent,
-                          child: InkWell(
-                            onTap: () {
-                              Navigator.pop(dialogContext); // Close dialog
+                                ),
+                                const SizedBox(width: 16),
+                                // Play button
+                                Expanded(
+                                  flex: 2,
+                                  child: Container(
+                                    height: 55,
+                                    decoration: BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          primaryColor,
+                                          Color.lerp(primaryColor, Colors.black,
+                                                  0.3) ??
+                                              primaryColor,
+                                        ],
+                                      ),
+                                      borderRadius: BorderRadius.circular(20),
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: primaryColor.withValues(
+                                              alpha: 0.5),
+                                          blurRadius: 10,
+                                          offset: const Offset(0, 5),
+                                        ),
+                                      ],
+                                    ),
+                                    child: Material(
+                                      color: Colors.transparent,
+                                      child: InkWell(
+                                        onTap: () {
+                                          Navigator.pop(
+                                              dialogContext); // Close dialog
 
-                              navigationService
-                                  .navigateToGameScreen<bool>(
-                                      context, gameSequenceItem.gameScreen,
-                                      stageNumber: level.id)
-                                  .then((result) {
-                                // Check if the game was completed (result == true)
-                                if (result == true) {
-                                  _onLevelCompleted(level.id, levelCubit);
-                                }
-                              });
-                            },
-                            borderRadius: BorderRadius.circular(20),
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  const Text(
-                                    '🚀',
-                                    style: TextStyle(fontSize: 24),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Flexible(
-                                    child: Text(
-                                      l10n.play,
-                                      style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                      letterSpacing: 1.2,
+                                          navigationService
+                                              .navigateToGameScreen<bool>(
+                                                  context,
+                                                  gameSequenceItem.gameScreen,
+                                                  stageNumber: level.id)
+                                              .then((result) {
+                                            // Check if the game was completed (result == true)
+                                            if (result == true) {
+                                              _onLevelCompleted(
+                                                  level.id, levelCubit);
+                                            }
+                                          });
+                                        },
+                                        borderRadius: BorderRadius.circular(20),
+                                        child: Center(
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              const Text(
+                                                '🚀',
+                                                style: TextStyle(fontSize: 24),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Flexible(
+                                                child: Text(
+                                                  l10n.play,
+                                                  style: const TextStyle(
+                                                    fontSize: 20,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                    letterSpacing: 1.2,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
-                                      overflow: TextOverflow.ellipsis,
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                );
-                  },
-                ),
-              ],
-            ),
+                                ),
+                              ],
+                            );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
         ),

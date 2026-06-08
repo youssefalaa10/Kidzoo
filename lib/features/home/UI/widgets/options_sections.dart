@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/Alphabets/alphabet_screen.dart';
-import 'package:kidzoo/features/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
-import 'package:kidzoo/features/Numbers/number_screen.dart';
-import 'package:kidzoo/features/Shapes/shape_screen.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
+import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
+import 'package:kidzo/features/Numbers/number_screen.dart';
+import 'package:kidzo/features/Shapes/shape_screen.dart';
 
 import '../../../../core/helpers/media_query.dart';
 import '../../../Shapes/bloc/shape_cubit.dart';

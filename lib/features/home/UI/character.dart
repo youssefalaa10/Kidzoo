@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/AppCategory/education_screen.dart';
-import 'package:kidzoo/features/AppCategory/games_screen.dart';
-import 'package:kidzoo/features/settings/settings_screen.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/AppCategory/education_screen.dart';
+import 'package:kidzo/features/AppCategory/games_screen.dart';
+import 'package:kidzo/features/settings/settings_screen.dart';
 
 import '../../Alphabets/bloc/alphabet_bloc.dart';
 import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';

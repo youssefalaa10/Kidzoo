@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/utils/assets.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/utils/assets.dart';
+
 class AlphabetModel {
   AlphabetModel({
     required this.letter,
@@ -16,39 +17,69 @@ class AlphabetModel {
   String getLocalizedExample(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     switch (exampleKey) {
-      case 'axe': return l10n.axe;
-      case 'ball': return l10n.ball;
-      case 'cold': return l10n.cold;
-      case 'dice': return l10n.dice;
-      case 'egg': return l10n.egg;
-      case 'fish': return l10n.fish;
-      case 'glasses': return l10n.glasses;
-      case 'hat': return l10n.hat;
-      case 'iceCream': return l10n.iceCream;
-      case 'juice': return l10n.juice;
-      case 'knife': return l10n.knife;
-      case 'light': return l10n.lightExample;
-      case 'music': return l10n.musicExample;
-      case 'nut': return l10n.nut;
-      case 'owl': return l10n.owl;
-      case 'pencil': return l10n.pencil;
-      case 'queen': return l10n.queen;
-      case 'ruler': return l10n.ruler;
-      case 'star': return l10n.star;
-      case 'tree': return l10n.tree;
-      case 'umbrella': return l10n.umbrella;
-      case 'van': return l10n.van;
-      case 'watch': return l10n.watch;
-      case 'xRay': return l10n.xRay;
-      case 'yellow': return l10n.yellow;
-      case 'zoom': return l10n.zoom;
-      default: return example;
+      case 'axe':
+        return l10n.axe;
+      case 'ball':
+        return l10n.ball;
+      case 'cold':
+        return l10n.cold;
+      case 'dice':
+        return l10n.dice;
+      case 'egg':
+        return l10n.egg;
+      case 'fish':
+        return l10n.fish;
+      case 'glasses':
+        return l10n.glasses;
+      case 'hat':
+        return l10n.hat;
+      case 'iceCream':
+        return l10n.iceCream;
+      case 'juice':
+        return l10n.juice;
+      case 'knife':
+        return l10n.knife;
+      case 'light':
+        return l10n.lightExample;
+      case 'music':
+        return l10n.musicExample;
+      case 'nut':
+        return l10n.nut;
+      case 'owl':
+        return l10n.owl;
+      case 'pencil':
+        return l10n.pencil;
+      case 'queen':
+        return l10n.queen;
+      case 'ruler':
+        return l10n.ruler;
+      case 'star':
+        return l10n.star;
+      case 'tree':
+        return l10n.tree;
+      case 'umbrella':
+        return l10n.umbrella;
+      case 'van':
+        return l10n.van;
+      case 'watch':
+        return l10n.watch;
+      case 'xRay':
+        return l10n.xRay;
+      case 'yellow':
+        return l10n.yellow;
+      case 'zoom':
+        return l10n.zoom;
+      default:
+        return example;
     }
   }
 
   static final List<AlphabetModel> alphabets = [
     AlphabetModel(
-        letter: 'A', imagePath: Assets.genImagesAlphabetA, example: 'Axe', exampleKey: 'axe'),
+        letter: 'A',
+        imagePath: Assets.genImagesAlphabetA,
+        example: 'Axe',
+        exampleKey: 'axe'),
     AlphabetModel(
         letter: 'B',
         imagePath: Assets.genImagesAlphabetB,
@@ -65,7 +96,10 @@ class AlphabetModel {
         example: 'Dice',
         exampleKey: 'dice'),
     AlphabetModel(
-        letter: 'E', imagePath: Assets.genImagesAlphabetE, example: 'Egg', exampleKey: 'egg'),
+        letter: 'E',
+        imagePath: Assets.genImagesAlphabetE,
+        example: 'Egg',
+        exampleKey: 'egg'),
     AlphabetModel(
         letter: 'F',
         imagePath: Assets.genImagesAlphabetF,
@@ -77,7 +111,10 @@ class AlphabetModel {
         example: 'Glasses',
         exampleKey: 'glasses'),
     AlphabetModel(
-        letter: 'H', imagePath: Assets.genImagesAlphabetH, example: 'Hat', exampleKey: 'hat'),
+        letter: 'H',
+        imagePath: Assets.genImagesAlphabetH,
+        example: 'Hat',
+        exampleKey: 'hat'),
     AlphabetModel(
         letter: 'I',
         imagePath: Assets.genImagesAlphabetI,
@@ -104,9 +141,15 @@ class AlphabetModel {
         example: 'Music',
         exampleKey: 'music'),
     AlphabetModel(
-        letter: 'N', imagePath: Assets.genImagesAlphabetN, example: 'Nut', exampleKey: 'nut'),
+        letter: 'N',
+        imagePath: Assets.genImagesAlphabetN,
+        example: 'Nut',
+        exampleKey: 'nut'),
     AlphabetModel(
-        letter: 'O', imagePath: Assets.genImagesAlphabetO, example: 'Owl', exampleKey: 'owl'),
+        letter: 'O',
+        imagePath: Assets.genImagesAlphabetO,
+        example: 'Owl',
+        exampleKey: 'owl'),
     AlphabetModel(
         letter: 'P',
         imagePath: Assets.genImagesAlphabetP,
@@ -138,7 +181,10 @@ class AlphabetModel {
         example: 'Umbrella',
         exampleKey: 'umbrella'),
     AlphabetModel(
-        letter: 'V', imagePath: Assets.genImagesAlphabetV, example: 'Van', exampleKey: 'van'),
+        letter: 'V',
+        imagePath: Assets.genImagesAlphabetV,
+        example: 'Van',
+        exampleKey: 'van'),
     AlphabetModel(
         letter: 'W',
         imagePath: Assets.genImagesAlphabetW,

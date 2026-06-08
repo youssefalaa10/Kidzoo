@@ -4,9 +4,8 @@ import 'package:flame/events.dart';
 import 'package:flame/game.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/helpers/tts_service.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
 
 import 'components/circle_rotator.dart';
 import 'components/color_switcher.dart';
@@ -16,18 +15,19 @@ import 'components/star_component.dart';
 
 class ColorSwitchGame extends FlameGame
     with TapCallbacks, HasCollisionDetection {
-
   ColorSwitchGame() : super();
   late Player myPlayer;
   TextComponent? colorNameText;
   TextComponent? scoreText;
   TextComponent? startText;
 
-  final TtsService _ttsService = TtsService();
   final AudioPlayer sfxPlayer = AudioPlayer();
 
   /// Called by the screen when the start overlay is tapped
   VoidCallback? onGameStarted;
+
+  /// Called when the player color changes (localized color name).
+  void Function(String colorName)? onPlayerColorChanged;
 
   bool isGameOver = false;
   bool isStarted = false;
@@ -141,24 +141,13 @@ class ColorSwitchGame extends FlameGame
           fontWeight: FontWeight.bold,
         ),
       );
-      // Always speak the new color name (even if TTS needs re-init)
       if (name != _lastSpokenColor) {
         _lastSpokenColor = name;
-        _speakColorName(name);
+        if (isStarted && !isGameOver) {
+          onPlayerColorChanged?.call(name);
+        }
       }
     } catch (_) {}
-  }
-
-  Future<void> _speakColorName(String name) async {
-    if (buildContext == null) return;
-    try {
-      final lang = Localizations.localeOf(buildContext!).languageCode;
-      // Let TtsService handle redundant init checks internally
-      await _ttsService.init(languageCode: lang);
-      await _ttsService.speak(name);
-    } catch (e) {
-      debugPrint('Error speaking color name: $e');
-    }
   }
 
   /// Called by [ColorSwitchScreen] when the start overlay is dismissed
@@ -168,7 +157,7 @@ class ColorSwitchGame extends FlameGame
     startText?.removeFromParent();
     myPlayer.jump();
     onGameStarted?.call();
-    _speakColorName(_getColorName(buildContext!, myPlayer.color));
+    updateColorName();
   }
 
   void incrementScore() {
@@ -320,6 +309,7 @@ class ColorSwitchGame extends FlameGame
   void resetGame() {
     isGameOver = false;
     isStarted = false;
+    _lastSpokenColor = '';
     score = 0;
     gameColors = [
       Colors.redAccent,

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/features/Numbers/bloc/number_bloc.dart';
-import 'package:kidzoo/features/Numbers/bloc/number_state.dart';
-import 'package:kidzoo/features/Numbers/data/model/number_model.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
+import 'package:kidzo/features/Numbers/bloc/number_state.dart';
+import 'package:kidzo/features/Numbers/data/model/number_model.dart';
 
 class NumberDisplay extends StatelessWidget {
   const NumberDisplay({super.key});
@@ -24,7 +24,8 @@ class NumberDisplay extends StatelessWidget {
         } else if (state is NumberLoadedState) {
           final numberModel = NumberModel.numbers.firstWhere(
             (model) => model.num == state.number,
-            orElse: () => NumberModel(num: '', imagePath: '', example: '', exampleKey: ''),
+            orElse: () => NumberModel(
+                num: '', imagePath: '', example: '', exampleKey: ''),
           );
 
           return Column(

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzoo/core/base/protected_game_screen.dart';
-import 'package:kidzoo/core/localization/app_localizations.dart';
-import 'package:kidzoo/core/shared/style/image_manager.dart';
-import 'package:kidzoo/features/Puzzle/bloc/cubit.dart';
-import 'package:kidzoo/features/Puzzle/bloc/state.dart';
-import 'package:kidzoo/features/Puzzle/data/model/puzzle_model.dart';
+import 'package:kidzo/core/base/protected_game_screen.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/Puzzle/bloc/cubit.dart';
+import 'package:kidzo/features/Puzzle/bloc/state.dart';
+import 'package:kidzo/features/Puzzle/data/model/puzzle_model.dart';
 
 class PuzzleScreen extends ProtectedGameScreen {
   const PuzzleScreen({required super.level, super.key});
@@ -130,7 +130,9 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
     final l10n = AppLocalizations.of(context);
     // Extra guard: if already completed, return true
     final cubitPre = context.read<PuzzleCubit>();
-    if (!_completionReturned && cubitPre.choosePiece.isEmpty && cubitPre.puzzle.isNotEmpty) {
+    if (!_completionReturned &&
+        cubitPre.choosePiece.isEmpty &&
+        cubitPre.puzzle.isNotEmpty) {
       _completionReturned = true;
       cubitPre.gameOver = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -143,7 +145,9 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
     return BlocListener<PuzzleCubit, PuzzleState>(
       listener: (context, state) {
         final cubit = context.read<PuzzleCubit>();
-        if (!_completionReturned && cubit.choosePiece.isEmpty && cubit.puzzle.isNotEmpty) {
+        if (!_completionReturned &&
+            cubit.choosePiece.isEmpty &&
+            cubit.puzzle.isNotEmpty) {
           _completionReturned = true;
           cubit.gameOver = true;
           Navigator.of(context).pop(true);
@@ -322,4 +326,8 @@ class _DraggableItemState extends State<DraggableItem> {
   }
 }
 
-final List<String> sampleImages = [ImageManager.gazelle, ImageManager.ghost, ImageManager.party];
+final List<String> sampleImages = [
+  ImageManager.gazelle,
+  ImageManager.ghost,
+  ImageManager.party
+];

@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/features/AnimalQuiz/UI/animal_quiz_screen.dart';
-import 'package:kidzoo/features/ColorMemoryGame/UI/color_memory_screen.dart';
-import 'package:kidzoo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
-import 'package:kidzoo/features/MathGame/Ui/math_game.dart';
-import 'package:kidzoo/features/MazeGame/UI/maze_game_screen.dart';
-import 'package:kidzoo/features/MemoryGame/UI/memory_game.dart';
-import 'package:kidzoo/features/Puzzle/puzzle_screen.dart';
+import 'package:kidzo/features/AnimalQuiz/UI/animal_quiz_screen.dart';
+import 'package:kidzo/features/ColorMemoryGame/UI/color_memory_screen.dart';
+import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
+import 'package:kidzo/features/MathGame/Ui/math_game.dart';
+import 'package:kidzo/features/MazeGame/UI/maze_game_screen.dart';
+import 'package:kidzo/features/MemoryGame/UI/memory_game.dart';
+import 'package:kidzo/features/Puzzle/puzzle_screen.dart';
 
 import 'map_stage_model.dart';
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/features/Numbers/UI/widgets/number_app_bar.dart';
-import 'package:kidzoo/features/Numbers/UI/widgets/number_display.dart';
-import 'package:kidzoo/features/Numbers/UI/widgets/number_selection.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/features/Numbers/UI/widgets/number_app_bar.dart';
+import 'package:kidzo/features/Numbers/UI/widgets/number_display.dart';
+import 'package:kidzo/features/Numbers/UI/widgets/number_selection.dart';
 
 class NumberScreen extends StatefulWidget {
   const NumberScreen({super.key});

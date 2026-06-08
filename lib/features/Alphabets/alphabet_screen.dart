@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kidzoo/core/helpers/tts_service.dart';
-import 'package:kidzoo/core/mixins/background_music_mixin.dart';
-import 'package:kidzoo/features/Alphabets/widgets/alphabet_app_bar.dart';
+import 'package:kidzo/core/helpers/tts_service.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/features/Alphabets/widgets/alphabet_app_bar.dart';
 
 import 'widgets/alphabet_display.dart';
 import 'widgets/alphabet_selection.dart';

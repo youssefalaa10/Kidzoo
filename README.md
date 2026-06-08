@@ -1,4 +1,4 @@
-# kidzoo
+# kidzo
 
 Kids education app
 
