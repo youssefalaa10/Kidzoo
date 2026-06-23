@@ -253,7 +253,6 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     });
   }
 
-
   int _getCrossAxisCount() {
     switch (_currentLevel) {
       case GameLevel.easy:

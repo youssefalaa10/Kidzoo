@@ -468,5 +468,10 @@
   "youReachedRound": "لقد وصلت إلى الجولة",
   "newBestScore": "رقم قياسي جديد!",
   "straightLineModeEnabled": "تم تفعيل وضع الخط المستقيم",
-  "freehandModeEnabled": "تم تفعيل وضع الرسم الحر"
+  "freehandModeEnabled": "تم تفعيل وضع الرسم الحر",
+  "vehicles": "المركبات",
+  "fruits": "الفواكه",
+  "vegetables": "الخضروات",
+  "splashTitle": "كيدزو",
+  "splashSubtitle": "تعلم والعب!"
 }

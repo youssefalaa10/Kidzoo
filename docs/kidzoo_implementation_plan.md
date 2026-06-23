@@ -564,7 +564,7 @@ class ResponsiveLayout extends StatelessWidget {
 
 ---
 
-## ⚫ Phase 8 — Profile/Score System & Balloon Hunt Game
+## ⚫ Phase 8 — Profile/Score System
 
 ### Task #15 — Mandatory Profile Onboarding & Score Points
 
@@ -597,35 +597,9 @@ context.read<ScoreCubit>().recordScore(
 
 ---
 
-### Task #16 — Balloon Hunt Game
 
-**New feature folder:** `lib/features/BalloonHuntGame/`
 
-**Mechanics:**
-- Balloons float upward from bottom at random X positions
-- Player taps balloons to pop them before they escape
-- Levels increase spawn rate and balloon speed
 
-**Implementation:**
-- `BalloonHuntCubit` — owns list of `BalloonModel` (id, x, y, color, speed)
-- `BalloonHuntBoard` — `Stack` with `AnimatedPositioned` per balloon
-- `Ticker` provided by `SingleTickerProviderStateMixin` on the screen
-- `balloon_pop.mp3` played on each tap
-
-```dart
-class BalloonModel {
-  final String id;
-  final double x;
-  double y;
-  final Color color;
-  final double speed;
-  bool isPopped;
-}
-```
-
-No static variables — cubit owns the balloon list as instance state.
-
----
 
 ## 📋 Summary: Assets & SVGs by Task
 
@@ -637,8 +611,7 @@ No static variables — cubit owns the balloon list as instance state.
 | #11 Quiz Engine | PNG/SVG | 8 fruits, 8 vegetables, 8 vehicles, 4 scenes (sky, road, sea, runway) |
 | #12 Animal sounds | MP3/WAV | 8+ animal sounds (meow, bark, moo…) |
 | #15 Profile | PNG/SVG | 6–8 cute kid avatars |
-| #16 Balloons | PNG/SVG | 5 balloon colors + popped state |
-| #16 Balloons | MP3 | `balloon_pop.mp3` |
+
 
 
 
@@ -670,7 +643,7 @@ graph TD
     P4 --> P6[Phase 6: Animal + TTS]
     P5 --> P6
     P6 --> P7[Phase 7: Unified Quiz + Responsive]
-    P7 --> P8[Phase 8: Profile Flow + Balloon Hunt]
+    P7 --> P8[Phase 8: Profile Flow]
 ```
 
 > [!NOTE]

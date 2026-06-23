@@ -48,7 +48,7 @@ class Game2048Home extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 30),
- // Best Score Card
+                  // Best Score Card
                   Container(
                     padding: const EdgeInsets.all(24),
                     decoration: BoxDecoration(

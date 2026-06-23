@@ -28,7 +28,8 @@ class SuccessDialog extends StatelessWidget {
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
           color: ColorMemoryConstants.cardBackgroundColor,
-          borderRadius: BorderRadius.circular(ColorMemoryConstants.borderRadius),
+          borderRadius:
+              BorderRadius.circular(ColorMemoryConstants.borderRadius),
         ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
@@ -160,7 +161,3 @@ class _StatItem extends StatelessWidget {
     );
   }
 }
-
-
-
-

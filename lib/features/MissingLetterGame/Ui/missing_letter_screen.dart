@@ -7,6 +7,7 @@ import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
 
 import '../../../core/localization/app_localizations.dart';
+import '../../../shared/widgets/game_exit_button.dart';
 
 class MissingLetterScreen extends StatefulWidget {
   const MissingLetterScreen({super.key});
@@ -115,9 +116,14 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             appBar: AppBar(
               backgroundColor: Colors.transparent,
               elevation: 0,
-              leading: IconButton(
-                icon: const Icon(Icons.arrow_back_ios_new, color: Colors.white),
-                onPressed: () => _showExitDialog(context),
+              leadingWidth: 120,
+              leading: Center(
+                child: Padding(
+                  padding: const EdgeInsets.only(left: 16.0),
+                  child: GameExitButton(
+                    onExit: () => _showExitDialog(context),
+                  ),
+                ),
               ),
               actions: [
                 IconButton(
@@ -301,7 +307,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
 
                         // Word display
                         Directionality(
-                          textDirection: isArabic ? TextDirection.ltr : TextDirection.ltr,
+                          textDirection:
+                              isArabic ? TextDirection.ltr : TextDirection.ltr,
                           child: AnimatedBuilder(
                             animation: _shakeController,
                             builder: (context, child) {
@@ -328,25 +335,27 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                                   child: LayoutBuilder(
                                     builder: (context, constraints) {
                                       final letterCount = word.word.length;
-                                      final availableWidth = constraints.maxWidth;
+                                      final availableWidth =
+                                          constraints.maxWidth;
                                       final fontSize =
                                           (availableWidth / letterCount * 0.6)
                                               .clamp(20.0, 40.0);
                                       final horizontalPadding =
                                           (availableWidth / letterCount * 0.1)
                                               .clamp(2.0, 8.0);
-                          
+
                                       return Wrap(
                                         alignment: WrapAlignment.center,
                                         spacing: horizontalPadding,
-                                        children: List.generate(word.word.length,
-                                            (index) {
-                                          final bool isMissingLetter =
-                                              word.missingIndices.contains(index);
+                                        children: List.generate(
+                                            word.word.length, (index) {
+                                          final bool isMissingLetter = word
+                                              .missingIndices
+                                              .contains(index);
                                           final filledLetter =
                                               state.filledLetters[index];
                                           final isFilled = filledLetter != null;
-                          
+
                                           final Widget letterWidget = Padding(
                                             padding: EdgeInsets.symmetric(
                                                 horizontal: horizontalPadding),
@@ -367,24 +376,26 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                                               ),
                                             ),
                                           );
-                          
+
                                           if (isMissingLetter &&
                                               isFilled &&
                                               state.allLettersFilled) {
                                             return AnimatedBuilder(
-                                              animation: _letterBounceController,
+                                              animation:
+                                                  _letterBounceController,
                                               builder: (context, child) {
                                                 return Transform.scale(
-                                                  scale:
-                                                      Curves.elasticOut.transform(
-                                                    _letterBounceController.value,
+                                                  scale: Curves.elasticOut
+                                                      .transform(
+                                                    _letterBounceController
+                                                        .value,
                                                   ),
                                                   child: letterWidget,
                                                 );
                                               },
                                             );
                                           }
-                          
+
                                           return letterWidget;
                                         }),
                                       );
@@ -402,7 +413,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
 
                         // Letter options
                         Directionality(
-                          textDirection: isArabic ? TextDirection.ltr : TextDirection.ltr,
+                          textDirection:
+                              isArabic ? TextDirection.ltr : TextDirection.ltr,
                           child: Wrap(
                             spacing: 16,
                             runSpacing: 16,
@@ -410,7 +422,7 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                             children: word.options.asMap().entries.map((entry) {
                               final int index = entry.key;
                               final String option = entry.value;
-                          
+
                               return AnimatedOpacity(
                                 opacity: state.isCorrect ? 0.5 : 1.0,
                                 duration: const Duration(milliseconds: 300),

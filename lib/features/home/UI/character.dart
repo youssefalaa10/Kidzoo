@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/features/AppCategory/education_screen.dart';
 import 'package:kidzo/features/AppCategory/games_screen.dart';
 import 'package:kidzo/features/settings/settings_screen.dart';
@@ -68,6 +69,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
 
   @override
   Widget build(BuildContext context) {
+    final mq = CustomMQ(context);
     return Scaffold(
       body: Stack(
         children: [
@@ -84,16 +86,16 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
             child: Column(
               children: [
                 // Header section
-                _buildHeader(),
-                const SizedBox(height: 20),
+                _buildHeader(mq),
+                SizedBox(height: mq.height(2.5)),
                 // Title
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 30),
+                  padding: EdgeInsets.symmetric(horizontal: mq.width(8)),
                   child: Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: mq.width(3),
+                      vertical: mq.height(1),
                     ),
                     decoration: BoxDecoration(
                       color: Colors.blue.shade200,
@@ -108,11 +110,11 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                     ),
                     child: Text(
                       AppLocalizations.of(context).improveYourSkills,
-                      style: const TextStyle(
-                        fontSize: 28,
+                      style: TextStyle(
+                        fontSize: mq.width(7),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
-                        shadows: [
+                        shadows: const [
                           Shadow(
                             color: Colors.black54,
                             blurRadius: 8,
@@ -124,12 +126,13 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                     ),
                   ),
                 ),
-                const SizedBox(height: 30),
+                SizedBox(height: mq.height(3.5)),
                 // Carousel section
                 Expanded(
                   child: OverlappedCarousel(
                     items: _getCategories(context),
                     selectedIndex: _selectedIndex,
+                    mq: mq,
                     onItemChanged: (index) {
                       setState(() {
                         _selectedIndex = index;
@@ -145,9 +148,10 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
     );
   }
 
-  Widget _buildHeader() {
+  Widget _buildHeader(CustomMQ mq) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(
+          horizontal: mq.width(5), vertical: mq.height(1.5)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -159,8 +163,8 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
               ),
             ),
             child: Container(
-              width: 40,
-              height: 40,
+              width: mq.width(10),
+              height: mq.width(10),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.white.withValues(alpha: 0.9),
@@ -176,7 +180,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
               child: Icon(
                 Icons.settings_outlined,
                 color: Colors.blue[800],
-                size: 20,
+                size: mq.width(5),
               ),
             ),
           ),
@@ -210,11 +214,13 @@ class OverlappedCarousel extends StatefulWidget {
     required this.items,
     required this.selectedIndex,
     required this.onItemChanged,
+    required this.mq,
     super.key,
   });
   final List<CharacterCategory> items;
   final int selectedIndex;
   final void Function(int) onItemChanged;
+  final CustomMQ mq;
 
   @override
   State<OverlappedCarousel> createState() => _OverlappedCarouselState();
@@ -272,6 +278,7 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
                     category: widget.items[index],
                     isSelected: isSelected,
                     characterImage: widget.items[index].characterImage,
+                    mq: widget.mq,
                   ),
                 ),
               ),
@@ -288,95 +295,108 @@ class CharacterCard extends StatelessWidget {
     required this.category,
     required this.isSelected,
     required this.characterImage,
+    required this.mq,
     super.key,
   });
   final CharacterCategory category;
   final bool isSelected;
   final String characterImage;
+  final CustomMQ mq;
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 20),
+      margin: EdgeInsets.symmetric(
+          horizontal: mq.width(2.5), vertical: mq.height(2.5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Character image container with rounded corners
-          Container(
-            width: double.infinity,
-            height: 280,
-            decoration: BoxDecoration(
-              color: category.color,
-              borderRadius: BorderRadius.circular(30),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 5),
-                ),
-              ],
-            ),
-            child: Center(
-              child: isSelected
-                  ? Image.asset(
-                      characterImage,
-                      height: 180,
-                      width: 180,
-                    )
-                  : Container(), // Empty for non-selected cards
-            ),
-          ),
-          const SizedBox(height: 20),
-
-          // Character name
-          Text(
-            category.characterName,
-            style: const TextStyle(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-
-          // Character description
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 15),
-            child: Text(
-              category.characterDesc,
-              textAlign: TextAlign.center,
-              maxLines: 3,
-              overflow: TextOverflow.ellipsis,
-              style: TextStyle(
-                fontSize: 14,
-                color: Colors.grey[600],
-                height: 1.2,
+          Flexible(
+            flex: 5,
+            child: Container(
+              width: double.infinity,
+              height: mq.height(35),
+              decoration: BoxDecoration(
+                color: category.color,
+                borderRadius: BorderRadius.circular(30),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.1),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Center(
+                child: isSelected
+                    ? Image.asset(
+                        characterImage,
+                        height: mq.height(22),
+                        width: mq.height(22),
+                      )
+                    : Container(), // Empty for non-selected cards
               ),
             ),
           ),
-          const SizedBox(height: 20),
+          SizedBox(height: mq.height(2)),
+
+          // Character name
+          Flexible(
+            flex: 1,
+            child: Text(
+              category.characterName,
+              style: TextStyle(
+                fontSize: mq.width(6),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          SizedBox(height: mq.height(1)),
+
+          // Character description
+          Flexible(
+            flex: 2,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: mq.width(4)),
+              child: Text(
+                category.characterDesc,
+                textAlign: TextAlign.center,
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                  fontSize: mq.width(3.5),
+                  color: Colors.grey[600],
+                  height: 1.2,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: mq.height(2)),
 
           // Coins indicator
-          Container(
-            padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 12),
-            decoration: BoxDecoration(
-              color: Colors.blue,
-              borderRadius: BorderRadius.circular(25),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // const Icon(Icons.monetization_on,
-                //     color: Colors.yellow, size: 18),
-                // const SizedBox(width: 8),
-                Text(
-                  category.buttonLabel,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+          Flexible(
+            flex: 1,
+            child: Container(
+              padding: EdgeInsets.symmetric(
+                  horizontal: mq.width(6), vertical: mq.height(1.5)),
+              decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(25),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    category.buttonLabel,
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: mq.width(4),
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ],

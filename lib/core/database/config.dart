@@ -1,18 +1,12 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
 import 'package:kidzo/core/database/tables/profile_table.dart';
+import 'package:kidzo/core/database/tables/game_scores_table.dart';
 import 'package:path_provider/path_provider.dart';
 
 part 'config.g.dart';
 
-// class TodoItems extends Table {
-//   IntColumn get id => integer().autoIncrement()();
-//   TextColumn get title => text().withLength(min: 6, max: 32)();
-//   TextColumn get content => text().named('body')();
-//   DateTimeColumn get createdAt => dateTime().nullable()();
-// }
-
-@DriftDatabase(tables: [Profiles])
+@DriftDatabase(tables: [Profiles, GameScores])
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
   // and a constructor telling drift where the database should be stored.

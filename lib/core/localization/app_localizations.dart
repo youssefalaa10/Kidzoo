@@ -23,7 +23,8 @@ class AppLocalizations {
   // DrawLab translations
   String get drawLab => _localizedValues['drawLab']!;
   String get navigationNotAllowed => _localizedValues['navigationNotAllowed']!;
-  String get gamesOnlyThroughLevelMap => _localizedValues['gamesOnlyThroughLevelMap']!;
+  String get gamesOnlyThroughLevelMap =>
+      _localizedValues['gamesOnlyThroughLevelMap']!;
   String get goBack => _localizedValues['goBack']!;
   String get toolSettings => _localizedValues['toolSettings']!;
   String get failedToShare => _localizedValues['failedToShare']!;
@@ -364,12 +365,12 @@ class AppLocalizations {
   String get memoryGameTimeResult => _localizedValues['memoryGameTimeResult']!;
   String totalMovesLabel(int moves) => _localizedValues['totalMovesLabel']!
       .replaceAll('{moves}', moves.toString());
-  String pairsLabel(int current, int total) =>
-      _localizedValues['pairsLabel']!
-          .replaceAll('{current}', current.toString())
-          .replaceAll('{total}', total.toString());
-  String lockedLevelMessage(int level) => _localizedValues['lockedLevelMessage']!
-      .replaceAll('{level}', level.toString());
+  String pairsLabel(int current, int total) => _localizedValues['pairsLabel']!
+      .replaceAll('{current}', current.toString())
+      .replaceAll('{total}', total.toString());
+  String lockedLevelMessage(int level) =>
+      _localizedValues['lockedLevelMessage']!
+          .replaceAll('{level}', level.toString());
 
   // Learning Activities translations
   String get numbers => _localizedValues['numbers']!;
@@ -522,6 +523,12 @@ class AppLocalizations {
   String get shape => _localizedValues['shape']!;
   String get text => _localizedValues['text']!;
   String get galleryAccessDenied => _localizedValues['galleryAccessDenied']!;
+
+  String get vehicles => _localizedValues['vehicles']!;
+  String get fruits => _localizedValues['fruits']!;
+  String get vegetables => _localizedValues['vegetables']!;
+  String get splashTitle => _localizedValues['splashTitle']!;
+  String get splashSubtitle => _localizedValues['splashSubtitle']!;
 
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;

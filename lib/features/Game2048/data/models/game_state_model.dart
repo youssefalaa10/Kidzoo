@@ -73,4 +73,3 @@ class GameState extends Equatable {
         moveCount,
       ];
 }
-

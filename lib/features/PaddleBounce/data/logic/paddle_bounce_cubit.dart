@@ -163,8 +163,9 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
       // Increase speed on each bounce up to max
-      final nextSpeed = (currentSpeed * _speedIncreaseFactor).clamp(_initialBallSpeed, _maxBallSpeed);
-      
+      final nextSpeed = (currentSpeed * _speedIncreaseFactor)
+          .clamp(_initialBallSpeed, _maxBallSpeed);
+
       newVelocityX = nextSpeed * math.sin(angle);
       newVelocityY = nextSpeed * math.cos(angle);
       newBallY = state.topPaddle.height + state.ball.radius + topPaddlePadding;
@@ -183,7 +184,8 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
       // Increase speed on each bounce up to max
-      final nextSpeed = (currentSpeed * _speedIncreaseFactor).clamp(_initialBallSpeed, _maxBallSpeed);
+      final nextSpeed = (currentSpeed * _speedIncreaseFactor)
+          .clamp(_initialBallSpeed, _maxBallSpeed);
 
       newVelocityX = nextSpeed * math.sin(angle);
       newVelocityY = -nextSpeed * math.cos(angle);
@@ -282,9 +284,12 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
     final moveDistance = distance * reactionDelay * accuracy;
 
     // Scale AI reaction speed based on current ball speed to keep it challenging
-    final currentBallSpeed = math.sqrt(state.ball.velocityX * state.ball.velocityX + state.ball.velocityY * state.ball.velocityY);
-    final speedMultiplier = (currentBallSpeed / _initialBallSpeed).clamp(1.0, 1.5);
-    
+    final currentBallSpeed = math.sqrt(
+        state.ball.velocityX * state.ball.velocityX +
+            state.ball.velocityY * state.ball.velocityY);
+    final speedMultiplier =
+        (currentBallSpeed / _initialBallSpeed).clamp(1.0, 1.5);
+
     final newX = (aiPaddle.x + moveDistance * 0.3 * speedMultiplier).clamp(
         _paddlePadding, state.screenWidth - aiPaddle.width - _paddlePadding);
 

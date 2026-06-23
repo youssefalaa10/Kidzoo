@@ -189,4 +189,3 @@ class GameStorage {
     await prefs.remove(_keyGameHistory);
   }
 }
-

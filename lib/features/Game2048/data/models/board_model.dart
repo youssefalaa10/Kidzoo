@@ -65,4 +65,3 @@ class Position {
   final int row;
   final int col;
 }
-

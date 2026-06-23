@@ -249,7 +249,8 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
     final lengthSq = dx * dx + dy * dy;
     if (lengthSq == 0) return (point - start).distance;
 
-    var t = ((point.dx - start.dx) * dx + (point.dy - start.dy) * dy) / lengthSq;
+    var t =
+        ((point.dx - start.dx) * dx + (point.dy - start.dy) * dy) / lengthSq;
     t = t.clamp(0.0, 1.0);
     final projection = Offset(start.dx + t * dx, start.dy + t * dy);
     return (point - projection).distance;

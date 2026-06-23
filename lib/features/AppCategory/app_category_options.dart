@@ -1,16 +1,17 @@
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
+import 'package:kidzo/core/database/daos/game_scores_dao.dart';
+import 'package:kidzo/core/database/daos/profile_dao.dart';
 import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
 import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
 import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
-import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
-import 'package:kidzo/features/FlagGame/pages/listening_game_screen.dart';
 import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
@@ -18,6 +19,9 @@ import 'package:kidzo/features/MissingLetterGame/Ui/missing_letter_home.dart';
 import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzo/features/Numbers/number_screen.dart';
 import 'package:kidzo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
+import 'package:kidzo/features/QuizEngine/bloc/quiz_cubit.dart';
+import 'package:kidzo/features/QuizEngine/data/quiz_models.dart';
+import 'package:kidzo/features/QuizEngine/ui/quiz_engine_screen.dart';
 import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzo/features/Shapes/shape_screen.dart';
 import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
@@ -160,17 +164,87 @@ class OptionsGrid extends StatelessWidget {
       ),
       OptionItem(
         icon: ImageManager.lion,
-        title: l10n.animalNameGame,
-        screen: const AnimalNameGameScreen(),
+        title: l10n.vehicles,
+        screen: Builder(
+          builder: (context) => BlocProvider(
+            create: (context) => QuizCubit(
+              gameScoresDao: context.read<GameScoresDao>(),
+              profileDao: context.read<ProfileDao>(),
+              flutterTts: context.read<FlutterTts>(),
+              audioPlayer: context.read<AudioPlayer>(),
+              gameKey: 'vehicles',
+              questions: const [
+                QuizQuestion(
+                  id: 'v1',
+                  prompt: 'Which vehicle flies?',
+                  imageOrScenePath: ImageManager.lion,
+                  options: [
+                    QuizOption(id: '1', text: 'Airplane', isCorrect: true),
+                    QuizOption(id: '2', text: 'Car', isCorrect: false),
+                  ],
+                ),
+              ],
+            ),
+            child: const QuizEngineScreen(),
+          ),
+        ),
         flipImage: ImageManager.elephant,
       ),
       OptionItem(
-        icon: ImageManager.egypt,
-        title: l10n.flagGame,
-        screen: const FlagGameMenuScreen(),
-        flipImage: ImageManager.worldMap,
-        backIcon: Icons.flag_rounded,
-        frontIcon: Icons.public_rounded,
+        icon: ImageManager.lion,
+        title: l10n.fruits,
+        screen: Builder(
+          builder: (context) => BlocProvider(
+            create: (context) => QuizCubit(
+              gameScoresDao: context.read<GameScoresDao>(),
+              profileDao: context.read<ProfileDao>(),
+              flutterTts: context.read<FlutterTts>(),
+              audioPlayer: context.read<AudioPlayer>(),
+              gameKey: 'fruits',
+              questions: const [
+                QuizQuestion(
+                  id: 'f1',
+                  prompt: 'Which fruit is red?',
+                  imageOrScenePath: ImageManager.lion,
+                  options: [
+                    QuizOption(id: '1', text: 'Apple', isCorrect: true),
+                    QuizOption(id: '2', text: 'Banana', isCorrect: false),
+                  ],
+                ),
+              ],
+            ),
+            child: const QuizEngineScreen(),
+          ),
+        ),
+        flipImage: ImageManager.elephant,
+      ),
+      OptionItem(
+        icon: ImageManager.lion,
+        title: l10n.vegetables,
+        screen: Builder(
+          builder: (context) => BlocProvider(
+            create: (context) => QuizCubit(
+              gameScoresDao: context.read<GameScoresDao>(),
+              profileDao: context.read<ProfileDao>(),
+              flutterTts: context.read<FlutterTts>(),
+              audioPlayer: context.read<AudioPlayer>(),
+              gameKey: 'vegetables',
+              questions: const [
+                QuizQuestion(
+                  id: 'vg1',
+                  prompt: 'Which is a vegetable?',
+                  imageOrScenePath: ImageManager.lion,
+                  options: [
+                    QuizOption(id: '1', text: 'Carrot', isCorrect: true),
+                    QuizOption(id: '2', text: 'Apple', isCorrect: false),
+                  ],
+                ),
+              ],
+            ),
+            child: const QuizEngineScreen(),
+          ),
+        ),
+        flipImage: ImageManager.elephant,
       ),
     ];
   }
@@ -317,28 +391,34 @@ class _OptionCardState extends State<OptionCard>
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           if (widget.frontIcon != null)
-            Icon(
-              widget.frontIcon,
-              size: iconSize,
-              color: const Color(0xFFe2c9b5),
+            Flexible(
+              child: Icon(
+                widget.frontIcon,
+                size: iconSize,
+                color: const Color(0xFFe2c9b5),
+              ),
             )
           else
-            Image.asset(
-              widget.icon,
-              width: iconSize,
-              height: iconSize,
-              fit: BoxFit.contain,
+            Flexible(
+              child: Image.asset(
+                widget.icon,
+                width: iconSize,
+                height: iconSize,
+                fit: BoxFit.contain,
+              ),
             ),
           SizedBox(height: widget.mq.height(1)),
-          Text(
-            widget.title,
-            style: TextStyle(
-              fontSize: widget.mq.width(3.5),
-              fontWeight: FontWeight.bold,
+          Flexible(
+            child: Text(
+              widget.title,
+              style: TextStyle(
+                fontSize: widget.mq.width(3.5),
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           ),
         ],
       ),

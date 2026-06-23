@@ -75,4 +75,3 @@ class MissingLetterStorage {
     await resetProgress();
   }
 }
-

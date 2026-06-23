@@ -69,10 +69,10 @@ class Box {
   /// Get the four lines that make up this box
   List<Line> getLines() {
     final top = Line(topLeft, DotPosition(topLeft.row, topLeft.col + 1));
-    final right =
-        Line(DotPosition(topLeft.row, topLeft.col + 1), DotPosition(topLeft.row + 1, topLeft.col + 1));
-    final bottom =
-        Line(DotPosition(topLeft.row + 1, topLeft.col + 1), DotPosition(topLeft.row + 1, topLeft.col));
+    final right = Line(DotPosition(topLeft.row, topLeft.col + 1),
+        DotPosition(topLeft.row + 1, topLeft.col + 1));
+    final bottom = Line(DotPosition(topLeft.row + 1, topLeft.col + 1),
+        DotPosition(topLeft.row + 1, topLeft.col));
     final left = Line(DotPosition(topLeft.row + 1, topLeft.col), topLeft);
 
     return [top, right, bottom, left];
@@ -204,4 +204,3 @@ enum GameStatus {
   playing,
   finished;
 }
-

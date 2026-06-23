@@ -4,7 +4,12 @@ import '../../data/models/dots_and_boxes_models.dart';
 
 class GameResultDialog extends StatelessWidget {
   const GameResultDialog({
-    required this.player1Score, required this.player2Score, required this.gameMode, required this.onNewGame, required this.onClose, super.key,
+    required this.player1Score,
+    required this.player2Score,
+    required this.gameMode,
+    required this.onNewGame,
+    required this.onClose,
+    super.key,
     this.winner,
     this.moveCount = 0,
     this.maxCombo = 0,
@@ -45,9 +50,9 @@ class GameResultDialog extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              isTie 
+              isTie
                   ? Colors.amber.shade50
-                  : winner!.lightColor.withValues(alpha:0.3),
+                  : winner!.lightColor.withValues(alpha: 0.3),
               Colors.white,
             ],
           ),
@@ -72,7 +77,7 @@ class GameResultDialog extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: winner!.color.withValues(alpha:0.1),
+                  color: winner!.color.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -136,9 +141,8 @@ class GameResultDialog extends StatelessWidget {
                     onPressed: onNewGame,
                     style: ElevatedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 14),
-                      backgroundColor: isTie 
-                          ? Colors.amber.shade600
-                          : winner!.color,
+                      backgroundColor:
+                          isTie ? Colors.amber.shade600 : winner!.color,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -243,7 +247,8 @@ class GameResultDialog extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(IconData icon, String label, String value, {Color? iconColor}) {
+  Widget _buildStatItem(IconData icon, String label, String value,
+      {Color? iconColor}) {
     return Column(
       children: [
         Icon(icon, size: 20, color: iconColor ?? Colors.grey.shade600),
@@ -268,4 +273,3 @@ class GameResultDialog extends StatelessWidget {
     );
   }
 }
-

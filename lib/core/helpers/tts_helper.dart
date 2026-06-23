@@ -8,7 +8,7 @@ class TtsHelper {
 
   final MusicCubit musicCubit;
   final String languageCode;
-  
+
   final TtsService _ttsService = TtsService();
 
   bool _isInitCalled = false;
@@ -16,7 +16,7 @@ class TtsHelper {
   void _initTts() {
     if (_isInitCalled) return;
     _isInitCalled = true;
-    
+
     _ttsService.init(languageCode: languageCode);
 
     _ttsService.setCompletionHandler(() {

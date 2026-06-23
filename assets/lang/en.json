@@ -467,5 +467,10 @@
   "sequence": "Sequence",
   "continueButton": "Continue",
   "youReachedRound": "You reached Round",
-  "newBestScore": "New Best Score!"
+  "newBestScore": "New Best Score!",
+  "vehicles": "Vehicles",
+  "fruits": "Fruits",
+  "vegetables": "Vegetables",
+  "splashTitle": "Kidzoo",
+  "splashSubtitle": "Learn and Play!"
 }

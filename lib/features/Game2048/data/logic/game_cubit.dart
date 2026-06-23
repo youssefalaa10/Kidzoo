@@ -231,4 +231,3 @@ class GameCubit extends Cubit<GameState> {
     return super.close();
   }
 }
-

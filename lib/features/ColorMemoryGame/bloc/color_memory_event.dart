@@ -137,7 +137,3 @@ class UpdateBestScoreEvent extends ColorMemoryEvent {
   @override
   List<Object?> get props => [score];
 }
-
-
-
-

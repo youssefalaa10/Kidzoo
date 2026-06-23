@@ -77,7 +77,7 @@ class MazeCubit extends Cubit<MazeState> {
 
     // Valid move
     final newPath = List<MazePosition>.from(state.path);
-    
+
     // Check if backtracking
     if (newPath.length > 1 && newPath[newPath.length - 2] == position) {
       newPath.removeLast(); // Remove current position, move back

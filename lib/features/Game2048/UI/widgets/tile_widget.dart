@@ -103,4 +103,3 @@ class EmptyTileWidget extends StatelessWidget {
     );
   }
 }
-

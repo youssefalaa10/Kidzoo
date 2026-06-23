@@ -98,8 +98,8 @@ class MazePainter extends CustomPainter {
       final pathPaint = Paint()
         ..shader = LinearGradient(
           colors: [
-            Colors.blue.shade300.withValues(alpha:0.7),
-            Colors.blue.shade600.withValues(alpha:0.8),
+            Colors.blue.shade300.withValues(alpha: 0.7),
+            Colors.blue.shade600.withValues(alpha: 0.8),
           ],
         ).createShader(Rect.fromLTWH(
             0, 0, state.gridSize * cellSize, state.gridSize * cellSize))
@@ -177,7 +177,7 @@ class MazePainter extends CustomPainter {
           if (!collected) {
             // Add glow effect for uncollected stars
             final glowPaint = Paint()
-              ..color = Colors.yellow.withValues(alpha:0.3)
+              ..color = Colors.yellow.withValues(alpha: 0.3)
               ..style = PaintingStyle.fill;
             canvas.drawCircle(
                 Offset(centerX, centerY), radius * 1.3, glowPaint);
@@ -187,7 +187,7 @@ class MazePainter extends CustomPainter {
           } else {
             // Draw checkmark for collected star
             final collectedPaint = Paint()
-              ..color = Colors.green.withValues(alpha:0.4)
+              ..color = Colors.green.withValues(alpha: 0.4)
               ..style = PaintingStyle.fill;
             canvas.drawCircle(Offset(centerX, centerY), radius, collectedPaint);
 
@@ -258,7 +258,7 @@ class MazePainter extends CustomPainter {
 
     // Draw circle background
     final bgPaint = Paint()
-      ..color = color.withValues(alpha:0.3)
+      ..color = color.withValues(alpha: 0.3)
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(Offset(centerX, centerY), radius, bgPaint);

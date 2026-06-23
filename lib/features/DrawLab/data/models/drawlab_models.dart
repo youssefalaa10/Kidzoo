@@ -345,4 +345,3 @@ class ColorPalette {
     Color(0xFF00FFFF), // Cyan
   ];
 }
-
