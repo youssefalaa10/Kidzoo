@@ -293,66 +293,119 @@ class _DotsAndBoxesScreenContentState
           return SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
+                final isLandscape = constraints.maxWidth > constraints.maxHeight;
                 return SingleChildScrollView(
                   child: ConstrainedBox(
                     constraints: BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
-                      child: Column(
-                        children: [
-                // Header
-                _buildHeader(context, state),
-                const SizedBox(height: 16),
-
-                // Score Board
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: ScoreBoard(
-                    player1Score: state.player1Score,
-                    player2Score: state.player2Score,
-                    currentPlayer: state.currentPlayer,
-                    gameMode: state.gameMode,
-                  ),
-                ),
-                const SizedBox(height: 16),
-
-                // Current Turn Indicator
-                _buildTurnIndicator(state),
-                const SizedBox(height: 8),
-
-                // Combo Indicator (if active)
-                if (state.isComboActive) _buildComboIndicator(state),
-
-                // Stats Row
-                _buildStatsRow(state),
-                const SizedBox(height: 8),
-
-                // Game Board
-                Expanded(
-                  child: Center(
-                    child: InteractiveGameBoard(
-                      state: state,
-                      onLineTapped: (start, end) {
-                        context.read<DotsAndBoxesCubit>().drawLine(start, end);
-                      },
+                      child: isLandscape 
+                          ? _buildLandscapeLayout(context, state)
+                          : _buildPortraitLayout(context, state),
                     ),
                   ),
-                ),
-
-                        // Control Buttons
-                        _buildControlButtons(context, state),
-                        const SizedBox(height: 16),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            },
-          ),
-        );
+                );
+              },
+            ),
+          );
         },
       ),
     );
   }
+
+  Widget _buildPortraitLayout(BuildContext context, DotsAndBoxesState state) {
+    return Column(
+      children: [
+        // Header
+        _buildHeader(context, state),
+        const SizedBox(height: 16),
+
+        // Score Board
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: ScoreBoard(
+            player1Score: state.player1Score,
+            player2Score: state.player2Score,
+            currentPlayer: state.currentPlayer,
+            gameMode: state.gameMode,
+          ),
+        ),
+        const SizedBox(height: 16),
+
+        // Current Turn Indicator
+        _buildTurnIndicator(state),
+        const SizedBox(height: 8),
+
+        // Combo Indicator (if active)
+        if (state.isComboActive) _buildComboIndicator(state),
+
+        // Stats Row
+        _buildStatsRow(state),
+        const SizedBox(height: 8),
+
+        // Game Board
+        Expanded(
+          child: Center(
+            child: InteractiveGameBoard(
+              state: state,
+              onLineTapped: (start, end) {
+                context.read<DotsAndBoxesCubit>().drawLine(start, end);
+              },
+            ),
+          ),
+        ),
+
+        // Control Buttons
+        _buildControlButtons(context, state),
+        const SizedBox(height: 16),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(BuildContext context, DotsAndBoxesState state) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: Center(
+            child: InteractiveGameBoard(
+              state: state,
+              onLineTapped: (start, end) {
+                context.read<DotsAndBoxesCubit>().drawLine(start, end);
+              },
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildHeader(context, state),
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: ScoreBoard(
+                  player1Score: state.player1Score,
+                  player2Score: state.player2Score,
+                  currentPlayer: state.currentPlayer,
+                  gameMode: state.gameMode,
+                ),
+              ),
+              const SizedBox(height: 16),
+              _buildTurnIndicator(state),
+              const SizedBox(height: 8),
+              if (state.isComboActive) _buildComboIndicator(state),
+              _buildStatsRow(state),
+              const SizedBox(height: 16),
+              _buildControlButtons(context, state),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
 
   Widget _buildHeader(BuildContext context, DotsAndBoxesState state) {
     return Padding(

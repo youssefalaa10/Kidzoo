@@ -162,8 +162,13 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           state.ball.calculateBounceAngle(hitPosition, state.topPaddle.width);
       final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
+          
+      // Smash effect: hitting near edge increases speed
+      final edgeFactor = (hitPosition - state.topPaddle.width / 2).abs() / (state.topPaddle.width / 2);
+      final speedBoost = 1.0 + (edgeFactor.clamp(0.0, 1.0) * 0.15); // Up to 15% extra speed
+      
       // Increase speed on each bounce up to max
-      final nextSpeed = (currentSpeed * _speedIncreaseFactor)
+      final nextSpeed = (currentSpeed * _speedIncreaseFactor * speedBoost)
           .clamp(_initialBallSpeed, _maxBallSpeed);
 
       newVelocityX = nextSpeed * math.sin(angle);
@@ -183,8 +188,13 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           .calculateBounceAngle(hitPosition, state.bottomPaddle.width);
       final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
+          
+      // Smash effect: hitting near edge increases speed
+      final edgeFactor = (hitPosition - state.bottomPaddle.width / 2).abs() / (state.bottomPaddle.width / 2);
+      final speedBoost = 1.0 + (edgeFactor.clamp(0.0, 1.0) * 0.15); // Up to 15% extra speed
+      
       // Increase speed on each bounce up to max
-      final nextSpeed = (currentSpeed * _speedIncreaseFactor)
+      final nextSpeed = (currentSpeed * _speedIncreaseFactor * speedBoost)
           .clamp(_initialBallSpeed, _maxBallSpeed);
 
       newVelocityX = nextSpeed * math.sin(angle);
@@ -272,25 +282,95 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
 
   void _updateAIPaddle() {
     final aiPaddle = state.topPaddle;
-    final ballX = state.ball.x;
-    final targetX = ballX - aiPaddle.width / 2;
+    final ball = state.ball;
+    
+    double targetX;
+    double maxSpeed;
+    
+    // Calculate the Y coordinate where the paddle can hit the ball
+    final targetY = aiPaddle.height + _paddlePadding + ball.radius;
+    
+    // AI configuration based on difficulty
+    switch (state.aiDifficulty) {
+      case AIDifficulty.easy:
+        // Follows the ball with delay and error
+        targetX = ball.x;
+        // Introduce some random error that oscillates
+        final error = math.sin(DateTime.now().millisecondsSinceEpoch / 500) * 40;
+        targetX += error;
+        maxSpeed = _paddleSpeed * 0.4;
+        break;
+        
+      case AIDifficulty.medium:
+        // Better tracking, simple short-term prediction
+        if (ball.velocityY < 0) { // Ball moving towards AI (top)
+          targetX = ball.x + (ball.velocityX * 10); 
+        } else {
+          // Ball moving away, return to center
+          targetX = state.screenWidth / 2;
+        }
+        maxSpeed = _paddleSpeed * 0.6;
+        break;
+        
+      case AIDifficulty.hard:
+        // Predicts trajectory without bounces if it's far, uses exact prediction if closer
+        if (ball.velocityY < 0) {
+          targetX = _predictBallX(ball.x, ball.y, ball.velocityX, ball.velocityY, targetY);
+          // Small error to allow player outplays
+          targetX += math.sin(DateTime.now().millisecondsSinceEpoch / 200) * 15;
+        } else {
+          // Follow ball loosely when moving away
+          targetX = state.screenWidth / 2 + (ball.x - state.screenWidth / 2) * 0.2;
+        }
+        maxSpeed = _paddleSpeed * 0.85;
+        break;
+        
+      case AIDifficulty.expert:
+        // Exact prediction, anticipates bounces perfectly
+        if (ball.velocityY < 0) {
+          targetX = _predictBallX(ball.x, ball.y, ball.velocityX, ball.velocityY, targetY);
+          // Very small micro-adjustments so it's not robotic
+          targetX += math.sin(DateTime.now().millisecondsSinceEpoch / 100) * 5;
+        } else {
+          // Anticipate by staying aligned with the ball even when it's moving away
+          targetX = state.screenWidth / 2 + (ball.x - state.screenWidth / 2) * 0.5;
+        }
+        maxSpeed = _paddleSpeed * 1.05; // Reduced from 1.2 so it is beatable
+        break;
+    }
 
-    // AI difficulty affects reaction speed and accuracy
-    final reactionDelay = state.aiDifficulty == AIDifficulty.easy ? 0.7 : 0.95;
-    final accuracy = state.aiDifficulty == AIDifficulty.easy ? 0.8 : 0.98;
+    // Expert AI has a "sweet spot" behavior to intentionally hit edges for sharp angles
+    final currentX = aiPaddle.x;
+    if (state.aiDifficulty == AIDifficulty.expert && ball.velocityY < 0) {
+      // If the AI is comfortably in position, it will try to hit with the edge 
+      // to return a difficult sharp angle smash.
+      final distanceToTarget = (currentX + aiPaddle.width / 2 - targetX).abs();
+      if (distanceToTarget < 30) {
+         // Shift target slightly to use paddle edge
+         if (ball.x < state.screenWidth / 2) {
+           targetX += aiPaddle.width * 0.3; // Hit to the right
+         } else {
+           targetX -= aiPaddle.width * 0.3; // Hit to the left
+         }
+      }
+    }
 
-    final currentCenter = aiPaddle.x + aiPaddle.width / 2;
-    final distance = targetX - currentCenter;
-    final moveDistance = distance * reactionDelay * accuracy;
+    // Adjust target to be the left edge of the paddle
+    targetX -= aiPaddle.width / 2;
+    
+    // Smooth movement towards target
+    double deltaX = targetX - currentX;
+    
+    // Apply speed limits scaling with the ball speed to keep it fair and competitive
+    final currentBallSpeed = math.sqrt(ball.velocityX * ball.velocityX + ball.velocityY * ball.velocityY);
+    final speedMultiplier = (currentBallSpeed / _initialBallSpeed).clamp(1.0, 2.0);
+    final actualMaxSpeed = maxSpeed * speedMultiplier;
+    
+    if (deltaX.abs() > actualMaxSpeed) {
+      deltaX = actualMaxSpeed * deltaX.sign;
+    }
 
-    // Scale AI reaction speed based on current ball speed to keep it challenging
-    final currentBallSpeed = math.sqrt(
-        state.ball.velocityX * state.ball.velocityX +
-            state.ball.velocityY * state.ball.velocityY);
-    final speedMultiplier =
-        (currentBallSpeed / _initialBallSpeed).clamp(1.0, 1.5);
-
-    final newX = (aiPaddle.x + moveDistance * 0.3 * speedMultiplier).clamp(
+    final newX = (currentX + deltaX).clamp(
         _paddlePadding, state.screenWidth - aiPaddle.width - _paddlePadding);
 
     if ((newX - aiPaddle.x).abs() > 0.5) {
@@ -298,6 +378,41 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
         topPaddle: aiPaddle.copyWith(x: newX),
       ));
     }
+  }
+
+  double _predictBallX(double startX, double startY, double velX, double velY, double targetY) {
+    if (velY >= 0) return startX; // Shouldn't happen if moving towards top AI
+    
+    // Time to reach target Y
+    final timeToReach = (targetY - startY) / velY; // velY is negative
+    
+    // Projected X without walls
+    double projectedX = startX + (velX * timeToReach);
+    
+    // Account for wall bounces
+    final leftWall = _paddlePadding + state.ball.radius;
+    final rightWall = state.screenWidth - _paddlePadding - state.ball.radius;
+    final width = rightWall - leftWall;
+    
+    if (width <= 0) return startX; // Guard against division by zero
+
+    // Shift coordinate system to 0 at left wall
+    projectedX -= leftWall;
+    
+    // Number of bounces
+    int bounces = (projectedX / width).floor();
+    
+    // Calculate final X within the bounds
+    double finalX = projectedX % width;
+    if (finalX < 0) finalX += width;
+    
+    // If bounces is odd, it's moving right-to-left
+    if (bounces % 2 != 0) {
+      finalX = width - finalX;
+    }
+    
+    // Shift back to original coordinates
+    return finalX + leftWall;
   }
 
   void _resetBallAfterScore() {
@@ -320,6 +435,43 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       screenWidth: state.screenWidth,
       screenHeight: state.screenHeight,
       winningScore: state.winningScore,
+    ));
+  }
+
+  void updateDimensions(double width, double height) {
+    if (state.screenWidth == width && state.screenHeight == height) return;
+
+    final widthScale = width / state.screenWidth;
+    final heightScale = height / state.screenHeight;
+
+    // Recalculate paddle width proportionally
+    final paddleWidth = width * 0.35;
+    
+    // Scale positions proportionally and clamp
+    final newBallX = (state.ball.x * widthScale).clamp(
+      state.ball.radius + _paddlePadding, 
+      width - state.ball.radius - _paddlePadding
+    );
+    final newBallY = (state.ball.y * heightScale).clamp(
+      state.ball.radius + _paddlePadding, 
+      height - state.ball.radius - _paddlePadding
+    );
+    
+    final newTopPaddleX = (state.topPaddle.x * widthScale).clamp(
+      _paddlePadding, 
+      width - paddleWidth - _paddlePadding
+    );
+    final newBottomPaddleX = (state.bottomPaddle.x * widthScale).clamp(
+      _paddlePadding, 
+      width - paddleWidth - _paddlePadding
+    );
+
+    emit(state.copyWith(
+      screenWidth: width,
+      screenHeight: height,
+      ball: state.ball.copyWith(x: newBallX, y: newBallY),
+      topPaddle: state.topPaddle.copyWith(x: newTopPaddleX, width: paddleWidth),
+      bottomPaddle: state.bottomPaddle.copyWith(x: newBottomPaddleX, width: paddleWidth),
     ));
   }
 }

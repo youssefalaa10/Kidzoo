@@ -269,206 +269,243 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screenWidth > screenHeight;
+
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
-            fit: BoxFit.cover,
-          ),
-        ),
         child: SafeArea(
           child: FluidContainer(
             padding: EdgeInsets.zero,
-            child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(
-                    horizontal: 16.0, vertical: 24.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      l10n.memoryGame,
-                      style: TextStyle(
-                        color: Colors.blueGrey[800],
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.refresh, color: Colors.blueGrey[800]),
-                      onPressed: _restartGame,
-                    ),
-                  ],
-                ),
-              ),
-              // Level selector
-              // Padding(
-              //   padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              //   child: Row(
-              //     mainAxisAlignment: MainAxisAlignment.center,
-              //     children: [
-              //       _buildLevelButton('Easy', GameLevel.easy),
-              //       const SizedBox(width: 12),
-              //       _buildLevelButton('Medium', GameLevel.medium),
-              //       const SizedBox(width: 12),
-              //       _buildLevelButton('Hard', GameLevel.hard),
-              //     ],
-              //   ),
-              // ),
-              // const SizedBox(height: 16),
-              // Game stats
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildInfoCard(l10n.time, _timeElapsed),
-                    _buildInfoCard(l10n.moves, _moves.toString()),
-                    _buildInfoCard(l10n.pairs, '$_pairs/$_totalPairs'),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 24),
-              Expanded(
-                child: Stack(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: _getCrossAxisCount(),
-                          crossAxisSpacing: 8,
-                          mainAxisSpacing: 8,
-                          mainAxisExtent: (MediaQuery.of(context).size.width -
-                                  (16 + (_getCrossAxisCount() - 1) * 8)) /
-                              _getCrossAxisCount(),
-                        ),
-                        itemCount: _cards.length,
-                        itemBuilder: (context, index) {
-                          return _cards[index].isEmpty
-                              ? Container() // Empty space for easy level
-                              : _buildCard(
-                                  _cards[index], () => _flipCard(index));
-                        },
-                      ),
-                    ),
-                    if (_gameCompleted)
-                      FadeTransition(
-                        opacity: _gameCompletedAnimation,
-                        child: Center(
-                          child: Container(
-                            padding: const EdgeInsets.all(24),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(16),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.blue.withValues(alpha: 0.3),
-                                  blurRadius: 20,
-                                  spreadRadius: 5,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  l10n.memoryGameCongrats,
-                                  style: TextStyle(
-                                    color: Colors.blueGrey[800],
-                                    fontSize: 24,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  l10n.memoryGameTimeResult,
-                                  style: TextStyle(
-                                    color: Colors.blueGrey[600],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  _timeElapsed,
-                                  style: TextStyle(
-                                    color: Colors.blueGrey[800],
-                                    fontSize: 36,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  l10n.totalMovesLabel(_moves),
-                                  style: TextStyle(
-                                    color: Colors.blueGrey[600],
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                const SizedBox(height: 24),
-                                Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Flexible(
-                                      child: ElevatedButton(
-                                        onPressed: _restartGame,
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.blue[400],
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          l10n.playAgain,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Flexible(
-                                      child: ElevatedButton(
-                                        onPressed: () {
-                                          // Return to level map with completion status
-                                          Navigator.of(context).pop(true);
-                                        },
-                                        style: ElevatedButton.styleFrom(
-                                          backgroundColor: Colors.green[400],
-                                          foregroundColor: Colors.white,
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 16, vertical: 12),
-                                          shape: RoundedRectangleBorder(
-                                            borderRadius:
-                                                BorderRadius.circular(30),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          l10n.continueText,
-                                          style: const TextStyle(fontSize: 14),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                  ],
-                ),
-              ),
-            ],
-            ),
-
+            child: isLandscape ? _buildLandscapeLayout(l10n) : _buildPortraitLayout(l10n),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildPortraitLayout(AppLocalizations l10n) {
+    return Column(
+      children: [
+        Padding(
+          padding: const EdgeInsets.symmetric(
+              horizontal: 16.0, vertical: 24.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                l10n.memoryGame,
+                style: TextStyle(
+                  color: Colors.blueGrey[800],
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              IconButton(
+                icon: Icon(Icons.refresh, color: Colors.blueGrey[800]),
+                onPressed: _restartGame,
+              ),
+            ],
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              _buildInfoCard(l10n.time, _timeElapsed),
+              _buildInfoCard(l10n.moves, _moves.toString()),
+              _buildInfoCard(l10n.pairs, '$_pairs/$_totalPairs'),
+            ],
+          ),
+        ),
+        const SizedBox(height: 24),
+        Expanded(
+          child: _buildGridAndCompletion(l10n),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(AppLocalizations l10n) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: _buildGridAndCompletion(l10n),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    l10n.memoryGame,
+                    style: TextStyle(
+                      color: Colors.blueGrey[800],
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  IconButton(
+                    icon: Icon(Icons.refresh, color: Colors.blueGrey[800]),
+                    onPressed: _restartGame,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 32),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  _buildInfoCard(l10n.time, _timeElapsed),
+                  _buildInfoCard(l10n.moves, _moves.toString()),
+                  _buildInfoCard(l10n.pairs, '$_pairs/$_totalPairs'),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGridAndCompletion(AppLocalizations l10n) {
+    return Stack(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: GridView.builder(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: _getCrossAxisCount(),
+              crossAxisSpacing: 8,
+              mainAxisSpacing: 8,
+              childAspectRatio: 1.0,
+            ),
+            itemCount: _cards.length,
+            itemBuilder: (context, index) {
+              return _cards[index].isEmpty
+                  ? Container() // Empty space for easy level
+                  : _buildCard(
+                      _cards[index], () => _flipCard(index));
+            },
+          ),
+        ),
+        if (_gameCompleted)
+          FadeTransition(
+            opacity: _gameCompletedAnimation,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: const EdgeInsets.all(24),
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.blue.withValues(alpha: 0.3),
+                        blurRadius: 20,
+                        spreadRadius: 5,
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.memoryGameCongrats,
+                        style: TextStyle(
+                          color: Colors.blueGrey[800],
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        l10n.memoryGameTimeResult,
+                        style: TextStyle(
+                          color: Colors.blueGrey[600],
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _timeElapsed,
+                        style: TextStyle(
+                          color: Colors.blueGrey[800],
+                          fontSize: 36,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        l10n.totalMovesLabel(_moves),
+                        style: TextStyle(
+                          color: Colors.blueGrey[600],
+                          fontSize: 16,
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Flexible(
+                            child: ElevatedButton(
+                              onPressed: _restartGame,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue[400],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                l10n.playAgain,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Flexible(
+                            child: ElevatedButton(
+                              onPressed: () {
+                                // Return to level map with completion status
+                                Navigator.of(context).pop(true);
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green[400],
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius:
+                                      BorderRadius.circular(30),
+                                ),
+                              ),
+                              child: Text(
+                                l10n.continueText,
+                                style: const TextStyle(fontSize: 14),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 

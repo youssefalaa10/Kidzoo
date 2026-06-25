@@ -63,6 +63,10 @@ class _Game2048ScreenState extends State<Game2048Screen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screenWidth > screenHeight;
+
     return KeyboardListener(
       focusNode: FocusNode()..requestFocus(),
       onKeyEvent: _handleKeyPress,
@@ -90,46 +94,75 @@ class _Game2048ScreenState extends State<Game2048Screen> {
           },
           builder: (context, state) {
             return SafeArea(
-              child: Column(
-                children: [
-                  // Header
-                  _buildHeader(state),
-                  const SizedBox(height: 20),
-                  // Score Board
-                  _buildScoreBoard(state),
-                  const SizedBox(height: 20),
-                  // Control Buttons
-                  _buildControlButtons(state),
-                  const Spacer(),
-                  // Game Board
-                  Expanded(
-                    flex: 4,
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final size = constraints.maxWidth < constraints.maxHeight
-                            ? constraints.maxWidth
-                            : constraints.maxHeight;
-                        final boardSize = (size - 32.0).clamp(150.0, 500.0); // min and max constraints
-                        
-                        return Center(
-                          child: SingleChildScrollView(
-                            child: GameBoard(
-                              board: state.board,
-                              onSwipe: _handleSwipe,
-                              boardSize: boardSize,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
-                  const Spacer(flex: 2),
-                ],
-              ),
+              child: isLandscape ? _buildLandscapeLayout(state) : _buildPortraitLayout(state),
             );
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildPortraitLayout(GameState state) {
+    return Column(
+      children: [
+        _buildHeader(state),
+        const SizedBox(height: 20),
+        _buildScoreBoard(state),
+        const SizedBox(height: 20),
+        _buildControlButtons(state),
+        const Spacer(),
+        Expanded(
+          flex: 4,
+          child: _buildGameBoardArea(state),
+        ),
+        const Spacer(flex: 2),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(GameState state) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: _buildGameBoardArea(state),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildHeader(state),
+              const SizedBox(height: 20),
+              _buildScoreBoard(state),
+              const SizedBox(height: 20),
+              _buildControlButtons(state),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGameBoardArea(GameState state) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.maxWidth < constraints.maxHeight
+            ? constraints.maxWidth
+            : constraints.maxHeight;
+        final boardSize = (size - 32.0).clamp(150.0, 500.0);
+        
+        return Center(
+          child: SingleChildScrollView(
+            child: GameBoard(
+              board: state.board,
+              onSwipe: _handleSwipe,
+              boardSize: boardSize,
+            ),
+          ),
+        );
+      },
     );
   }
 

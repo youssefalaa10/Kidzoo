@@ -382,6 +382,10 @@ class _DrawLabScreenState extends State<DrawLabScreen>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screenWidth > screenHeight;
+
     return PopScope(
       canPop: false,
       onPopInvoked: (didPop) async {
@@ -505,7 +509,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
                               Offset(0, (1 - _toolbarAnimation.value) * 100),
                           child: Opacity(
                             opacity: _toolbarAnimation.value,
-                            child: _buildSmartToolBar(),
+                            child: _buildSmartToolBar(isLandscape),
                           ),
                         );
                       },
@@ -588,7 +592,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     );
   }
 
-  Widget _buildSmartToolBar() {
+  Widget _buildSmartToolBar(bool isLandscape) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: const BoxDecoration(
@@ -604,46 +608,59 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Top row - Tools and Actions
-          Row(
-            children: [
-              // Tool selector
-              Expanded(
-                child: _buildToolSelector(),
+      child: isLandscape 
+          ? SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children: [
+                  _buildToolSelector(),
+                  const SizedBox(width: 12),
+                  _buildQuickActions(),
+                  const SizedBox(width: 12),
+                  _buildColorPicker(),
+                  const SizedBox(width: 12),
+                  SizedBox(width: 150, child: _buildWidthControl(false)),
+                  const SizedBox(width: 12),
+                  SizedBox(width: 150, child: _buildOpacityControl(false)),
+                  const SizedBox(width: 12),
+                  _buildSaveButton(),
+                ],
               ),
-              const SizedBox(width: 12),
-
-              // Quick actions
-              _buildQuickActions(),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // Bottom row - Color, Width, Opacity, and Save
-          Row(
-            children: [
-              // Color picker
-              _buildColorPicker(),
-              const SizedBox(width: 12),
-
-              // Width control
-              _buildWidthControl(),
-              const SizedBox(width: 12),
-
-              // Opacity control
-              _buildOpacityControl(),
-              const SizedBox(width: 12),
-
-              // Save to gallery
-              _buildSaveButton(),
-            ],
-          ),
-        ],
-      ),
+            )
+          : Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Top row - Tools and Actions
+                Row(
+                  children: [
+                    // Tool selector
+                    Expanded(
+                      child: _buildToolSelector(),
+                    ),
+                    const SizedBox(width: 12),
+                    // Quick actions
+                    _buildQuickActions(),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                // Bottom row - Color, Width, Opacity, and Save
+                Row(
+                  children: [
+                    // Color picker
+                    _buildColorPicker(),
+                    const SizedBox(width: 12),
+                    // Width control
+                    _buildWidthControl(true),
+                    const SizedBox(width: 12),
+                    // Opacity control
+                    _buildOpacityControl(true),
+                    const SizedBox(width: 12),
+                    // Save to gallery
+                    _buildSaveButton(),
+                  ],
+                ),
+              ],
+            ),
     );
   }
 
@@ -780,77 +797,75 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     );
   }
 
-  Widget _buildWidthControl() {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.line_weight, color: Color(0xFF6B7280), size: 14),
-              const SizedBox(width: 4),
-              Text(
-                '${_currentWidth.toInt()}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
-                ),
+  Widget _buildWidthControl(bool useExpanded) {
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.line_weight, color: Color(0xFF6B7280), size: 14),
+            const SizedBox(width: 4),
+            Text(
+              '${_currentWidth.toInt()}',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1F2937),
               ),
-            ],
-          ),
-          Slider(
-            value: _currentWidth,
-            min: 1.0,
-            max: 20.0,
-            divisions: 19,
-            activeColor: const Color(0xFF6366F1),
-            onChanged: (value) {
-              setState(() {
-                _currentWidth = value;
-              });
-            },
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+        Slider(
+          value: _currentWidth,
+          min: 1.0,
+          max: 20.0,
+          divisions: 19,
+          activeColor: const Color(0xFF6366F1),
+          onChanged: (value) {
+            setState(() {
+              _currentWidth = value;
+            });
+          },
+        ),
+      ],
     );
+    return useExpanded ? Expanded(child: content) : content;
   }
 
-  Widget _buildOpacityControl() {
-    return Expanded(
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.opacity, color: Color(0xFF6B7280), size: 14),
-              const SizedBox(width: 4),
-              Text(
-                '${(_currentOpacity * 100).toInt()}%',
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
-                ),
+  Widget _buildOpacityControl(bool useExpanded) {
+    Widget content = Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(Icons.opacity, color: Color(0xFF6B7280), size: 14),
+            const SizedBox(width: 4),
+            Text(
+              '${(_currentOpacity * 100).toInt()}%',
+              style: const TextStyle(
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+                color: Color(0xFF1F2937),
               ),
-            ],
-          ),
-          Slider(
-            value: _currentOpacity,
-            min: 0.1,
-            divisions: 9,
-            activeColor: const Color(0xFF6366F1),
-            onChanged: (value) {
-              setState(() {
-                _currentOpacity = value;
-              });
-            },
-          ),
-        ],
-      ),
+            ),
+          ],
+        ),
+        Slider(
+          value: _currentOpacity,
+          min: 0.1,
+          divisions: 9,
+          activeColor: const Color(0xFF6366F1),
+          onChanged: (value) {
+            setState(() {
+              _currentOpacity = value;
+            });
+          },
+        ),
+      ],
     );
+    return useExpanded ? Expanded(child: content) : content;
   }
 
   Widget _buildQuickActionsPanel() {

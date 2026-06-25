@@ -75,6 +75,9 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
   @override
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -90,10 +93,10 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
               children: [
                 // Header section
                 _buildHeader(mq),
-                SizedBox(height: mq.height(2.5)),
+                SizedBox(height: isLandscape ? mq.height(1) : mq.height(2.5)),
                 // Title
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: mq.width(8)),
+                  padding: EdgeInsets.symmetric(horizontal: isLandscape ? size.width * 0.2 : mq.width(8)),
                   child: Container(
                     width: double.infinity,
                     padding: EdgeInsets.symmetric(
@@ -114,7 +117,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                     child: Text(
                       AppLocalizations.of(context).improveYourSkills,
                       style: TextStyle(
-                        fontSize: mq.width(7),
+                        fontSize: isLandscape ? size.height * 0.06 : mq.width(7),
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                         shadows: const [
@@ -129,7 +132,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                     ),
                   ),
                 ),
-                SizedBox(height: mq.height(3.5)),
+                SizedBox(height: isLandscape ? mq.height(1.5) : mq.height(3.5)),
                 // Carousel section
                 Expanded(
                   child: OverlappedCarousel(
@@ -385,18 +388,20 @@ class CharacterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
+    final isLandscape = size.width > size.height;
+
     return Container(
       margin: EdgeInsets.symmetric(
-          horizontal: mq.width(2.5), vertical: mq.height(2.5)),
+          horizontal: mq.width(2.5), vertical: isLandscape ? mq.height(1) : mq.height(2.5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           // Character image container with rounded corners
-          Flexible(
+          Expanded(
             flex: 5,
             child: Container(
               width: double.infinity,
-              height: mq.height(35),
               decoration: BoxDecoration(
                 color: category.color,
                 borderRadius: BorderRadius.circular(30),
@@ -410,28 +415,34 @@ class CharacterCard extends StatelessWidget {
               ),
               child: Center(
                 child: isSelected
-                    ? Image.asset(
-                        characterImage,
-                        height: mq.height(22),
-                        width: mq.height(22),
+                    ? Padding(
+                        padding: EdgeInsets.all(isLandscape ? 8.0 : 16.0),
+                        child: Image.asset(
+                          characterImage,
+                          fit: BoxFit.contain,
+                        ),
                       )
                     : Container(), // Empty for non-selected cards
               ),
             ),
           ),
-          SizedBox(height: mq.height(2)),
+          SizedBox(height: isLandscape ? mq.height(1) : mq.height(2)),
 
           // Character name
           Flexible(
-            child: Text(
-              category.characterName,
-              style: TextStyle(
-                fontSize: mq.width(6),
-                fontWeight: FontWeight.bold,
+            flex: 1,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                category.characterName,
+                style: TextStyle(
+                  fontSize: isLandscape ? size.height * 0.06 : mq.width(6),
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
-          SizedBox(height: mq.height(1)),
+          SizedBox(height: isLandscape ? mq.height(0.5) : mq.height(1)),
 
           // Character description
           Flexible(
@@ -441,39 +452,44 @@ class CharacterCard extends StatelessWidget {
               child: Text(
                 category.characterDesc,
                 textAlign: TextAlign.center,
-                maxLines: 3,
+                maxLines: isLandscape ? 2 : 3,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
-                  fontSize: mq.width(3.5),
+                  fontSize: isLandscape ? size.height * 0.04 : mq.width(3.5),
                   color: Colors.grey[600],
                   height: 1.2,
                 ),
               ),
             ),
           ),
-          SizedBox(height: mq.height(2)),
+          SizedBox(height: isLandscape ? mq.height(1) : mq.height(2)),
 
           // Coins indicator
           Flexible(
-            child: Container(
-              padding: EdgeInsets.symmetric(
-                  horizontal: mq.width(6), vertical: mq.height(1.5)),
-              decoration: BoxDecoration(
-                color: Colors.blue,
-                borderRadius: BorderRadius.circular(25),
-              ),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    category.buttonLabel,
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                      fontSize: mq.width(4),
+            flex: 1,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isLandscape ? size.width * 0.04 : mq.width(6), 
+                    vertical: isLandscape ? size.height * 0.015 : mq.height(1.5)),
+                decoration: BoxDecoration(
+                  color: Colors.blue,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      category.buttonLabel,
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: isLandscape ? size.height * 0.04 : mq.width(4),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
           ),

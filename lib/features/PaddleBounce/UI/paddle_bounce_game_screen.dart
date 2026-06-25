@@ -25,6 +25,14 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
     final l10n = AppLocalizations.of(context);
     final screenSize = MediaQuery.of(context).size;
 
+    final cubit = context.read<PaddleBounceCubit>();
+    if (cubit.state.screenWidth != screenSize.width ||
+        cubit.state.screenHeight != screenSize.height) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        cubit.updateDimensions(screenSize.width, screenSize.height);
+      });
+    }
+
     return Scaffold(
       body: BlocConsumer<PaddleBounceCubit, PaddleBounceState>(
         listener: (context, state) {

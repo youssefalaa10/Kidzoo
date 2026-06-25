@@ -202,27 +202,47 @@ class PaddleBounceMenuScreen extends StatelessWidget {
           l10n.selectAIDifficulty,
           textAlign: TextAlign.center,
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _buildDifficultyOption(
-              context: dialogContext,
-              difficulty: AIDifficulty.easy,
-              title: l10n.easy,
-              description: l10n.easy,
-              color: Colors.green,
-              screenSize: screenSize,
-            ),
-            const SizedBox(height: 16),
-            _buildDifficultyOption(
-              context: dialogContext,
-              difficulty: AIDifficulty.hard,
-              title: l10n.hard,
-              description: l10n.hard,
-              color: Colors.red,
-              screenSize: screenSize,
-            ),
-          ],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildDifficultyOption(
+                context: dialogContext,
+                difficulty: AIDifficulty.easy,
+                title: l10n.easy,
+                description: 'Slower reactions, simple tracking',
+                color: Colors.green,
+                screenSize: screenSize,
+              ),
+              const SizedBox(height: 12),
+              _buildDifficultyOption(
+                context: dialogContext,
+                difficulty: AIDifficulty.medium,
+                title: 'Medium',
+                description: 'Faster tracking, smaller delays',
+                color: Colors.orange,
+                screenSize: screenSize,
+              ),
+              const SizedBox(height: 12),
+              _buildDifficultyOption(
+                context: dialogContext,
+                difficulty: AIDifficulty.hard,
+                title: l10n.hard,
+                description: 'Proactive movement, fast speed',
+                color: Colors.red,
+                screenSize: screenSize,
+              ),
+              const SizedBox(height: 12),
+              _buildDifficultyOption(
+                context: dialogContext,
+                difficulty: AIDifficulty.expert,
+                title: 'Expert',
+                description: 'Trajectory prediction, minimal delay',
+                color: Colors.purple,
+                screenSize: screenSize,
+              ),
+            ],
+          ),
         ),
       ),
     );

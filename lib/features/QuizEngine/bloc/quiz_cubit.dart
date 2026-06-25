@@ -39,6 +39,13 @@ class QuizCubit extends Cubit<QuizState> {
       return;
     }
     emit(QuizActive(_questions[_currentIndex], _score, _currentIndex));
+    _speakPrompt(_questions[_currentIndex].prompt);
+  }
+
+  Future<void> _speakPrompt(String text) async {
+    try {
+      await flutterTts.speak(text);
+    } catch (_) {}
   }
 
   Future<void> submitAnswer(QuizOption option) async {
@@ -58,6 +65,7 @@ class QuizCubit extends Cubit<QuizState> {
     _currentIndex++;
     if (_currentIndex < _questions.length) {
       emit(QuizActive(_questions[_currentIndex], _score, _currentIndex));
+      _speakPrompt(_questions[_currentIndex].prompt);
     } else {
       await _finishQuiz();
     }

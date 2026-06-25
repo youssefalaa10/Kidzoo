@@ -65,12 +65,6 @@ class ImageSelectionPage extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
-            fit: BoxFit.cover,
-          ),
-        ),
         child: FluidContainer(
           padding: EdgeInsets.zero,
           child: GridView.builder(
@@ -175,12 +169,6 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
         body: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: BoxDecoration(
-            image: DecorationImage(
-              image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
-              fit: BoxFit.cover,
-            ),
-          ),
           child: FluidContainer(
             padding: EdgeInsets.zero,
             child: BlocBuilder<PuzzleCubit, PuzzleState>(

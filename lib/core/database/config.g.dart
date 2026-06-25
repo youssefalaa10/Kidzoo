@@ -676,10 +676,9 @@ final class $$ProfilesTableReferences
   $$ProfilesTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static MultiTypedResultKey<$GameScoresTable, List<GameScore>>
-      _gameScoresRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-          db.gameScores,
-          aliasName:
-              $_aliasNameGenerator(db.profiles.id, db.gameScores.profileId));
+      _gameScoresRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.gameScores,
+              aliasName: 'profiles__id__game_scores__profile_id');
 
   $$GameScoresTableProcessedTableManager get gameScoresRefs {
     final manager = $$GameScoresTableTableManager($_db, $_db.gameScores)
@@ -923,8 +922,7 @@ final class $$GameScoresTableReferences
   $$GameScoresTableReferences(super.$_db, super.$_table, super.$_typedResult);
 
   static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
-      db.profiles.createAlias(
-          $_aliasNameGenerator(db.gameScores.profileId, db.profiles.id));
+      db.profiles.createAlias('game_scores__profile_id__profiles__id');
 
   $$ProfilesTableProcessedTableManager get profileId {
     final $_column = $_itemColumn<int>('profile_id')!;

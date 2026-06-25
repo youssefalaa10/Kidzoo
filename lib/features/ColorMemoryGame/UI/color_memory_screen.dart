@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/localization/app_localizations.dart';
-import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../bloc/color_memory_bloc.dart';
 import '../bloc/color_memory_event.dart';
@@ -169,65 +168,110 @@ class _ColorMemoryScreenState
           final palette =
               ColorPalettes.all[state.settings.selectedPaletteIndex];
 
+          final screenWidth = MediaQuery.of(context).size.width;
+          final screenHeight = MediaQuery.of(context).size.height;
+          final isLandscape = screenWidth > screenHeight;
+
           return Scaffold(
             body: Container(
-              decoration: BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
-                  fit: BoxFit.cover,
-                ),
-              ),
               child: SafeArea(
                 child: FluidContainer(
-                  maxWidth: 800,
+                  maxWidth: 1000,
                   padding: EdgeInsets.zero,
-                  child: Column(
-                children: [
-                  // Header with stats
-                  GameHeaderWidget(
-                    state: state,
-                    onBack: () => Navigator.of(context).pop(),
-                    onRestart: () => _bloc.add(const RestartGameEvent()),
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  // Status message
-                  _buildStatusMessage(state),
-
-                  const SizedBox(height: 24),
-
-                  // Color grid
-                  Expanded(
-                    child: Center(
-                      child: ColorGridWidget(
-                        gridSize: config.gridSize,
-                        palette: palette,
-                        highlightedIndex: state.highlightedColorIndex,
-                        onColorTap: (index) => _onColorTap(index, state),
-                        isInteractive: state.phase == GamePhase.playerTurn,
-                        colorBlindMode: state.settings.colorBlindMode,
-                      ),
-                    ),
-                  ),
-
-                  const SizedBox(height: 24),
-
-                  // Progress indicator
-                  if (state.phase == GamePhase.playerTurn)
-                    _buildProgressIndicator(state)
-                  else if (state.phase == GamePhase.showingSequence)
-                    _buildSequenceProgress(state),
-
-                  const SizedBox(height: 24),
-                ],
+                  child: isLandscape 
+                      ? _buildLandscapeLayout(state, config, palette)
+                      : _buildPortraitLayout(state, config, palette),
+                ),
               ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout(ColorMemoryGameState state, dynamic config, dynamic palette) {
+    return Column(
+      children: [
+        // Header with stats
+        GameHeaderWidget(
+          state: state,
+          onBack: () => Navigator.of(context).pop(),
+          onRestart: () => _bloc.add(const RestartGameEvent()),
+        ),
+
+        const SizedBox(height: 16),
+
+        // Status message
+        _buildStatusMessage(state),
+
+        const SizedBox(height: 24),
+
+        // Color grid
+        Expanded(
+          child: Center(
+            child: ColorGridWidget(
+              gridSize: config.gridSize,
+              palette: palette,
+              highlightedIndex: state.highlightedColorIndex,
+              onColorTap: (index) => _onColorTap(index, state),
+              isInteractive: state.phase == GamePhase.playerTurn,
+              colorBlindMode: state.settings.colorBlindMode,
             ),
           ),
         ),
-      );
-        },
-      ),
+
+        const SizedBox(height: 24),
+
+        // Progress indicator
+        if (state.phase == GamePhase.playerTurn)
+          _buildProgressIndicator(state)
+        else if (state.phase == GamePhase.showingSequence)
+          _buildSequenceProgress(state),
+
+        const SizedBox(height: 24),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(ColorMemoryGameState state, dynamic config, dynamic palette) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: Center(
+            child: ColorGridWidget(
+              gridSize: config.gridSize,
+              palette: palette,
+              highlightedIndex: state.highlightedColorIndex,
+              onColorTap: (index) => _onColorTap(index, state),
+              isInteractive: state.phase == GamePhase.playerTurn,
+              colorBlindMode: state.settings.colorBlindMode,
+            ),
+          ),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              GameHeaderWidget(
+                state: state,
+                onBack: () => Navigator.of(context).pop(),
+                onRestart: () => _bloc.add(const RestartGameEvent()),
+              ),
+              const SizedBox(height: 24),
+              _buildStatusMessage(state),
+              const SizedBox(height: 24),
+              if (state.phase == GamePhase.playerTurn)
+                _buildProgressIndicator(state)
+              else if (state.phase == GamePhase.showingSequence)
+                _buildSequenceProgress(state),
+            ],
+          ),
+        ),
+      ],
     );
   }
 

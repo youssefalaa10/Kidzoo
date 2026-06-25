@@ -523,6 +523,23 @@ class AppLocalizations {
   String get shape => _localizedValues['shape']!;
   String get text => _localizedValues['text']!;
   String get galleryAccessDenied => _localizedValues['galleryAccessDenied']!;
+  
+  // Vehicles Game
+  String get whichVehicleFliesInSky => _localizedValues['which_vehicle_flies_in_sky']!;
+  String get whichVehicleTravelsOnRailway => _localizedValues['which_vehicle_travels_on_railway']!;
+  String get whichVehicleDrivesOnRoad => _localizedValues['which_vehicle_drives_on_road']!;
+  String get whichVehicleTravelsOnWater => _localizedValues['which_vehicle_travels_on_water']!;
+  String get airplane => _localizedValues['airplane']!;
+  String get car => _localizedValues['car']!;
+  String get train => _localizedValues['train']!;
+  String get boat => _localizedValues['boat']!;
+  String get helicopter => _localizedValues['helicopter']!;
+  String get motorcycle => _localizedValues['motorcycle']!;
+  String get truck => _localizedValues['truck']!;
+  String get bus => _localizedValues['bus']!;
+  String get bicycle => _localizedValues['bicycle']!;
+  String get submarine => _localizedValues['submarine']!;
+  String get ship => _localizedValues['ship']!;
 
   String get vehicles => _localizedValues['vehicles']!;
   String get fruits => _localizedValues['fruits']!;
@@ -533,6 +550,23 @@ class AppLocalizations {
   String get backgroundMusicDesc => _localizedValues['backgroundMusicDesc']!;
   String get track1 => _localizedValues['track1']!;
   String get track2 => _localizedValues['track2']!;
+
+  // Feed The Animal
+  String get apple => _localizedValues['apple']!;
+  String get orangeFruit => _localizedValues['orange_fruit']!; // 'orange' is already used for color
+  String get grapes => _localizedValues['grapes']!;
+  String get watermelon => _localizedValues['watermelon']!;
+  String get mango => _localizedValues['mango']!;
+  String get pineapple => _localizedValues['pineapple']!;
+  String get cherries => _localizedValues['cherries']!;
+  String get monkey => _localizedValues['monkey']!;
+  String get rabbit => _localizedValues['rabbit']!;
+  
+  String promptGiveMeFruit(String fruit) => _localizedValues['prompt_give_me_fruit']!.replaceAll('{fruit}', fruit);
+  String promptFindColorFruit(String color) => _localizedValues['prompt_find_color_fruit']!.replaceAll('{color}', color);
+  String promptWhichIsCalled(String fruit) => _localizedValues['prompt_which_is_called']!.replaceAll('{fruit}', fruit);
+  String yummyFruit(String fruit) => _localizedValues['yummy_fruit']!.replaceAll('{fruit}', fruit);
+  String get tryAgainPrompt => _localizedValues['try_again_prompt']!;
 
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;
