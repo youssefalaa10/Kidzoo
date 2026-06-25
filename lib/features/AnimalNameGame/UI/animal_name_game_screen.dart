@@ -3,11 +3,13 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/helpers/tts_service.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/services/cubit/music_cubit.dart';
-import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/utils/assets.dart';
 
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import '../data/model/animal_name_model.dart';
 import 'widgets/animal_name_success_overlay.dart';
 
@@ -73,7 +75,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
         });
         _ttsService.setErrorHandler((msg) {
           if (mounted) context.read<MusicCubit>().resumeMusic();
-          print("TTS Error: $msg");
+          print('TTS Error: $msg');
         });
         _startNewRound();
       }
@@ -134,12 +136,16 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
             const Center(child: CircularProgressIndicator())
           else
             SafeArea(
-              child: Column(
-                children: [
-                  _buildAppBar(),
-                  const SizedBox(height: 12),
-                  Expanded(child: _buildGameArea()),
-                ],
+              child: FluidContainer(
+                maxWidth: 800,
+                padding: EdgeInsets.zero,
+                child: Column(
+                  children: [
+                    _buildAppBar(),
+                    const SizedBox(height: 12),
+                    Expanded(child: _buildGameArea()),
+                  ],
+                ),
               ),
             ),
           if (_isComplete)
@@ -155,8 +161,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   Widget _buildBackground() {
     return Positioned.fill(
       child: Image.asset(
-        Assets
-            .genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle,
+        BackgroundResolver(context, BackgroundType.education).resolveBackground()!,
         fit: BoxFit.cover,
       ),
     );
@@ -246,7 +251,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
       width: double.infinity,
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
-        image: DecorationImage(
+        image: const DecorationImage(
           image: AssetImage(Assets.genImagesHomeBoard),
           fit: BoxFit.fill,
         ),
@@ -480,7 +485,7 @@ class _TrayItem extends StatelessWidget {
       padding: const EdgeInsets.all(8.0),
       child: Draggable<AnimalNameModel>(
         data: animal,
-        childWhenDragging: SizedBox(
+        childWhenDragging: const SizedBox(
           width: _itemSize,
           height: _itemSize,
         ),

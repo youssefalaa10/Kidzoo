@@ -4,6 +4,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import 'widgets/game_result_dialog.dart';
 
 class TicTacToeGame extends StatefulWidget {
@@ -371,13 +373,25 @@ class TicTacToeGameState extends State<TicTacToeGame>
     final scoreValueFontSize = (screenWidth * 0.05).clamp(18.0, 24.0);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: isLandscape
-            ? _buildLandscapeLayout(cellSize, titleFontSize, statusFontSize,
-                scoreFontSize, scoreValueFontSize)
-            : _buildPortraitLayout(cellSize, titleFontSize, statusFontSize,
-                scoreFontSize, scoreValueFontSize),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: SafeArea(
+          child: FluidContainer(
+            padding: EdgeInsets.zero,
+            child: isLandscape
+                ? _buildLandscapeLayout(cellSize, titleFontSize, statusFontSize,
+                    scoreFontSize, scoreValueFontSize)
+                : _buildPortraitLayout(cellSize, titleFontSize, statusFontSize,
+                    scoreFontSize, scoreValueFontSize),
+          ),
+        ),
       ),
     );
   }

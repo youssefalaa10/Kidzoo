@@ -529,6 +529,10 @@ class AppLocalizations {
   String get vegetables => _localizedValues['vegetables']!;
   String get splashTitle => _localizedValues['splashTitle']!;
   String get splashSubtitle => _localizedValues['splashSubtitle']!;
+  String get backgroundMusicTitle => _localizedValues['backgroundMusicTitle']!;
+  String get backgroundMusicDesc => _localizedValues['backgroundMusicDesc']!;
+  String get track1 => _localizedValues['track1']!;
+  String get track2 => _localizedValues['track2']!;
 
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;

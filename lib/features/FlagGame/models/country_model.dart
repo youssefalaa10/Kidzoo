@@ -2,17 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 
 class Country {
-  final String code;
-  final String name;
-  final String continent;
-  final String capital;
-
-  Country({
-    required this.code,
-    required this.name,
-    required this.continent,
-    required this.capital,
-  });
 
   factory Country.fromJson(Map<String, dynamic> json) {
     return Country(
@@ -22,6 +11,17 @@ class Country {
       capital: json['capital'] ?? '',
     );
   }
+
+  Country({
+    required this.code,
+    required this.name,
+    required this.continent,
+    required this.capital,
+  });
+  final String code;
+  final String name;
+  final String continent;
+  final String capital;
 
   String get flagAsset => 'assets/flags/${code.toLowerCase()}.svg';
 

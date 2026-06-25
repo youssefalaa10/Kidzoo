@@ -1,16 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
-import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/features/AppCategory/education_screen.dart';
 import 'package:kidzo/features/AppCategory/games_screen.dart';
 import 'package:kidzo/features/settings/settings_screen.dart';
 
+import '../../../core/localization/language_provider.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import '../../Alphabets/bloc/alphabet_bloc.dart';
 import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
 import '../../LevelsMap/levelmap_screen.dart';
+import '../../Profile/profile_cubit.dart';
+import '../../Profile/profile_state.dart';
 
 class CharacterSelectionScreen extends StatefulWidget {
   const CharacterSelectionScreen({super.key});
@@ -71,19 +76,17 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
   Widget build(BuildContext context) {
     final mq = CustomMQ(context);
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background image
-          Positioned.fill(
-            child: Image.asset(
-              ImageManager.techBg,
-              fit: BoxFit.cover,
-            ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(BackgroundResolver(context, BackgroundType.tech).resolveBackground()!),
+            fit: BoxFit.cover,
           ),
-
-          // Content
-          SafeArea(
-            child: Column(
+        ),
+        child: FluidContainer(
+          child: Column(
               children: [
                 // Header section
                 _buildHeader(mq),
@@ -142,50 +145,127 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                 ),
               ],
             ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildHeader(CustomMQ mq) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-          horizontal: mq.width(5), vertical: mq.height(1.5)),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          GestureDetector(
-            onTap: () => Navigator.push<void>(
-              context,
-              MaterialPageRoute<void>(
-                builder: (context) => const SettingsScreen(),
+    return BlocBuilder<ProfileCubit, ProfileState>(
+      builder: (context, state) {
+        String avatarPath = 'assets/gen/images/avatar/avatar-monstar.png';
+        if (state is ProfileLoaded && state.currentProfile != null) {
+            final avatars = [
+              'assets/gen/images/avatar/avatar-monstar.png',
+              'assets/gen/images/avatar/avatar-boy.png',
+              'assets/gen/images/avatar/avatar-girl.png',
+              'assets/gen/images/avatar/avatar-astronaut.png',
+            ];
+            final idx = state.currentProfile!.avatarIndex;
+            if (idx >= 0 && idx < avatars.length) {
+               avatarPath = avatars[idx];
+            }
+        }
+        
+        return Padding(
+          padding: EdgeInsets.symmetric(
+              horizontal: mq.width(5), vertical: mq.height(1.5)),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // Avatar on one side
+              Container(
+                width: mq.width(12),
+                height: mq.width(12),
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Colors.white.withValues(alpha: 0.9),
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withValues(alpha: 0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: ClipOval(
+                  child: Image.asset(avatarPath, fit: BoxFit.cover),
+                ),
               ),
-            ),
-            child: Container(
-              width: mq.width(10),
-              height: mq.width(10),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: Colors.white.withValues(alpha: 0.9),
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.2),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+              
+              // Settings and Lang on the other side
+              Row(
+                children: [
+                  // Language Toggle
+                  GestureDetector(
+                    onTap: () {
+                      context.read<LanguageCubit>().toggleLanguage();
+                    },
+                    child: Container(
+                      width: mq.width(10),
+                      height: mq.width(10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Center(
+                        child: Text(
+                          context.read<LanguageCubit>().isArabic ? 'EN' : 'ع',
+                          style: TextStyle(
+                            color: Colors.blue[800],
+                            fontWeight: FontWeight.bold,
+                            fontSize: mq.width(4),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: mq.width(3)),
+                  // Settings Icon
+                  GestureDetector(
+                    onTap: () => Navigator.push<void>(
+                      context,
+                      MaterialPageRoute<void>(
+                        builder: (context) => const SettingsScreen(),
+                      ),
+                    ),
+                    child: Container(
+                      width: mq.width(10),
+                      height: mq.width(10),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: Colors.white.withValues(alpha: 0.9),
+                        border: Border.all(color: Colors.white, width: 2),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.2),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
+                      ),
+                      child: Icon(
+                        Icons.settings_outlined,
+                        color: Colors.blue[800],
+                        size: mq.width(5),
+                      ),
+                    ),
                   ),
                 ],
               ),
-              child: Icon(
-                Icons.settings_outlined,
-                color: Colors.blue[800],
-                size: mq.width(5),
-              ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      }
     );
   }
 }
@@ -343,7 +423,6 @@ class CharacterCard extends StatelessWidget {
 
           // Character name
           Flexible(
-            flex: 1,
             child: Text(
               category.characterName,
               style: TextStyle(
@@ -376,7 +455,6 @@ class CharacterCard extends StatelessWidget {
 
           // Coins indicator
           Flexible(
-            flex: 1,
             child: Container(
               padding: EdgeInsets.symmetric(
                   horizontal: mq.width(6), vertical: mq.height(1.5)),

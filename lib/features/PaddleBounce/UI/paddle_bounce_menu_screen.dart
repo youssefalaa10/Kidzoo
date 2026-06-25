@@ -33,80 +33,84 @@ class PaddleBounceMenuScreen extends StatelessWidget {
             ),
           ),
           SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Game Title
-                  Text(
-                    l10n.paddleBounce,
-                    style: GoogleFonts.poppins(
-                      fontSize: 32,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                      shadows: [
-                        const Shadow(
-                          color: Colors.cyan,
-                          blurRadius: 20,
-                        ),
-                        const Shadow(
-                          color: Colors.pink,
-                          blurRadius: 20,
-                        ),
-                      ],
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 60),
-                  // Play vs Friend Button
-                  _buildMenuButton(
-                    context: context,
-                    icon: Icons.people,
-                    title: l10n.playVsFriend,
-                    subtitle: l10n.playWithAFriend,
-                    color: Colors.green,
-                    onTap: () {
-                      Navigator.push<void>(
-                        context,
-                        MaterialPageRoute<void>(
-                          builder: (context) => BlocProvider(
-                            create: (context) => PaddleBounceCubit(
-                              screenWidth: screenSize.width,
-                              screenHeight: screenSize.height,
+            child: Center(
+              child: SingleChildScrollView(
+                child: Padding(
+                  padding: const EdgeInsets.all(24.0),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Game Title
+                      Text(
+                        l10n.paddleBounce,
+                        style: GoogleFonts.poppins(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                          shadows: [
+                            const Shadow(
+                              color: Colors.cyan,
+                              blurRadius: 20,
                             ),
-                            child: const PaddleBounceGameScreen(),
+                            const Shadow(
+                              color: Colors.pink,
+                              blurRadius: 20,
+                            ),
+                          ],
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                      const SizedBox(height: 60),
+                      // Play vs Friend Button
+                      _buildMenuButton(
+                        context: context,
+                        icon: Icons.people,
+                        title: l10n.playVsFriend,
+                        subtitle: l10n.playWithAFriend,
+                        color: Colors.green,
+                        onTap: () {
+                          Navigator.push<void>(
+                            context,
+                            MaterialPageRoute<void>(
+                              builder: (context) => BlocProvider(
+                                create: (context) => PaddleBounceCubit(
+                                  screenWidth: screenSize.width,
+                                  screenHeight: screenSize.height,
+                                ),
+                                child: const PaddleBounceGameScreen(),
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      const SizedBox(height: 20),
+                      // Play vs AI Button
+                      _buildMenuButton(
+                        context: context,
+                        icon: Icons.smart_toy,
+                        title: l10n.playVsAI,
+                        subtitle: l10n.challengeTheComputer,
+                        color: Colors.orange,
+                        onTap: () {
+                          _showAIDifficultyDialog(context, screenSize);
+                        },
+                      ),
+                      const SizedBox(height: 40),
+                      // Back Button
+                      TextButton.icon(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back, color: Colors.white),
+                        label: Text(
+                          l10n.mainMenu,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
                           ),
                         ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 20),
-                  // Play vs AI Button
-                  _buildMenuButton(
-                    context: context,
-                    icon: Icons.smart_toy,
-                    title: l10n.playVsAI,
-                    subtitle: l10n.challengeTheComputer,
-                    color: Colors.orange,
-                    onTap: () {
-                      _showAIDifficultyDialog(context, screenSize);
-                    },
-                  ),
-                  const SizedBox(height: 40),
-                  // Back Button
-                  TextButton.icon(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_back, color: Colors.white),
-                    label: Text(
-                      l10n.mainMenu,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 18,
                       ),
-                    ),
+                    ],
                   ),
-                ],
+                ),
               ),
             ),
           ),
@@ -134,13 +138,13 @@ class PaddleBounceMenuScreen extends StatelessWidget {
             end: Alignment.bottomRight,
             colors: [
               color,
-              color.withOpacity(0.7),
+              color.withValues(alpha: 0.7),
             ],
           ),
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: color.withOpacity(0.5),
+              color: color.withValues(alpha: 0.5),
               blurRadius: 20,
               spreadRadius: 5,
               offset: const Offset(0, 5),
@@ -152,7 +156,7 @@ class PaddleBounceMenuScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: Colors.white, size: 32),
@@ -175,7 +179,7 @@ class PaddleBounceMenuScreen extends StatelessWidget {
                     subtitle,
                     style: GoogleFonts.poppins(
                       fontSize: 14,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha: 0.9),
                     ),
                   ),
                 ],
@@ -253,7 +257,7 @@ class PaddleBounceMenuScreen extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
+          color: color.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(15),
           border: Border.all(color: color, width: 2),
         ),

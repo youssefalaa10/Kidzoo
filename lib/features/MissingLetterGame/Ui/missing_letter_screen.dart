@@ -7,6 +7,8 @@ import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
 
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import '../../../shared/widgets/game_exit_button.dart';
 
 class MissingLetterScreen extends StatefulWidget {
@@ -21,16 +23,9 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
   late AnimationController _shakeController;
   late Animation<double> _shakeAnimation;
   late AnimationController _backgroundAnimationController;
-  late Animation<double> _backgroundScaleAnimation;
   late AnimationController _celebrationController;
   late AnimationController _letterBounceController;
 
-  final List<Color> _backgroundColors = [
-    const Color(0xFF9C27B0),
-    const Color(0xFF3F51B5),
-    const Color(0xFF2196F3),
-    const Color(0xFF00BCD4),
-  ];
 
   @override
   void initState() {
@@ -53,15 +48,6 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
       vsync: this,
       duration: const Duration(seconds: 15),
     )..repeat(reverse: true);
-    _backgroundScaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 1.2,
-    ).animate(
-      CurvedAnimation(
-        parent: _backgroundAnimationController,
-        curve: Curves.easeInOut,
-      ),
-    );
 
     // Celebration animation
     _celebrationController = AnimationController(
@@ -134,24 +120,16 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             ),
             body: Stack(
               children: [
-                // Animated background
-                AnimatedBuilder(
-                  animation: _backgroundAnimationController,
-                  builder: (context, child) {
-                    return Transform.scale(
-                      scale: _backgroundScaleAnimation.value,
-                      child: Container(
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                            colors: _backgroundColors,
-                            stops: const [0.1, 0.4, 0.7, 1.0],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
+                // Background
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+                      fit: BoxFit.cover,
+                    ),
+                  ),
                 ),
 
                 // Animated background elements
@@ -203,12 +181,15 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 //   ),
 
                 // Game content
-                SafeArea(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
+                FluidContainer(
+                  padding: EdgeInsets.zero,
+                  child: SafeArea(
+                    child: SingleChildScrollView(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
                         const SizedBox(height: 20),
                         // Progress indicator
                         Row(
@@ -305,7 +286,7 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
 
                         const SizedBox(height: 60),
 
-                        // Word display
+                        // Word display with Image
                         Directionality(
                           textDirection:
                               isArabic ? TextDirection.ltr : TextDirection.ltr,
@@ -318,94 +299,131 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                                   0,
                                 ),
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 24, vertical: 20),
+                                  padding: const EdgeInsets.all(24),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    borderRadius: BorderRadius.circular(24),
+                                    borderRadius: BorderRadius.circular(32),
+                                    border: Border.all(
+                                      color: Colors.white,
+                                      width: 4,
+                                    ),
                                     boxShadow: [
                                       BoxShadow(
-                                        color:
-                                            Colors.black.withValues(alpha: 0.1),
-                                        blurRadius: 20,
+                                        color: state.isCorrect 
+                                          ? Colors.green.withValues(alpha: 0.4) 
+                                          : Colors.black.withValues(alpha: 0.15),
+                                        blurRadius: state.isCorrect ? 30 : 20,
+                                        spreadRadius: state.isCorrect ? 5 : 0,
                                         offset: const Offset(0, 10),
                                       ),
                                     ],
                                   ),
-                                  child: LayoutBuilder(
-                                    builder: (context, constraints) {
-                                      final letterCount = word.word.length;
-                                      final availableWidth =
-                                          constraints.maxWidth;
-                                      final fontSize =
-                                          (availableWidth / letterCount * 0.6)
-                                              .clamp(20.0, 40.0);
-                                      final horizontalPadding =
-                                          (availableWidth / letterCount * 0.1)
-                                              .clamp(2.0, 8.0);
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Image
+                                      Container(
+                                        height: 160,
+                                        padding: const EdgeInsets.all(16),
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF8F9FA),
+                                          borderRadius: BorderRadius.circular(24),
+                                        ),
+                                        child: Image.asset(
+                                          word.imagePath,
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ).animate().scale(delay: 200.ms, duration: 500.ms, curve: Curves.easeOutBack),
+                                      
+                                      const SizedBox(height: 30),
+                                      
+                                      // Letters
+                                      LayoutBuilder(
+                                        builder: (context, constraints) {
+                                          final letterCount = word.word.length;
+                                          final availableWidth =
+                                              constraints.maxWidth;
+                                          final fontSize =
+                                              (availableWidth / letterCount * 0.6)
+                                                  .clamp(24.0, 48.0);
+                                          final horizontalPadding =
+                                              (availableWidth / letterCount * 0.1)
+                                                  .clamp(2.0, 8.0);
 
-                                      return Wrap(
-                                        alignment: WrapAlignment.center,
-                                        spacing: horizontalPadding,
-                                        children: List.generate(
-                                            word.word.length, (index) {
-                                          final bool isMissingLetter = word
-                                              .missingIndices
-                                              .contains(index);
-                                          final filledLetter =
-                                              state.filledLetters[index];
-                                          final isFilled = filledLetter != null;
+                                          return Wrap(
+                                            alignment: WrapAlignment.center,
+                                            spacing: horizontalPadding,
+                                            children: List.generate(
+                                                word.word.length, (index) {
+                                              final bool isMissingLetter = word
+                                                  .missingIndices
+                                                  .contains(index);
+                                              final filledLetter =
+                                                  state.filledLetters[index];
+                                              final isFilled = filledLetter != null;
 
-                                          final Widget letterWidget = Padding(
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: horizontalPadding),
-                                            child: Text(
-                                              isMissingLetter
-                                                  ? (isFilled
-                                                      ? filledLetter
-                                                      : '_')
-                                                  : word.word[index],
-                                              style: GoogleFonts.comicNeue(
-                                                fontSize: fontSize,
-                                                fontWeight: FontWeight.bold,
-                                                color: isMissingLetter
-                                                    ? (isFilled
-                                                        ? Colors.green
-                                                        : Colors.orange)
-                                                    : const Color(0xFF6C63FF),
-                                              ),
-                                            ),
-                                          );
-
-                                          if (isMissingLetter &&
-                                              isFilled &&
-                                              state.allLettersFilled) {
-                                            return AnimatedBuilder(
-                                              animation:
-                                                  _letterBounceController,
-                                              builder: (context, child) {
-                                                return Transform.scale(
-                                                  scale: Curves.elasticOut
-                                                      .transform(
-                                                    _letterBounceController
-                                                        .value,
+                                              final Widget letterWidget = Container(
+                                                margin: EdgeInsets.symmetric(horizontal: horizontalPadding),
+                                                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                                                decoration: BoxDecoration(
+                                                  border: Border(
+                                                    bottom: BorderSide(
+                                                      color: isMissingLetter 
+                                                        ? (isFilled ? Colors.green : Colors.orange)
+                                                        : Colors.transparent,
+                                                      width: 4,
+                                                    ),
                                                   ),
-                                                  child: letterWidget,
-                                                );
-                                              },
-                                            );
-                                          }
+                                                ),
+                                                child: Text(
+                                                  isMissingLetter
+                                                      ? (isFilled
+                                                          ? filledLetter
+                                                          : ' ')
+                                                      : word.word[index].toUpperCase(),
+                                                  style: GoogleFonts.comicNeue(
+                                                    fontSize: fontSize,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: isMissingLetter
+                                                        ? (isFilled
+                                                            ? Colors.green
+                                                            : Colors.orange)
+                                                        : const Color(0xFF6C63FF),
+                                                  ),
+                                                ),
+                                              );
 
-                                          return letterWidget;
-                                        }),
-                                      );
-                                    },
+                                              if (isMissingLetter &&
+                                                  isFilled &&
+                                                  state.allLettersFilled) {
+                                                return AnimatedBuilder(
+                                                  animation:
+                                                      _letterBounceController,
+                                                  builder: (context, child) {
+                                                    return Transform.scale(
+                                                      scale: Curves.elasticOut
+                                                          .transform(
+                                                        _letterBounceController
+                                                            .value,
+                                                      ),
+                                                      child: letterWidget,
+                                                    );
+                                                  },
+                                                );
+                                              }
+
+                                              return letterWidget;
+                                            }),
+                                          );
+                                        },
+                                      ),
+                                    ],
                                   ),
                                 ),
                               );
                             },
                           )
-                              .animate()
+                              .animate(key: ValueKey(word.word)) // Re-animate when word changes
                               .fadeIn(duration: 800.ms)
                               .slideY(begin: 0.2, end: 0),
                         ),
@@ -552,10 +570,11 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                                 curve: Curves.elasticOut,
                               ),
                       ],
+                      ),
                     ),
                   ),
                 ),
-
+                  ), 
                 // Feedback indicators
                 if (state.allLettersFilled)
                   Positioned(

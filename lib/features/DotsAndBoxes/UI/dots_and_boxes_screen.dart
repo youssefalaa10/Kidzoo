@@ -291,8 +291,14 @@ class _DotsAndBoxesScreenContentState
         },
         builder: (context, state) {
           return SafeArea(
-            child: Column(
-              children: [
+            child: LayoutBuilder(
+              builder: (context, constraints) {
+                return SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    child: IntrinsicHeight(
+                      child: Column(
+                        children: [
                 // Header
                 _buildHeader(context, state),
                 const SizedBox(height: 16),
@@ -332,12 +338,17 @@ class _DotsAndBoxesScreenContentState
                   ),
                 ),
 
-                // Control Buttons
-                _buildControlButtons(context, state),
-                const SizedBox(height: 16),
-              ],
-            ),
-          );
+                        // Control Buttons
+                        _buildControlButtons(context, state),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        );
         },
       ),
     );

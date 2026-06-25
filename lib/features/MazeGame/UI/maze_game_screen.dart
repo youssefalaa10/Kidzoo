@@ -236,7 +236,7 @@ class _MazeGameContentState extends State<_MazeGameContent> {
                             : Icons.fullscreen,
                         size: 20),
                     const SizedBox(width: 8),
-                    Text(_isFullScreen ? "Exit Fullscreen" : "Fullscreen"),
+                    Text(_isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'),
                   ],
                 ),
               ),

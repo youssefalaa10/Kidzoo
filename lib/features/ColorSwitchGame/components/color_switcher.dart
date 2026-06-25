@@ -1,7 +1,9 @@
+import 'dart:math' as math;
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+
 import '../color_switch_game.dart';
-import 'dart:math' as math;
 
 class ColorSwitcher extends PositionComponent with HasGameRef<ColorSwitchGame> {
   ColorSwitcher({

@@ -1,6 +1,5 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -38,20 +37,15 @@ void main() async {
 }
 
 class MyApp extends StatelessWidget {
+
+  const MyApp({
+    required this.profileDao, required this.gameScoresDao, required this.flutterTts, required this.audioPlayer, required this.gameAssetManager, super.key,
+  });
   final ProfileDao profileDao;
   final GameScoresDao gameScoresDao;
   final FlutterTts flutterTts;
   final AudioPlayer audioPlayer;
   final GameAssetManager gameAssetManager;
-
-  const MyApp({
-    super.key,
-    required this.profileDao,
-    required this.gameScoresDao,
-    required this.flutterTts,
-    required this.audioPlayer,
-    required this.gameAssetManager,
-  });
 
   @override
   Widget build(BuildContext context) {

@@ -12,6 +12,7 @@ import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
+import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
 import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
@@ -28,12 +29,6 @@ import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 
 // Define the option data structure
 class OptionItem {
-  final String icon;
-  final String title;
-  final Widget screen;
-  final String flipImage;
-  final IconData? backIcon;
-  final IconData? frontIcon;
 
   OptionItem({
     required this.icon,
@@ -43,6 +38,12 @@ class OptionItem {
     this.backIcon,
     this.frontIcon,
   });
+  final String icon;
+  final String title;
+  final Widget screen;
+  final String flipImage;
+  final IconData? backIcon;
+  final IconData? frontIcon;
 }
 
 // Define app categories
@@ -155,6 +156,14 @@ class OptionsGrid extends StatelessWidget {
         flipImage: ImageManager.flipShapes,
       ),
       OptionItem(
+        icon: ImageManager.worldMap,
+        title: l10n.learnCountryFlags,
+        screen: const FlagGameMenuScreen(),
+        flipImage: ImageManager.worldMap,
+        frontIcon: Icons.flag_rounded,
+        backIcon: Icons.outlined_flag_rounded,
+      ),
+      OptionItem(
         icon: ImageManager.colorLearn,
         title: l10n.colorSwitch,
         screen: const ColorSwitchScreen(),
@@ -177,10 +186,28 @@ class OptionsGrid extends StatelessWidget {
                 QuizQuestion(
                   id: 'v1',
                   prompt: 'Which vehicle flies?',
-                  imageOrScenePath: ImageManager.lion,
+                  imageOrScenePath: 'assets/gen/images/vehicles/airplane.png',
                   options: [
                     QuizOption(id: '1', text: 'Airplane', isCorrect: true),
                     QuizOption(id: '2', text: 'Car', isCorrect: false),
+                  ],
+                ),
+                QuizQuestion(
+                  id: 'v2',
+                  prompt: 'Which vehicle runs on tracks?',
+                  imageOrScenePath: 'assets/gen/images/vehicles/train.png',
+                  options: [
+                    QuizOption(id: '1', text: 'Train', isCorrect: true),
+                    QuizOption(id: '2', text: 'Bus', isCorrect: false),
+                  ],
+                ),
+                QuizQuestion(
+                  id: 'v3',
+                  prompt: 'Which vehicle sails on water?',
+                  imageOrScenePath: 'assets/gen/images/vehicles/ship.png',
+                  options: [
+                    QuizOption(id: '1', text: 'Ship', isCorrect: true),
+                    QuizOption(id: '2', text: 'Bicycle', isCorrect: false),
                   ],
                 ),
               ],
@@ -205,10 +232,28 @@ class OptionsGrid extends StatelessWidget {
                 QuizQuestion(
                   id: 'f1',
                   prompt: 'Which fruit is red?',
-                  imageOrScenePath: ImageManager.lion,
+                  imageOrScenePath: 'assets/gen/images/fruits/apple.png',
                   options: [
                     QuizOption(id: '1', text: 'Apple', isCorrect: true),
                     QuizOption(id: '2', text: 'Banana', isCorrect: false),
+                  ],
+                ),
+                QuizQuestion(
+                  id: 'f2',
+                  prompt: 'Which fruit is yellow?',
+                  imageOrScenePath: 'assets/gen/images/fruits/banana.png',
+                  options: [
+                    QuizOption(id: '1', text: 'Banana', isCorrect: true),
+                    QuizOption(id: '2', text: 'Grapes', isCorrect: false),
+                  ],
+                ),
+                QuizQuestion(
+                  id: 'f3',
+                  prompt: 'Which fruit is orange?',
+                  imageOrScenePath: 'assets/gen/images/fruits/orange.png',
+                  options: [
+                    QuizOption(id: '1', text: 'Orange', isCorrect: true),
+                    QuizOption(id: '2', text: 'Watermelon', isCorrect: false),
                   ],
                 ),
               ],
@@ -233,10 +278,28 @@ class OptionsGrid extends StatelessWidget {
                 QuizQuestion(
                   id: 'vg1',
                   prompt: 'Which is a vegetable?',
-                  imageOrScenePath: ImageManager.lion,
+                  imageOrScenePath: 'assets/gen/images/vegetables/carrot.png',
                   options: [
                     QuizOption(id: '1', text: 'Carrot', isCorrect: true),
                     QuizOption(id: '2', text: 'Apple', isCorrect: false),
+                  ],
+                ),
+                QuizQuestion(
+                  id: 'vg2',
+                  prompt: 'Which vegetable makes you cry when you cut it?',
+                  imageOrScenePath: 'assets/gen/images/vegetables/onion.png',
+                  options: [
+                    QuizOption(id: '1', text: 'Onion', isCorrect: true),
+                    QuizOption(id: '2', text: 'Tomato', isCorrect: false),
+                  ],
+                ),
+                QuizQuestion(
+                  id: 'vg3',
+                  prompt: 'Which vegetable is red?',
+                  imageOrScenePath: 'assets/gen/images/vegetables/tomato.png',
+                  options: [
+                    QuizOption(id: '1', text: 'Tomato', isCorrect: true),
+                    QuizOption(id: '2', text: 'Cucumber', isCorrect: false),
                   ],
                 ),
               ],

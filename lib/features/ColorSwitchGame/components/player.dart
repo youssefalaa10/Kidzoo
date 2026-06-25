@@ -1,11 +1,13 @@
 import 'dart:math' as math;
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
+
 import '../color_switch_game.dart';
 import 'circle_rotator.dart';
 import 'color_switcher.dart';
-import 'star_component.dart';
 import 'ground.dart';
+import 'star_component.dart';
 
 class Player extends PositionComponent with HasGameRef<ColorSwitchGame> {
   Player({

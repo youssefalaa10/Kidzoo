@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import '../bloc/quiz_cubit.dart';
 import '../bloc/quiz_state.dart';
-import 'widgets/quiz_scene_card.dart';
 import 'widgets/quiz_options_row.dart';
+import 'widgets/quiz_scene_card.dart';
 
 class QuizEngineScreen extends StatelessWidget {
   const QuizEngineScreen({super.key});
@@ -14,13 +17,22 @@ class QuizEngineScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Quiz'),
       ),
-      body: BlocBuilder<QuizCubit, QuizState>(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(BackgroundResolver(context, BackgroundType.education).resolveBackground()!),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: BlocBuilder<QuizCubit, QuizState>(
         builder: (context, state) {
           if (state is QuizLoading) {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is QuizCompleted) {
-            return Center(
+            return FluidContainer(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -48,38 +60,40 @@ class QuizEngineScreen extends StatelessWidget {
                 : (state as QuizFeedback).score;
             final isFeedback = state is QuizFeedback;
 
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Text('Score: $score',
-                      style: const TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 20),
-                  Text(question.prompt,
-                      style: const TextStyle(
-                          fontSize: 24, fontWeight: FontWeight.bold),
-                      textAlign: TextAlign.center),
-                  const SizedBox(height: 20),
-                  QuizSceneCard(imagePath: question.imageOrScenePath),
-                  const Spacer(),
-                  QuizOptionsRow(
-                    options: question.options,
-                    showFeedback: isFeedback,
-                    onOptionSelected: (option) {
-                      if (!isFeedback) {
-                        context.read<QuizCubit>().submitAnswer(option);
-                      }
-                    },
-                  ),
-                  const SizedBox(height: 40),
-                ],
+            return FluidContainer(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    Text('Score: $score',
+                        style: const TextStyle(
+                            fontSize: 20, fontWeight: FontWeight.bold)),
+                    const SizedBox(height: 20),
+                    Text(question.prompt,
+                        style: const TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
+                        textAlign: TextAlign.center),
+                    const SizedBox(height: 20),
+                    QuizSceneCard(imagePath: question.imageOrScenePath),
+                    const SizedBox(height: 20), // Replace Spacer with SizedBox
+                    QuizOptionsRow(
+                      options: question.options,
+                      showFeedback: isFeedback,
+                      onOptionSelected: (option) {
+                        if (!isFeedback) {
+                          context.read<QuizCubit>().submitAnswer(option);
+                        }
+                      },
+                    ),
+                    const SizedBox(height: 40),
+                  ],
+                ),
               ),
             );
           }
 
           return const SizedBox.shrink();
         },
+      ),
       ),
     );
   }

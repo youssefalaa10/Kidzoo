@@ -4,181 +4,31 @@ import 'Model/word_model.dart';
 
 class WordList {
   static final List<Word> allWords = [
-    // 1
-    Word(
-      word: 'Apple',
-      missingIndices: [0],
-      options: ['A', 'E', 'I', 'O'],
-      correctLetters: ['A'],
-    ),
-    // 2
-    Word(
-      word: 'Ball',
-      missingIndices: [0],
-      options: ['B', 'C', 'D', 'F'],
-      correctLetters: ['B'],
-    ),
-    // 3
-    Word(
-      word: 'Cat',
-      missingIndices: [0],
-      options: ['C', 'K', 'S', 'T'],
-      correctLetters: ['C'],
-    ),
-    // 4
-    Word(
-      word: 'Dog',
-      missingIndices: [0],
-      options: ['D', 'B', 'G', 'P'],
-      correctLetters: ['D'],
-    ),
-    // 5
-    Word(
-      word: 'Elephant',
-      missingIndices: [0],
-      options: ['E', 'I', 'A', 'U'],
-      correctLetters: ['E'],
-    ),
-    // 6
-    Word(
-      word: 'Fish',
-      missingIndices: [0],
-      options: ['F', 'P', 'V', 'T'],
-      correctLetters: ['F'],
-    ),
-    // 7
-    Word(
-      word: 'Goat',
-      missingIndices: [0],
-      options: ['G', 'C', 'J', 'K'],
-      correctLetters: ['G'],
-    ),
-    // 8
-    Word(
-      word: 'House',
-      missingIndices: [0],
-      options: ['H', 'Y', 'F', 'M'],
-      correctLetters: ['H'],
-    ),
-    // 9
-    Word(
-      word: 'Ice',
-      missingIndices: [0],
-      options: ['I', 'E', 'Y', 'A'],
-      correctLetters: ['I'],
-    ),
-    // 10
-    Word(
-      word: 'Jelly',
-      missingIndices: [0],
-      options: ['J', 'G', 'Y', 'I'],
-      correctLetters: ['J'],
-    ),
-    // 11
-    Word(
-      word: 'Kite',
-      missingIndices: [0],
-      options: ['K', 'C', 'Q', 'X'],
-      correctLetters: ['K'],
-    ),
-    // 12
-    Word(
-      word: 'Lion',
-      missingIndices: [0],
-      options: ['L', 'I', 'T', 'Y'],
-      correctLetters: ['L'],
-    ),
-    // 13
-    Word(
-      word: 'Moon',
-      missingIndices: [0],
-      options: ['M', 'N', 'W', 'V'],
-      correctLetters: ['M'],
-    ),
-    // 14
-    Word(
-      word: 'Nest',
-      missingIndices: [0],
-      options: ['N', 'M', 'H', 'R'],
-      correctLetters: ['N'],
-    ),
-    // 15
-    Word(
-      word: 'Orange',
-      missingIndices: [0],
-      options: ['O', 'A', 'U', 'I'],
-      correctLetters: ['O'],
-    ),
-    // 16
-    Word(
-      word: 'Pen',
-      missingIndices: [0],
-      options: ['P', 'B', 'D', 'Q'],
-      correctLetters: ['P'],
-    ),
-    // 17
-    Word(
-      word: 'Queen',
-      missingIndices: [0],
-      options: ['Q', 'K', 'C', 'G'],
-      correctLetters: ['Q'],
-    ),
-    // 18
-    Word(
-      word: 'Rabbit',
-      missingIndices: [0],
-      options: ['R', 'P', 'L', 'W'],
-      correctLetters: ['R'],
-    ),
-    // 19
-    Word(
-      word: 'Sun',
-      missingIndices: [0],
-      options: ['S', 'Z', 'C', 'X'],
-      correctLetters: ['S'],
-    ),
-    // 20
-    Word(
-      word: 'Tree',
-      missingIndices: [0],
-      options: ['T', 'D', 'F', 'P'],
-      correctLetters: ['T'],
-    ),
-    // 21
-    Word(
-      word: 'Umbrella',
-      missingIndices: [0],
-      options: ['U', 'A', 'O', 'E'],
-      correctLetters: ['U'],
-    ),
-    // 22
-    Word(
-      word: 'Van',
-      missingIndices: [0],
-      options: ['V', 'W', 'F', 'B'],
-      correctLetters: ['V'],
-    ),
-    // 23
-    Word(
-      word: 'Water',
-      missingIndices: [0],
-      options: ['W', 'V', 'U', 'M'],
-      correctLetters: ['W'],
-    ),
-    // 24
-    Word(
-      word: 'Xylophone',
-      missingIndices: [0],
-      options: ['X', 'Z', 'S', 'K'],
-      correctLetters: ['X'],
-    ),
-    // 25
-    Word(
-      word: 'Zebra',
-      missingIndices: [0],
-      options: ['Z', 'S', 'X', 'C'],
-      correctLetters: ['Z'],
-    ),
+    Word(word: 'Apple', missingIndices: [0], options: ['A', 'E', 'I', 'O'], correctLetters: ['A'], imagePath: 'assets/gen/images/fruits/apple.png'),
+    Word(word: 'Banana', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/fruits/banana.png'),
+    Word(word: 'Grapes', missingIndices: [0], options: ['G', 'J', 'C', 'K'], correctLetters: ['G'], imagePath: 'assets/gen/images/fruits/grapes.png'),
+    Word(word: 'Mango', missingIndices: [0], options: ['M', 'N', 'W', 'V'], correctLetters: ['M'], imagePath: 'assets/gen/images/fruits/mango.png'),
+    Word(word: 'Orange', missingIndices: [0], options: ['O', 'A', 'U', 'E'], correctLetters: ['O'], imagePath: 'assets/gen/images/fruits/orange.png'),
+    Word(word: 'Carrot', missingIndices: [0], options: ['C', 'K', 'S', 'T'], correctLetters: ['C'], imagePath: 'assets/gen/images/vegetables/carrot.png'),
+    Word(word: 'Tomato', missingIndices: [0], options: ['T', 'D', 'P', 'F'], correctLetters: ['T'], imagePath: 'assets/gen/images/vegetables/tomato.png'),
+    Word(word: 'Potato', missingIndices: [0], options: ['P', 'B', 'D', 'Q'], correctLetters: ['P'], imagePath: 'assets/gen/images/vegetables/potato.png'),
+    Word(word: 'Lemon', missingIndices: [0], options: ['L', 'R', 'M', 'N'], correctLetters: ['L'], imagePath: 'assets/gen/images/vegetables/lemon.png'),
+    Word(word: 'Onion', missingIndices: [0], options: ['O', 'U', 'A', 'E'], correctLetters: ['O'], imagePath: 'assets/gen/images/vegetables/onion.png'),
+    Word(word: 'Car', missingIndices: [0], options: ['C', 'K', 'G', 'S'], correctLetters: ['C'], imagePath: 'assets/gen/images/vehicles/car.png'),
+    Word(word: 'Bus', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/vehicles/bus.png'),
+    Word(word: 'Train', missingIndices: [0], options: ['T', 'D', 'F', 'P'], correctLetters: ['T'], imagePath: 'assets/gen/images/vehicles/train.png'),
+    Word(word: 'Airplane', missingIndices: [0], options: ['A', 'E', 'I', 'U'], correctLetters: ['A'], imagePath: 'assets/gen/images/vehicles/airplane.png'),
+    Word(word: 'Bicycle', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/vehicles/bicycle.png'),
+    Word(word: 'Cat', missingIndices: [0], options: ['C', 'K', 'S', 'T'], correctLetters: ['C'], imagePath: 'assets/gen/images/animal/cat.png'),
+    Word(word: 'Dog', missingIndices: [0], options: ['D', 'B', 'G', 'P'], correctLetters: ['D'], imagePath: 'assets/gen/images/animal/dog.png'),
+    Word(word: 'Cow', missingIndices: [0], options: ['C', 'K', 'G', 'Q'], correctLetters: ['C'], imagePath: 'assets/gen/images/animal/cow.png'),
+    Word(word: 'Bird', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/animal/bird.png'),
+    Word(word: 'Lion', missingIndices: [0], options: ['L', 'I', 'T', 'Y'], correctLetters: ['L'], imagePath: 'assets/gen/images/animal/lion.png'),
+    Word(word: 'Elephant', missingIndices: [0], options: ['E', 'I', 'A', 'U'], correctLetters: ['E'], imagePath: 'assets/gen/images/animal/elephant.png'),
+    Word(word: 'Panda', missingIndices: [0], options: ['P', 'B', 'D', 'Q'], correctLetters: ['P'], imagePath: 'assets/gen/images/animal/panda.png'),
+    Word(word: 'Horse', missingIndices: [0], options: ['H', 'Y', 'F', 'M'], correctLetters: ['H'], imagePath: 'assets/gen/images/animal/horse.png'),
+    Word(word: 'Sheep', missingIndices: [0], options: ['S', 'Z', 'C', 'X'], correctLetters: ['S'], imagePath: 'assets/gen/images/animal/sheep.png'),
+    Word(word: 'Giraffe', missingIndices: [0], options: ['G', 'J', 'C', 'K'], correctLetters: ['G'], imagePath: 'assets/gen/images/animal/giraffe.png'),
   ];
 
   static Word getWordAtIndex(int index) {
@@ -197,6 +47,7 @@ class WordList {
         word: originalWord.word,
         missingIndex: originalWord.missingIndex,
         correctLetter: originalWord.correctLetter,
+        imagePath: originalWord.imagePath,
       );
     } else if (missingCount == 2 && originalWord.word.length >= 3) {
       // Two missing letters
@@ -213,6 +64,7 @@ class WordList {
         word: originalWord.word,
         missingIndices: [firstIndex, secondIndex],
         correctLetters: [firstLetter, secondLetter],
+        imagePath: originalWord.imagePath,
       );
     } else if (missingCount == 3 && originalWord.word.length >= 4) {
       // Three missing letters
@@ -227,6 +79,7 @@ class WordList {
         word: originalWord.word,
         missingIndices: sortedIndices,
         correctLetters: letters,
+        imagePath: originalWord.imagePath,
       );
     } else {
       // Fallback to single missing letter
@@ -234,6 +87,7 @@ class WordList {
         word: originalWord.word,
         missingIndex: originalWord.missingIndex,
         correctLetter: originalWord.correctLetter,
+        imagePath: originalWord.imagePath,
       );
     }
   }

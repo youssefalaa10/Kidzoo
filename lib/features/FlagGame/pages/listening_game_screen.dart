@@ -1,15 +1,17 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
-import 'package:kidzo/core/helpers/tts_service.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:confetti/confetti.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/helpers/tts_helper.dart';
+import 'package:kidzo/core/helpers/tts_service.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/services/cubit/music_cubit.dart';
-import 'package:kidzo/core/localization/app_localizations.dart';
+
 import '../data/flag_data_manager.dart';
 import '../models/country_model.dart';
 
@@ -67,7 +69,7 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
     setState(() {
       _isCorrect = null;
       _selectedCountryCode = null;
-      var countries = FlagDataManager.getRandomCountries(4);
+      final countries = FlagDataManager.getRandomCountries(4);
       if (countries.isEmpty) {
         // If still loading or empty, try again in a bit
         Future.delayed(const Duration(milliseconds: 500), () {
@@ -128,8 +130,9 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
     final mq = CustomMQ(context);
     final l10n = AppLocalizations.of(context);
 
-    if (_targetCountry == null)
+    if (_targetCountry == null) {
       return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     return Scaffold(
       backgroundColor: Colors.purple[50],
@@ -210,11 +213,11 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
+                          boxShadow: const [
                             BoxShadow(
                               color: Colors.black12,
                               blurRadius: 10,
-                              offset: const Offset(0, 5),
+                              offset: Offset(0, 5),
                             ),
                           ],
                           border: Border.all(

@@ -18,10 +18,11 @@ class ShapeSelection extends StatelessWidget {
           const SizedBox(
             height: 30,
           ),
-        Container(
-          clipBehavior: Clip.antiAliasWithSaveLayer,
-          margin: const EdgeInsets.all(8),
-          //height: 80,
+        Expanded(
+          child: Container(
+            clipBehavior: Clip.antiAliasWithSaveLayer,
+            margin: const EdgeInsets.all(8),
+            //height: 80,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -45,6 +46,7 @@ class ShapeSelection extends StatelessWidget {
                   ],
                 )
               : Image.asset(temp),
+          ),
         ),
         if (index % 2 != 0)
           const SizedBox(

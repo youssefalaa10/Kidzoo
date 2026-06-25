@@ -10,32 +10,32 @@ abstract class QuizState extends Equatable {
 class QuizLoading extends QuizState {}
 
 class QuizActive extends QuizState {
+
+  const QuizActive(this.question, this.score, this.questionIndex);
   final QuizQuestion question;
   final int score;
   final int questionIndex;
-
-  const QuizActive(this.question, this.score, this.questionIndex);
 
   @override
   List<Object?> get props => [question, score, questionIndex];
 }
 
 class QuizFeedback extends QuizState {
+
+  const QuizFeedback(
+      this.question, this.isCorrect, this.score, this.questionIndex);
   final QuizQuestion question;
   final bool isCorrect;
   final int score;
   final int questionIndex;
-
-  const QuizFeedback(
-      this.question, this.isCorrect, this.score, this.questionIndex);
 
   @override
   List<Object?> get props => [question, isCorrect, score, questionIndex];
 }
 
 class QuizCompleted extends QuizState {
-  final int finalScore;
   const QuizCompleted(this.finalScore);
+  final int finalScore;
 
   @override
   List<Object?> get props => [finalScore];

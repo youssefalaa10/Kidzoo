@@ -35,12 +35,10 @@ class _ColorSwitchScreenState extends State<ColorSwitchScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_ttsHelper == null) {
-      _ttsHelper = TtsHelper(
+    _ttsHelper ??= TtsHelper(
         musicCubit: context.read<MusicCubit>(),
         languageCode: Localizations.localeOf(context).languageCode,
       );
-    }
   }
 
   @override

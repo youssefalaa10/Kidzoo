@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../../core/helpers/tts_service.dart';
-import '../../../core/localization/app_localizations.dart';
+import 'package:kidzo/core/utils/assets.dart';
 
 import '../../../core/base/protected_game_screen.dart';
+import '../../../core/helpers/tts_service.dart';
+import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
+import '../../../core/services/background_resolver.dart';
 import '../data/model/animal_quiz_model.dart';
-import 'package:kidzo/core/utils/assets.dart';
 
 class AnimalQuizScreen extends ProtectedGameScreen {
   const AnimalQuizScreen({required super.level, super.key});
@@ -290,11 +291,17 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     return Scaffold(
       body: Stack(
         children: [
-          Image.asset(
-            Assets
-                .genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle,
-            height: MediaQuery.of(context).size.height,
-            fit: BoxFit.cover,
+          Container(
+            width: double.infinity,
+            height: double.infinity,
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage(
+                  BackgroundResolver(context, BackgroundType.jungle).resolveBackground()!
+                ),
+                fit: BoxFit.cover,
+              ),
+            ),
           ),
           SafeArea(
             child: SingleChildScrollView(

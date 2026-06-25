@@ -8,17 +8,16 @@ class GameBoard extends StatelessWidget {
   const GameBoard({
     required this.board,
     required this.onSwipe,
+    required this.boardSize,
     super.key,
   });
 
   final Board board;
   final void Function(DragEndDetails) onSwipe;
+  final double boardSize;
 
   @override
   Widget build(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final boardPadding = 16.0;
-    final boardSize = screenWidth - (boardPadding * 2);
     final spacing = 12.0;
     final tileSize = (boardSize - (spacing * (board.size + 1))) / board.size;
 

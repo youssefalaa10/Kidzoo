@@ -2,8 +2,7 @@ import '../../utils/assets.dart';
 
 class ImageManager {
   // General images
-  static const String logo = Assets
-      .genImagesHomePageBorderInGreenIllustrativeNaturePastelsJungleThemedStyle; // Placeholder or fix if found
+  static const String logo = Assets.genImagesHomeCloudyBg; // Fallback for missing Page Border
 
   // Shapes
   static const String square = Assets.genImagesShapesSquare;

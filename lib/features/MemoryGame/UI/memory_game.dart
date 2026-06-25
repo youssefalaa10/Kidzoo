@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 
 enum GameLevel {
   easy,
@@ -269,15 +271,16 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     final l10n = AppLocalizations.of(context);
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [Color(0xFFF0F8FF), Color(0xFFE6F2FF)],
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
-          child: Column(
+          child: FluidContainer(
+            padding: EdgeInsets.zero,
+            child: Column(
             children: [
               Padding(
                 padding: const EdgeInsets.symmetric(
@@ -461,6 +464,8 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                 ),
               ),
             ],
+            ),
+
           ),
         ),
       ),

@@ -472,5 +472,9 @@
   "fruits": "Fruits",
   "vegetables": "Vegetables",
   "splashTitle": "Kidzoo",
-  "splashSubtitle": "Learn and Play!"
+  "splashSubtitle": "Learn and Play!",
+  "backgroundMusicTitle": "Background Music",
+  "backgroundMusicDesc": "Choose which music track plays in the background",
+  "track1": "Track 1",
+  "track2": "Track 2"
 }

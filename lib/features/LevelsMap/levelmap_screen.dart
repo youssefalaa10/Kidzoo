@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzo/core/utils/assets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../core/localization/app_localizations.dart';
+import '../../core/services/background_resolver.dart';
 import '../../core/services/navigation_service.dart';
+import '../../core/shared/widgets/fluid_container.dart';
 import 'Data/Logic/Model/game_sequence_model.dart';
 import 'Data/Logic/Model/level_model.dart';
 import 'Data/Logic/cubit/levelmap_cubit.dart';
@@ -45,50 +46,53 @@ class LevelMapScreen extends StatelessWidget {
         create: (context) => LevelCubit(),
         child: BlocBuilder<LevelCubit, LevelMapState>(
           builder: (context, state) {
-            return SingleChildScrollView(
-              child: SizedBox(
-                // Set the container height to match the image
-                height: backgroundHeight,
-                child: Stack(
-                  children: [
-                    // Background Image
-                    Container(
-                      decoration: const BoxDecoration(
-                        image: DecorationImage(
-                          image: AssetImage(Assets.genImagesHomeFav),
-                          fit: BoxFit.cover,
-                        ),
+            return Container(
+              width: double.infinity,
+              height: double.infinity,
+              color: const Color(0xfffaf5f1),
+              child: FluidContainer(
+                padding: EdgeInsets.zero,
+                child: SingleChildScrollView(
+                  child: Container(
+                    // Set the container height to match the image
+                    height: backgroundHeight,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: AssetImage(BackgroundResolver(context, BackgroundType.map).resolveBackground()!),
+                        fit: BoxFit.cover,
                       ),
                     ),
-                    // Current Level Indicator
-                    Positioned(
-                      top: 20,
-                      left: 20,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withValues(alpha: 0.1),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
+                    child: Stack(
+                      children: [
+                        // Current Level Indicator
+                        Positioned(
+                          top: 20,
+                          left: 20,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.8),
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.1),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
                             ),
-                          ],
-                        ),
-                        child: Text(
-                          l10n.currentLevelLabel(state.highestUnlockedLevelId),
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.deepPurple,
+                            child: Text(
+                              l10n.currentLevelLabel(state.highestUnlockedLevelId),
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.deepPurple,
+                              ),
+                            ),
                           ),
                         ),
-                      ),
-                    ),
-                    // Debug buttons removed
+                        // Debug buttons removed
                     // Level Buttons
                     Stack(
                       children: state.levels.map((level) {
@@ -192,6 +196,8 @@ class LevelMapScreen extends StatelessWidget {
                   ],
                 ),
               ),
+              ), 
+              ), 
             );
           },
         ),

@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/base/protected_game_screen.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/services/background_resolver.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/shared/widgets/fluid_container.dart';
 import 'package:kidzo/features/Puzzle/bloc/cubit.dart';
 import 'package:kidzo/features/Puzzle/bloc/state.dart';
 import 'package:kidzo/features/Puzzle/data/model/puzzle_model.dart';
@@ -60,7 +62,18 @@ class ImageSelectionPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(l10n.selectAnImage),
       ),
-      body: GridView.builder(
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            fit: BoxFit.cover,
+          ),
+        ),
+        child: FluidContainer(
+          padding: EdgeInsets.zero,
+          child: GridView.builder(
         padding: const EdgeInsets.all(16),
         gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 2,
@@ -98,6 +111,8 @@ class ImageSelectionPage extends StatelessWidget {
             ),
           );
         },
+      ),
+      ),
       ),
     );
   }
@@ -157,7 +172,18 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
         appBar: AppBar(
           title: Text(l10n.puzzleFrame),
         ),
-        body: BlocBuilder<PuzzleCubit, PuzzleState>(
+        body: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+              fit: BoxFit.cover,
+            ),
+          ),
+          child: FluidContainer(
+            padding: EdgeInsets.zero,
+            child: BlocBuilder<PuzzleCubit, PuzzleState>(
           builder: (context, state) {
             final cubit = context.read<PuzzleCubit>();
             // Check if puzzle data is ready
@@ -243,6 +269,8 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
                           style: const TextStyle(fontSize: 20)),
                     ])));
           },
+        ),
+        ),
         ),
       ),
     );

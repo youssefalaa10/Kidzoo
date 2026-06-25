@@ -162,7 +162,7 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.cyan.withOpacity(0.8),
+                              color: Colors.cyan.withValues(alpha: 0.8),
                               blurRadius: 15,
                               spreadRadius: 2,
                             ),
@@ -182,7 +182,7 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.pink.withOpacity(0.8),
+                              color: Colors.pink.withValues(alpha: 0.8),
                               blurRadius: 15,
                               spreadRadius: 2,
                             ),
@@ -207,7 +207,7 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: Colors.yellow.withOpacity(0.8),
+                              color: Colors.yellow.withValues(alpha: 0.8),
                               blurRadius: 20,
                               spreadRadius: 5,
                             ),
@@ -256,7 +256,7 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                                 child: Container(
                                   padding: const EdgeInsets.all(8),
                                   decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
+                                    color: Colors.black.withValues(alpha: 0.5),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Icon(
@@ -299,7 +299,7 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                     if (state.status == PaddleBounceGameStatus.waiting ||
                         state.status == PaddleBounceGameStatus.paused)
                       Container(
-                        color: Colors.black.withOpacity(0.7),
+                        color: Colors.black.withValues(alpha: 0.7),
                         child: Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
@@ -372,7 +372,7 @@ class _CenterLinePainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.white.withOpacity(0.15)
+      ..color = Colors.white.withValues(alpha: 0.15)
       ..strokeWidth = 1
       ..style = PaintingStyle.stroke;
 

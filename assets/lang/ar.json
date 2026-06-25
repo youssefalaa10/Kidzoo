@@ -473,5 +473,9 @@
   "fruits": "الفواكه",
   "vegetables": "الخضروات",
   "splashTitle": "كيدزو",
-  "splashSubtitle": "تعلم والعب!"
+  "splashSubtitle": "تعلم والعب!",
+  "backgroundMusicTitle": "موسيقى الخلفية",
+  "backgroundMusicDesc": "اختر المقطع الموسيقي الذي يتم تشغيله في الخلفية",
+  "track1": "مقطع 1",
+  "track2": "مقطع 2"
 }

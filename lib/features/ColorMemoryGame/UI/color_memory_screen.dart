@@ -5,6 +5,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import '../bloc/color_memory_bloc.dart';
 import '../bloc/color_memory_event.dart';
 import '../data/models/color_memory_constants.dart';
@@ -168,9 +170,18 @@ class _ColorMemoryScreenState
               ColorPalettes.all[state.settings.selectedPaletteIndex];
 
           return Scaffold(
-            backgroundColor: ColorMemoryConstants.backgroundColor,
-            body: SafeArea(
-              child: Column(
+            body: Container(
+              decoration: BoxDecoration(
+                image: DecorationImage(
+                  image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+                  fit: BoxFit.cover,
+                ),
+              ),
+              child: SafeArea(
+                child: FluidContainer(
+                  maxWidth: 800,
+                  padding: EdgeInsets.zero,
+                  child: Column(
                 children: [
                   // Header with stats
                   GameHeaderWidget(
@@ -212,7 +223,9 @@ class _ColorMemoryScreenState
                 ],
               ),
             ),
-          );
+          ),
+        ),
+      );
         },
       ),
     );

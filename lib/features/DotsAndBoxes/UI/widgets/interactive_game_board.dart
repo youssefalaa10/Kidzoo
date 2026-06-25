@@ -150,55 +150,48 @@ class _InteractiveGameBoardState extends State<InteractiveGameBoard>
   Line? _getLineFromPosition(
       Offset position, double cellSize, double dotRadius) {
     final padding = _hitPadding(cellSize, dotRadius);
+    final maxDistance = padding * 1.5;
     final dotsPerSide = widget.state.dotsPerSide;
 
-    // 1) Generous rectangular hit zones (easy for small fingers)
+    Line? nearest;
+    var nearestDist = maxDistance;
+
     for (int row = 0; row < dotsPerSide; row++) {
       for (int col = 0; col < dotsPerSide - 1; col++) {
-        final lineStartX = col * cellSize;
-        final lineEndX = (col + 1) * cellSize;
-        final lineY = row * cellSize;
-
-        final hitArea = Rect.fromLTRB(
-          lineStartX - padding,
-          lineY - padding,
-          lineEndX + padding,
-          lineY + padding,
+        final dist = _distanceToSegment(
+          position,
+          Offset(col * cellSize, row * cellSize),
+          Offset((col + 1) * cellSize, row * cellSize),
         );
-
-        if (hitArea.contains(position)) {
-          return Line(
-            DotPosition(row, col),
-            DotPosition(row, col + 1),
-          );
+        if (dist < nearestDist) {
+          nearestDist = dist;
+          nearest = Line(DotPosition(row, col), DotPosition(row, col + 1));
         }
       }
     }
 
     for (int row = 0; row < dotsPerSide - 1; row++) {
       for (int col = 0; col < dotsPerSide; col++) {
-        final lineX = col * cellSize;
-        final lineStartY = row * cellSize;
-        final lineEndY = (row + 1) * cellSize;
-
-        final hitArea = Rect.fromLTRB(
-          lineX - padding,
-          lineStartY - padding,
-          lineX + padding,
-          lineEndY + padding,
+        final dist = _distanceToSegment(
+          position,
+          Offset(col * cellSize, row * cellSize),
+          Offset(col * cellSize, (row + 1) * cellSize),
         );
-
-        if (hitArea.contains(position)) {
-          return Line(
-            DotPosition(row, col),
-            DotPosition(row + 1, col),
-          );
+        if (dist < nearestDist) {
+          nearestDist = dist;
+          nearest = Line(DotPosition(row, col), DotPosition(row + 1, col));
         }
       }
     }
 
-    // 2) Snap to the nearest undrawn line within reach
-    return _findNearestLine(position, cellSize, padding * 1.2);
+    if (nearest != null && widget.state.isLineDrawn(nearest)) {
+      final nearestUndrawn = _findNearestLine(position, cellSize, maxDistance);
+      if (nearestUndrawn != null) {
+        return nearestUndrawn;
+      }
+    }
+
+    return nearest;
   }
 
   Line? _findNearestLine(Offset position, double cellSize, double maxDistance) {

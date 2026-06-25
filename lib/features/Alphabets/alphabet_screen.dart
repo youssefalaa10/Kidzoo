@@ -46,12 +46,7 @@ class _AlphabetScreenState extends State<AlphabetScreen> with TTSMusicMixin {
             flex: 3,
             child: Container(
               color: Colors.white,
-              child: const Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  AlphabetSelection(),
-                ],
-              ),
+              child: const AlphabetSelection(),
             ),
           ),
         ],

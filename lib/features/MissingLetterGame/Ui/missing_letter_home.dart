@@ -4,6 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/localization/language_provider.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/widgets/fluid_container.dart';
 import '../Data/Logic/cubit/missing_letter_cubit.dart';
 import '../Data/game_storage.dart';
 import 'missing_letter_screen.dart';
@@ -85,20 +87,16 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
 
     return Scaffold(
       body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              Color(0xFF9C27B0),
-              Color(0xFF3F51B5),
-              Color(0xFF2196F3),
-              Color(0xFF00BCD4),
-            ],
+        decoration: BoxDecoration(
+          image: DecorationImage(
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            fit: BoxFit.cover,
           ),
         ),
         child: SafeArea(
-          child: Padding(
+          child: FluidContainer(
+            padding: EdgeInsets.zero,
+            child: Padding(
             padding: const EdgeInsets.all(20),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -248,6 +246,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

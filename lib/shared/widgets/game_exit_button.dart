@@ -3,17 +3,17 @@ import 'package:flutter/material.dart';
 import '../../core/localization/app_localizations.dart';
 
 class GameExitButton extends StatelessWidget {
-  final VoidCallback? onExit;
 
   const GameExitButton({super.key, this.onExit});
+  final VoidCallback? onExit;
 
   @override
   Widget build(BuildContext context) {
     // Read the primary color from the Theme instead of a static color.
     final primaryColor = Theme.of(context).primaryColor;
-    
+
     // Read localized text for exit (fallback to generic if missing from localization)
-    final exitText = AppLocalizations.of(context)?.exit ?? 'Exit';
+    final exitText = AppLocalizations.of(context).exit;
 
     return GestureDetector(
       onTap: onExit ?? () => Navigator.of(context).pop(),
@@ -24,7 +24,7 @@ class GameExitButton extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
+              color: Colors.black.withValues(alpha: 0.2),
               offset: const Offset(0, 4),
               blurRadius: 4,
             ),

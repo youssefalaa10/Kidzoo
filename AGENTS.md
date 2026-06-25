@@ -1,4 +1,4 @@
 <!-- SPECKIT START -->
 For additional context about technologies to be used, project structure,
-shell commands, and other important information, read the current plan at `specs/003-game-enhancements-exit-buttons/plan.md`
+shell commands, and other important information, read the current plan at `specs/004-unified-quiz-responsive/plan.md`
 <!-- SPECKIT END -->

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class QuizImageCard extends StatelessWidget {
+  const QuizImageCard({required this.imagePath, super.key});
   final String imagePath;
-  const QuizImageCard({super.key, required this.imagePath});
 
   @override
   Widget build(BuildContext context) {

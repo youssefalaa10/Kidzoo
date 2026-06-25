@@ -7,7 +7,7 @@ import '../../core/localization/app_localizations.dart';
 import '../../core/localization/language_provider.dart';
 import '../../core/mixins/background_music_mixin.dart';
 import '../../core/services/cubit/music_cubit.dart';
-import '../../core/shared/style/image_manager.dart';
+import '../../core/shared/widgets/fluid_container.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -25,102 +25,95 @@ class _SettingsScreenState extends State<SettingsScreen>
 
     return Scaffold(
       backgroundColor: const Color(0xfffaf5f1),
-      body: Stack(
-        children: [
-          // Background image (same as games screen)
-          Image.asset(
-            height: MediaQuery.of(context).size.height,
-            fit: BoxFit.fitHeight,
-            ImageManager.homeBackground,
-          ),
-          SafeArea(
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: mq.width(5)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  SizedBox(height: mq.height(2)),
-                  // Header with back button
-                  Row(
-                    children: [
-                      IconButton(
-                        onPressed: () => Navigator.pop(context),
-                        icon: Icon(
-                          Icons.arrow_back_ios_new_outlined,
-                          size: 30,
-                          color: Colors.purple[800],
-                        ),
-                      ),
-                      HeaderSection(
-                        mq: mq,
-                        title: l10n.funSettings,
-                        textColor: Colors.purple[800]!,
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: mq.height(3)),
-                  // Settings content
-                  Expanded(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          // Language Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.language,
-                            title: l10n.language,
-                            description: l10n.languageDescription,
-                            child: _buildLanguageSelector(context, l10n),
-                            color: Colors.blue,
-                          ),
-                          SizedBox(height: mq.height(2)),
-
-                          // Music Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.music_note,
-                            title: l10n.music,
-                            description: l10n.musicDescription,
-                            child: _buildMusicSettings(context, l10n),
-                            color: Colors.orange,
-                          ),
-                          SizedBox(height: mq.height(2)),
-
-                          // Background Music Track Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.album,
-                            title: 'Background Music',
-                            description:
-                                'Choose which music track plays in the background',
-                            child: _buildMusicTrackSelector(context),
-                            color: Colors.deepPurple,
-                          ),
-                          SizedBox(height: mq.height(2)),
-
-                          // Volume Settings Card
-                          _buildSettingsCard(
-                            context,
-                            mq,
-                            icon: Icons.volume_down,
-                            title: l10n.volume,
-                            description: l10n.volumeDescription,
-                            child: _buildVolumeSlider(context, l10n),
-                            color: Colors.teal,
-                          ),
-                          SizedBox(height: mq.height(3)),
-                        ],
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: const Color(0xfffaf5f1),
+        child: SafeArea(
+          child: FluidContainer(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(height: mq.height(2)),
+                // Header with back button
+                Row(
+                  children: [
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(
+                        Icons.arrow_back_ios_new_outlined,
+                        size: 30,
+                        color: Colors.purple[800],
                       ),
                     ),
+                    HeaderSection(
+                      mq: mq,
+                      title: l10n.funSettings,
+                      textColor: Colors.purple[800]!,
+                    ),
+                  ],
+                ),
+                SizedBox(height: mq.height(3)),
+                // Settings content
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        // Language Settings Card
+                        _buildSettingsCard(
+                          context,
+                          mq,
+                          icon: Icons.language,
+                          title: l10n.language,
+                          description: l10n.languageDescription,
+                          child: _buildLanguageSelector(context, l10n),
+                          color: Colors.blue,
+                        ),
+                        SizedBox(height: mq.height(2)),
+
+                        // Music Settings Card
+                        _buildSettingsCard(
+                          context,
+                          mq,
+                          icon: Icons.music_note,
+                          title: l10n.music,
+                          description: l10n.musicDescription,
+                          child: _buildMusicSettings(context, l10n),
+                          color: Colors.orange,
+                        ),
+                        SizedBox(height: mq.height(2)),
+
+                        // Background Music Track Card
+                        _buildSettingsCard(
+                          context,
+                          mq,
+                          icon: Icons.album,
+                          title: l10n.backgroundMusicTitle,
+                          description: l10n.backgroundMusicDesc,
+                          child: _buildMusicTrackSelector(context, l10n),
+                          color: Colors.deepPurple,
+                        ),
+                        SizedBox(height: mq.height(2)),
+
+                        // Volume Settings Card
+                        _buildSettingsCard(
+                          context,
+                          mq,
+                          icon: Icons.volume_down,
+                          title: l10n.volume,
+                          description: l10n.volumeDescription,
+                          child: _buildVolumeSlider(context, l10n),
+                          color: Colors.teal,
+                        ),
+                        SizedBox(height: mq.height(3)),
+                      ],
+                    ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
-        ],
+        ),
       ),
     );
   }
@@ -345,7 +338,7 @@ class _SettingsScreenState extends State<SettingsScreen>
     );
   }
 
-  Widget _buildMusicTrackSelector(BuildContext context) {
+  Widget _buildMusicTrackSelector(BuildContext context, AppLocalizations l10n) {
     return BlocBuilder<MusicCubit, MusicState>(
       builder: (context, musicState) {
         return Row(
@@ -353,7 +346,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             Expanded(
               child: _buildTrackOption(
                 context,
-                label: 'Track 1',
+                label: l10n.track1,
                 icon: '🎵',
                 track: 'audio/ton.mp3',
                 isSelected: musicState.musicTrack == 'audio/ton.mp3',
@@ -363,7 +356,7 @@ class _SettingsScreenState extends State<SettingsScreen>
             Expanded(
               child: _buildTrackOption(
                 context,
-                label: 'Track 2',
+                label: l10n.track2,
                 icon: '🎶',
                 track: 'audio/ton2.mp3',
                 isSelected: musicState.musicTrack == 'audio/ton2.mp3',

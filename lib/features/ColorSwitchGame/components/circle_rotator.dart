@@ -1,6 +1,8 @@
+import 'dart:math' as math;
+
 import 'package:flame/components.dart';
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+
 import '../color_switch_game.dart';
 
 class CircleRotator extends PositionComponent with HasGameRef<ColorSwitchGame> {
@@ -39,15 +41,15 @@ class CircleRotator extends PositionComponent with HasGameRef<ColorSwitchGame> {
 }
 
 class CircleArc extends PositionComponent with ParentIsA<CircleRotator> {
-  final Color color;
-  final double startAngle;
-  final double sweepAngle;
 
   CircleArc({
     required this.color,
     required this.startAngle,
     required this.sweepAngle,
   }) : super(anchor: Anchor.center);
+  final Color color;
+  final double startAngle;
+  final double sweepAngle;
 
   @override
   Future<void> onLoad() async {

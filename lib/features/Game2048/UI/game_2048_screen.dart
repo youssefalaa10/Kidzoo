@@ -102,10 +102,25 @@ class _Game2048ScreenState extends State<Game2048Screen> {
                   _buildControlButtons(state),
                   const Spacer(),
                   // Game Board
-                  Center(
-                    child: GameBoard(
-                      board: state.board,
-                      onSwipe: _handleSwipe,
+                  Expanded(
+                    flex: 4,
+                    child: LayoutBuilder(
+                      builder: (context, constraints) {
+                        final size = constraints.maxWidth < constraints.maxHeight
+                            ? constraints.maxWidth
+                            : constraints.maxHeight;
+                        final boardSize = (size - 32.0).clamp(150.0, 500.0); // min and max constraints
+                        
+                        return Center(
+                          child: SingleChildScrollView(
+                            child: GameBoard(
+                              board: state.board,
+                              onSwipe: _handleSwipe,
+                              boardSize: boardSize,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                   const Spacer(flex: 2),
