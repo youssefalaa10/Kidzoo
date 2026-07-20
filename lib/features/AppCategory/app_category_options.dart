@@ -1,28 +1,27 @@
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tts/flutter_tts.dart';
-import 'package:kidzo/core/database/daos/game_scores_dao.dart';
-import 'package:kidzo/core/database/daos/profile_dao.dart';
 import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
 import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
+import 'package:kidzo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
 import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
+import 'package:kidzo/features/FeedTheAnimalGame/ui/feed_animal_screen.dart';
+import 'package:kidzo/features/VehiclesGame/UI/vehicles_game_screen.dart';
+import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
+import 'package:kidzo/features/VegetablesGame/UI/vegetables_game_screen.dart';
 import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
 import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
+import 'package:kidzo/features/FruitVegSorterGame/ui/sorter_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzo/features/MissingLetterGame/Ui/missing_letter_home.dart';
 import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzo/features/Numbers/number_screen.dart';
 import 'package:kidzo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
-import 'package:kidzo/features/QuizEngine/bloc/quiz_cubit.dart';
-import 'package:kidzo/features/QuizEngine/data/quiz_models.dart';
-import 'package:kidzo/features/QuizEngine/ui/quiz_engine_screen.dart';
 import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzo/features/Shapes/shape_screen.dart';
 import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
@@ -138,6 +137,12 @@ class OptionsGrid extends StatelessWidget {
         flipImage: ImageManager.flipNumbers,
       ),
       OptionItem(
+        icon: 'assets/gen/images/animal/cat.png',
+        title: l10n.animalNames,
+        screen: const AnimalNameGameScreen(),
+        flipImage: 'assets/gen/images/animal/dog.png',
+      ),
+      OptionItem(
         icon: ImageManager.letters,
         title: l10n.alphabet,
         screen: BlocProvider(
@@ -164,7 +169,7 @@ class OptionsGrid extends StatelessWidget {
         backIcon: Icons.outlined_flag_rounded,
       ),
       OptionItem(
-        icon: ImageManager.colorLearn,
+        icon: 'assets/gen/images/shapes/circle.png',
         title: l10n.colorSwitch,
         screen: const ColorSwitchScreen(),
         flipImage: ImageManager.colorLearn,
@@ -172,142 +177,34 @@ class OptionsGrid extends StatelessWidget {
         frontIcon: Icons.color_lens_rounded,
       ),
       OptionItem(
-        icon: ImageManager.lion,
+        icon: 'assets/gen/images/animal/cow.png',
+        title: l10n.feedAnimalTitle,
+        screen: const FeedAnimalScreen(),
+        flipImage: 'assets/gen/images/animal/sheep.png',
+      ),
+      OptionItem(
+        icon: 'assets/gen/images/fruits/watermelon.png',
+        title: l10n.fruitVegSorterTitle,
+        screen: const SorterGameScreen(),
+        flipImage: 'assets/gen/images/vegetables/carrot.png',
+      ),
+      OptionItem(
+        icon: 'assets/gen/images/vehicles/car.png',
         title: l10n.vehicles,
-        screen: Builder(
-          builder: (context) => BlocProvider(
-            create: (context) => QuizCubit(
-              gameScoresDao: context.read<GameScoresDao>(),
-              profileDao: context.read<ProfileDao>(),
-              flutterTts: context.read<FlutterTts>(),
-              audioPlayer: context.read<AudioPlayer>(),
-              gameKey: 'vehicles',
-              questions: const [
-                QuizQuestion(
-                  id: 'v1',
-                  prompt: 'Which vehicle flies?',
-                  imageOrScenePath: 'assets/gen/images/vehicles/airplane.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Airplane', isCorrect: true),
-                    QuizOption(id: '2', text: 'Car', isCorrect: false),
-                  ],
-                ),
-                QuizQuestion(
-                  id: 'v2',
-                  prompt: 'Which vehicle runs on tracks?',
-                  imageOrScenePath: 'assets/gen/images/vehicles/train.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Train', isCorrect: true),
-                    QuizOption(id: '2', text: 'Bus', isCorrect: false),
-                  ],
-                ),
-                QuizQuestion(
-                  id: 'v3',
-                  prompt: 'Which vehicle sails on water?',
-                  imageOrScenePath: 'assets/gen/images/vehicles/ship.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Ship', isCorrect: true),
-                    QuizOption(id: '2', text: 'Bicycle', isCorrect: false),
-                  ],
-                ),
-              ],
-            ),
-            child: const QuizEngineScreen(),
-          ),
-        ),
-        flipImage: ImageManager.elephant,
+        screen: const VehiclesGameScreen(),
+        flipImage: 'assets/gen/images/vehicles/train.png',
       ),
       OptionItem(
-        icon: ImageManager.lion,
+        icon: 'assets/gen/images/fruits/mango.png',
         title: l10n.fruits,
-        screen: Builder(
-          builder: (context) => BlocProvider(
-            create: (context) => QuizCubit(
-              gameScoresDao: context.read<GameScoresDao>(),
-              profileDao: context.read<ProfileDao>(),
-              flutterTts: context.read<FlutterTts>(),
-              audioPlayer: context.read<AudioPlayer>(),
-              gameKey: 'fruits',
-              questions: const [
-                QuizQuestion(
-                  id: 'f1',
-                  prompt: 'Which fruit is red?',
-                  imageOrScenePath: 'assets/gen/images/fruits/apple.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Apple', isCorrect: true),
-                    QuizOption(id: '2', text: 'Banana', isCorrect: false),
-                  ],
-                ),
-                QuizQuestion(
-                  id: 'f2',
-                  prompt: 'Which fruit is yellow?',
-                  imageOrScenePath: 'assets/gen/images/fruits/banana.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Banana', isCorrect: true),
-                    QuizOption(id: '2', text: 'Grapes', isCorrect: false),
-                  ],
-                ),
-                QuizQuestion(
-                  id: 'f3',
-                  prompt: 'Which fruit is orange?',
-                  imageOrScenePath: 'assets/gen/images/fruits/orange.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Orange', isCorrect: true),
-                    QuizOption(id: '2', text: 'Watermelon', isCorrect: false),
-                  ],
-                ),
-              ],
-            ),
-            child: const QuizEngineScreen(),
-          ),
-        ),
-        flipImage: ImageManager.elephant,
+        screen: const FruitsGameScreen(),
+        flipImage: 'assets/gen/images/fruits/orange.png',
       ),
       OptionItem(
-        icon: ImageManager.lion,
+        icon: 'assets/gen/images/vegetables/corn.png',
         title: l10n.vegetables,
-        screen: Builder(
-          builder: (context) => BlocProvider(
-            create: (context) => QuizCubit(
-              gameScoresDao: context.read<GameScoresDao>(),
-              profileDao: context.read<ProfileDao>(),
-              flutterTts: context.read<FlutterTts>(),
-              audioPlayer: context.read<AudioPlayer>(),
-              gameKey: 'vegetables',
-              questions: const [
-                QuizQuestion(
-                  id: 'vg1',
-                  prompt: 'Which is a vegetable?',
-                  imageOrScenePath: 'assets/gen/images/vegetables/carrot.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Carrot', isCorrect: true),
-                    QuizOption(id: '2', text: 'Apple', isCorrect: false),
-                  ],
-                ),
-                QuizQuestion(
-                  id: 'vg2',
-                  prompt: 'Which vegetable makes you cry when you cut it?',
-                  imageOrScenePath: 'assets/gen/images/vegetables/onion.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Onion', isCorrect: true),
-                    QuizOption(id: '2', text: 'Tomato', isCorrect: false),
-                  ],
-                ),
-                QuizQuestion(
-                  id: 'vg3',
-                  prompt: 'Which vegetable is red?',
-                  imageOrScenePath: 'assets/gen/images/vegetables/tomato.png',
-                  options: [
-                    QuizOption(id: '1', text: 'Tomato', isCorrect: true),
-                    QuizOption(id: '2', text: 'Cucumber', isCorrect: false),
-                  ],
-                ),
-              ],
-            ),
-            child: const QuizEngineScreen(),
-          ),
-        ),
-        flipImage: ImageManager.elephant,
+        screen: const VegetablesGameScreen(),
+        flipImage: 'assets/gen/images/vegetables/potato.png',
       ),
     ];
   }

@@ -9,6 +9,28 @@ import '../data/quiz_models.dart';
 import 'quiz_state.dart';
 
 class QuizCubit extends Cubit<QuizState> {
+
+  final bool allowRetries;
+  final String? tryAgainText;
+  final Duration transitionDuration;
+  final Duration wrongFeedbackDuration;
+
+  QuizCubit({
+    required this.gameScoresDao,
+    required this.profileDao,
+    required this.flutterTts,
+    required this.audioPlayer,
+    required List<QuizQuestion> questions,
+    required String gameKey,
+    this.allowRetries = false,
+    this.tryAgainText,
+    this.transitionDuration = const Duration(seconds: 2),
+    this.wrongFeedbackDuration = const Duration(seconds: 2),
+  })  : _questions = questions,
+        _gameKey = gameKey,
+        super(QuizLoading()) {
+    _startQuiz();
+  }
   final GameScoresDao gameScoresDao;
   final ProfileDao profileDao;
   final FlutterTts flutterTts;
@@ -19,19 +41,6 @@ class QuizCubit extends Cubit<QuizState> {
 
   int _currentIndex = 0;
   int _score = 0;
-
-  QuizCubit({
-    required this.gameScoresDao,
-    required this.profileDao,
-    required this.flutterTts,
-    required this.audioPlayer,
-    required List<QuizQuestion> questions,
-    required String gameKey,
-  })  : _questions = questions,
-        _gameKey = gameKey,
-        super(QuizLoading()) {
-    _startQuiz();
-  }
 
   void _startQuiz() {
     if (_questions.isEmpty) {
@@ -55,17 +64,29 @@ class QuizCubit extends Cubit<QuizState> {
       try {
         await flutterTts.speak(option.text);
       } catch (_) {}
+    } else if (allowRetries) {
+      try {
+        await flutterTts.speak(tryAgainText ?? "Try again");
+      } catch (_) {}
     }
 
     emit(QuizFeedback(
         _questions[_currentIndex], isCorrect, _score, _currentIndex));
 
-    await Future.delayed(const Duration(seconds: 2));
+    final delay = isCorrect ? transitionDuration : wrongFeedbackDuration;
+    await Future.delayed(delay);
 
-    _currentIndex++;
+    if (isClosed) return;
+
+    if (isCorrect || !allowRetries) {
+      _currentIndex++;
+    }
+    
     if (_currentIndex < _questions.length) {
       emit(QuizActive(_questions[_currentIndex], _score, _currentIndex));
-      _speakPrompt(_questions[_currentIndex].prompt);
+      if (isCorrect || !allowRetries) {
+        _speakPrompt(_questions[_currentIndex].prompt);
+      }
     } else {
       await _finishQuiz();
     }

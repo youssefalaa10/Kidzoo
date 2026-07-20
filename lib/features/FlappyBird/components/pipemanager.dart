@@ -23,21 +23,39 @@ class PipeManager extends Component with HasGameRef<FlappyBirdGame> {
 
   void spwanPipe() {
     final double screenHeight = gameRef.size.y;
-    const double minPipeHeight = 80;
+    final double groundHeight = gameRef.groundHeight;
+    const double minPipeHeight = 50;
     const double pipeWidth = 60;
 
-    //Calculate pipe heights
-    final double maxPipeHeight = screenHeight - 200 - pipeGap - minPipeHeight;
-    //height of bottom pipe -> randomly select between min and max
+    final double availableHeight = screenHeight - groundHeight;
+
+    double currentGap = gameRef.currentPipeGap;
+
+    // To ensure pipes have enough room to vary vertically, maxPipeHeight - minPipeHeight should be at least 80 pixels.
+    // We calculate a target gap to guarantee 80 pixels of vertical variation, without shrinking the gap too much.
+    double targetMaxGap = availableHeight - (minPipeHeight * 2) - 80;
+    
+    if (currentGap > targetMaxGap) {
+      currentGap = targetMaxGap;
+    }
+    
+    // Absolute minimum gap ensuring playability
+    if (currentGap < 110) {
+      currentGap = 110; 
+    }
+
+    double maxPipeHeight = availableHeight - currentGap - minPipeHeight;
+    if (maxPipeHeight < minPipeHeight) {
+      maxPipeHeight = minPipeHeight;
+    }
 
     final double bottomPipeHeight =
         minPipeHeight + Random().nextDouble() * (maxPipeHeight - minPipeHeight);
 
-    final double topPipeHeight =
-        screenHeight - 200 - bottomPipeHeight - pipeGap;
+    final double topPipeHeight = availableHeight - bottomPipeHeight - currentGap;
 
     final bottomPipe = Pipe(
-        Vector2(gameRef.size.x, screenHeight - 200 - bottomPipeHeight),
+        Vector2(gameRef.size.x, availableHeight - bottomPipeHeight),
         Vector2(pipeWidth, bottomPipeHeight),
         isUpPipe: false);
 

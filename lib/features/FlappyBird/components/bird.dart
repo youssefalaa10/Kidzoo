@@ -22,6 +22,17 @@ Init Bird
   //physical world properties
   double velocity = 0;
 
+  @override
+  void onGameResize(Vector2 gameSize) {
+    super.onGameResize(gameSize);
+    if (parent is FlappyBirdGame) {
+      final game = parent as FlappyBirdGame;
+      if (game.gameState == GameState.waiting) {
+        position.y = gameSize.y / 2;
+      }
+    }
+  }
+
   /*
   Load
    */

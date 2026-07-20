@@ -553,6 +553,7 @@ class AppLocalizations {
 
   // Feed The Animal
   String get apple => _localizedValues['apple']!;
+  String get banana => _localizedValues['banana']!;
   String get orangeFruit => _localizedValues['orange_fruit']!; // 'orange' is already used for color
   String get grapes => _localizedValues['grapes']!;
   String get watermelon => _localizedValues['watermelon']!;
@@ -566,10 +567,82 @@ class AppLocalizations {
   String promptFindColorFruit(String color) => _localizedValues['prompt_find_color_fruit']!.replaceAll('{color}', color);
   String promptWhichIsCalled(String fruit) => _localizedValues['prompt_which_is_called']!.replaceAll('{fruit}', fruit);
   String yummyFruit(String fruit) => _localizedValues['yummy_fruit']!.replaceAll('{fruit}', fruit);
+  String successPhrase1(String fruit) => _localizedValues['success_phrase_1']!.replaceAll('{fruit}', fruit);
+  String successPhrase2(String fruit) => _localizedValues['success_phrase_2']!.replaceAll('{fruit}', fruit);
+  String successPhrase3(String fruit) => _localizedValues['success_phrase_3']!.replaceAll('{fruit}', fruit);
   String get tryAgainPrompt => _localizedValues['try_again_prompt']!;
+  String get feedAnimalTitle => _localizedValues['feed_animal_title']!;
+
+  // Fruit & Vegetable Sorter
+  String get fruitVegSorterTitle => _localizedValues['fruitVegSorterTitle']!;
+  String get cabbage => _localizedValues['cabbage']!;
+  String get carrot => _localizedValues['carrot']!;
+  String get cucumber => _localizedValues['cucumber']!;
+  String get eggplant => _localizedValues['eggplant']!;
+  String get onion => _localizedValues['onion']!;
+  String get potato => _localizedValues['potato']!;
+  String get redPepper => _localizedValues['redPepper']!;
+  String get tomato => _localizedValues['tomato']!;
+  String get fruitsBasket => _localizedValues['fruitsBasket']!;
+  String get vegetablesBasket => _localizedValues['vegetablesBasket']!;
+  String putItemInBasket(String item, String basket) => _localizedValues['putItemInBasket']!.replaceAll('{item}', item).replaceAll('{basket}', basket);
+  String get sorterGreatJob => _localizedValues['sorterGreatJob']!;
+  String get sorterExcellent => _localizedValues['sorterExcellent']!;
+  String get sorterFantastic => _localizedValues['sorterFantastic']!;
+  String get sorterTryAgain => _localizedValues['sorterTryAgain']!;
+
+  String get bamboo => _localizedValues['bamboo']!;
+  String get corn => _localizedValues['corn']!;
+  String get grass => _localizedValues['grass']!;
+  String get meat => _localizedValues['meat']!;
+  String get fantastic => _localizedValues['fantastic']!;
+  String get wellDone => _localizedValues['wellDone']!;
+  String promptFeedAnimal(String animal) => _localizedValues['promptFeedAnimal']!.replaceAll('{animal}', animal);
+  String promptWhatDoesAnimalEat(String animal) => _localizedValues['promptWhatDoesAnimalEat']!.replaceAll('{animal}', animal);
 
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;
+  }
+
+  String getVegetableName(String key) {
+    // try direct key, then lowerCamelCase if there are underscores
+    final camelKey = key.replaceAllMapped(RegExp(r'_([a-z])'), (m) => m[1]!.toUpperCase());
+    return _localizedValues[camelKey] ?? _localizedValues[key] ?? key;
+  }
+
+  String getFruitName(String key) {
+    if (key == 'orange') return _localizedValues['orange_fruit'] ?? key;
+    final camelKey = key.replaceAllMapped(RegExp(r'_([a-z])'), (m) => m[1]!.toUpperCase());
+    return _localizedValues[camelKey] ?? _localizedValues[key] ?? key;
+  }
+
+  // Vegetables Drag Game
+  String get chiliPepper => _localizedValues['chiliPepper']!;
+  String get lemon => _localizedValues['lemon']!;
+  String get whatIsThisVegetable => _localizedValues['whatIsThisVegetable']!;
+
+  String get vegetablesGameComplete => _localizedValues['vegetablesGameComplete']!;
+  String get backToCategories => _localizedValues['backToCategories']!;
+
+  String get fruitsGameComplete => _localizedValues['fruitsGameComplete']!;
+
+  // Universal Educational Prompts
+  List<String> getEducationalPrompts(String itemName) {
+    return [
+      _localizedValues['vocab_tap_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_touch_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_find_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_can_you_find_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_catch_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_where_is_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_point_to_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_show_me_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_choose_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_lets_find_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_can_you_tap_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_touch_picture_of']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_which_one_is_the']!.replaceAll('{item}', itemName),
+    ];
   }
 }
 

@@ -57,9 +57,10 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         child: Padding(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
               SvgPicture.asset(
                 country.flagAsset,
                 width: 200,
@@ -94,6 +95,7 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
               ),
             ],
           ),
+        ),
         ),
       ),
     );

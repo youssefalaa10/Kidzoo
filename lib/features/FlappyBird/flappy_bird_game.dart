@@ -39,6 +39,29 @@ class FlappyBirdGame extends FlameGame
   GameState gameState = GameState.waiting;
   bool isSoundEnabled = true;
 
+  double get groundHeight => size.x > size.y ? size.y * 0.10 : size.y * 0.15;
+
+  double get currentPipeSpeed {
+    if (score >= 60) return pipeSpeed * 1.15;
+    if (score >= 40) return pipeSpeed * 1.10;
+    if (score >= 20) return pipeSpeed * 1.05;
+    return pipeSpeed;
+  }
+
+  double get currentPipeGap {
+    if (score >= 60) return pipeGap * 0.90;
+    if (score >= 40) return pipeGap * 0.92;
+    if (score >= 20) return pipeGap * 0.95;
+    return pipeGap;
+  }
+
+  double get currentGroundSpeed {
+    if (score >= 60) return groundSpeed * 1.15;
+    if (score >= 40) return groundSpeed * 1.10;
+    if (score >= 20) return groundSpeed * 1.05;
+    return groundSpeed;
+  }
+
   final AudioPlayer _flapPlayer = AudioPlayer();
   final AudioPlayer _scorePlayer = AudioPlayer();
 
@@ -149,7 +172,7 @@ class FlappyBirdGame extends FlameGame
 
     //show Dialog Box to restart
 
-    showDialog(
+    showDialog<void>(
         barrierDismissible: false,
         context: buildContext!,
         builder: (context) => AlertDialog(
@@ -166,51 +189,86 @@ class FlappyBirdGame extends FlameGame
                 ),
                 textAlign: TextAlign.center,
               ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(
-                    Icons.emoji_events,
-                    size: 60,
-                    color: Colors.amber,
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    '${AppLocalizations.of(context).score}: $score',
-                    style: const TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.emoji_events,
+                      size: 60,
+                      color: Colors.amber,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 10),
+                    Text(
+                      '${AppLocalizations.of(context).score}: $score',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
               ),
               actions: [
-                Center(
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      resetGame();
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.green,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 40,
-                        vertical: 15,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(25),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // close dialog
+                          Navigator.pop(context); // exit game
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context).exit,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      AppLocalizations.of(context).playAgain,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          resetGame();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context).playAgain,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
               ],
             ));
@@ -225,7 +283,7 @@ class FlappyBirdGame extends FlameGame
     children.whereType<Pipe>().forEach((pipe) => pipe.removeFromParent());
 
     // Re-add start text
-    String startMsg = "Tap to Start";
+    String startMsg = 'Tap to Start';
     if (buildContext != null) {
       try {
         startMsg = AppLocalizations.of(buildContext!).tapToStart;

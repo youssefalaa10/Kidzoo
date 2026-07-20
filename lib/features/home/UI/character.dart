@@ -92,7 +92,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
           child: Column(
               children: [
                 // Header section
-                _buildHeader(mq),
+                _buildHeader(mq, isLandscape),
                 SizedBox(height: isLandscape ? mq.height(1) : mq.height(2.5)),
                 // Title
                 Padding(
@@ -153,7 +153,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
     );
   }
 
-  Widget _buildHeader(CustomMQ mq) {
+  Widget _buildHeader(CustomMQ mq, bool isLandscape) {
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
         String avatarPath = 'assets/gen/images/avatar/avatar-monstar.png';
@@ -178,8 +178,8 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
             children: [
               // Avatar on one side
               Container(
-                width: mq.width(12),
-                height: mq.width(12),
+                width: isLandscape ? mq.height(15) : mq.width(12),
+                height: isLandscape ? mq.height(15) : mq.width(12),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   color: Colors.white.withValues(alpha: 0.9),
@@ -206,8 +206,8 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                       context.read<LanguageCubit>().toggleLanguage();
                     },
                     child: Container(
-                      width: mq.width(10),
-                      height: mq.width(10),
+                      width: isLandscape ? mq.height(12) : mq.width(10),
+                      height: isLandscape ? mq.height(12) : mq.width(10),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withValues(alpha: 0.9),
@@ -242,8 +242,8 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                       ),
                     ),
                     child: Container(
-                      width: mq.width(10),
-                      height: mq.width(10),
+                      width: isLandscape ? mq.height(12) : mq.width(10),
+                      height: isLandscape ? mq.height(12) : mq.width(10),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white.withValues(alpha: 0.9),
@@ -316,7 +316,7 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
   void initState() {
     super.initState();
     _pageController = PageController(
-      viewportFraction: 0.65,
+      viewportFraction: 0.8,
       initialPage: widget.selectedIndex,
     );
   }

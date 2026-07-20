@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../../core/localization/app_localizations.dart';
 import '../../QuizEngine/data/quiz_models.dart';
 
@@ -46,27 +48,68 @@ extension VehicleTypeExtension on VehicleType {
   }
 }
 
+enum EnvironmentType {
+  sky,
+  sea,
+  road,
+  railway,
+}
+
+extension EnvironmentTypeExtension on EnvironmentType {
+  String get assetPath {
+    switch (this) {
+      case EnvironmentType.sky:
+        return 'assets/gen/images/vehicles/sky.png';
+      case EnvironmentType.sea:
+        return 'assets/gen/images/vehicles/sea.png';
+      case EnvironmentType.road:
+        return 'assets/gen/images/vehicles/road.png';
+      case EnvironmentType.railway:
+        return 'assets/gen/images/vehicles/railway.png';
+    }
+  }
+
+
+}
+
+const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
+  EnvironmentType.sky: [VehicleType.airplane, VehicleType.helicopter],
+  EnvironmentType.sea: [VehicleType.boat, VehicleType.submarine],
+  EnvironmentType.road: [
+    VehicleType.car,
+    VehicleType.motorcycle,
+    VehicleType.truck,
+    VehicleType.bus,
+    VehicleType.bicycle
+  ],
+  EnvironmentType.railway: [VehicleType.train],
+};
+
 class EnvironmentVehicleQuestion {
   final String environmentAsset;
-  final String Function(AppLocalizations) getQuestionText;
   final VehicleType correctVehicle;
   final List<VehicleType> options;
 
   EnvironmentVehicleQuestion({
     required this.environmentAsset,
-    required this.getQuestionText,
     required this.correctVehicle,
     required this.options,
   }) {
     assert(options.length == 3, "Options must be exactly 3");
-    assert(options.contains(correctVehicle), "Options must contain correct answer");
+    assert(options.contains(correctVehicle),
+        "Options must contain correct answer");
     assert(options.toSet().length == 3, "Options must be unique");
   }
 
   QuizQuestion toQuizQuestion(AppLocalizations l10n, String id) {
+    final name = correctVehicle.localizedName(l10n);
+    final templates = l10n.getEducationalPrompts(name);
+    templates.shuffle(Random());
+    final prompt = templates.first;
+
     return QuizQuestion(
       id: id,
-      prompt: getQuestionText(l10n),
+      prompt: prompt,
       imageOrScenePath: environmentAsset,
       options: options.map((v) {
         return QuizOption(
@@ -80,31 +123,74 @@ class EnvironmentVehicleQuestion {
   }
 }
 
-List<EnvironmentVehicleQuestion> generateVehicleQuestions() {
-  return [
-    EnvironmentVehicleQuestion(
-      environmentAsset: 'assets/gen/images/vehicles/sky.png',
-      getQuestionText: (l10n) => l10n.whichVehicleFliesInSky,
-      correctVehicle: VehicleType.airplane,
-      options: [VehicleType.airplane, VehicleType.car, VehicleType.train],
-    ),
-    EnvironmentVehicleQuestion(
-      environmentAsset: 'assets/gen/images/vehicles/railway.png',
-      getQuestionText: (l10n) => l10n.whichVehicleTravelsOnRailway,
-      correctVehicle: VehicleType.train,
-      options: [VehicleType.train, VehicleType.airplane, VehicleType.boat],
-    ),
-    EnvironmentVehicleQuestion(
-      environmentAsset: 'assets/gen/images/vehicles/road.png',
-      getQuestionText: (l10n) => l10n.whichVehicleDrivesOnRoad,
-      correctVehicle: VehicleType.car,
-      options: [VehicleType.car, VehicleType.airplane, VehicleType.boat],
-    ),
-    EnvironmentVehicleQuestion(
-      environmentAsset: 'assets/gen/images/vehicles/sea.png',
-      getQuestionText: (l10n) => l10n.whichVehicleTravelsOnWater,
-      correctVehicle: VehicleType.boat,
-      options: [VehicleType.boat, VehicleType.car, VehicleType.airplane],
-    ),
-  ];
+List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
+  final random = Random();
+  final List<EnvironmentVehicleQuestion> questions = [];
+
+  EnvironmentType? lastEnvironment;
+  VehicleType? lastCorrectAnswer;
+  List<EnvironmentType> environmentCycle = [];
+
+  List<VehicleType> usedAnswers = [];
+
+  for (int i = 0; i < count; i++) {
+    // 1. Select Environment (Cycle through all before repeating)
+    if (environmentCycle.isEmpty) {
+      environmentCycle = EnvironmentType.values.toList();
+      environmentCycle.shuffle(random);
+      // Ensure the new cycle doesn't start with the last environment of the previous cycle
+      if (lastEnvironment != null &&
+          environmentCycle.first == lastEnvironment &&
+          environmentCycle.length > 1) {
+        final temp = environmentCycle[0];
+        environmentCycle[0] = environmentCycle.last;
+        environmentCycle.last = temp;
+      }
+    }
+    EnvironmentType env = environmentCycle.removeAt(0);
+
+    // 2. Select Correct Vehicle (Avoid repeating recently used vehicles)
+    List<VehicleType> validVehicles = List.from(environmentVehicles[env]!);
+    List<VehicleType> unusedValid = validVehicles.where((v) => !usedAnswers.contains(v)).toList();
+    
+    VehicleType correctVehicle;
+    if (unusedValid.isNotEmpty) {
+      unusedValid.shuffle(random);
+      correctVehicle = unusedValid.first;
+    } else {
+      if (lastCorrectAnswer != null && validVehicles.length > 1) {
+        validVehicles.remove(lastCorrectAnswer);
+      }
+      validVehicles.shuffle(random);
+      correctVehicle = validVehicles.first;
+    }
+    usedAnswers.add(correctVehicle);
+
+    // 3. Select 2 Invalid Vehicles from DIFFERENT environments
+    // To ensure distractors are very distinct, we pick from 2 distinct incorrect environments
+    List<EnvironmentType> otherEnvs = EnvironmentType.values.where((e) => e != env).toList();
+    otherEnvs.shuffle(random);
+    
+    List<VehicleType> invalidVehicles = [];
+    for (int j = 0; j < 2; j++) {
+      List<VehicleType> pool = List.from(environmentVehicles[otherEnvs[j]]!);
+      pool.shuffle(random);
+      invalidVehicles.add(pool.first);
+    }
+
+    // 4. Combine and Shuffle Options
+    List<VehicleType> options = [correctVehicle, ...invalidVehicles];
+    options.shuffle(random);
+
+    questions.add(EnvironmentVehicleQuestion(
+      environmentAsset: env.assetPath,
+      correctVehicle: correctVehicle,
+      options: options,
+    ));
+
+    lastEnvironment = env;
+    lastCorrectAnswer = correctVehicle;
+  }
+
+  return questions;
 }

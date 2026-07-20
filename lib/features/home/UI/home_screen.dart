@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:kidzo/core/shared/style/image_manager.dart';
 
 import '../../../core/helpers/media_query.dart';
+import '../../../core/services/background_resolver.dart';
 import 'widgets/header_section.dart';
 import 'widgets/options_sections.dart';
 
@@ -18,8 +18,9 @@ class HomeScreen extends StatelessWidget {
         children: [
           Image.asset(
             height: MediaQuery.of(context).size.height,
-            fit: BoxFit.fitHeight,
-            ImageManager.homeBackground,
+            width: MediaQuery.of(context).size.width,
+            fit: BoxFit.cover,
+            BackgroundResolver(context, BackgroundType.tech).resolveBackground()!,
           ),
           SafeArea(
             child: Padding(

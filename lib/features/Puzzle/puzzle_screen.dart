@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/base/protected_game_screen.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
-import 'package:kidzo/core/services/background_resolver.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
 import 'package:kidzo/core/shared/widgets/fluid_container.dart';
 import 'package:kidzo/features/Puzzle/bloc/cubit.dart';
@@ -62,7 +61,7 @@ class ImageSelectionPage extends StatelessWidget {
       appBar: AppBar(
         title: Text(l10n.selectAnImage),
       ),
-      body: Container(
+      body: SizedBox(
         width: double.infinity,
         height: double.infinity,
         child: FluidContainer(
@@ -166,7 +165,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
         appBar: AppBar(
           title: Text(l10n.puzzleFrame),
         ),
-        body: Container(
+        body: SizedBox(
           width: double.infinity,
           height: double.infinity,
           child: FluidContainer(

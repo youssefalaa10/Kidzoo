@@ -50,7 +50,7 @@ flutter:
   assets:
     - assets/gen/images/
     - assets/gen/images/backgrounds/
-    - assets/gen/images/scenes/
+    - assets/gen/images/feed/
     - assets/gen/images/home/
     - assets/gen/images/flappy/
     - assets/gen/images/shapes/

@@ -35,12 +35,15 @@ class GameExitButton extends StatelessWidget {
           children: [
             const Icon(Icons.close, color: Colors.white, size: 24),
             const SizedBox(width: 8),
-            Text(
-              exitText,
-              style: const TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
+            Flexible(
+              child: Text(
+                exitText,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18,
+                ),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ],

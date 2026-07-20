@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../bloc/quiz_cubit.dart';
 import '../bloc/quiz_state.dart';
@@ -20,12 +19,7 @@ class QuizEngineScreen extends StatelessWidget {
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
-          image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.education).resolveBackground()!),
-            fit: BoxFit.cover,
-          ),
-        ),
+        color: const Color(0xfffaf5f1),
         child: BlocBuilder<QuizCubit, QuizState>(
         builder: (context, state) {
           if (state is QuizLoading) {

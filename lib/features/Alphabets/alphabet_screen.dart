@@ -38,7 +38,11 @@ class _AlphabetScreenState extends State<AlphabetScreen> with TTSMusicMixin {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 AlphabetAppBar(),
-                AlphabetDisplay(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: AlphabetDisplay(),
+                  ),
+                ),
               ],
             ),
           ),

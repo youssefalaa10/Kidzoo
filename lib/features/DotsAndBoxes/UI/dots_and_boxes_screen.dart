@@ -71,39 +71,41 @@ class _DotsAndBoxesScreenContentState
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              AppLocalizations.of(context).whoWouldYouLikeToPlayAgainst,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14),
-            ),
-            const SizedBox(height: 24),
-            _buildModeCard(
-              context: dialogContext,
-              icon: Icons.smart_toy,
-              title: AppLocalizations.of(context).playVsAI,
-              description: AppLocalizations.of(context).challengeTheComputer,
-              color: Colors.blue,
-              mode: GameMode.vsAI,
-              gradient: LinearGradient(
-                colors: [Colors.blue.shade400, Colors.blue.shade600],
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                AppLocalizations.of(context).whoWouldYouLikeToPlayAgainst,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14),
               ),
-            ),
-            const SizedBox(height: 16),
-            _buildModeCard(
-              context: dialogContext,
-              icon: Icons.people,
-              title: AppLocalizations.of(context).playVsFriend,
-              description: AppLocalizations.of(context).playWithAFriend,
-              color: Colors.green,
-              mode: GameMode.vsPlayer,
-              gradient: LinearGradient(
-                colors: [Colors.green.shade400, Colors.green.shade600],
+              const SizedBox(height: 24),
+              _buildModeCard(
+                context: dialogContext,
+                icon: Icons.smart_toy,
+                title: AppLocalizations.of(context).playVsAI,
+                description: AppLocalizations.of(context).challengeTheComputer,
+                color: Colors.blue,
+                mode: GameMode.vsAI,
+                gradient: LinearGradient(
+                  colors: [Colors.blue.shade400, Colors.blue.shade600],
+                ),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+              _buildModeCard(
+                context: dialogContext,
+                icon: Icons.people,
+                title: AppLocalizations.of(context).playVsFriend,
+                description: AppLocalizations.of(context).playWithAFriend,
+                color: Colors.green,
+                mode: GameMode.vsPlayer,
+                gradient: LinearGradient(
+                  colors: [Colors.green.shade400, Colors.green.shade600],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -199,77 +201,79 @@ class _DotsAndBoxesScreenContentState
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: AIDifficulty.values.map((difficulty) {
-            Color color;
-            IconData icon;
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: AIDifficulty.values.map((difficulty) {
+              Color color;
+              IconData icon;
 
-            switch (difficulty) {
-              case AIDifficulty.easy:
-                color = Colors.green;
-                icon = Icons.sentiment_satisfied;
-                break;
-              case AIDifficulty.medium:
-                color = Colors.orange;
-                icon = Icons.sentiment_neutral;
-                break;
-              case AIDifficulty.hard:
-                color = Colors.red;
-                icon = Icons.psychology;
-                break;
-            }
+              switch (difficulty) {
+                case AIDifficulty.easy:
+                  color = Colors.green;
+                  icon = Icons.sentiment_satisfied;
+                  break;
+                case AIDifficulty.medium:
+                  color = Colors.orange;
+                  icon = Icons.sentiment_neutral;
+                  break;
+                case AIDifficulty.hard:
+                  color = Colors.red;
+                  icon = Icons.psychology;
+                  break;
+              }
 
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
-              child: InkWell(
-                onTap: () {
-                  Navigator.pop(dialogContext);
-                  context
-                      .read<DotsAndBoxesCubit>()
-                      .changeAIDifficulty(difficulty);
-                },
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: color, width: 2),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(icon, color: color, size: 28),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              difficulty.displayName,
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: color,
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: InkWell(
+                  onTap: () {
+                    Navigator.pop(dialogContext);
+                    context
+                        .read<DotsAndBoxesCubit>()
+                        .changeAIDifficulty(difficulty);
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: color.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: color, width: 2),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(icon, color: color, size: 28),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                difficulty.displayName,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: color,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              difficulty.description,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.black54,
+                              const SizedBox(height: 4),
+                              Text(
+                                difficulty.description,
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.black54,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                      Icon(Icons.arrow_forward_ios, color: color, size: 16),
-                    ],
+                        Icon(Icons.arrow_forward_ios, color: color, size: 16),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            );
-          }).toList(),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
@@ -293,12 +297,14 @@ class _DotsAndBoxesScreenContentState
           return SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final isLandscape = constraints.maxWidth > constraints.maxHeight;
+                final isLandscape =
+                    constraints.maxWidth > constraints.maxHeight;
                 return SingleChildScrollView(
                   child: ConstrainedBox(
-                    constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                    constraints:
+                        BoxConstraints(minHeight: constraints.maxHeight),
                     child: IntrinsicHeight(
-                      child: isLandscape 
+                      child: isLandscape
                           ? _buildLandscapeLayout(context, state)
                           : _buildPortraitLayout(context, state),
                     ),
@@ -405,7 +411,6 @@ class _DotsAndBoxesScreenContentState
       ],
     );
   }
-
 
   Widget _buildHeader(BuildContext context, DotsAndBoxesState state) {
     return Padding(
@@ -731,33 +736,37 @@ class _DotsAndBoxesScreenContentState
           borderRadius: BorderRadius.circular(16),
         ),
         title: Text(AppLocalizations.of(context).selectGridSize),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: GameDifficulty.values.map((difficulty) {
-            final isSelected = difficulty == state.difficulty;
-            return ListTile(
-              title: Text(difficulty.displayName),
-              leading: Radio<GameDifficulty>(
-                value: difficulty,
-                groupValue: state.difficulty,
-                onChanged: (value) {
-                  if (value != null) {
-                    Navigator.pop(dialogContext);
-                    context.read<DotsAndBoxesCubit>().changeDifficulty(value);
-                  }
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: GameDifficulty.values.map((difficulty) {
+              final isSelected = difficulty == state.difficulty;
+              return ListTile(
+                title: Text(difficulty.displayName),
+                leading: Radio<GameDifficulty>(
+                  value: difficulty,
+                  groupValue: state.difficulty,
+                  onChanged: (value) {
+                    if (value != null) {
+                      Navigator.pop(dialogContext);
+                      context.read<DotsAndBoxesCubit>().changeDifficulty(value);
+                    }
+                  },
+                ),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  context
+                      .read<DotsAndBoxesCubit>()
+                      .changeDifficulty(difficulty);
                 },
-              ),
-              onTap: () {
-                Navigator.pop(dialogContext);
-                context.read<DotsAndBoxesCubit>().changeDifficulty(difficulty);
-              },
-              selected: isSelected,
-              selectedTileColor: Colors.blue.shade50,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            );
-          }).toList(),
+                selected: isSelected,
+                selectedTileColor: Colors.blue.shade50,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );
@@ -771,33 +780,35 @@ class _DotsAndBoxesScreenContentState
           borderRadius: BorderRadius.circular(16),
         ),
         title: Text(AppLocalizations.of(context).selectGameMode),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: GameMode.values.map((mode) {
-            final isSelected = mode == state.gameMode;
-            return ListTile(
-              title: Text(mode.displayName),
-              leading: Radio<GameMode>(
-                value: mode,
-                groupValue: state.gameMode,
-                onChanged: (value) {
-                  if (value != null) {
-                    Navigator.pop(dialogContext);
-                    context.read<DotsAndBoxesCubit>().changeGameMode(value);
-                  }
+        content: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: GameMode.values.map((mode) {
+              final isSelected = mode == state.gameMode;
+              return ListTile(
+                title: Text(mode.displayName),
+                leading: Radio<GameMode>(
+                  value: mode,
+                  groupValue: state.gameMode,
+                  onChanged: (value) {
+                    if (value != null) {
+                      Navigator.pop(dialogContext);
+                      context.read<DotsAndBoxesCubit>().changeGameMode(value);
+                    }
+                  },
+                ),
+                onTap: () {
+                  Navigator.pop(dialogContext);
+                  context.read<DotsAndBoxesCubit>().changeGameMode(mode);
                 },
-              ),
-              onTap: () {
-                Navigator.pop(dialogContext);
-                context.read<DotsAndBoxesCubit>().changeGameMode(mode);
-              },
-              selected: isSelected,
-              selectedTileColor: Colors.blue.shade50,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            );
-          }).toList(),
+                selected: isSelected,
+                selectedTileColor: Colors.blue.shade50,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              );
+            }).toList(),
+          ),
         ),
       ),
     );

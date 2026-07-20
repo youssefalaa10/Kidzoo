@@ -39,7 +39,7 @@ class ImageManager {
   static const String homeBackground = Assets.genImagesHomeCloudyBg;
   static const String mathBg = Assets.genImagesHomeMathBg;
   static const String catsBg = Assets.genImagesHomeCatsBg;
-  static const String learningBg = Assets.genImagesHomeLearnBg;
+  static const String learningBg = 'assets/gen/images/backgrounds/learn_bg_mob.png';
   static const String techBg = Assets.genImagesHomeTechBg;
 
   static const String numbers = Assets.genImagesHomeNumbers;

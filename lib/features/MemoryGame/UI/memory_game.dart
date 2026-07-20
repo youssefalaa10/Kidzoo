@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/base/protected_game_screen.dart';
 import '../../../core/localization/app_localizations.dart';
-import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 
 enum GameLevel {
@@ -274,12 +273,10 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     final isLandscape = screenWidth > screenHeight;
 
     return Scaffold(
-      body: Container(
-        child: SafeArea(
-          child: FluidContainer(
-            padding: EdgeInsets.zero,
-            child: isLandscape ? _buildLandscapeLayout(l10n) : _buildPortraitLayout(l10n),
-          ),
+      body: SafeArea(
+        child: FluidContainer(
+          padding: EdgeInsets.zero,
+          child: isLandscape ? _buildLandscapeLayout(l10n) : _buildPortraitLayout(l10n),
         ),
       ),
     );

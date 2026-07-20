@@ -59,8 +59,8 @@ class BackgroundResolver {
       case BackgroundType.tech:
         mobilePortrait = 'assets/gen/images/backgrounds/tech_bg_mob.jpeg';
         mobileLandscape = 'assets/gen/images/backgrounds/tech_bg_mob.jpeg';
-        tabletPortrait = 'assets/gen/images/backgrounds/board_tab.jpg';
-        tabletLandscape = 'assets/gen/images/backgrounds/board_tab.jpg';
+        tabletPortrait = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
+        tabletLandscape = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
         desktop = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
         break;
       case BackgroundType.splash:

@@ -3,7 +3,7 @@ import '../../data/quiz_models.dart';
 
 class QuizOptionsRow extends StatelessWidget {
   final List<QuizOption> options;
-  final Function(QuizOption) onOptionSelected;
+  final void Function(QuizOption) onOptionSelected;
   final bool showFeedback;
 
   const QuizOptionsRow({

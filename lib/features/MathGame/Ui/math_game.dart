@@ -154,7 +154,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                               ),
                               const SizedBox(height: 12),
                               LayoutBuilder(
-                                builder: (context, constraints) {
+                                builder: (layoutContext, constraints) {
                                   final isSmallScreen =
                                       constraints.maxWidth < 300;
                                   final starSize = isSmallScreen ? 30.0 : 40.0;
@@ -190,7 +190,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                         const SizedBox(height: 24),
                         // Action buttons
                         LayoutBuilder(
-                          builder: (context, constraints) {
+                          builder: (layoutContext, constraints) {
                             final isSmallScreen = constraints.maxWidth < 300;
                             return isSmallScreen
                                 ? Column(
@@ -222,9 +222,6 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                                         child: OutlinedButton.icon(
                                           onPressed: () {
                                             Navigator.pop(dialogContext);
-                                            context
-                                                .read<MathGameCubit>()
-                                                .close();
                                             Navigator.pushReplacement<void,
                                                 void>(
                                               context,
@@ -258,9 +255,6 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                                         child: OutlinedButton.icon(
                                           onPressed: () {
                                             Navigator.pop(dialogContext);
-                                            context
-                                                .read<MathGameCubit>()
-                                                .close();
                                             Navigator.pushReplacement<void,
                                                 void>(
                                               context,
@@ -408,72 +402,76 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                                 color: Colors.white,
                                 child: Padding(
                                   padding: const EdgeInsets.all(20),
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Text(
-                                        currentQuestion['question'],
-                                        style: GoogleFonts.poppins(
-                                          fontSize: 40,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.purple,
+                                  child: SingleChildScrollView(
+                                    physics: const BouncingScrollPhysics(),
+                                    child: Column(
+                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          currentQuestion['question'],
+                                          style: GoogleFonts.poppins(
+                                            fontSize: 40,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.purple,
+                                          ),
                                         ),
-                                      ),
-                                      const SizedBox(height: 30),
-                                      // Answer Options
-                                      GridView.count(
-                                        crossAxisCount: 2,
-                                        shrinkWrap: true,
-                                        childAspectRatio: 1.2,
-                                        mainAxisSpacing: 15,
-                                        crossAxisSpacing: 15,
-                                        children: currentQuestion['options']
-                                            .asMap()
-                                            .entries
-                                            .map<Widget>(
-                                                (MapEntry<int, dynamic> entry) {
-                                          final option = entry.value;
-                                          final index = entry.key;
-                                          return _FunnyOptionButton(
-                                            option: option,
-                                            index: index,
-                                            isCorrect: option ==
-                                                currentQuestion[
-                                                    'correctAnswer'],
-                                            onPressed: () {
-                                              context
-                                                  .read<MathGameCubit>()
-                                                  .checkAnswer(option);
-                                              if (option !=
+                                        const SizedBox(height: 30),
+                                        // Answer Options
+                                        GridView.count(
+                                          crossAxisCount: 2,
+                                          shrinkWrap: true,
+                                          physics: const NeverScrollableScrollPhysics(),
+                                          childAspectRatio: 1.2,
+                                          mainAxisSpacing: 15,
+                                          crossAxisSpacing: 15,
+                                          children: currentQuestion['options']
+                                              .asMap()
+                                              .entries
+                                              .map<Widget>(
+                                                  (MapEntry<int, dynamic> entry) {
+                                            final option = entry.value;
+                                            final index = entry.key;
+                                            return _FunnyOptionButton(
+                                              option: option,
+                                              index: index,
+                                              isCorrect: option ==
                                                   currentQuestion[
-                                                      'correctAnswer']) {
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                  SnackBar(
-                                                    content: Text(
-                                                        AppLocalizations.of(
-                                                                context)
-                                                            .oopsieTryAgain),
-                                                    backgroundColor:
-                                                        Colors.redAccent,
-                                                    duration: const Duration(
-                                                        seconds: 1),
-                                                    behavior: SnackBarBehavior
-                                                        .floating,
-                                                    shape:
-                                                        RoundedRectangleBorder(
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
+                                                      'correctAnswer'],
+                                              onPressed: () {
+                                                context
+                                                    .read<MathGameCubit>()
+                                                    .checkAnswer(option);
+                                                if (option !=
+                                                    currentQuestion[
+                                                        'correctAnswer']) {
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                    SnackBar(
+                                                      content: Text(
+                                                          AppLocalizations.of(
+                                                                  context)
+                                                              .oopsieTryAgain),
+                                                      backgroundColor:
+                                                          Colors.redAccent,
+                                                      duration: const Duration(
+                                                          seconds: 1),
+                                                      behavior: SnackBarBehavior
+                                                          .floating,
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius.circular(
+                                                                20),
+                                                      ),
                                                     ),
-                                                  ),
-                                                );
-                                              }
-                                            },
-                                          );
-                                        }).toList(),
-                                      ),
-                                    ],
+                                                  );
+                                                }
+                                              },
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ),
                               ),

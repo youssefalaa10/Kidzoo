@@ -6,9 +6,9 @@ import 'package:kidzo/core/helpers/tts_service.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/services/cubit/music_cubit.dart';
+import 'package:kidzo/core/services/background_resolver.dart';
 import 'package:kidzo/core/utils/assets.dart';
 
-import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../data/model/animal_name_model.dart';
 import 'widgets/animal_name_success_overlay.dart';
@@ -159,9 +159,12 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
   // Background
   // ──────────────────────────────────────────────
   Widget _buildBackground() {
+    final bgPath = BackgroundResolver(context, BackgroundType.game).resolveBackground();
+    if (bgPath == null) return const SizedBox();
+    
     return Positioned.fill(
       child: Image.asset(
-        BackgroundResolver(context, BackgroundType.education).resolveBackground()!,
+        bgPath,
         fit: BoxFit.cover,
       ),
     );
@@ -252,7 +255,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
       margin: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         image: const DecorationImage(
-          image: AssetImage(Assets.genImagesHomeBoard),
+          image: AssetImage('assets/gen/images/backgrounds/board_mob.jpg'),
           fit: BoxFit.fill,
         ),
         borderRadius: BorderRadius.circular(12),
