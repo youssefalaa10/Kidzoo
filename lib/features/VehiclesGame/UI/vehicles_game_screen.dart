@@ -8,6 +8,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
+import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../QuizEngine/bloc/quiz_cubit.dart';
@@ -30,8 +31,14 @@ class _VehiclesGameScreenState extends State<VehiclesGameScreen> {
     super.didChangeDependencies();
     if (!_assetsPrecached) {
       _precacheAssets();
+      _applyTtsLanguage();
       _assetsPrecached = true;
     }
+  }
+
+  void _applyTtsLanguage() {
+    final languageCode = Localizations.localeOf(context).languageCode;
+    TtsService.applyLanguageTo(context.read<FlutterTts>(), languageCode);
   }
 
   void _precacheAssets() {
@@ -51,9 +58,20 @@ class _VehiclesGameScreenState extends State<VehiclesGameScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final backgroundPath =
+        BackgroundResolver(context, BackgroundType.game).resolveBackground();
+
     return Scaffold(
       body: Container(
-        color: const Color(0xfffaf5f1),
+        decoration: BoxDecoration(
+          color: const Color(0xfffaf5f1),
+          image: backgroundPath != null
+              ? DecorationImage(
+                  image: AssetImage(backgroundPath),
+                  fit: BoxFit.cover,
+                )
+              : null,
+        ),
         child: SafeArea(
           child: VehiclesGameContent(
             key: _gameKey,
@@ -183,28 +201,50 @@ class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
               children: [
                 Text(
                   l10n.greatJob,
+                  textAlign: TextAlign.center,
                   style: Theme.of(context).textTheme.displayMedium?.copyWith(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
+                        shadows: const [
+                          Shadow(
+                              color: Colors.black54,
+                              blurRadius: 6,
+                              offset: Offset(0, 3)),
+                        ],
                       ),
                 ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
                 const SizedBox(height: 40),
-                ElevatedButton.icon(
-                  onPressed: widget.onReplay,
-                  icon: const Icon(Icons.replay, size: 32),
-                  label: const Text('Replay', style: TextStyle(fontSize: 24)),
-                  style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 32, vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20)),
-                  ),
-                ).animate(delay: 500.ms).fadeIn().slideY(begin: 0.5),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Back to Menu',
-                      style: TextStyle(fontSize: 20, color: Colors.white)),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    ElevatedButton.icon(
+                      onPressed: widget.onReplay,
+                      icon: const Icon(Icons.replay, size: 32),
+                      label:
+                          const Text('Replay', style: TextStyle(fontSize: 24)),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ).animate(delay: 500.ms).fadeIn().slideY(begin: 0.5),
+                    const SizedBox(width: 20),
+                    ElevatedButton.icon(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.exit_to_app, size: 32),
+                      label:
+                          Text(l10n.exit, style: const TextStyle(fontSize: 24)),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white.withValues(alpha: 0.9),
+                        foregroundColor: Colors.black87,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20)),
+                      ),
+                    ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.5),
+                  ],
                 ),
               ],
             ),
@@ -253,7 +293,12 @@ class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
                           ),
                           child: _buildProgressBar(currentIndex + 1, 10),
                         ),
-                        const SizedBox(width: 48), // Balance back button
+                        IconButton(
+                          icon: const Icon(Icons.volume_up,
+                              color: Colors.white, size: 32),
+                          onPressed: () =>
+                              context.read<FlutterTts>().speak(question.prompt),
+                        ),
                       ],
                     ),
                     const SizedBox(height: 12),

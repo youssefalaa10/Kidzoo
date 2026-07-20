@@ -87,11 +87,13 @@ const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
 
 class EnvironmentVehicleQuestion {
   final String environmentAsset;
+  final EnvironmentType environmentType;
   final VehicleType correctVehicle;
   final List<VehicleType> options;
 
   EnvironmentVehicleQuestion({
     required this.environmentAsset,
+    required this.environmentType,
     required this.correctVehicle,
     required this.options,
   }) {
@@ -102,8 +104,7 @@ class EnvironmentVehicleQuestion {
   }
 
   QuizQuestion toQuizQuestion(AppLocalizations l10n, String id) {
-    final name = correctVehicle.localizedName(l10n);
-    final templates = l10n.getEducationalPrompts(name);
+    final templates = l10n.getVehicleEnvironmentPrompts(environmentType.name);
     templates.shuffle(Random());
     final prompt = templates.first;
 
@@ -184,6 +185,7 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
 
     questions.add(EnvironmentVehicleQuestion(
       environmentAsset: env.assetPath,
+      environmentType: env,
       correctVehicle: correctVehicle,
       options: options,
     ));

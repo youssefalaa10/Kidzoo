@@ -644,6 +644,40 @@ class AppLocalizations {
       _localizedValues['vocab_which_one_is_the']!.replaceAll('{item}', itemName),
     ];
   }
+
+  /// Clever, environment-based prompts for the Vehicles game, e.g.
+  /// "Which vehicle can fly in the sky?" instead of "Where is the {item}?".
+  /// [environment] must be one of: sky, sea, road, railway.
+  List<String> getVehicleEnvironmentPrompts(String environment) {
+    switch (environment) {
+      case 'sky':
+        return [
+          _localizedValues['vehicle_q_sky_1']!,
+          _localizedValues['vehicle_q_sky_2']!,
+          _localizedValues['vehicle_q_sky_3']!,
+        ];
+      case 'sea':
+        return [
+          _localizedValues['vehicle_q_sea_1']!,
+          _localizedValues['vehicle_q_sea_2']!,
+          _localizedValues['vehicle_q_sea_3']!,
+        ];
+      case 'road':
+        return [
+          _localizedValues['vehicle_q_road_1']!,
+          _localizedValues['vehicle_q_road_2']!,
+          _localizedValues['vehicle_q_road_3']!,
+        ];
+      case 'railway':
+        return [
+          _localizedValues['vehicle_q_railway_1']!,
+          _localizedValues['vehicle_q_railway_2']!,
+          _localizedValues['vehicle_q_railway_3']!,
+        ];
+      default:
+        return [_localizedValues['vocab_where_is_the']!];
+    }
+  }
 }
 
 class _AppLocalizationsDelegate

@@ -9,6 +9,7 @@ class FruitDraggable extends StatelessWidget {
   final bool isDropped;
   final bool showHint;
   final FlutterTts flutterTts;
+  final double scale;
 
   const FruitDraggable({
     super.key,
@@ -16,12 +17,13 @@ class FruitDraggable extends StatelessWidget {
     this.isDropped = false,
     this.showHint = false,
     required this.flutterTts,
+    this.scale = 1.0,
   });
 
   @override
   Widget build(BuildContext context) {
     if (isDropped) {
-      return const SizedBox(width: 120, height: 160);
+      return SizedBox(width: 120 * scale, height: 160 * scale);
     }
 
     final l10n = AppLocalizations.of(context);
@@ -35,11 +37,11 @@ class FruitDraggable extends StatelessWidget {
       },
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 500),
-        width: 140,
-        padding: const EdgeInsets.all(12),
+        width: 140 * scale,
+        padding: EdgeInsets.all(12 * scale),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(20 * scale),
           border: Border.all(
             color: showHint ? Colors.amber : Colors.blue.shade100,
             width: showHint ? 5 : 3,
@@ -57,13 +59,14 @@ class FruitDraggable extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Image.asset(food.imageAsset, height: 90, fit: BoxFit.contain),
-            const SizedBox(height: 8),
+            Image.asset(food.imageAsset,
+                height: 90 * scale, fit: BoxFit.contain),
+            SizedBox(height: 8 * scale),
             Text(
               localizedName,
               textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 20,
+              style: TextStyle(
+                fontSize: (20 * scale).clamp(12.0, 20.0),
                 fontWeight: FontWeight.bold,
                 color: Colors.black87,
               ),

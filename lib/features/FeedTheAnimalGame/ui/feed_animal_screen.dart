@@ -158,12 +158,43 @@ class _FeedAnimalView extends StatelessWidget {
                           final isLandscape =
                               constraints.maxWidth > constraints.maxHeight;
 
+                          // Available space for the animal (flex 3) and the
+                          // food tray (flex 2), matching the 3:2 split used
+                          // below, so sizes are derived from real space
+                          // instead of fixed pixels that could overflow and
+                          // force a scroll on small screens.
+                          final animalAreaHeight = isLandscape
+                              ? constraints.maxHeight - 40
+                              : (constraints.maxHeight * 3 / 5) - 40;
+                          final animalMaxHeight =
+                              animalAreaHeight.clamp(120.0, 350.0);
+
+                          final trayAreaWidth = isLandscape
+                              ? (constraints.maxWidth * 2 / 5) - 40
+                              : constraints.maxWidth - 40;
+                          final trayAreaHeight = isLandscape
+                              ? constraints.maxHeight - 40
+                              : (constraints.maxHeight * 2 / 5) - 40;
+
+                          final choiceCount = roundData.choices.length;
+                          final widthPerCard = (trayAreaWidth -
+                                  20 * (choiceCount + 1)) /
+                              choiceCount;
+                          var cardWidth = widthPerCard.clamp(60.0, 140.0);
+                          final approxCardHeight = cardWidth * 1.25;
+                          if (approxCardHeight > trayAreaHeight) {
+                            cardWidth =
+                                (trayAreaHeight / 1.25).clamp(60.0, cardWidth);
+                          }
+                          final cardScale = cardWidth / 140.0;
+
                           final animalContent = Center(
                             child: AnimalTarget(
                               animal: roundData.animal,
                               isSuccess: isSuccess,
                               isError: isError,
                               eatenFood: droppedFood,
+                              maxHeight: animalMaxHeight,
                               onFoodDropped: (food) {
                                 context
                                     .read<FeedAnimalCubit>()
@@ -179,24 +210,23 @@ class _FeedAnimalView extends StatelessWidget {
                                 color: Colors.white.withValues(alpha: 0.5),
                                 borderRadius: BorderRadius.circular(30),
                               ),
-                              child: SingleChildScrollView(
-                                child: Wrap(
-                                  alignment: WrapAlignment.center,
-                                  spacing: 20,
-                                  runSpacing: 20,
-                                  children: roundData.choices.map((food) {
-                                    final isDropped = isSuccess &&
-                                        food.id == roundData.targetFood.id;
-                                    final isTarget =
-                                        food.id == roundData.targetFood.id;
-                                    return FruitDraggable(
-                                      food: food,
-                                      isDropped: isDropped,
-                                      showHint: showHint && isTarget,
-                                      flutterTts: flutterTts,
-                                    );
-                                  }).toList(),
-                                ),
+                              child: Wrap(
+                                alignment: WrapAlignment.center,
+                                spacing: 20,
+                                runSpacing: 20,
+                                children: roundData.choices.map((food) {
+                                  final isDropped = isSuccess &&
+                                      food.id == roundData.targetFood.id;
+                                  final isTarget =
+                                      food.id == roundData.targetFood.id;
+                                  return FruitDraggable(
+                                    food: food,
+                                    isDropped: isDropped,
+                                    showHint: showHint && isTarget,
+                                    flutterTts: flutterTts,
+                                    scale: cardScale,
+                                  );
+                                }).toList(),
                               ),
                             ),
                           );
@@ -209,16 +239,13 @@ class _FeedAnimalView extends StatelessWidget {
                               ],
                             );
                           } else {
-                            return SingleChildScrollView(
-                              child: Column(
-                                children: [
-                                  const SizedBox(height: 20),
-                                  animalContent,
-                                  const SizedBox(height: 20),
-                                  trayContent,
-                                  const SizedBox(height: 40),
-                                ],
-                              ),
+                            return Column(
+                              children: [
+                                const SizedBox(height: 12),
+                                Expanded(flex: 3, child: animalContent),
+                                const SizedBox(height: 12),
+                                Expanded(flex: 2, child: trayContent),
+                              ],
                             );
                           }
                         },

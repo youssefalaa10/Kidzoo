@@ -34,11 +34,35 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
   final int _totalRounds = 10;
   int _wrongAttempts = 0;
   final Random _random = Random();
+  String? _lastAnimalId;
+  List<AnimalItem> _animalCycle = [];
+  PromptType? _lastPromptType;
 
   void restartGame() {
     _score = 0;
     _currentRound = 1;
+    _lastAnimalId = null;
+    _animalCycle = [];
+    _lastPromptType = null;
     _startNextRound();
+  }
+
+  AnimalItem _pickNextAnimal() {
+    if (_animalCycle.isEmpty) {
+      _animalCycle = List.of(FeedAnimalData.allAnimals)..shuffle(_random);
+      // Avoid the new cycle starting with the same animal that just ended
+      // the previous cycle, which would read as a back-to-back repeat.
+      if (_lastAnimalId != null &&
+          _animalCycle.length > 1 &&
+          _animalCycle.first.id == _lastAnimalId) {
+        final temp = _animalCycle[0];
+        _animalCycle[0] = _animalCycle.last;
+        _animalCycle.last = temp;
+      }
+    }
+    final animal = _animalCycle.removeAt(0);
+    _lastAnimalId = animal.id;
+    return animal;
   }
 
   Future<void> _startNextRound() async {
@@ -56,7 +80,7 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
       emit(FeedAnimalComplete(score: _score, totalRounds: _totalRounds));
       return;
     }
-    final animal = FeedAnimalData.allAnimals[_random.nextInt(FeedAnimalData.allAnimals.length)];
+    final animal = _pickNextAnimal();
     
     // Difficulty scaling: Easy (1-3) -> 3 choices, Medium (4-7) -> 4 choices, Hard (8-10) -> 5 choices
     int numChoices = 3;
@@ -70,8 +94,11 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
     
     final choices = [targetFood, ...distractorFoods.take(numChoices - 1)]..shuffle(_random);
 
-    final promptTypes = [PromptType.feedAnimal, PromptType.whatDoesAnimalEat];
+    final promptTypes = [PromptType.feedAnimal, PromptType.whatDoesAnimalEat]
+        .where((p) => p != _lastPromptType)
+        .toList();
     final promptType = promptTypes[_random.nextInt(promptTypes.length)];
+    _lastPromptType = promptType;
 
     _wrongAttempts = 0;
 

@@ -10,6 +10,7 @@ class AnimalTarget extends StatefulWidget {
   final bool isError;
   final FeedItem? eatenFood;
   final void Function(FeedItem) onFoodDropped;
+  final double maxHeight;
 
   const AnimalTarget({
     super.key,
@@ -18,6 +19,7 @@ class AnimalTarget extends StatefulWidget {
     required this.isError,
     this.eatenFood,
     required this.onFoodDropped,
+    this.maxHeight = 350,
   });
 
   @override
@@ -52,6 +54,7 @@ class _AnimalTargetState extends State<AnimalTarget> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final scale = widget.maxHeight / 350;
     return DragTarget<FeedItem>(
       onWillAcceptWithDetails: (details) => true,
       onAcceptWithDetails: (details) {
@@ -80,7 +83,7 @@ class _AnimalTargetState extends State<AnimalTarget> with SingleTickerProviderSt
                   return Transform.scale(
                     scale: scale,
                     child: ConstrainedBox(
-                      constraints: const BoxConstraints(maxHeight: 350),
+                      constraints: BoxConstraints(maxHeight: widget.maxHeight),
                       child: Image.asset(
                         widget.animal.imageAsset,
                         fit: BoxFit.contain,
@@ -97,12 +100,13 @@ class _AnimalTargetState extends State<AnimalTarget> with SingleTickerProviderSt
                   builder: (context, value, child) {
                     // Food starts at bottom (scale 1.0) and moves to center (scale 0.0)
                     return Positioned(
-                      top: 200 + (1 - value) * 100, // Starts lower
+                      top: (200 + (1 - value) * 100) * scale, // Starts lower
                       child: Transform.scale(
                         scale: 1.0 - value, // Shrinks as it goes into mouth
                         child: Opacity(
                           opacity: 1.0 - (value * 0.5), // Fades slightly
-                          child: Image.asset(widget.eatenFood!.imageAsset, height: 80),
+                          child: Image.asset(widget.eatenFood!.imageAsset,
+                              height: 80 * scale),
                         ),
                       ),
                     );
@@ -114,10 +118,11 @@ class _AnimalTargetState extends State<AnimalTarget> with SingleTickerProviderSt
                   duration: const Duration(milliseconds: 800),
                   builder: (context, value, child) {
                     return Positioned(
-                      top: 20 - (value * 50),
+                      top: (20 - value * 50) * scale,
                       child: Opacity(
                         opacity: 1.0 - value,
-                        child: const Icon(Icons.star, color: Colors.amber, size: 60),
+                        child: Icon(Icons.star,
+                            color: Colors.amber, size: 60 * scale),
                       ),
                     );
                   },

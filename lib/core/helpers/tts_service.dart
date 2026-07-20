@@ -46,13 +46,22 @@ class TtsService {
     }
   }
 
-  Future<bool> _applyLanguage(String languageCode) async {
+  Future<bool> _applyLanguage(String languageCode) {
+    return applyLanguageTo(_tts, languageCode);
+  }
+
+  /// Applies the correct locale (with Arabic fallbacks) to any [FlutterTts]
+  /// instance, not just the shared singleton's engine. Games that keep their
+  /// own [FlutterTts] instance (e.g. via a repository provider) should call
+  /// this before speaking so Arabic prompts actually use an Arabic voice.
+  static Future<bool> applyLanguageTo(
+      FlutterTts tts, String languageCode) async {
     if (languageCode.toLowerCase() == 'ar') {
       // Try different Arabic locales in order of preference
       final arabicLocales = ['ar-SA', 'ar-EG', 'ar-AE', 'ar'];
       for (final locale in arabicLocales) {
         try {
-          final result = await _tts.setLanguage(locale);
+          final result = await tts.setLanguage(locale);
           // On Android, setLanguage returns 1 on success
           if (result == 1 || result == null) {
             debugPrint('TTS: Arabic language set to $locale successfully');
@@ -63,10 +72,10 @@ class TtsService {
         }
       }
       debugPrint('TTS: Could not set any Arabic locale, falling back to en-US');
-      await _tts.setLanguage('en-US');
+      await tts.setLanguage('en-US');
       return false;
     } else {
-      await _tts.setLanguage('en-US');
+      await tts.setLanguage('en-US');
       return true;
     }
   }
