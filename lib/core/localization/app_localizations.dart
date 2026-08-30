@@ -645,6 +645,91 @@ class AppLocalizations {
     ];
   }
 
+  // Kid Profile Screen
+  String get myProfile => _localizedValues['myProfile']!;
+  String get editProfile => _localizedValues['editProfile']!;
+  String helloKidName(String name) =>
+      _localizedValues['helloKidName']!.replaceAll('{name}', name);
+  String get readyForAdventure => _localizedValues['readyForAdventure']!;
+  String get youAreDoingAmazing => _localizedValues['youAreDoingAmazing']!;
+  String get chooseYourHero => _localizedValues['chooseYourHero']!;
+  String get pickAvatarSubtitle => _localizedValues['pickAvatarSubtitle']!;
+  String get whatsYourName => _localizedValues['whatsYourName']!;
+  String get namePlaceholder => _localizedValues['namePlaceholder']!;
+  String get nameEmptyError => _localizedValues['nameEmptyError']!;
+  String get age => _localizedValues['age']!;
+  String iAmYearsOld(int age) =>
+      _localizedValues['iAmYearsOld']!.replaceAll('{age}', age.toString());
+  String get totalScoreLabel => _localizedValues['totalScoreLabel']!;
+  String get starsEarnedLabel => _localizedValues['starsEarnedLabel']!;
+  String get currentStreakLabel => _localizedValues['currentStreakLabel']!;
+  String get bestScoreLabel => _localizedValues['bestScoreLabel']!;
+  String get daysSuffix => _localizedValues['daysSuffix']!;
+  String get gameProgressTitle => _localizedValues['gameProgressTitle']!;
+  String get achievementsTitle => _localizedValues['achievementsTitle']!;
+  String get saveMyProfile => _localizedValues['saveMyProfile']!;
+  String get profileSavedMessage => _localizedValues['profileSavedMessage']!;
+
+  List<String> get motivationalQuotes => [
+        _localizedValues['quote1']!,
+        _localizedValues['quote2']!,
+        _localizedValues['quote3']!,
+        _localizedValues['quote4']!,
+        _localizedValues['quote5']!,
+        _localizedValues['quote6']!,
+        _localizedValues['quote7']!,
+        _localizedValues['quote8']!,
+      ];
+
+  // Profile analytics / achievements
+  String get categoryMemoryGames => _localizedValues['categoryMemoryGames']!;
+  String get categoryMathGames => _localizedValues['categoryMathGames']!;
+  String get categoryPuzzleGames => _localizedValues['categoryPuzzleGames']!;
+  String get categorySportsGames => _localizedValues['categorySportsGames']!;
+  String get categoryLanguageGames => _localizedValues['categoryLanguageGames']!;
+  String get encouragementNewbie => _localizedValues['encouragementNewbie']!;
+  String get encouragementMemoryMastered => _localizedValues['encouragementMemoryMastered']!;
+  String get encouragementMathMastered => _localizedValues['encouragementMathMastered']!;
+  String get encouragementPuzzleMastered => _localizedValues['encouragementPuzzleMastered']!;
+  String get encouragementSportsMastered => _localizedValues['encouragementSportsMastered']!;
+  String get encouragementLanguageMastered => _localizedValues['encouragementLanguageMastered']!;
+  String get encouragementImproving => _localizedValues['encouragementImproving']!;
+  String get encouragementKeepPracticing => _localizedValues['encouragementKeepPracticing']!;
+  String get achievementFirstWinTitle => _localizedValues['achievementFirstWinTitle']!;
+  String get achievementFirstWinDesc => _localizedValues['achievementFirstWinDesc']!;
+  String get achievementMemoryMasterTitle => _localizedValues['achievementMemoryMasterTitle']!;
+  String get achievementMemoryMasterDesc => _localizedValues['achievementMemoryMasterDesc']!;
+  String get achievementMathStarTitle => _localizedValues['achievementMathStarTitle']!;
+  String get achievementMathStarDesc => _localizedValues['achievementMathStarDesc']!;
+  String get achievementFiveDayStreakTitle => _localizedValues['achievementFiveDayStreakTitle']!;
+  String get achievementFiveDayStreakDesc => _localizedValues['achievementFiveDayStreakDesc']!;
+  String get achievementPuzzleHeroTitle => _localizedValues['achievementPuzzleHeroTitle']!;
+  String get achievementPuzzleHeroDesc => _localizedValues['achievementPuzzleHeroDesc']!;
+  String get achievementSuperLearnerTitle => _localizedValues['achievementSuperLearnerTitle']!;
+  String get achievementSuperLearnerDesc => _localizedValues['achievementSuperLearnerDesc']!;
+  String get pleaseEnterNameError => _localizedValues['pleaseEnterNameError']!;
+  String get nameFieldHint => _localizedValues['nameFieldHint']!;
+  String get theSmartKid => _localizedValues['theSmartKid']!;
+  String get chooseYourAvatarCaps => _localizedValues['chooseYourAvatarCaps']!;
+  String get letsPlay => _localizedValues['letsPlay']!;
+  String get decreaseAge => _localizedValues['decreaseAge']!;
+  String get increaseAge => _localizedValues['increaseAge']!;
+  String get yearsOld => _localizedValues['yearsOld']!;
+  String get avatarOptionLabel => _localizedValues['avatarOptionLabel']!;
+  String get showAnotherQuote => _localizedValues['showAnotherQuote']!;
+  String get editProfileLabel => _localizedValues['editProfileLabel']!;
+  String ageValueLabel(int age) =>
+      _localizedValues['ageValueLabel']!.replaceAll('{age}', age.toString());
+  String playedBestLabel(int played, int best) => _localizedValues['playedBestLabel']!
+      .replaceAll('{played}', played.toString())
+      .replaceAll('{best}', best.toString());
+  String gameAnalyticsSemanticLabel(String title, int score, int played, int best) =>
+      _localizedValues['gameAnalyticsSemanticLabel']!
+          .replaceAll('{title}', title)
+          .replaceAll('{score}', score.toString())
+          .replaceAll('{played}', played.toString())
+          .replaceAll('{best}', best.toString());
+
   /// Clever, environment-based prompts for the Vehicles game, e.g.
   /// "Which vehicle can fly in the sky?" instead of "Where is the {item}?".
   /// [environment] must be one of: sky, sea, road, railway.

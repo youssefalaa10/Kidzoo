@@ -6,6 +6,7 @@ import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
 import 'package:kidzo/features/AppCategory/education_screen.dart';
 import 'package:kidzo/features/AppCategory/games_screen.dart';
+import 'package:kidzo/features/Profile/kid_profile_screen.dart';
 import 'package:kidzo/features/settings/settings_screen.dart';
 
 import '../../../core/localization/language_provider.dart';
@@ -156,47 +157,53 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
   Widget _buildHeader(CustomMQ mq, bool isLandscape) {
     return BlocBuilder<ProfileCubit, ProfileState>(
       builder: (context, state) {
-        String avatarPath = 'assets/gen/images/avatar/avatar-monstar.png';
+        String avatarPath = ImageManager.kidAvatars.first;
         if (state is ProfileLoaded && state.currentProfile != null) {
-            final avatars = [
-              'assets/gen/images/avatar/avatar-monstar.png',
-              'assets/gen/images/avatar/avatar-boy.png',
-              'assets/gen/images/avatar/avatar-girl.png',
-              'assets/gen/images/avatar/avatar-astronaut.png',
-            ];
             final idx = state.currentProfile!.avatarIndex;
-            if (idx >= 0 && idx < avatars.length) {
-               avatarPath = avatars[idx];
+            if (idx >= 0 && idx < ImageManager.kidAvatars.length) {
+               avatarPath = ImageManager.kidAvatars[idx];
             }
         }
-        
+
         return Padding(
           padding: EdgeInsets.symmetric(
               horizontal: mq.width(5), vertical: mq.height(1.5)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              // Avatar on one side
-              Container(
-                width: isLandscape ? mq.height(15) : mq.width(12),
-                height: isLandscape ? mq.height(15) : mq.width(12),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: Colors.white.withValues(alpha: 0.9),
-                  border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.2),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+              // Avatar on one side — tap to open the Kid Profile screen
+              Semantics(
+                label: 'Open my profile',
+                button: true,
+                child: GestureDetector(
+                  onTap: () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const KidProfileScreen(),
                     ),
-                  ],
-                ),
-                child: ClipOval(
-                  child: Image.asset(avatarPath, fit: BoxFit.cover),
+                  ),
+                  child: Container(
+                    width: isLandscape ? mq.height(15) : mq.width(12),
+                    height: isLandscape ? mq.height(15) : mq.width(12),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: Image.asset(avatarPath, fit: BoxFit.cover),
+                    ),
+                  ),
                 ),
               ),
-              
+
               // Settings and Lang on the other side
               Row(
                 children: [

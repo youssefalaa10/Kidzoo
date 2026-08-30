@@ -170,4 +170,18 @@ class ImageManager {
   // ColorLearn icon (using shapes icon as placeholder, can be replaced with custom icon)
   static const String colorLearn = Assets.genImagesHomeShapes;
   static const String worldMap = Assets.genImagesPuzzleEgypt;
+
+  // Kid avatars (profile selection)
+  static const String avatarMonster = 'assets/gen/images/avatar/avatar-monstar.png';
+  static const String avatarBoy = 'assets/gen/images/avatar/avatar-boy.png';
+  static const String avatarGirl = 'assets/gen/images/avatar/avatar-girl.png';
+  static const String avatarAstronaut = 'assets/gen/images/avatar/avatar-astronaut.png';
+
+  /// Ordered list of avatar assets. Index corresponds to `Profiles.avatarIndex`.
+  static const List<String> kidAvatars = [
+    avatarMonster,
+    avatarBoy,
+    avatarGirl,
+    avatarAstronaut,
+  ];
 }

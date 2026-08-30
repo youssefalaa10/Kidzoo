@@ -39,4 +39,31 @@ class ProfileCubit extends Cubit<ProfileState> {
       emit(ProfileError(e.toString()));
     }
   }
+
+  Future<void> updateProfile({
+    required int id,
+    required String name,
+    required int age,
+    required int avatarIndex,
+  }) async {
+    final previous = state;
+    emit(ProfileLoading());
+    try {
+      final existing = await profileDao.getProfileById(id);
+      if (existing == null) {
+        emit(const ProfileError('Profile not found'));
+        return;
+      }
+      final updated = existing.copyWith(
+        name: name,
+        age: age,
+        avatarIndex: avatarIndex,
+      );
+      await profileDao.updateProfile(updated);
+      emit(ProfileLoaded(updated));
+    } catch (e) {
+      emit(ProfileError(e.toString()));
+      emit(previous);
+    }
+  }
 }

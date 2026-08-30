@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
 
 import '../Alphabets/bloc/alphabet_bloc.dart';
 import '../home/UI/character.dart';
@@ -17,12 +19,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   final _nameController = TextEditingController();
   int _selectedAvatarIndex = 0;
 
-  final List<String> _avatars = [
-    'assets/gen/images/avatar/avatar-monstar.png',
-    'assets/gen/images/avatar/avatar-boy.png',
-    'assets/gen/images/avatar/avatar-girl.png',
-    'assets/gen/images/avatar/avatar-astronaut.png',
-  ];
+  final List<String> _avatars = ImageManager.kidAvatars;
 
   @override
   void dispose() {
@@ -36,7 +33,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
       context.read<ProfileCubit>().createProfile(name, _selectedAvatarIndex);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a name')),
+        SnackBar(content: Text(AppLocalizations.of(context).pleaseEnterNameError)),
       );
     }
   }
@@ -56,6 +53,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
   @override
   Widget build(BuildContext context) {
     final mq = MediaQuery.of(context).size;
+    final l10n = AppLocalizations.of(context);
 
     return Scaffold(
       backgroundColor: const Color(0xFFFFF7E2), // Warm cream background
@@ -140,9 +138,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             ),
                           ],
                         ),
-                        decoration: const InputDecoration(
-                          hintText: 'NAME',
-                          hintStyle: TextStyle(
+                        decoration: InputDecoration(
+                          hintText: l10n.nameFieldHint,
+                          hintStyle: const TextStyle(
                             color: Colors.white54,
                             fontSize: 48,
                             fontWeight: FontWeight.w900,
@@ -152,9 +150,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                         ),
                       ),
                     ),
-                    const Text(
-                      'The Smart Kid',
-                      style: TextStyle(
+                    Text(
+                      l10n.theSmartKid,
+                      style: const TextStyle(
                         fontSize: 18,
                         color: Colors.white70,
                         fontWeight: FontWeight.w500,
@@ -238,9 +236,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                     const Spacer(),
 
                     // Text
-                    const Text(
-                      'CHOOSE YOUR AVATAR',
-                      style: TextStyle(
+                    Text(
+                      l10n.chooseYourAvatarCaps,
+                      style: const TextStyle(
                         fontSize: 20,
                         fontWeight: FontWeight.w900,
                         color: Color(0xFF5A4C78),
@@ -264,9 +262,9 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                             borderRadius: BorderRadius.circular(30),
                           ),
                         ),
-                        child: const Text(
-                          'Let\'s Play!',
-                          style: TextStyle(
+                        child: Text(
+                          l10n.letsPlay,
+                          style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1,

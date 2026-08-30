@@ -33,6 +33,13 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
       type: DriftSqlType.int,
       requiredDuringInsert: false,
       defaultValue: const Constant(0));
+  static const VerificationMeta _ageMeta = const VerificationMeta('age');
+  @override
+  late final GeneratedColumn<int> age = GeneratedColumn<int>(
+      'age', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(7));
   static const VerificationMeta _totalPointsMeta =
       const VerificationMeta('totalPoints');
   @override
@@ -51,7 +58,7 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
       defaultValue: currentDateAndTime);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, name, avatarIndex, totalPoints, createdAt];
+      [id, name, avatarIndex, age, totalPoints, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -76,6 +83,10 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
           _avatarIndexMeta,
           avatarIndex.isAcceptableOrUnknown(
               data['avatar_index']!, _avatarIndexMeta));
+    }
+    if (data.containsKey('age')) {
+      context.handle(
+          _ageMeta, age.isAcceptableOrUnknown(data['age']!, _ageMeta));
     }
     if (data.containsKey('total_points')) {
       context.handle(
@@ -102,6 +113,8 @@ class $ProfilesTable extends Profiles with TableInfo<$ProfilesTable, Profile> {
           .read(DriftSqlType.string, data['${effectivePrefix}name'])!,
       avatarIndex: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}avatar_index'])!,
+      age: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}age'])!,
       totalPoints: attachedDatabase.typeMapping
           .read(DriftSqlType.int, data['${effectivePrefix}total_points'])!,
       createdAt: attachedDatabase.typeMapping
@@ -119,12 +132,14 @@ class Profile extends DataClass implements Insertable<Profile> {
   final int id;
   final String name;
   final int avatarIndex;
+  final int age;
   final int totalPoints;
   final DateTime createdAt;
   const Profile(
       {required this.id,
       required this.name,
       required this.avatarIndex,
+      required this.age,
       required this.totalPoints,
       required this.createdAt});
   @override
@@ -133,6 +148,7 @@ class Profile extends DataClass implements Insertable<Profile> {
     map['id'] = Variable<int>(id);
     map['name'] = Variable<String>(name);
     map['avatar_index'] = Variable<int>(avatarIndex);
+    map['age'] = Variable<int>(age);
     map['total_points'] = Variable<int>(totalPoints);
     map['created_at'] = Variable<DateTime>(createdAt);
     return map;
@@ -143,6 +159,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       id: Value(id),
       name: Value(name),
       avatarIndex: Value(avatarIndex),
+      age: Value(age),
       totalPoints: Value(totalPoints),
       createdAt: Value(createdAt),
     );
@@ -155,6 +172,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       id: serializer.fromJson<int>(json['id']),
       name: serializer.fromJson<String>(json['name']),
       avatarIndex: serializer.fromJson<int>(json['avatarIndex']),
+      age: serializer.fromJson<int>(json['age']),
       totalPoints: serializer.fromJson<int>(json['totalPoints']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
     );
@@ -166,6 +184,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       'id': serializer.toJson<int>(id),
       'name': serializer.toJson<String>(name),
       'avatarIndex': serializer.toJson<int>(avatarIndex),
+      'age': serializer.toJson<int>(age),
       'totalPoints': serializer.toJson<int>(totalPoints),
       'createdAt': serializer.toJson<DateTime>(createdAt),
     };
@@ -175,12 +194,14 @@ class Profile extends DataClass implements Insertable<Profile> {
           {int? id,
           String? name,
           int? avatarIndex,
+          int? age,
           int? totalPoints,
           DateTime? createdAt}) =>
       Profile(
         id: id ?? this.id,
         name: name ?? this.name,
         avatarIndex: avatarIndex ?? this.avatarIndex,
+        age: age ?? this.age,
         totalPoints: totalPoints ?? this.totalPoints,
         createdAt: createdAt ?? this.createdAt,
       );
@@ -190,6 +211,7 @@ class Profile extends DataClass implements Insertable<Profile> {
       name: data.name.present ? data.name.value : this.name,
       avatarIndex:
           data.avatarIndex.present ? data.avatarIndex.value : this.avatarIndex,
+      age: data.age.present ? data.age.value : this.age,
       totalPoints:
           data.totalPoints.present ? data.totalPoints.value : this.totalPoints,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
@@ -202,6 +224,7 @@ class Profile extends DataClass implements Insertable<Profile> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('avatarIndex: $avatarIndex, ')
+          ..write('age: $age, ')
           ..write('totalPoints: $totalPoints, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -210,7 +233,7 @@ class Profile extends DataClass implements Insertable<Profile> {
 
   @override
   int get hashCode =>
-      Object.hash(id, name, avatarIndex, totalPoints, createdAt);
+      Object.hash(id, name, avatarIndex, age, totalPoints, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -218,6 +241,7 @@ class Profile extends DataClass implements Insertable<Profile> {
           other.id == this.id &&
           other.name == this.name &&
           other.avatarIndex == this.avatarIndex &&
+          other.age == this.age &&
           other.totalPoints == this.totalPoints &&
           other.createdAt == this.createdAt);
 }
@@ -226,12 +250,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
   final Value<int> id;
   final Value<String> name;
   final Value<int> avatarIndex;
+  final Value<int> age;
   final Value<int> totalPoints;
   final Value<DateTime> createdAt;
   const ProfilesCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
     this.avatarIndex = const Value.absent(),
+    this.age = const Value.absent(),
     this.totalPoints = const Value.absent(),
     this.createdAt = const Value.absent(),
   });
@@ -239,6 +265,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     this.id = const Value.absent(),
     required String name,
     this.avatarIndex = const Value.absent(),
+    this.age = const Value.absent(),
     this.totalPoints = const Value.absent(),
     this.createdAt = const Value.absent(),
   }) : name = Value(name);
@@ -246,6 +273,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     Expression<int>? id,
     Expression<String>? name,
     Expression<int>? avatarIndex,
+    Expression<int>? age,
     Expression<int>? totalPoints,
     Expression<DateTime>? createdAt,
   }) {
@@ -253,6 +281,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       if (id != null) 'id': id,
       if (name != null) 'name': name,
       if (avatarIndex != null) 'avatar_index': avatarIndex,
+      if (age != null) 'age': age,
       if (totalPoints != null) 'total_points': totalPoints,
       if (createdAt != null) 'created_at': createdAt,
     });
@@ -262,12 +291,14 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
       {Value<int>? id,
       Value<String>? name,
       Value<int>? avatarIndex,
+      Value<int>? age,
       Value<int>? totalPoints,
       Value<DateTime>? createdAt}) {
     return ProfilesCompanion(
       id: id ?? this.id,
       name: name ?? this.name,
       avatarIndex: avatarIndex ?? this.avatarIndex,
+      age: age ?? this.age,
       totalPoints: totalPoints ?? this.totalPoints,
       createdAt: createdAt ?? this.createdAt,
     );
@@ -285,6 +316,9 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
     if (avatarIndex.present) {
       map['avatar_index'] = Variable<int>(avatarIndex.value);
     }
+    if (age.present) {
+      map['age'] = Variable<int>(age.value);
+    }
     if (totalPoints.present) {
       map['total_points'] = Variable<int>(totalPoints.value);
     }
@@ -300,6 +334,7 @@ class ProfilesCompanion extends UpdateCompanion<Profile> {
           ..write('id: $id, ')
           ..write('name: $name, ')
           ..write('avatarIndex: $avatarIndex, ')
+          ..write('age: $age, ')
           ..write('totalPoints: $totalPoints, ')
           ..write('createdAt: $createdAt')
           ..write(')'))
@@ -660,6 +695,7 @@ typedef $$ProfilesTableCreateCompanionBuilder = ProfilesCompanion Function({
   Value<int> id,
   required String name,
   Value<int> avatarIndex,
+  Value<int> age,
   Value<int> totalPoints,
   Value<DateTime> createdAt,
 });
@@ -667,6 +703,7 @@ typedef $$ProfilesTableUpdateCompanionBuilder = ProfilesCompanion Function({
   Value<int> id,
   Value<String> name,
   Value<int> avatarIndex,
+  Value<int> age,
   Value<int> totalPoints,
   Value<DateTime> createdAt,
 });
@@ -707,6 +744,9 @@ class $$ProfilesTableFilterComposer
 
   ColumnFilters<int> get avatarIndex => $composableBuilder(
       column: $table.avatarIndex, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get age => $composableBuilder(
+      column: $table.age, builder: (column) => ColumnFilters(column));
 
   ColumnFilters<int> get totalPoints => $composableBuilder(
       column: $table.totalPoints, builder: (column) => ColumnFilters(column));
@@ -754,6 +794,9 @@ class $$ProfilesTableOrderingComposer
   ColumnOrderings<int> get avatarIndex => $composableBuilder(
       column: $table.avatarIndex, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get age => $composableBuilder(
+      column: $table.age, builder: (column) => ColumnOrderings(column));
+
   ColumnOrderings<int> get totalPoints => $composableBuilder(
       column: $table.totalPoints, builder: (column) => ColumnOrderings(column));
 
@@ -778,6 +821,9 @@ class $$ProfilesTableAnnotationComposer
 
   GeneratedColumn<int> get avatarIndex => $composableBuilder(
       column: $table.avatarIndex, builder: (column) => column);
+
+  GeneratedColumn<int> get age =>
+      $composableBuilder(column: $table.age, builder: (column) => column);
 
   GeneratedColumn<int> get totalPoints => $composableBuilder(
       column: $table.totalPoints, builder: (column) => column);
@@ -833,6 +879,7 @@ class $$ProfilesTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             Value<String> name = const Value.absent(),
             Value<int> avatarIndex = const Value.absent(),
+            Value<int> age = const Value.absent(),
             Value<int> totalPoints = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
@@ -840,6 +887,7 @@ class $$ProfilesTableTableManager extends RootTableManager<
             id: id,
             name: name,
             avatarIndex: avatarIndex,
+            age: age,
             totalPoints: totalPoints,
             createdAt: createdAt,
           ),
@@ -847,6 +895,7 @@ class $$ProfilesTableTableManager extends RootTableManager<
             Value<int> id = const Value.absent(),
             required String name,
             Value<int> avatarIndex = const Value.absent(),
+            Value<int> age = const Value.absent(),
             Value<int> totalPoints = const Value.absent(),
             Value<DateTime> createdAt = const Value.absent(),
           }) =>
@@ -854,6 +903,7 @@ class $$ProfilesTableTableManager extends RootTableManager<
             id: id,
             name: name,
             avatarIndex: avatarIndex,
+            age: age,
             totalPoints: totalPoints,
             createdAt: createdAt,
           ),
