@@ -19,7 +19,7 @@ enum VehicleType {
 extension VehicleTypeExtension on VehicleType {
   String get assetPath {
     if (this == VehicleType.boat) return 'assets/gen/images/vehicles/ship.png';
-    return 'assets/gen/images/vehicles/${name}.png';
+    return 'assets/gen/images/vehicles/$name.png';
   }
 
   String localizedName(AppLocalizations l10n) {
@@ -86,10 +86,6 @@ const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
 };
 
 class EnvironmentVehicleQuestion {
-  final String environmentAsset;
-  final EnvironmentType environmentType;
-  final VehicleType correctVehicle;
-  final List<VehicleType> options;
 
   EnvironmentVehicleQuestion({
     required this.environmentAsset,
@@ -102,6 +98,10 @@ class EnvironmentVehicleQuestion {
         "Options must contain correct answer");
     assert(options.toSet().length == 3, "Options must be unique");
   }
+  final String environmentAsset;
+  final EnvironmentType environmentType;
+  final VehicleType correctVehicle;
+  final List<VehicleType> options;
 
   QuizQuestion toQuizQuestion(AppLocalizations l10n, String id) {
     final templates = l10n.getVehicleEnvironmentPrompts(environmentType.name);
@@ -132,7 +132,7 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
   VehicleType? lastCorrectAnswer;
   List<EnvironmentType> environmentCycle = [];
 
-  List<VehicleType> usedAnswers = [];
+  final List<VehicleType> usedAnswers = [];
 
   for (int i = 0; i < count; i++) {
     // 1. Select Environment (Cycle through all before repeating)
@@ -148,11 +148,11 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
         environmentCycle.last = temp;
       }
     }
-    EnvironmentType env = environmentCycle.removeAt(0);
+    final EnvironmentType env = environmentCycle.removeAt(0);
 
     // 2. Select Correct Vehicle (Avoid repeating recently used vehicles)
-    List<VehicleType> validVehicles = List.from(environmentVehicles[env]!);
-    List<VehicleType> unusedValid = validVehicles.where((v) => !usedAnswers.contains(v)).toList();
+    final List<VehicleType> validVehicles = List.from(environmentVehicles[env]!);
+    final List<VehicleType> unusedValid = validVehicles.where((v) => !usedAnswers.contains(v)).toList();
     
     VehicleType correctVehicle;
     if (unusedValid.isNotEmpty) {
@@ -169,18 +169,18 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
 
     // 3. Select 2 Invalid Vehicles from DIFFERENT environments
     // To ensure distractors are very distinct, we pick from 2 distinct incorrect environments
-    List<EnvironmentType> otherEnvs = EnvironmentType.values.where((e) => e != env).toList();
+    final List<EnvironmentType> otherEnvs = EnvironmentType.values.where((e) => e != env).toList();
     otherEnvs.shuffle(random);
     
-    List<VehicleType> invalidVehicles = [];
+    final List<VehicleType> invalidVehicles = [];
     for (int j = 0; j < 2; j++) {
-      List<VehicleType> pool = List.from(environmentVehicles[otherEnvs[j]]!);
+      final List<VehicleType> pool = List.from(environmentVehicles[otherEnvs[j]]!);
       pool.shuffle(random);
       invalidVehicles.add(pool.first);
     }
 
     // 4. Combine and Shuffle Options
-    List<VehicleType> options = [correctVehicle, ...invalidVehicles];
+    final List<VehicleType> options = [correctVehicle, ...invalidVehicles];
     options.shuffle(random);
 
     questions.add(EnvironmentVehicleQuestion(

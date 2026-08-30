@@ -4,9 +4,9 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../../../core/database/config.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
-import '../../../core/database/config.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../data/vegetables_game_engine.dart';
 import 'widgets/draggable_veggie.dart';

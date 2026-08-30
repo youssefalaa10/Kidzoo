@@ -84,14 +84,14 @@ class _VehiclesGameScreenState extends State<VehiclesGameScreen> {
 }
 
 class VehiclesGameContent extends StatelessWidget {
-  final VoidCallback onReplay;
 
   const VehiclesGameContent({super.key, required this.onReplay});
+  final VoidCallback onReplay;
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final rawQuestions = generateVehicleQuestions(count: 10);
+    final rawQuestions = generateVehicleQuestions();
 
     final questions = rawQuestions.asMap().entries.map((entry) {
       return entry.value.toQuizQuestion(l10n, 'vehicle_q_${entry.key}');
@@ -116,9 +116,9 @@ class VehiclesGameContent extends StatelessWidget {
 }
 
 class _VehiclesGameLayout extends StatefulWidget {
-  final VoidCallback onReplay;
 
   const _VehiclesGameLayout({required this.onReplay});
+  final VoidCallback onReplay;
 
   @override
   State<_VehiclesGameLayout> createState() => _VehiclesGameLayoutState();
@@ -329,7 +329,7 @@ class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
                           Expanded(
                             flex: isLandscape ? 6 : 4,
                             child: Hero(
-                              tag: 'env_image_${currentIndex}',
+                              tag: 'env_image_$currentIndex',
                               child: Container(
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(24),

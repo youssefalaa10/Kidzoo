@@ -24,7 +24,6 @@ class AvatarSelector extends StatelessWidget {
         maxCrossAxisExtent: 130,
         mainAxisSpacing: 16,
         crossAxisSpacing: 16,
-        childAspectRatio: 1,
       ),
       itemBuilder: (context, index) {
         final isSelected = index == selectedIndex;

@@ -37,7 +37,6 @@ class _EducationScreenState extends State<EducationScreen> with TTSMusicMixin {
         ),
         child: SafeArea(
           child: FluidContainer(
-            maxWidth: 800,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

@@ -74,7 +74,7 @@ class _MazeGameContentState extends State<_MazeGameContent> {
 
   void _toggleFullScreen() {
     if (_isFullScreen) {
-      _disableFullScreen(isDisposing: false);
+      _disableFullScreen();
     } else {
       _enableFullScreen();
     }

@@ -5,10 +5,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/vegetables_game_engine.dart';
 
 class DashedCirclePainter extends CustomPainter {
-  final Color color;
-  final double strokeWidth;
-  final double dashLength;
-  final double dashSpace;
 
   DashedCirclePainter({
     required this.color,
@@ -16,6 +12,10 @@ class DashedCirclePainter extends CustomPainter {
     required this.dashLength,
     required this.dashSpace,
   });
+  final Color color;
+  final double strokeWidth;
+  final double dashLength;
+  final double dashSpace;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -49,15 +49,15 @@ class DashedCirclePainter extends CustomPainter {
 }
 
 class VeggieTarget extends StatelessWidget {
-  final VegetableItem? currentTarget;
-  final bool isSuccess;
-  final void Function(VegetableItem) onAccept;
   const VeggieTarget({
     super.key,
     required this.currentTarget,
     required this.isSuccess,
     required this.onAccept,
   });
+  final VegetableItem? currentTarget;
+  final bool isSuccess;
+  final void Function(VegetableItem) onAccept;
 
   @override
   Widget build(BuildContext context) {
@@ -99,10 +99,10 @@ class VeggieTarget extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.green, width: 6),
-                        color: Colors.green.withOpacity(0.1),
+                        color: Colors.green.withValues(alpha: 0.1),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.green.withOpacity(0.3),
+                            color: Colors.green.withValues(alpha: 0.3),
                             blurRadius: 20,
                             spreadRadius: 5,
                           )
@@ -111,10 +111,10 @@ class VeggieTarget extends StatelessWidget {
                     ),
                   if (isSuccess)
                     Container(
-                      decoration: BoxDecoration(
+                      decoration: const BoxDecoration(
                         shape: BoxShape.circle,
                         color: Colors.white,
-                        boxShadow: const [
+                        boxShadow: [
                           BoxShadow(
                             color: Colors.black12,
                             blurRadius: 15,
@@ -144,7 +144,7 @@ class VeggieTarget extends StatelessWidget {
                       child: Image.asset(currentTarget!.assetPath)
                           .animate()
                           .scale(curve: Curves.elasticOut, duration: 800.ms)
-                          .shimmer(duration: 800.ms, color: Colors.yellow.withOpacity(0.4)),
+                          .shimmer(duration: 800.ms, color: Colors.yellow.withValues(alpha: 0.4)),
                     ),
                     
                   // Star Burst

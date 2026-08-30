@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';

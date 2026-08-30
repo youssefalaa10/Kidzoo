@@ -400,7 +400,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
     projectedX -= leftWall;
     
     // Number of bounces
-    int bounces = (projectedX / width).floor();
+    final int bounces = (projectedX / width).floor();
     
     // Calculate final X within the bounds
     double finalX = projectedX % width;

@@ -437,7 +437,6 @@ class CharacterCard extends StatelessWidget {
 
           // Character name
           Flexible(
-            flex: 1,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Text(
@@ -473,7 +472,6 @@ class CharacterCard extends StatelessWidget {
 
           // Coins indicator
           Flexible(
-            flex: 1,
             child: FittedBox(
               fit: BoxFit.scaleDown,
               child: Container(

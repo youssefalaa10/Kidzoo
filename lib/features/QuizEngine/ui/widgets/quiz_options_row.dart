@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import '../../data/quiz_models.dart';
 
 class QuizOptionsRow extends StatelessWidget {
-  final List<QuizOption> options;
-  final void Function(QuizOption) onOptionSelected;
-  final bool showFeedback;
 
   const QuizOptionsRow({
     super.key,
@@ -12,6 +9,9 @@ class QuizOptionsRow extends StatelessWidget {
     required this.onOptionSelected,
     this.showFeedback = false,
   });
+  final List<QuizOption> options;
+  final void Function(QuizOption) onOptionSelected;
+  final bool showFeedback;
 
   @override
   Widget build(BuildContext context) {

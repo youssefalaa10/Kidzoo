@@ -137,7 +137,6 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
           else
             SafeArea(
               child: FluidContainer(
-                maxWidth: 800,
                 padding: EdgeInsets.zero,
                 child: Column(
                   children: [

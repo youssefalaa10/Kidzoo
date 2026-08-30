@@ -730,6 +730,21 @@ class AppLocalizations {
           .replaceAll('{played}', played.toString())
           .replaceAll('{best}', best.toString());
 
+  // Missing Letters feedback variety
+  List<String> get positiveFeedbackMessages => [
+        _localizedValues['feedbackGreatJob']!,
+        _localizedValues['feedbackAmazing']!,
+        _localizedValues['feedbackWellDone']!,
+        _localizedValues['feedbackYouFoundIt']!,
+      ];
+  List<String> get gentleFeedbackMessages => [
+        _localizedValues['tryAgain']!,
+        _localizedValues['feedbackAlmost']!,
+        _localizedValues['feedbackYouCanDoIt']!,
+      ];
+  String currentLevelShort(int level) =>
+      _localizedValues['currentLevelShort']!.replaceAll('{level}', level.toString());
+
   /// Clever, environment-based prompts for the Vehicles game, e.g.
   /// "Which vehicle can fly in the sky?" instead of "Where is the {item}?".
   /// [environment] must be one of: sky, sea, road, railway.

@@ -248,7 +248,6 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
             child: ConfettiWidget(
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
-              shouldLoop: false,
               colors: const [
                 Colors.green,
                 Colors.blue,

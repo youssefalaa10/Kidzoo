@@ -9,13 +9,6 @@ import '../data/sorter_models.dart';
 import 'sorter_state.dart';
 
 class SorterGameCubit extends Cubit<SorterGameState> {
-  final FlutterTts flutterTts;
-  final AudioPlayer audioPlayer;
-  final AppLocalizations l10n;
-  
-  final int totalRounds = 10;
-  int currentRound = 1;
-  final Random _random = Random();
 
   SorterGameCubit({
     required this.flutterTts,
@@ -24,6 +17,13 @@ class SorterGameCubit extends Cubit<SorterGameState> {
   }) : super(SorterGameLoading()) {
     _initGame();
   }
+  final FlutterTts flutterTts;
+  final AudioPlayer audioPlayer;
+  final AppLocalizations l10n;
+  
+  final int totalRounds = 10;
+  int currentRound = 1;
+  final Random _random = Random();
 
   void _initGame() {
     currentRound = 1;
@@ -41,8 +41,6 @@ class SorterGameCubit extends Cubit<SorterGameState> {
       roundData: roundData,
       currentRound: currentRound,
       totalRounds: totalRounds,
-      incorrectAttempts: 0,
-      showHint: false,
     ));
 
     _playRoundPrompt(roundData);

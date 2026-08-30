@@ -106,19 +106,27 @@ class Player extends PositionComponent with HasGameRef<ColorSwitchGame> {
         double angle = math.atan2(
             position.y - rotator.position.y, position.x - rotator.position.x);
 
-        while (angle < 0) angle += 2 * math.pi;
-        while (angle >= 2 * math.pi) angle -= 2 * math.pi;
+        while (angle < 0) {
+          angle += 2 * math.pi;
+        }
+        while (angle >= 2 * math.pi) {
+          angle -= 2 * math.pi;
+        }
 
         double relativeAngle = angle - rotator.angle;
-        while (relativeAngle < 0) relativeAngle += 2 * math.pi;
-        while (relativeAngle >= 2 * math.pi) relativeAngle -= 2 * math.pi;
+        while (relativeAngle < 0) {
+          relativeAngle += 2 * math.pi;
+        }
+        while (relativeAngle >= 2 * math.pi) {
+          relativeAngle -= 2 * math.pi;
+        }
 
         final circle = math.pi * 2;
         final sweep = circle / gameRef.gameColors.length;
-        int arcIndex = (relativeAngle / sweep).floor();
+        final int arcIndex = (relativeAngle / sweep).floor();
 
         if (arcIndex >= 0 && arcIndex < gameRef.gameColors.length) {
-          Color arcColor = gameRef.gameColors[arcIndex];
+          final Color arcColor = gameRef.gameColors[arcIndex];
           if (arcColor != color) {
             gameRef.gameOver();
           }

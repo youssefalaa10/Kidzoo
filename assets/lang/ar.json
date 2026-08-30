@@ -645,5 +645,12 @@
   "editProfileLabel": "تعديل الملف الشخصي",
   "ageValueLabel": "العمر {age}",
   "playedBestLabel": "لعب {played} · الأفضل {best}",
-  "gameAnalyticsSemanticLabel": "{title}: النتيجة {score}، عدد الألعاب {played}، الأفضل {best}"
+  "gameAnalyticsSemanticLabel": "{title}: النتيجة {score}، عدد الألعاب {played}، الأفضل {best}",
+  "feedbackGreatJob": "أحسنت!",
+  "feedbackAmazing": "رائع!",
+  "feedbackWellDone": "عمل جميل!",
+  "feedbackYouFoundIt": "لقد وجدتها!",
+  "feedbackAlmost": "اقتربت!",
+  "feedbackYouCanDoIt": "تستطيع فعل ذلك!",
+  "currentLevelShort": "المستوى {level}"
 }

@@ -73,7 +73,7 @@ class DrawingData {
         'width': canvasSize.width,
         'height': canvasSize.height,
       },
-      'backgroundColor': backgroundColor.value,
+      'backgroundColor': backgroundColor.toARGB32(),
       'name': name,
       'createdAt': createdAt.toIso8601String(),
       'updatedAt': updatedAt.toIso8601String(),
@@ -113,7 +113,7 @@ class DrawingStroke {
   Map<String, dynamic> toJson() {
     return {
       'points': points.map((point) => {'x': point.dx, 'y': point.dy}).toList(),
-      'color': color.value,
+      'color': color.toARGB32(),
       'width': width,
       'opacity': opacity,
       'tool': tool,
@@ -160,7 +160,7 @@ class DrawingShape {
       'type': type,
       'startPoint': {'x': startPoint.dx, 'y': startPoint.dy},
       'endPoint': {'x': endPoint.dx, 'y': endPoint.dy},
-      'color': color.value,
+      'color': color.toARGB32(),
       'width': width,
       'opacity': opacity,
       'isFilled': isFilled,
@@ -203,7 +203,7 @@ class DrawingText {
     return {
       'text': text,
       'position': {'x': position.dx, 'y': position.dy},
-      'color': color.value,
+      'color': color.toARGB32(),
       'fontSize': fontSize,
       'fontFamily': fontFamily,
       'fontWeight': fontWeight.index,

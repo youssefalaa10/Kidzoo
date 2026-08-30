@@ -5,12 +5,6 @@ import 'package:flutter/material.dart';
 import '../../data/feed_animal_models.dart';
 
 class AnimalTarget extends StatefulWidget {
-  final AnimalItem animal;
-  final bool isSuccess;
-  final bool isError;
-  final FeedItem? eatenFood;
-  final void Function(FeedItem) onFoodDropped;
-  final double maxHeight;
 
   const AnimalTarget({
     super.key,
@@ -21,6 +15,12 @@ class AnimalTarget extends StatefulWidget {
     required this.onFoodDropped,
     this.maxHeight = 350,
   });
+  final AnimalItem animal;
+  final bool isSuccess;
+  final bool isError;
+  final FeedItem? eatenFood;
+  final void Function(FeedItem) onFoodDropped;
+  final double maxHeight;
 
   @override
   State<AnimalTarget> createState() => _AnimalTargetState();

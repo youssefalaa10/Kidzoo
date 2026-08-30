@@ -20,7 +20,7 @@ class FlagDataManager {
   }
 
   static List<Country> getRandomCountries(int count) {
-    var list = List<Country>.from(_countries)..shuffle();
+    final list = List<Country>.from(_countries)..shuffle();
     return list.take(count).toList();
   }
 }

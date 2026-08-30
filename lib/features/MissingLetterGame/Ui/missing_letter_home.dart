@@ -8,6 +8,7 @@ import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../Data/Logic/cubit/missing_letter_cubit.dart';
 import '../Data/game_storage.dart';
+import '../Data/word_list.dart';
 import 'missing_letter_screen.dart';
 
 class MissingLetterHome extends StatefulWidget {
@@ -187,7 +188,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                           _buildStatItem(
                             icon: Icons.check_circle,
                             label: l10n.completed,
-                            value: '$_completedWords/25',
+                            value: '$_completedWords/${WordList.getTotalWords()}',
                             color: Colors.green,
                           ),
                         ],

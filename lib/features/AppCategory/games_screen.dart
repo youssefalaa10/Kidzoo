@@ -32,7 +32,6 @@ class _GamesScreenState extends State<GamesScreen> with BackgroundMusicMixin {
         ),
         child: SafeArea(
           child: FluidContainer(
-            maxWidth: 800,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [

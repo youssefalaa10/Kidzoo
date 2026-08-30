@@ -3,13 +3,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/fruits_game_engine.dart';
 
 class ConveyorBelt extends StatefulWidget {
-  final List<FruitItem> fruits;
-  final void Function(FruitItem) onFruitTapped;
-  final FruitItem currentTarget;
-  final bool isFrozen;
-  final FruitItem? successFruit;
-  final FruitItem? shakingFruit;
-  final VoidCallback onBeltFinished;
 
   const ConveyorBelt({
     super.key,
@@ -21,6 +14,13 @@ class ConveyorBelt extends StatefulWidget {
     this.shakingFruit,
     required this.onBeltFinished,
   });
+  final List<FruitItem> fruits;
+  final void Function(FruitItem) onFruitTapped;
+  final FruitItem currentTarget;
+  final bool isFrozen;
+  final FruitItem? successFruit;
+  final FruitItem? shakingFruit;
+  final VoidCallback onBeltFinished;
 
   @override
   State<ConveyorBelt> createState() => _ConveyorBeltState();
@@ -144,14 +144,14 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                           color: Colors.white,
                           shape: BoxShape.circle,
                           boxShadow: [
-                            BoxShadow(
+                            const BoxShadow(
                               color: Colors.black12,
                               blurRadius: 10,
-                              offset: const Offset(0, 6),
+                              offset: Offset(0, 6),
                             ),
                             if (isSuccess)
                               BoxShadow(
-                                color: Colors.yellow.withOpacity(0.6),
+                                color: Colors.yellow.withValues(alpha: 0.6),
                                 blurRadius: 20,
                                 spreadRadius: 10,
                               ),
@@ -170,7 +170,7 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                       fruitWidget = fruitWidget
                           .animate(key: UniqueKey())
                           .shakeX(hz: 4, amount: 6, duration: 400.ms)
-                          .tint(color: Colors.red.withOpacity(0.3), duration: 400.ms);
+                          .tint(color: Colors.red.withValues(alpha: 0.3), duration: 400.ms);
                     } else if (isSuccess) {
                       fruitWidget = fruitWidget
                           .animate()

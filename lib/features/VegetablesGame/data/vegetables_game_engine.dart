@@ -21,7 +21,7 @@ class VegetablesGameEngine {
   
   VegetableItem? currentTarget;
   List<VegetableItem> currentOptions = [];
-  String currentPrompt = "";
+  String currentPrompt = '';
 
   Future<void> initialize() async {
     final AssetManifest assetManifest = await AssetManifest.loadFromAssetBundle(rootBundle);
@@ -64,6 +64,6 @@ class VegetablesGameEngine {
     _unusedVegetables = List.from(_allVegetables)..shuffle(_random);
     currentTarget = null;
     currentOptions = [];
-    currentPrompt = "";
+    currentPrompt = '';
   }
 }

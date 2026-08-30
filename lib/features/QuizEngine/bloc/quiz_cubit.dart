@@ -10,11 +10,6 @@ import 'quiz_state.dart';
 
 class QuizCubit extends Cubit<QuizState> {
 
-  final bool allowRetries;
-  final String? tryAgainText;
-  final Duration transitionDuration;
-  final Duration wrongFeedbackDuration;
-
   QuizCubit({
     required this.gameScoresDao,
     required this.profileDao,
@@ -31,6 +26,11 @@ class QuizCubit extends Cubit<QuizState> {
         super(QuizLoading()) {
     _startQuiz();
   }
+
+  final bool allowRetries;
+  final String? tryAgainText;
+  final Duration transitionDuration;
+  final Duration wrongFeedbackDuration;
   final GameScoresDao gameScoresDao;
   final ProfileDao profileDao;
   final FlutterTts flutterTts;
@@ -66,7 +66,7 @@ class QuizCubit extends Cubit<QuizState> {
       } catch (_) {}
     } else if (allowRetries) {
       try {
-        await flutterTts.speak(tryAgainText ?? "Try again");
+        await flutterTts.speak(tryAgainText ?? 'Try again');
       } catch (_) {}
     }
 

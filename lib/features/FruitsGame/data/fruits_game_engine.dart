@@ -4,10 +4,10 @@ import 'package:flutter/services.dart';
 import '../../../../core/localization/app_localizations.dart';
 
 class FruitItem {
-  final String assetPath;
-  final String keyName;
 
   FruitItem(this.assetPath) : keyName = assetPath.split('/').last.split('.').first;
+  final String assetPath;
+  final String keyName;
 
   String getLocalizedName(AppLocalizations l10n) {
     return l10n.getFruitName(keyName);
@@ -21,7 +21,7 @@ class FruitsGameEngine {
   
   FruitItem? currentTarget;
   List<FruitItem> currentOptions = [];
-  String currentPrompt = "";
+  String currentPrompt = '';
 
   Random get random => _random;
 
@@ -74,6 +74,6 @@ class FruitsGameEngine {
     _unusedFruits = List.from(_allFruits)..shuffle(_random);
     currentTarget = null;
     currentOptions = [];
-    currentPrompt = "";
+    currentPrompt = '';
   }
 }

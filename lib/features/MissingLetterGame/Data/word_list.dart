@@ -2,104 +2,51 @@ import 'dart:math';
 
 import 'Model/word_model.dart';
 
+/// Static bank of words for the Missing Letters game. Difficulty (how many
+/// letters are hidden and which positions) is decided by
+/// [MissingLetterCubit], not baked into this list.
 class WordList {
-  static final List<Word> allWords = [
-    Word(word: 'Apple', missingIndices: [0], options: ['A', 'E', 'I', 'O'], correctLetters: ['A'], imagePath: 'assets/gen/images/fruits/apple.png'),
-    Word(word: 'Banana', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/fruits/banana.png'),
-    Word(word: 'Grapes', missingIndices: [0], options: ['G', 'J', 'C', 'K'], correctLetters: ['G'], imagePath: 'assets/gen/images/fruits/grapes.png'),
-    Word(word: 'Mango', missingIndices: [0], options: ['M', 'N', 'W', 'V'], correctLetters: ['M'], imagePath: 'assets/gen/images/fruits/mango.png'),
-    Word(word: 'Orange', missingIndices: [0], options: ['O', 'A', 'U', 'E'], correctLetters: ['O'], imagePath: 'assets/gen/images/fruits/orange.png'),
-    Word(word: 'Carrot', missingIndices: [0], options: ['C', 'K', 'S', 'T'], correctLetters: ['C'], imagePath: 'assets/gen/images/vegetables/carrot.png'),
-    Word(word: 'Tomato', missingIndices: [0], options: ['T', 'D', 'P', 'F'], correctLetters: ['T'], imagePath: 'assets/gen/images/vegetables/tomato.png'),
-    Word(word: 'Potato', missingIndices: [0], options: ['P', 'B', 'D', 'Q'], correctLetters: ['P'], imagePath: 'assets/gen/images/vegetables/potato.png'),
-    Word(word: 'Lemon', missingIndices: [0], options: ['L', 'R', 'M', 'N'], correctLetters: ['L'], imagePath: 'assets/gen/images/vegetables/lemon.png'),
-    Word(word: 'Onion', missingIndices: [0], options: ['O', 'U', 'A', 'E'], correctLetters: ['O'], imagePath: 'assets/gen/images/vegetables/onion.png'),
-    Word(word: 'Car', missingIndices: [0], options: ['C', 'K', 'G', 'S'], correctLetters: ['C'], imagePath: 'assets/gen/images/vehicles/car.png'),
-    Word(word: 'Bus', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/vehicles/bus.png'),
-    Word(word: 'Train', missingIndices: [0], options: ['T', 'D', 'F', 'P'], correctLetters: ['T'], imagePath: 'assets/gen/images/vehicles/train.png'),
-    Word(word: 'Airplane', missingIndices: [0], options: ['A', 'E', 'I', 'U'], correctLetters: ['A'], imagePath: 'assets/gen/images/vehicles/airplane.png'),
-    Word(word: 'Bicycle', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/vehicles/bicycle.png'),
-    Word(word: 'Cat', missingIndices: [0], options: ['C', 'K', 'S', 'T'], correctLetters: ['C'], imagePath: 'assets/gen/images/animal/cat.png'),
-    Word(word: 'Dog', missingIndices: [0], options: ['D', 'B', 'G', 'P'], correctLetters: ['D'], imagePath: 'assets/gen/images/animal/dog.png'),
-    Word(word: 'Cow', missingIndices: [0], options: ['C', 'K', 'G', 'Q'], correctLetters: ['C'], imagePath: 'assets/gen/images/animal/cow.png'),
-    Word(word: 'Bird', missingIndices: [0], options: ['B', 'P', 'D', 'V'], correctLetters: ['B'], imagePath: 'assets/gen/images/animal/bird.png'),
-    Word(word: 'Lion', missingIndices: [0], options: ['L', 'I', 'T', 'Y'], correctLetters: ['L'], imagePath: 'assets/gen/images/animal/lion.png'),
-    Word(word: 'Elephant', missingIndices: [0], options: ['E', 'I', 'A', 'U'], correctLetters: ['E'], imagePath: 'assets/gen/images/animal/elephant.png'),
-    Word(word: 'Panda', missingIndices: [0], options: ['P', 'B', 'D', 'Q'], correctLetters: ['P'], imagePath: 'assets/gen/images/animal/panda.png'),
-    Word(word: 'Horse', missingIndices: [0], options: ['H', 'Y', 'F', 'M'], correctLetters: ['H'], imagePath: 'assets/gen/images/animal/horse.png'),
-    Word(word: 'Sheep', missingIndices: [0], options: ['S', 'Z', 'C', 'X'], correctLetters: ['S'], imagePath: 'assets/gen/images/animal/sheep.png'),
-    Word(word: 'Giraffe', missingIndices: [0], options: ['G', 'J', 'C', 'K'], correctLetters: ['G'], imagePath: 'assets/gen/images/animal/giraffe.png'),
+  static const List<WordEntry> allWords = [
+    WordEntry(word: 'Apple', imagePath: 'assets/gen/images/fruits/apple.png', category: 'fruits'),
+    WordEntry(word: 'Banana', imagePath: 'assets/gen/images/fruits/banana.png', category: 'fruits'),
+    WordEntry(word: 'Grapes', imagePath: 'assets/gen/images/fruits/grapes.png', category: 'fruits'),
+    WordEntry(word: 'Mango', imagePath: 'assets/gen/images/fruits/mango.png', category: 'fruits'),
+    WordEntry(word: 'Orange', imagePath: 'assets/gen/images/fruits/orange.png', category: 'fruits'),
+    WordEntry(word: 'Carrot', imagePath: 'assets/gen/images/vegetables/carrot.png', category: 'vegetables'),
+    WordEntry(word: 'Tomato', imagePath: 'assets/gen/images/vegetables/tomato.png', category: 'vegetables'),
+    WordEntry(word: 'Potato', imagePath: 'assets/gen/images/vegetables/potato.png', category: 'vegetables'),
+    WordEntry(word: 'Lemon', imagePath: 'assets/gen/images/vegetables/lemon.png', category: 'vegetables'),
+    WordEntry(word: 'Onion', imagePath: 'assets/gen/images/vegetables/onion.png', category: 'vegetables'),
+    WordEntry(word: 'Car', imagePath: 'assets/gen/images/vehicles/car.png', category: 'vehicles'),
+    WordEntry(word: 'Bus', imagePath: 'assets/gen/images/vehicles/bus.png', category: 'vehicles'),
+    WordEntry(word: 'Train', imagePath: 'assets/gen/images/vehicles/train.png', category: 'vehicles'),
+    WordEntry(word: 'Airplane', imagePath: 'assets/gen/images/vehicles/airplane.png', category: 'vehicles'),
+    WordEntry(word: 'Bicycle', imagePath: 'assets/gen/images/vehicles/bicycle.png', category: 'vehicles'),
+    WordEntry(word: 'Cat', imagePath: 'assets/gen/images/animal/cat.png', category: 'animals'),
+    WordEntry(word: 'Dog', imagePath: 'assets/gen/images/animal/dog.png', category: 'animals'),
+    WordEntry(word: 'Cow', imagePath: 'assets/gen/images/animal/cow.png', category: 'animals'),
+    WordEntry(word: 'Bird', imagePath: 'assets/gen/images/animal/bird.png', category: 'animals'),
+    WordEntry(word: 'Lion', imagePath: 'assets/gen/images/animal/lion.png', category: 'animals'),
+    WordEntry(word: 'Elephant', imagePath: 'assets/gen/images/animal/elephant.png', category: 'animals'),
+    WordEntry(word: 'Panda', imagePath: 'assets/gen/images/animal/panda.png', category: 'animals'),
+    WordEntry(word: 'Horse', imagePath: 'assets/gen/images/animal/horse.png', category: 'animals'),
+    WordEntry(word: 'Sheep', imagePath: 'assets/gen/images/animal/sheep.png', category: 'animals'),
+    WordEntry(word: 'Giraffe', imagePath: 'assets/gen/images/animal/giraffe.png', category: 'animals'),
   ];
 
-  static Word getWordAtIndex(int index) {
-    if (index < 0 || index >= allWords.length) {
-      return allWords[0];
-    }
-    final originalWord = allWords[index];
-
-    // Randomly decide if this word should have 1, 2, or 3 missing letters
-    final random = Random();
-    final missingCount = random.nextInt(3) + 1; // 1, 2, or 3
-
-    if (missingCount == 1) {
-      // Single missing letter (original behavior)
-      return Word.withSingleMissingLetter(
-        word: originalWord.word,
-        missingIndex: originalWord.missingIndex,
-        correctLetter: originalWord.correctLetter,
-        imagePath: originalWord.imagePath,
-      );
-    } else if (missingCount == 2 && originalWord.word.length >= 3) {
-      // Two missing letters
-      final firstIndex = originalWord.missingIndex;
-      int secondIndex;
-      do {
-        secondIndex = random.nextInt(originalWord.word.length);
-      } while (secondIndex == firstIndex);
-
-      final firstLetter = originalWord.word[firstIndex];
-      final secondLetter = originalWord.word[secondIndex];
-
-      return Word.withRandomizedOptions(
-        word: originalWord.word,
-        missingIndices: [firstIndex, secondIndex],
-        correctLetters: [firstLetter, secondLetter],
-        imagePath: originalWord.imagePath,
-      );
-    } else if (missingCount == 3 && originalWord.word.length >= 4) {
-      // Three missing letters
-      final indices = <int>{originalWord.missingIndex};
-      while (indices.length < 3 && indices.length < originalWord.word.length) {
-        indices.add(random.nextInt(originalWord.word.length));
-      }
-      final sortedIndices = indices.toList()..sort();
-      final letters = sortedIndices.map((i) => originalWord.word[i]).toList();
-
-      return Word.withRandomizedOptions(
-        word: originalWord.word,
-        missingIndices: sortedIndices,
-        correctLetters: letters,
-        imagePath: originalWord.imagePath,
-      );
-    } else {
-      // Fallback to single missing letter
-      return Word.withSingleMissingLetter(
-        word: originalWord.word,
-        missingIndex: originalWord.missingIndex,
-        correctLetter: originalWord.correctLetter,
-        imagePath: originalWord.imagePath,
-      );
-    }
+  static WordEntry getBaseWordAtIndex(int index) {
+    if (index < 0 || index >= allWords.length) return allWords[0];
+    return allWords[index];
   }
 
   static int getTotalWords() => allWords.length;
 
-  static Word getRandomWord({int? excludeIndex}) {
+  static WordEntry getRandomWord({int? excludeIndex}) {
     final random = Random();
     int index;
     do {
       index = random.nextInt(allWords.length);
-    } while (excludeIndex != null && index == excludeIndex);
-    return getWordAtIndex(index);
+    } while (excludeIndex != null && allWords.length > 1 && index == excludeIndex);
+    return allWords[index];
   }
 }

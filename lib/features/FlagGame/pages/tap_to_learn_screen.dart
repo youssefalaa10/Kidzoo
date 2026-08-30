@@ -157,7 +157,6 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
                           Expanded(
                             child: SvgPicture.asset(
                               country.flagAsset,
-                              fit: BoxFit.contain,
                             ),
                           ),
                           const SizedBox(height: 4),

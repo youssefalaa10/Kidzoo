@@ -10,12 +10,10 @@ import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
 import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
 import 'package:kidzo/features/FeedTheAnimalGame/ui/feed_animal_screen.dart';
-import 'package:kidzo/features/VehiclesGame/UI/vehicles_game_screen.dart';
-import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
-import 'package:kidzo/features/VegetablesGame/UI/vegetables_game_screen.dart';
 import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
 import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
 import 'package:kidzo/features/FruitVegSorterGame/ui/sorter_game_screen.dart';
+import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzo/features/MissingLetterGame/Ui/missing_letter_home.dart';
@@ -25,6 +23,8 @@ import 'package:kidzo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
 import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzo/features/Shapes/shape_screen.dart';
 import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
+import 'package:kidzo/features/VegetablesGame/UI/vegetables_game_screen.dart';
+import 'package:kidzo/features/VehiclesGame/UI/vehicles_game_screen.dart';
 
 // Define the option data structure
 class OptionItem {

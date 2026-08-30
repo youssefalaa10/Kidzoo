@@ -5,11 +5,6 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../data/sorter_models.dart';
 
 class FoodDraggable extends StatefulWidget {
-  final FoodItem food;
-  final bool isDropped;
-  final bool showHint;
-  final FlutterTts flutterTts;
-  final bool isError;
 
   const FoodDraggable({
     super.key,
@@ -19,6 +14,11 @@ class FoodDraggable extends StatefulWidget {
     required this.flutterTts,
     this.isError = false,
   });
+  final FoodItem food;
+  final bool isDropped;
+  final bool showHint;
+  final FlutterTts flutterTts;
+  final bool isError;
 
   @override
   State<FoodDraggable> createState() => _FoodDraggableState();
@@ -65,7 +65,7 @@ class _FoodDraggableState extends State<FoodDraggable>
       return const SizedBox(width: 100, height: 100);
     }
 
-    Widget content = Container(
+    final Widget content = Container(
       width: 100,
       height: 100,
       decoration: BoxDecoration(

@@ -4,9 +4,7 @@ import '../../data/vegetables_game_engine.dart';
 
 class DraggableVeggie extends StatelessWidget {
   const DraggableVeggie({
-    super.key,
-    required this.option,
-    required this.isLandscape,
+    required this.option, required this.isLandscape, super.key,
     this.isShaking = false,
     this.isSuccess = false,
     this.isTarget = false,
@@ -32,10 +30,10 @@ class DraggableVeggie extends StatelessWidget {
           ),
           boxShadow: dragging
               ? [
-                  BoxShadow(
+                  const BoxShadow(
                     color: Colors.black26,
                     blurRadius: 12,
-                    offset: const Offset(0, 8),
+                    offset: Offset(0, 8),
                   )
                 ]
               : const [
@@ -76,7 +74,7 @@ class DraggableVeggie extends StatelessWidget {
         card = card
             .animate(key: UniqueKey())
             .shakeX(hz: 4, amount: 6, duration: 400.ms)
-            .tint(color: Colors.red.withOpacity(0.3), duration: 400.ms);
+            .tint(color: Colors.red.withValues(alpha: 0.3), duration: 400.ms);
       } else if (isSuccess && isTarget) {
         // Hide the draggable card when successfully placed in the target
         card = Opacity(opacity: 0.0, child: _buildCard(size: size));

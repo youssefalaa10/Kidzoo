@@ -76,7 +76,7 @@ class _KidProfileViewState extends State<_KidProfileView> {
     _nameController.text = profile.name;
     _selectedAvatarIndex = profile.avatarIndex.clamp(0, ImageManager.kidAvatars.length - 1);
     _age = profile.age;
-    _currentQuote = _pickQuote(context, exclude: null);
+    _currentQuote = _pickQuote(context);
     context.read<ProfileAnalyticsCubit>().load(profile.id, AppLocalizations.of(context));
     _loadedProfileId = profile.id;
   }

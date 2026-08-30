@@ -644,5 +644,12 @@
   "editProfileLabel": "Edit profile",
   "ageValueLabel": "Age {age}",
   "playedBestLabel": "Played {played} · Best {best}",
-  "gameAnalyticsSemanticLabel": "{title}: score {score}, {played} games played, best {best}"
+  "gameAnalyticsSemanticLabel": "{title}: score {score}, {played} games played, best {best}",
+  "feedbackGreatJob": "Great job!",
+  "feedbackAmazing": "Amazing!",
+  "feedbackWellDone": "Well done!",
+  "feedbackYouFoundIt": "You found it!",
+  "feedbackAlmost": "Almost!",
+  "feedbackYouCanDoIt": "You can do it!",
+  "currentLevelShort": "Level {level}"
 }

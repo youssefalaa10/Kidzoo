@@ -4,13 +4,8 @@ import '../../data/sorter_models.dart';
 class BasketTarget extends StatefulWidget {
 
   const BasketTarget({
-    super.key,
-    required this.basketType,
-    required this.label,
-    required this.icon,
-    required this.color,
+    required this.basketType, required this.label, required this.icon, required this.color, required this.onFoodDropped, super.key,
     this.isTargetBasket = false,
-    required this.onFoodDropped,
   });
   final FoodType basketType;
   final String label;

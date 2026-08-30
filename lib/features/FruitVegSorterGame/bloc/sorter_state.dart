@@ -11,11 +11,6 @@ abstract class SorterGameState extends Equatable {
 class SorterGameLoading extends SorterGameState {}
 
 class SorterGamePlaying extends SorterGameState {
-  final SorterGameRoundData roundData;
-  final int currentRound;
-  final int totalRounds;
-  final int incorrectAttempts;
-  final bool showHint;
 
   const SorterGamePlaying({
     required this.roundData,
@@ -24,6 +19,11 @@ class SorterGamePlaying extends SorterGameState {
     this.incorrectAttempts = 0,
     this.showHint = false,
   });
+  final SorterGameRoundData roundData;
+  final int currentRound;
+  final int totalRounds;
+  final int incorrectAttempts;
+  final bool showHint;
 
   @override
   List<Object?> get props => [roundData, currentRound, totalRounds, incorrectAttempts, showHint];
@@ -46,10 +46,6 @@ class SorterGamePlaying extends SorterGameState {
 }
 
 class SorterGameSuccess extends SorterGameState {
-  final SorterGameRoundData roundData;
-  final int currentRound;
-  final int totalRounds;
-  final FoodItem droppedFood;
 
   const SorterGameSuccess({
     required this.roundData,
@@ -57,21 +53,25 @@ class SorterGameSuccess extends SorterGameState {
     required this.totalRounds,
     required this.droppedFood,
   });
+  final SorterGameRoundData roundData;
+  final int currentRound;
+  final int totalRounds;
+  final FoodItem droppedFood;
 
   @override
   List<Object?> get props => [roundData, currentRound, totalRounds, droppedFood];
 }
 
 class SorterGameWrong extends SorterGameState {
-  final SorterGameRoundData roundData;
-  final int currentRound;
-  final int totalRounds;
 
   const SorterGameWrong({
     required this.roundData,
     required this.currentRound,
     required this.totalRounds,
   });
+  final SorterGameRoundData roundData;
+  final int currentRound;
+  final int totalRounds;
 
   @override
   List<Object?> get props => [roundData, currentRound, totalRounds];

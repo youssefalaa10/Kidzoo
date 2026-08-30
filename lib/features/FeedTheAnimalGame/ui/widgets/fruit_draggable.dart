@@ -5,11 +5,6 @@ import '../../../../core/localization/app_localizations.dart';
 import '../../data/feed_animal_models.dart';
 
 class FruitDraggable extends StatelessWidget {
-  final FeedItem food;
-  final bool isDropped;
-  final bool showHint;
-  final FlutterTts flutterTts;
-  final double scale;
 
   const FruitDraggable({
     super.key,
@@ -19,6 +14,11 @@ class FruitDraggable extends StatelessWidget {
     required this.flutterTts,
     this.scale = 1.0,
   });
+  final FeedItem food;
+  final bool isDropped;
+  final bool showHint;
+  final FlutterTts flutterTts;
+  final double scale;
 
   @override
   Widget build(BuildContext context) {

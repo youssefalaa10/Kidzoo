@@ -1,31 +1,39 @@
 import 'dart:math';
 
+/// A single base word entry from the word bank, before difficulty is applied.
+class WordEntry {
+  const WordEntry({
+    required this.word,
+    required this.imagePath,
+    this.category = 'general',
+  });
+
+  final String word;
+  final String imagePath;
+  final String category;
+}
+
+/// A word instance prepared for gameplay: which letters are missing, the
+/// letter choices shown to the child, and the correct answers for those gaps.
 class Word {
-  // Factory constructor to create a word with randomized options
   factory Word.withRandomizedOptions({
     required String word,
     required List<int> missingIndices,
     required List<String> correctLetters,
     required String imagePath,
+    int distractorCount = 4,
   }) {
     final random = Random();
     final allLetters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
 
-    // Remove correct letters from the pool
     for (final correctLetter in correctLetters) {
       allLetters.remove(correctLetter);
     }
-
-    // Shuffle the remaining letters
     allLetters.shuffle(random);
 
-    // Calculate how many wrong options we need
-    final wrongOptionsNeeded = 4 - correctLetters.length;
+    final wrongOptionsNeeded = max(0, distractorCount - correctLetters.length);
     final wrongOptions = allLetters.take(wrongOptionsNeeded).toList();
-    final options = [...wrongOptions, ...correctLetters];
-
-    // Shuffle the options to randomize their positions
-    options.shuffle(random);
+    final options = [...wrongOptions, ...correctLetters]..shuffle(random);
 
     return Word(
       word: word,
@@ -36,37 +44,17 @@ class Word {
     );
   }
 
-  // Legacy factory for single missing letter (named differently to avoid conflict)
-  factory Word.withSingleMissingLetter({
-    required String word,
-    required int missingIndex,
-    required String correctLetter,
-    required String imagePath,
-  }) {
-    return Word.withRandomizedOptions(
-      word: word,
-      missingIndices: [missingIndex],
-      correctLetters: [correctLetter],
-      imagePath: imagePath,
-    );
-  }
-  
-  Word({
+  const Word({
     required this.word,
     required this.missingIndices,
     required this.options,
     required this.correctLetters,
     required this.imagePath,
   });
-  
-  final String word; // e.g., "Can"
-  final List<int> missingIndices; // e.g., [1] or [0, 2] for multiple missing letters
-  final List<String> options; // e.g., ["C", "A", "G", "Y"]
-  final List<String> correctLetters; // e.g., ["A"] or ["C", "N"]
-  final String imagePath;
 
-  // Legacy support - single missing letter
-  int get missingIndex => missingIndices.isNotEmpty ? missingIndices[0] : -1;
-  String get correctLetter =>
-      correctLetters.isNotEmpty ? correctLetters[0] : '';
+  final String word; // e.g., "CAT" (already uppercased)
+  final List<int> missingIndices; // e.g., [1] or [0, 2] for multiple gaps
+  final List<String> options; // shuffled letter choices, e.g. ["C", "A", "G", "Y"]
+  final List<String> correctLetters; // correct letters, in missingIndices order
+  final String imagePath;
 }

@@ -382,7 +382,6 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
               crossAxisCount: _getCrossAxisCount(),
               crossAxisSpacing: 8,
               mainAxisSpacing: 8,
-              childAspectRatio: 1.0,
             ),
             itemCount: _cards.length,
             itemBuilder: (context, index) {

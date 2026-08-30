@@ -33,7 +33,7 @@ class PipeManager extends Component with HasGameRef<FlappyBirdGame> {
 
     // To ensure pipes have enough room to vary vertically, maxPipeHeight - minPipeHeight should be at least 80 pixels.
     // We calculate a target gap to guarantee 80 pixels of vertical variation, without shrinking the gap too much.
-    double targetMaxGap = availableHeight - (minPipeHeight * 2) - 80;
+    final double targetMaxGap = availableHeight - (minPipeHeight * 2) - 80;
     
     if (currentGap > targetMaxGap) {
       currentGap = targetMaxGap;

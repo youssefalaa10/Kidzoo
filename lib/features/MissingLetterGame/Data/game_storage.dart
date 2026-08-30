@@ -5,6 +5,19 @@ class MissingLetterStorage {
   static const String _keyTotalScore = 'missing_letter_total_score';
   static const String _keyCompletedWords = 'missing_letter_completed_words';
   static const String _keyBestScore = 'missing_letter_best_score';
+  static const String _keyLevel = 'missing_letter_level';
+
+  // Save current difficulty level
+  Future<void> saveLevel(int level) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt(_keyLevel, level);
+  }
+
+  // Load current difficulty level
+  Future<int> getLevel() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getInt(_keyLevel) ?? 1;
+  }
 
   // Save current progress
   Future<void> saveProgress({
@@ -67,6 +80,7 @@ class MissingLetterStorage {
     await prefs.setInt(_keyCurrentIndex, 0);
     await prefs.setInt(_keyTotalScore, 0);
     await prefs.setInt(_keyCompletedWords, 0);
+    await prefs.setInt(_keyLevel, 1);
   }
 
   // Complete the game

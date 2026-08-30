@@ -52,7 +52,6 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final mq = MediaQuery.of(context).size;
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
@@ -61,7 +60,7 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
         listener: (context, state) {
           if (state is ProfileLoaded && state.currentProfile != null) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(
+              MaterialPageRoute<void>(
                 builder: (_) => BlocProvider(
                   create: (context) => AlphabetBloc(),
                   child: const CharacterSelectionScreen(),
@@ -89,197 +88,246 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
               ),
 
               SafeArea(
-                child: Column(
-                  children: [
-                    // Top Bar
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Container(
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                            ),
-                            padding: const EdgeInsets.all(8),
-                            child: const Icon(Icons.person, color: Color(0xFFEE4964)),
-                          ),
-                          const Row(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    // Everything below scales against the available height so the
+                    // layout survives short phones, big text and the keyboard.
+                    final availableHeight = constraints.maxHeight;
+                    final scale = (availableHeight / 780).clamp(0.65, 1.15);
+
+                    final nameFontSize = (48 * scale).clamp(28.0, 52.0);
+                    final subtitleFontSize = (18 * scale).clamp(12.0, 20.0);
+                    final captionFontSize = (20 * scale).clamp(14.0, 22.0);
+                    final buttonFontSize = (24 * scale).clamp(16.0, 26.0);
+                    final buttonHeight = (60 * scale).clamp(46.0, 64.0);
+                    final arrowPadding = (12 * scale).clamp(8.0, 14.0);
+                    final arrowIconSize = (22 * scale).clamp(16.0, 24.0);
+                    final horizontalPadding =
+                        (constraints.maxWidth * 0.09).clamp(20.0, 48.0);
+                    final avatarHeight =
+                        (availableHeight * 0.42).clamp(150.0, 420.0);
+                    final topGap = (50 * scale).clamp(16.0, 56.0);
+
+                    return SingleChildScrollView(
+                      physics: const ClampingScrollPhysics(),
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: availableHeight),
+                        child: IntrinsicHeight(
+                          child: Column(
                             children: [
-                              Icon(Icons.nightlight_round, color: Colors.white, size: 20),
-                              SizedBox(width: 15),
-                              Icon(Icons.grid_view_rounded, color: Colors.white, size: 24),
+                              SizedBox(height: topGap),
+
+                              // Name TextField
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: horizontalPadding),
+                                child: TextField(
+                                  controller: _nameController,
+                                  textAlign: TextAlign.center,
+                                  textCapitalization:
+                                      TextCapitalization.characters,
+                                  textInputAction: TextInputAction.done,
+                                  onSubmitted: (_) => _saveProfile(),
+                                  style: TextStyle(
+                                    fontSize: nameFontSize,
+                                    fontWeight: FontWeight.w900,
+                                    color: Colors.white,
+                                    letterSpacing: 2,
+                                    shadows: const [
+                                      Shadow(
+                                        offset: Offset(2, 2),
+                                        blurRadius: 4.0,
+                                        color: Colors.black26,
+                                      ),
+                                    ],
+                                  ),
+                                  decoration: InputDecoration(
+                                    hintText: l10n.nameFieldHint,
+                                    hintStyle: TextStyle(
+                                      color: Colors.white54,
+                                      fontSize: nameFontSize,
+                                      fontWeight: FontWeight.w900,
+                                    ),
+                                    border: InputBorder.none,
+                                    isDense: true,
+                                  ),
+                                ),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: horizontalPadding),
+                                child: Text(
+                                  l10n.theSmartKid,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: subtitleFontSize,
+                                    color: Colors.white70,
+                                    fontWeight: FontWeight.w500,
+                                    letterSpacing: 1,
+                                  ),
+                                ),
+                              ),
+
+                              const Spacer(),
+
+                              // Avatar Carousel
+                              SizedBox(
+                                height: avatarHeight,
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    // Previous
+                                    _CarouselArrow(
+                                      icon: Icons.arrow_back_ios_new_rounded,
+                                      onTap: _prevAvatar,
+                                      padding: arrowPadding,
+                                      iconSize: arrowIconSize,
+                                    ),
+
+                                    // Avatar Image
+                                    Expanded(
+                                      child: AnimatedSwitcher(
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        transitionBuilder: (Widget child,
+                                            Animation<double> animation) {
+                                          return ScaleTransition(
+                                            scale: Tween<double>(
+                                                    begin: 0.8, end: 1.0)
+                                                .animate(
+                                              CurvedAnimation(
+                                                parent: animation,
+                                                curve: Curves.easeOutBack,
+                                              ),
+                                            ),
+                                            child: child,
+                                          );
+                                        },
+                                        child: Image.asset(
+                                          _avatars[_selectedAvatarIndex],
+                                          key: ValueKey<int>(
+                                              _selectedAvatarIndex),
+                                          fit: BoxFit.contain,
+                                        ),
+                                      ),
+                                    ),
+
+                                    // Next
+                                    _CarouselArrow(
+                                      icon: Icons.arrow_forward_ios_rounded,
+                                      onTap: _nextAvatar,
+                                      padding: arrowPadding,
+                                      iconSize: arrowIconSize,
+                                    ),
+                                  ],
+                                ),
+                              ),
+
+                              const Spacer(),
+
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: horizontalPadding),
+                                child: Text(
+                                  l10n.chooseYourAvatarCaps,
+                                  textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    fontSize: captionFontSize,
+                                    fontWeight: FontWeight.w900,
+                                    color: const Color(0xFF5A4C78),
+                                    letterSpacing: 1.5,
+                                  ),
+                                ),
+                              ),
+
+                              SizedBox(height: 16 * scale),
+
+                              // Save Button
+                              Padding(
+                                padding: EdgeInsets.fromLTRB(
+                                  horizontalPadding,
+                                  0,
+                                  horizontalPadding,
+                                  16 * scale,
+                                ),
+                                child: ElevatedButton(
+                                  onPressed: _saveProfile,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color(0xFF4AC49A), // Kid-friendly green
+                                    foregroundColor: Colors.white,
+                                    elevation: 5,
+                                    minimumSize:
+                                        Size(double.infinity, buttonHeight),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  child: FittedBox(
+                                    fit: BoxFit.scaleDown,
+                                    child: Text(
+                                      l10n.letsPlay,
+                                      maxLines: 1,
+                                      style: TextStyle(
+                                        fontSize: buttonFontSize,
+                                        fontWeight: FontWeight.bold,
+                                        letterSpacing: 1,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Name TextField
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40),
-                      child: TextField(
-                        controller: _nameController,
-                        textAlign: TextAlign.center,
-                        textCapitalization: TextCapitalization.characters,
-                        style: const TextStyle(
-                          fontSize: 48,
-                          fontWeight: FontWeight.w900,
-                          color: Colors.white,
-                          letterSpacing: 2,
-                          shadows: [
-                            Shadow(
-                              offset: Offset(2, 2),
-                              blurRadius: 4.0,
-                              color: Colors.black26,
-                            ),
-                          ],
-                        ),
-                        decoration: InputDecoration(
-                          hintText: l10n.nameFieldHint,
-                          hintStyle: const TextStyle(
-                            color: Colors.white54,
-                            fontSize: 48,
-                            fontWeight: FontWeight.w900,
-                          ),
-                          border: InputBorder.none,
-                          isDense: true,
                         ),
                       ),
-                    ),
-                    Text(
-                      l10n.theSmartKid,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        color: Colors.white70,
-                        fontWeight: FontWeight.w500,
-                        letterSpacing: 1,
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Avatar Carousel
-                    SizedBox(
-                      height: mq.height * 0.45,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          // Left Arrow
-                          GestureDetector(
-                            onTap: _prevAvatar,
-                            child: Container(
-                              margin: const EdgeInsets.only(left: 16),
-                              padding: const EdgeInsets.all(12),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  )
-                                ],
-                              ),
-                              child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.black87),
-                            ),
-                          ),
-
-                          // Avatar Image
-                          Expanded(
-                            child: AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 300),
-                              transitionBuilder: (Widget child, Animation<double> animation) {
-                                return ScaleTransition(
-                                  scale: Tween<double>(begin: 0.8, end: 1.0).animate(
-                                    CurvedAnimation(parent: animation, curve: Curves.easeOutBack),
-                                  ),
-                                  child: child,
-                                );
-                              },
-                              child: Image.asset(
-                                _avatars[_selectedAvatarIndex],
-                                key: ValueKey<int>(_selectedAvatarIndex),
-                                fit: BoxFit.contain,
-                              ),
-                            ),
-                          ),
-
-                          // Right Arrow
-                          GestureDetector(
-                            onTap: _nextAvatar,
-                            child: Container(
-                              margin: const EdgeInsets.only(right: 16),
-                              padding: const EdgeInsets.all(12),
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                shape: BoxShape.circle,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black12,
-                                    blurRadius: 10,
-                                    offset: Offset(0, 5),
-                                  )
-                                ],
-                              ),
-                              child: const Icon(Icons.arrow_forward_ios_rounded, color: Colors.black87),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const Spacer(),
-
-                    // Text
-                    Text(
-                      l10n.chooseYourAvatarCaps,
-                      style: const TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w900,
-                        color: Color(0xFF5A4C78),
-                        letterSpacing: 1.5,
-                      ),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    // Save Button
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 20),
-                      child: ElevatedButton(
-                        onPressed: _saveProfile,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF4AC49A), // Kid-friendly green
-                          foregroundColor: Colors.white,
-                          elevation: 5,
-                          minimumSize: const Size(double.infinity, 60),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Text(
-                          l10n.letsPlay,
-                          style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                          ),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-                  ],
+                    );
+                  },
                 ),
               ),
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _CarouselArrow extends StatelessWidget {
+  const _CarouselArrow({
+    required this.icon,
+    required this.onTap,
+    required this.padding,
+    required this.iconSize,
+  });
+
+  final IconData icon;
+  final VoidCallback onTap;
+  final double padding;
+  final double iconSize;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      child: Material(
+        color: Colors.white,
+        shape: const CircleBorder(),
+        elevation: 4,
+        shadowColor: Colors.black26,
+        child: InkWell(
+          onTap: onTap,
+          customBorder: const CircleBorder(),
+          child: Padding(
+            padding: EdgeInsets.all(padding),
+            child: Icon(icon, color: Colors.black87, size: iconSize),
+          ),
+        ),
       ),
     );
   }

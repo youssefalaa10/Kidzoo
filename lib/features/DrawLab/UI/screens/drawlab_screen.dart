@@ -798,7 +798,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
   }
 
   Widget _buildWidthControl(bool useExpanded) {
-    Widget content = Column(
+    final Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
@@ -834,7 +834,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
   }
 
   Widget _buildOpacityControl(bool useExpanded) {
-    Widget content = Column(
+    final Widget content = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         Row(
