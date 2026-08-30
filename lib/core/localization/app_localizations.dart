@@ -600,6 +600,26 @@ class AppLocalizations {
   String promptFeedAnimal(String animal) => _localizedValues['promptFeedAnimal']!.replaceAll('{animal}', animal);
   String promptWhatDoesAnimalEat(String animal) => _localizedValues['promptWhatDoesAnimalEat']!.replaceAll('{animal}', animal);
 
+  // Shared kid-game UI
+  String get tapOrDragHint => _localizedValues['tapOrDragHint']!;
+  String get tapBasketHint => _localizedValues['tapBasketHint']!;
+  String get keepGoing => _localizedValues['keepGoing']!;
+
+  // Math game: spoken questions
+  String mathSpokenQuestion(String a, String op, String b) =>
+      _localizedValues['mathSpokenQuestion']!
+          .replaceAll('{a}', a)
+          .replaceAll('{op}', op)
+          .replaceAll('{b}', b);
+  String get mathOpPlus => _localizedValues['mathOpPlus']!;
+  String get mathOpMinus => _localizedValues['mathOpMinus']!;
+  String get mathOpTimes => _localizedValues['mathOpTimes']!;
+  String get mathOpDividedBy => _localizedValues['mathOpDividedBy']!;
+  String get listenToQuestion => _localizedValues['listenToQuestion']!;
+
+  String get fullscreen => _localizedValues['fullscreen']!;
+  String get exitFullscreen => _localizedValues['exitFullscreen']!;
+
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;
   }

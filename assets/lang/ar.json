@@ -652,5 +652,16 @@
   "feedbackYouFoundIt": "لقد وجدتها!",
   "feedbackAlmost": "اقتربت!",
   "feedbackYouCanDoIt": "تستطيع فعل ذلك!",
-  "currentLevelShort": "المستوى {level}"
+  "currentLevelShort": "المستوى {level}",
+  "tapOrDragHint": "اضغط عليها أو اسحبها",
+  "tapBasketHint": "الآن اضغط على السلة الصحيحة",
+  "keepGoing": "واصل التقدم!",
+  "mathSpokenQuestion": "كم يساوي {a} {op} {b}؟",
+  "mathOpPlus": "زائد",
+  "mathOpMinus": "ناقص",
+  "mathOpTimes": "ضرب",
+  "mathOpDividedBy": "مقسوم على",
+  "listenToQuestion": "استمع إلى السؤال",
+  "fullscreen": "ملء الشاشة",
+  "exitFullscreen": "إنهاء ملء الشاشة"
 }

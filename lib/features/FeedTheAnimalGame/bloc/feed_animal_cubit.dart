@@ -12,46 +12,56 @@ import '../data/feed_animal_data.dart';
 import '../data/feed_animal_models.dart';
 import 'feed_animal_state.dart';
 
-class FeedAnimalCubit extends Cubit<FeedAnimalState> {
+const int kFeedMaxRoundScore = 10;
+const int kFeedMinRoundScore = 4;
+const String kFeedGameKey = 'feed_animal_game';
 
+class FeedAnimalCubit extends Cubit<FeedAnimalState> {
   FeedAnimalCubit({
     required this.gameScoresDao,
     required this.profileDao,
     required this.flutterTts,
     required this.audioPlayer,
     required this.l10n,
-  }) : super(FeedAnimalLoading()) {
-    _startNextRound();
+    this.totalRounds = 10,
+  }) : super(const FeedAnimalState.loading()) {
+    _startGame();
   }
+
   final GameScoresDao gameScoresDao;
   final ProfileDao profileDao;
   final FlutterTts flutterTts;
   final AudioPlayer audioPlayer;
   final AppLocalizations l10n;
+  final int totalRounds;
 
-  int _score = 0;
-  int _currentRound = 1;
-  final int _totalRounds = 10;
-  int _wrongAttempts = 0;
   final Random _random = Random();
+
+  int _wrongAttempts = 0;
   String? _lastAnimalId;
   List<AnimalItem> _animalCycle = [];
   PromptType? _lastPromptType;
 
-  void restartGame() {
-    _score = 0;
-    _currentRound = 1;
+  /// Guards the delayed prompt: a round that has already been answered must not
+  /// speak its question over the next round's.
+  int _promptToken = 0;
+
+  int get maxScore => totalRounds * kFeedMaxRoundScore;
+
+  void _startGame() {
     _lastAnimalId = null;
     _animalCycle = [];
     _lastPromptType = null;
-    _startNextRound();
+    _startRound(round: 1, score: 0);
   }
+
+  void restartGame() => _startGame();
 
   AnimalItem _pickNextAnimal() {
     if (_animalCycle.isEmpty) {
       _animalCycle = List.of(FeedAnimalData.allAnimals)..shuffle(_random);
-      // Avoid the new cycle starting with the same animal that just ended
-      // the previous cycle, which would read as a back-to-back repeat.
+      // Avoid the new cycle starting with the animal that just ended the
+      // previous one, which would read as a back-to-back repeat.
       if (_lastAnimalId != null &&
           _animalCycle.length > 1 &&
           _animalCycle.first.id == _lastAnimalId) {
@@ -65,39 +75,30 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
     return animal;
   }
 
-  Future<void> _startNextRound() async {
-    if (_currentRound > _totalRounds) {
-      // Save score
-      final profiles = await profileDao.getAllProfiles();
-      if (profiles.isNotEmpty) {
-        final profileId = profiles.first.id;
-        await gameScoresDao.insertScore(GameScoresCompanion.insert(
-          profileId: profileId,
-          gameKey: 'feed_animal_game',
-          score: _score,
-        ));
-      }
-      emit(FeedAnimalComplete(score: _score, totalRounds: _totalRounds));
-      return;
-    }
+  void _startRound({required int round, required int score}) {
     final animal = _pickNextAnimal();
-    
-    // Difficulty scaling: Easy (1-3) -> 3 choices, Medium (4-7) -> 4 choices, Hard (8-10) -> 5 choices
-    int numChoices = 3;
-    if (_currentRound > 3) numChoices = 4;
-    if (_currentRound > 7) numChoices = 5;
+    final targetFood =
+        FeedAnimalData.allFoods.firstWhere((f) => f.id == animal.targetFoodId);
 
-    final targetFood = FeedAnimalData.allFoods.firstWhere((f) => f.id == animal.targetFoodId);
-    
-    // Distractor foods must NOT contain the target food, and must NOT contain duplicates
-    final distractorFoods = FeedAnimalData.allFoods.where((f) => f.id != targetFood.id).toList()..shuffle(_random);
-    
-    final choices = [targetFood, ...distractorFoods.take(numChoices - 1)]..shuffle(_random);
+    final progress = totalRounds <= 0 ? 1.0 : round / totalRounds;
+    final numChoices = FeedAnimalData.choiceCountFor(progress);
 
-    final promptTypes = [PromptType.feedAnimal, PromptType.whatDoesAnimalEat]
+    final choices = <FeedItem>[
+      targetFood,
+      ...FeedAnimalData.buildDistractors(
+        animal: animal,
+        targetFood: targetFood,
+        count: numChoices - 1,
+        progress: progress,
+        random: _random,
+      ),
+    ]..shuffle(_random);
+
+    // Alternate the phrasing so the same sentence is not repeated ten times.
+    final promptCandidates = PromptType.values
         .where((p) => p != _lastPromptType)
         .toList();
-    final promptType = promptTypes[_random.nextInt(promptTypes.length)];
+    final promptType = promptCandidates[_random.nextInt(promptCandidates.length)];
     _lastPromptType = promptType;
 
     _wrongAttempts = 0;
@@ -109,98 +110,154 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
       promptType: promptType,
     );
 
-    emit(FeedAnimalPlaying(
-      roundData: roundData, 
-      score: _score, 
-      currentRound: _currentRound, 
-      totalRounds: _totalRounds,
+    emit(FeedAnimalState(
+      phase: FeedPhase.playing,
+      roundData: roundData,
+      currentRound: round,
+      totalRounds: totalRounds,
+      score: score,
     ));
 
-    // Wait 500ms before speaking
-    await Future.delayed(const Duration(milliseconds: 500));
-    if (state is FeedAnimalPlaying) {
-      _speakPrompt(roundData);
-    }
+    _schedulePrompt(roundData);
   }
 
-  void _speakPrompt(GameRoundData roundData) async {
+  Future<void> _schedulePrompt(GameRoundData roundData) async {
+    final token = ++_promptToken;
+    await Future<void>.delayed(const Duration(milliseconds: 450));
+    if (isClosed || token != _promptToken) return;
+    await _speak(roundData.getPromptText(l10n));
+  }
+
+  Future<void> _speak(String text) async {
     try {
-      await flutterTts.speak(roundData.getPromptText(l10n));
+      await flutterTts.speak(text);
     } catch (_) {}
   }
 
-  void replayPrompt() {
-    final currentState = state;
-    if (currentState is FeedAnimalPlaying) {
-      _speakPrompt(currentState.roundData);
+  Future<void> _playSound(String asset) async {
+    try {
+      await audioPlayer.play(AssetSource(asset));
+    } catch (_) {}
+  }
+
+  Future<void> replayPrompt() async {
+    final data = state.roundData;
+    if (data == null) return;
+    await _speak(data.getPromptText(l10n));
+  }
+
+  /// Tap-to-pick: a tap selects the food and speaks its name, a second tap on
+  /// the animal feeds it. Dragging remains available but is no longer required.
+  Future<void> selectFood(FeedItem food) async {
+    if (!state.isInteractive) return;
+    final alreadySelected = state.selectedFoodId == food.id;
+    emit(state.copyWith(
+      selectedFoodId: alreadySelected ? null : food.id,
+      clearSelection: alreadySelected,
+      clearWrong: true,
+    ));
+    if (!alreadySelected) {
+      await _speak(food.getLocalizedName(l10n));
     }
   }
 
-  void onFoodDropped(FeedItem food) async {
-    final currentState = state;
-    if (currentState is! FeedAnimalPlaying) return;
+  /// Tapping the animal feeds it whatever is currently held.
+  Future<void> tapAnimal() async {
+    if (!state.isInteractive) return;
+    final data = state.roundData;
+    if (data == null) return;
 
-    final roundData = currentState.roundData;
-
-    if (food.id == roundData.targetFood.id) {
-      _score += 10;
-      emit(FeedAnimalSuccess(
-        roundData: roundData, 
-        score: _score, 
-        currentRound: _currentRound, 
-        totalRounds: _totalRounds,
-        droppedFood: food,
-      ));
-      
-      // Play Animal Sound
-      audioPlayer.play(AssetSource(roundData.animal.audioAsset.replaceFirst('assets/', '')));
-
-      // Play random positive TTS
-      try {
-        final phraseIndex = _random.nextInt(4);
-        String phrase;
-        if (phraseIndex == 0) {
-          phrase = l10n.greatJob;
-        } else if (phraseIndex == 1) {
-          phrase = l10n.excellent;
-        } else if (phraseIndex == 2) {
-          phrase = l10n.fantastic;
-        } else {
-          phrase = l10n.wellDone;
-        }
-        await flutterTts.speak(phrase);
-      } catch (_) {}
-
-      // Wait for success animation
-      await Future.delayed(const Duration(seconds: 2));
-      _currentRound++;
-      _startNextRound();
-    } else {
-      _wrongAttempts++;
-      emit(FeedAnimalWrong(
-        roundData: roundData, 
-        score: _score, 
-        wrongFoodId: food.id,
-        currentRound: _currentRound,
-        totalRounds: _totalRounds,
-      ));
-      
-      try {
-        await flutterTts.speak(l10n.tryAgainPrompt);
-      } catch (_) {}
-
-      await Future.delayed(const Duration(seconds: 1));
-      
-      // Return to playing state, applying hint if _wrongAttempts >= 2
-      if (state is FeedAnimalWrong) {
-        emit(FeedAnimalPlaying(
-          roundData: roundData, 
-          score: _score,
-          currentRound: _currentRound,
-          totalRounds: _totalRounds,
-          showHint: _wrongAttempts >= 2,
-        ));
-      }
+    final selectedId = state.selectedFoodId;
+    if (selectedId == null) {
+      await _speak(data.getPromptText(l10n));
+      return;
     }
+    await onFoodDropped(data.choices.firstWhere((f) => f.id == selectedId));
+  }
+
+  Future<void> onFoodDropped(FeedItem food) async {
+    if (!state.isInteractive) return;
+    final data = state.roundData!;
+
+    if (food.id == data.targetFood.id) {
+      await _handleCorrect(food);
+    } else {
+      await _handleWrong(food);
+    }
+  }
+
+  Future<void> _handleCorrect(FeedItem food) async {
+    _promptToken++; // cancel any pending prompt for this round
+    final earned =
+        max(kFeedMinRoundScore, kFeedMaxRoundScore - _wrongAttempts * 3);
+    final newScore = state.score + earned;
+
+    emit(state.copyWith(
+      phase: FeedPhase.correct,
+      score: newScore,
+      eatenFood: food,
+      clearSelection: true,
+      clearWrong: true,
+    ));
+
+    final animal = state.roundData!.animal;
+    await _playSound(animal.audioAsset.replaceFirst('assets/', ''));
+
+    final phrases = [
+      l10n.greatJob,
+      l10n.excellent,
+      l10n.fantastic,
+      l10n.wellDone,
+    ];
+    await _speak(phrases[_random.nextInt(phrases.length)]);
+
+    await Future<void>.delayed(const Duration(milliseconds: 1600));
+    if (isClosed) return;
+
+    if (state.currentRound < totalRounds) {
+      _startRound(round: state.currentRound + 1, score: newScore);
+    } else {
+      await _finish(newScore);
+    }
+  }
+
+  Future<void> _handleWrong(FeedItem food) async {
+    _wrongAttempts++;
+
+    emit(state.copyWith(
+      phase: FeedPhase.wrong,
+      wrongFoodId: food.id,
+      clearSelection: true,
+    ));
+
+    await _playSound('audio/wrong.mp3');
+    await _speak(l10n.tryAgainPrompt);
+
+    await Future<void>.delayed(const Duration(milliseconds: 800));
+    if (isClosed) return;
+
+    emit(state.copyWith(
+      phase: FeedPhase.playing,
+      showHint: _wrongAttempts >= 2,
+      clearWrong: true,
+    ));
+  }
+
+  Future<void> _finish(int finalScore) async {
+    await _saveScore(finalScore);
+    if (isClosed) return;
+    emit(state.copyWith(phase: FeedPhase.complete, score: finalScore));
+  }
+
+  Future<void> _saveScore(int finalScore) async {
+    try {
+      final profiles = await profileDao.getAllProfiles();
+      if (profiles.isEmpty) return;
+      await gameScoresDao.insertScore(GameScoresCompanion.insert(
+        profileId: profiles.first.id,
+        gameKey: kFeedGameKey,
+        score: finalScore,
+      ));
+    } catch (_) {}
   }
 }

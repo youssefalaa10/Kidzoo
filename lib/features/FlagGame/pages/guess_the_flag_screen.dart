@@ -212,6 +212,9 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
                 Colors.orange,
                 Colors.purple
               ],
+              numberOfParticles: 30,
+              minimumSize: const Size(6, 6),
+              maximumSize: const Size(12, 12),
             ),
           ),
         ],

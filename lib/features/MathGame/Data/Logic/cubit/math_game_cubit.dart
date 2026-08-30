@@ -95,6 +95,10 @@ class MathGameCubit extends Cubit<MathGameState> {
         'correctAnswer': correctAnswer,
         'options': options,
         'operation': selectedOperation,
+        // Kept separately so the UI can build a spoken, localised version of
+        // the question instead of handing "7 x 3 = ?" to a screen reader.
+        'left': a,
+        'right': b,
       });
     }
 

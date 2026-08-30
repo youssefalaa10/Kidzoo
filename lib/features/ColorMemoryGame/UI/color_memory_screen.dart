@@ -31,6 +31,28 @@ class _ColorMemoryScreenState
   late ColorMemoryBloc _bloc;
   late AudioPlayer _sfxPlayer;
 
+  /// Only ever one results dialog at a time.
+  ///
+  /// The listener used to fire on every state emission, and a round could emit
+  /// more than once while staying in the same phase, so two identical dialogs
+  /// stacked up: dismissing the top one revealed another, and the game looked
+  /// like it was running behind it.
+  bool _dialogOpen = false;
+
+  Future<void> _showGameDialog(Widget Function(BuildContext) builder) async {
+    if (_dialogOpen || !mounted) return;
+    _dialogOpen = true;
+    try {
+      await showDialog<void>(
+        context: context,
+        barrierDismissible: false,
+        builder: builder,
+      );
+    } finally {
+      _dialogOpen = false;
+    }
+  }
+
   static const List<String> _pianoNotes = [
     'audio/piano-a.wav',
     'audio/piano-c.wav',
@@ -87,6 +109,10 @@ class _ColorMemoryScreenState
     return BlocProvider.value(
       value: _bloc,
       child: BlocConsumer<ColorMemoryBloc, ColorMemoryGameState>(
+        // Dialogs belong to phase *changes*, not to every emission.
+        listenWhen: (previous, current) =>
+            previous.phase != current.phase ||
+            previous.highlightedColorIndex != current.highlightedColorIndex,
         listener: (context, state) {
           // Play piano note during sequence display
           if (state.phase == GamePhase.showingSequence &&
@@ -94,73 +120,58 @@ class _ColorMemoryScreenState
               state.settings.soundEnabled) {
             _playSound(state.highlightedColorIndex);
           }
-          // Show level complete dialog
-          if (state.phase == GamePhase.levelComplete) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                showDialog<void>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => LevelCompleteDialog(
+
+          switch (state.phase) {
+            case GamePhase.levelComplete:
+              _showGameDialog((dialogContext) => LevelCompleteDialog(
                     level: state.level,
                     score: state.score.currentScore,
                     onContinue: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context)
-                          .pop(true); // Exit to level map with success
+                      Navigator.of(dialogContext).pop();
+                      // Only a finished level reports success to the map.
+                      Navigator.of(context).pop(true);
                     },
-                  ),
-                );
-              }
-            });
-          }
+                  ));
+              break;
 
-          // Show success dialog
-          if (state.phase == GamePhase.success) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                showDialog<void>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => SuccessDialog(
+            case GamePhase.success:
+              _showGameDialog((dialogContext) => SuccessDialog(
                     round: state.score.currentRound - 1,
                     score: state.score.currentScore,
                     sequenceLength: state.sequence.length,
                     onContinue: () {
-                      Navigator.of(context).pop();
-                      // Trigger next round manually
+                      Navigator.of(dialogContext).pop();
+                      // The next sequence starts only once the dialog is gone.
                       _bloc.add(const NextRoundEvent());
                     },
-                  ),
-                );
-              }
-            });
-          }
+                  ));
+              break;
 
-          // Show game over dialog
-          if (state.phase == GamePhase.failure) {
-            Future.delayed(const Duration(milliseconds: 500), () {
-              if (mounted) {
-                showDialog<void>(
-                  context: context,
-                  barrierDismissible: false,
-                  builder: (context) => GameOverDialog(
+            case GamePhase.failure:
+            case GamePhase.gameOver:
+              _showGameDialog((dialogContext) => GameOverDialog(
                     score: state.score.currentScore,
                     bestScore: state.bestScore,
                     round: state.score.currentRound,
                     longestSequence: state.score.longestSequence,
                     onRestart: () {
-                      Navigator.of(context).pop();
+                      Navigator.of(dialogContext).pop();
                       _bloc.add(const RestartGameEvent());
                     },
                     onExit: () {
-                      Navigator.of(context).pop(); // Close dialog
-                      Navigator.of(context).pop(true); // Exit to level map
+                      Navigator.of(dialogContext).pop();
+                      // Losing must not unlock the next level. This used to
+                      // pop `true`, which the level map reads as a win.
+                      Navigator.of(context).pop(false);
                     },
-                  ),
-                );
-              }
-            });
+                  ));
+              break;
+
+            case GamePhase.waiting:
+            case GamePhase.showingSequence:
+            case GamePhase.playerTurn:
+            case GamePhase.checking:
+              break;
           }
         },
         builder: (context, state) {
@@ -173,15 +184,13 @@ class _ColorMemoryScreenState
           final isLandscape = screenWidth > screenHeight;
 
           return Scaffold(
-            body: Container(
-              child: SafeArea(
-                child: FluidContainer(
-                  maxWidth: 1000,
-                  padding: EdgeInsets.zero,
-                  child: isLandscape 
-                      ? _buildLandscapeLayout(state, config, palette)
-                      : _buildPortraitLayout(state, config, palette),
-                ),
+            body: SafeArea(
+              child: FluidContainer(
+                maxWidth: 1000,
+                padding: EdgeInsets.zero,
+                child: isLandscape
+                    ? _buildLandscapeLayout(state, config, palette)
+                    : _buildPortraitLayout(state, config, palette),
               ),
             ),
           );

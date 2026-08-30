@@ -11,9 +11,16 @@ import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/style/kid_ui.dart';
+import '../../../core/shared/widgets/kid_game_shell.dart';
+import '../../../core/shared/widgets/kid_pick_card.dart';
+import '../../../core/shared/widgets/kid_result_view.dart';
 import '../../QuizEngine/bloc/quiz_cubit.dart';
 import '../../QuizEngine/bloc/quiz_state.dart';
+import '../../QuizEngine/data/quiz_models.dart';
 import '../data/environment_vehicle_question.dart';
+
+const int _kPointsPerQuestion = 10;
 
 class VehiclesGameScreen extends StatefulWidget {
   const VehiclesGameScreen({super.key});
@@ -42,18 +49,16 @@ class _VehiclesGameScreenState extends State<VehiclesGameScreen> {
   }
 
   void _precacheAssets() {
-    for (var env in EnvironmentType.values) {
+    for (final env in EnvironmentType.values) {
       precacheImage(AssetImage(env.assetPath), context);
     }
-    for (var veh in VehicleType.values) {
+    for (final veh in VehicleType.values) {
       precacheImage(AssetImage(veh.assetPath), context);
     }
   }
 
   void _restartGame() {
-    setState(() {
-      _gameKey = UniqueKey();
-    });
+    setState(() => _gameKey = UniqueKey());
   }
 
   @override
@@ -61,63 +66,95 @@ class _VehiclesGameScreenState extends State<VehiclesGameScreen> {
     final backgroundPath =
         BackgroundResolver(context, BackgroundType.game).resolveBackground();
 
-    return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          color: const Color(0xfffaf5f1),
-          image: backgroundPath != null
-              ? DecorationImage(
-                  image: AssetImage(backgroundPath),
-                  fit: BoxFit.cover,
-                )
-              : null,
-        ),
-        child: SafeArea(
-          child: VehiclesGameContent(
-            key: _gameKey,
-            onReplay: _restartGame,
-          ),
-        ),
+    return KidGameShell(
+      backgroundAsset: backgroundPath,
+      builder: (context, metrics) => _VehiclesGameContent(
+        key: _gameKey,
+        metrics: metrics,
+        onReplay: _restartGame,
       ),
     );
   }
 }
 
-class VehiclesGameContent extends StatelessWidget {
+class _VehiclesGameContent extends StatefulWidget {
+  const _VehiclesGameContent({
+    required this.metrics,
+    required this.onReplay,
+    super.key,
+  });
 
-  const VehiclesGameContent({super.key, required this.onReplay});
+  final KidMetrics metrics;
   final VoidCallback onReplay;
+
+  @override
+  State<_VehiclesGameContent> createState() => _VehiclesGameContentState();
+}
+
+class _VehiclesGameContentState extends State<_VehiclesGameContent> {
+  List<QuizQuestion>? _questions;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    // Built once per game, not once per frame: the previous version rebuilt the
+    // whole question set (and re-rolled every prompt) on any rebuild.
+    _questions ??= _buildQuestions(AppLocalizations.of(context));
+  }
+
+  List<QuizQuestion> _buildQuestions(AppLocalizations l10n) {
+    final raw = generateVehicleQuestions();
+    return raw
+        .asMap()
+        .entries
+        .map((entry) =>
+            entry.value.toQuizQuestion(l10n, 'vehicle_q_${entry.key}'))
+        .toList();
+  }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
-    final rawQuestions = generateVehicleQuestions();
+    final questions = _questions!;
 
-    final questions = rawQuestions.asMap().entries.map((entry) {
-      return entry.value.toQuizQuestion(l10n, 'vehicle_q_${entry.key}');
-    }).toList();
-
-    return BlocProvider(
-      create: (context) => QuizCubit(
-        gameScoresDao: context.read<GameScoresDao>(),
-        profileDao: context.read<ProfileDao>(),
-        flutterTts: context.read<FlutterTts>(),
-        audioPlayer: context.read<AudioPlayer>(),
-        questions: questions,
-        gameKey: 'vehicles_game',
-        allowRetries: true,
-        tryAgainText: l10n.tryAgain,
-        transitionDuration: const Duration(milliseconds: 800),
-        wrongFeedbackDuration: const Duration(milliseconds: 300),
+    return BlocProvider<QuizCubit>(
+      create: (context) {
+        try {
+          return QuizCubit(
+            gameScoresDao: context.read<GameScoresDao>(),
+            profileDao: context.read<ProfileDao>(),
+            flutterTts: context.read<FlutterTts>(),
+            audioPlayer: context.read<AudioPlayer>(),
+            questions: questions,
+            gameKey: 'vehicles_game',
+            allowRetries: true,
+            tryAgainText: l10n.tryAgain,
+            transitionDuration: const Duration(milliseconds: 1200),
+            wrongFeedbackDuration: const Duration(milliseconds: 600),
+          );
+        } catch (e) {
+          debugPrint('Error creating QuizCubit for vehicles: $e');
+          rethrow;
+        }
+      },
+      child: _VehiclesGameLayout(
+        metrics: widget.metrics,
+        totalQuestions: questions.length,
+        onReplay: widget.onReplay,
       ),
-      child: _VehiclesGameLayout(onReplay: onReplay),
     );
   }
 }
 
 class _VehiclesGameLayout extends StatefulWidget {
+  const _VehiclesGameLayout({
+    required this.metrics,
+    required this.totalQuestions,
+    required this.onReplay,
+  });
 
-  const _VehiclesGameLayout({required this.onReplay});
+  final KidMetrics metrics;
+  final int totalQuestions;
   final VoidCallback onReplay;
 
   @override
@@ -125,68 +162,69 @@ class _VehiclesGameLayout extends StatefulWidget {
 }
 
 class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
-  String? _wrongOptionId;
-  String? _correctOptionId;
+  /// The option the child last tapped, so only that card turns red.
+  String? _tappedOptionId;
   final _random = Random();
 
-  Widget _buildProgressBar(int current, int total) {
-    return Text(
-      '$current / $total',
-      style: const TextStyle(
-          fontSize: 24,
-          fontWeight: FontWeight.bold,
-          color: Colors.blueAccent),
-    );
+  void _onOptionTapped(QuizOption option, bool locked) {
+    if (locked) return;
+    setState(() => _tappedOptionId = option.id);
+
+    if (option.isCorrect) {
+      KidHaptics.success();
+    } else {
+      KidHaptics.error();
+      _play('audio/wrong.mp3');
+    }
+    context.read<QuizCubit>().submitAnswer(option);
+  }
+
+  void _play(String asset) {
+    try {
+      context.read<AudioPlayer>().play(AssetSource(asset));
+    } catch (_) {}
+  }
+
+  void _celebrate(AppLocalizations l10n) {
+    _play('audio/success.mp3');
+    final phrases = <String>[
+      l10n.greatJob,
+      l10n.excellent,
+      l10n.fantastic,
+      l10n.perfect,
+      ...l10n.positiveFeedbackMessages,
+    ];
+    final phrase = phrases[_random.nextInt(phrases.length)];
+    final tts = context.read<FlutterTts>();
+    Future.delayed(const Duration(milliseconds: 550), () async {
+      if (!mounted) return;
+      try {
+        await tts.stop();
+        final result = await tts.speak(phrase);
+        if (result == 1 && mounted) {
+          await Future<void>.delayed(const Duration(milliseconds: 800));
+        }
+      } catch (_) {}
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
+    final m = widget.metrics;
+    final maxScore = widget.totalQuestions * _kPointsPerQuestion;
 
     return BlocConsumer<QuizCubit, QuizState>(
-      listener: (context, state) async {
-        if (state is QuizFeedback) {
-          if (state.isCorrect) {
-            setState(() {
-              _correctOptionId =
-                  state.question.options.firstWhere((o) => o.isCorrect).id;
-              _wrongOptionId = null;
-            });
-            final tts = context.read<FlutterTts>();
-            // Fallback for some properties if missing
-            final phrases = [
-              l10n.greatJob,
-              l10n.excellent,
-              l10n.fantastic,
-              l10n.perfect,
-              'Amazing!',
-              'Wonderful!',
-              'You got it!',
-              'Brilliant!'
-            ];
-            final phrase = phrases[_random.nextInt(phrases.length)];
-
-            Future.delayed(const Duration(milliseconds: 700), () {
-              tts.speak(phrase);
-            });
-
-            final audioPlayer = context.read<AudioPlayer>();
-            try {
-              await audioPlayer.play(AssetSource('audio/success.mp3'));
-            } catch (_) {}
-          } else {
-            // Nothing needed here, state handles shaking
-          }
+      listener: (context, state) {
+        if (state is QuizFeedback && state.isCorrect) {
+          _celebrate(l10n);
         } else if (state is QuizActive) {
-          setState(() {
-            _wrongOptionId = null;
-            _correctOptionId = null;
-          });
+          if (_tappedOptionId != null) {
+            setState(() => _tappedOptionId = null);
+          }
         } else if (state is QuizCompleted) {
-          final audioPlayer = context.read<AudioPlayer>();
-          try {
-            await audioPlayer.play(AssetSource('audio/success.mp3'));
-          } catch (_) {}
+          _play('audio/success.mp3');
+          KidHaptics.success();
         }
       },
       builder: (context, state) {
@@ -195,284 +233,179 @@ class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
         }
 
         if (state is QuizCompleted) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  l10n.greatJob,
-                  textAlign: TextAlign.center,
-                  style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        shadows: const [
-                          Shadow(
-                              color: Colors.black54,
-                              blurRadius: 6,
-                              offset: Offset(0, 3)),
-                        ],
-                      ),
-                ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
-                const SizedBox(height: 40),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ElevatedButton.icon(
-                      onPressed: widget.onReplay,
-                      icon: const Icon(Icons.replay, size: 32),
-                      label:
-                          const Text('Replay', style: TextStyle(fontSize: 24)),
-                      style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                      ),
-                    ).animate(delay: 500.ms).fadeIn().slideY(begin: 0.5),
-                    const SizedBox(width: 20),
-                    ElevatedButton.icon(
-                      onPressed: () => Navigator.of(context).pop(),
-                      icon: const Icon(Icons.exit_to_app, size: 32),
-                      label:
-                          Text(l10n.exit, style: const TextStyle(fontSize: 24)),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white.withValues(alpha: 0.9),
-                        foregroundColor: Colors.black87,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 32, vertical: 16),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20)),
-                      ),
-                    ).animate(delay: 600.ms).fadeIn().slideY(begin: 0.5),
-                  ],
-                ),
-              ],
-            ),
+          return KidResultView(
+            metrics: m,
+            score: state.finalScore,
+            maxScore: maxScore,
+            onPlayAgain: widget.onReplay,
           );
         }
 
-        if (state is QuizActive || state is QuizFeedback) {
-          final question = state is QuizActive
-              ? state.question
-              : (state as QuizFeedback).question;
-          final currentIndex = state is QuizActive
-              ? state.questionIndex
-              : (state as QuizFeedback).questionIndex;
-          final isFeedback = state is QuizFeedback;
+        if (state is! QuizActive && state is! QuizFeedback) {
+          return const SizedBox.shrink();
+        }
 
-          return LayoutBuilder(
-            builder: (context, constraints) {
-              final isLandscape = constraints.maxWidth > constraints.maxHeight;
+        final question = state is QuizActive
+            ? state.question
+            : (state as QuizFeedback).question;
+        final index = state is QuizActive
+            ? state.questionIndex
+            : (state as QuizFeedback).questionIndex;
+        final score =
+            state is QuizActive ? state.score : (state as QuizFeedback).score;
+        final answeredCorrectly = state is QuizFeedback && state.isCorrect;
 
-              return Padding(
-                padding: const EdgeInsets.all(24.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
+        return Padding(
+          padding: EdgeInsets.all(m.pagePadding),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              KidTopBar(
+                metrics: m,
+                current: index + 1,
+                total: widget.totalQuestions,
+                score: score,
+                onReplayPrompt: () =>
+                    context.read<FlutterTts>().speak(question.prompt),
+              ),
+              SizedBox(height: m.gap * 0.75),
+              KidPromptBanner(
+                metrics: m,
+                text: question.prompt,
+                hint: l10n.tapOrDragHint,
+                onSpeak: () =>
+                    context.read<FlutterTts>().speak(question.prompt),
+              ),
+              SizedBox(height: m.gap * 0.75),
+              Expanded(
+                child: Flex(
+                  direction: m.isLandscape ? Axis.horizontal : Axis.vertical,
                   children: [
-                    // Top Bar: Back Button, Progress
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back_ios,
-                              color: Colors.white, size: 32),
-                          onPressed: () => Navigator.of(context).pop(),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20, vertical: 10),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.9),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: const [
-                              BoxShadow(
-                                  color: Colors.black26,
-                                  blurRadius: 8,
-                                  offset: Offset(0, 4)),
-                            ],
-                          ),
-                          child: _buildProgressBar(currentIndex + 1, 10),
-                        ),
-                        IconButton(
-                          icon: const Icon(Icons.volume_up,
-                              color: Colors.white, size: 32),
-                          onPressed: () =>
-                              context.read<FlutterTts>().speak(question.prompt),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 12),
-                    
-                    // Question Text
-                    Text(
-                      question.prompt,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        fontSize: isLandscape ? 28 : 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: const [
-                          Shadow(color: Colors.black45, blurRadius: 4, offset: Offset(0, 2)),
-                        ],
-                      ),
-                    ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.2),
-
-                    const SizedBox(height: 20),
-
-                    // Main Content
                     Expanded(
-                      child: Flex(
-                        direction:
-                            isLandscape ? Axis.horizontal : Axis.vertical,
-                        children: [
-                          // Environment Image (60% landscape width)
-                          Expanded(
-                            flex: isLandscape ? 6 : 4,
-                            child: Hero(
-                              tag: 'env_image_$currentIndex',
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(24),
-                                  border:
-                                      Border.all(color: Colors.white, width: 6),
-                                  boxShadow: const [
-                                    BoxShadow(
-                                        color: Colors.black38,
-                                        blurRadius: 15,
-                                        offset: Offset(0, 8)),
-                                  ],
-                                  image: DecorationImage(
-                                    image:
-                                        AssetImage(question.imageOrScenePath),
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
-                              )
-                                  .animate()
-                                  .fadeIn(duration: 400.ms)
-                                  .scale(begin: const Offset(0.95, 0.95)),
-                            ),
-                          ),
-
-                          SizedBox(
-                            height: isLandscape ? 0 : 20,
-                            width: isLandscape ? 20 : 0,
-                          ),
-
-                          // Vehicles Options (40% landscape width)
-                          Expanded(
-                            flex: isLandscape ? 4 : 5,
-                            child: LayoutBuilder(
-                                builder: (context, cardConstraints) {
-                              return Flex(
-                                direction: isLandscape
-                                    ? Axis.vertical
-                                    : Axis.horizontal,
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.stretch,
-                                children: question.options.map((option) {
-                                  final isCorrectOption = option.isCorrect;
-                                  final isSelectedWrong =
-                                      _wrongOptionId == option.id;
-                                  final isSelectedCorrect =
-                                      _correctOptionId == option.id;
-
-                                  Widget card = GestureDetector(
-                                    onTap: (isFeedback && state.isCorrect)
-                                        ? null
-                                        : () {
-                                            if (!isCorrectOption) {
-                                              setState(() =>
-                                                  _wrongOptionId = option.id);
-                                              final audioPlayer =
-                                                  context.read<AudioPlayer>();
-                                              try {
-                                                audioPlayer.play(AssetSource(
-                                                    'audio/wrong.mp3'));
-                                              } catch (_) {}
-                                            }
-                                            context
-                                                .read<QuizCubit>()
-                                                .submitAnswer(option);
-                                          },
-                                    child: Container(
-                                      margin:
-                                          EdgeInsets.all(isLandscape ? 8 : 4),
-                                      decoration: BoxDecoration(
-                                        color: Colors.white
-                                            .withValues(alpha: 0.95),
-                                        borderRadius: BorderRadius.circular(24),
-                                        border: Border.all(
-                                          color: isSelectedCorrect
-                                              ? Colors.green
-                                              : (isSelectedWrong
-                                                  ? Colors.red
-                                                  : Colors.transparent),
-                                          width: isSelectedCorrect ||
-                                                  isSelectedWrong
-                                              ? 6
-                                              : 0,
-                                        ),
-                                        boxShadow: const [
-                                          BoxShadow(
-                                              color: Colors.black26,
-                                              blurRadius: 8,
-                                              offset: Offset(0, 6)),
-                                        ],
-                                      ),
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(16.0),
-                                        child: Image.asset(
-                                          option.imagePath ?? '',
-                                          fit: BoxFit.contain,
-                                        ),
-                                      ),
-                                    ),
-                                  );
-
-                                  if (isSelectedCorrect) {
-                                    card = card
-                                        .animate()
-                                        .scale(
-                                            duration: 400.ms,
-                                            curve: Curves.elasticOut,
-                                            end: const Offset(1.1, 1.1))
-                                        .shimmer(
-                                            duration: 400.ms,
-                                            color: Colors.green
-                                                .withValues(alpha: 0.3));
-                                  } else if (isSelectedWrong) {
-                                    card = card
-                                        .animate()
-                                        .shakeX(hz: 4, duration: 300.ms)
-                                        .tint(
-                                            color: Colors.red,
-                                            duration: 300.ms);
-                                  } else if (!isFeedback) {
-                                    card = card
-                                        .animate()
-                                        .fadeIn(duration: 400.ms)
-                                        .slideY(begin: 0.2);
-                                  }
-
-                                  return Expanded(child: card);
-                                }).toList(),
-                              );
-                            }),
-                          ),
-                        ],
+                      flex: m.isLandscape ? 6 : 5,
+                      child: _SceneCard(
+                        key: ValueKey(question.imageOrScenePath),
+                        assetPath: question.imageOrScenePath,
+                        metrics: m,
+                      ),
+                    ),
+                    SizedBox(
+                      width: m.isLandscape ? m.gap : 0,
+                      height: m.isLandscape ? 0 : m.gap,
+                    ),
+                    Expanded(
+                      flex: 4,
+                      child: _OptionsBoard(
+                        metrics: m,
+                        question: question,
+                        tappedOptionId: _tappedOptionId,
+                        onTap: (option) =>
+                            _onOptionTapped(option, answeredCorrectly),
                       ),
                     ),
                   ],
                 ),
-              );
-            },
-          );
-        }
-
-        return const SizedBox.shrink();
+              ),
+            ],
+          ),
+        );
       },
     );
+  }
+}
+
+/// The environment the child has to reason about.
+class _SceneCard extends StatelessWidget {
+  const _SceneCard({
+    required this.assetPath,
+    required this.metrics,
+    super.key,
+  });
+
+  final String assetPath;
+  final KidMetrics metrics;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(KidUi.radiusCard),
+        border: Border.all(color: Colors.white, width: metrics.size(6, min: 4, max: 8)),
+        boxShadow: KidUi.shadow(Colors.black, strength: 1.2),
+        image: DecorationImage(
+          image: AssetImage(assetPath),
+          fit: BoxFit.cover,
+        ),
+      ),
+    )
+        .animate()
+        .fadeIn(duration: 400.ms)
+        .scale(begin: const Offset(0.96, 0.96), curve: Curves.easeOut);
+  }
+}
+
+/// The answer cards, sized from the space they were actually handed.
+class _OptionsBoard extends StatelessWidget {
+  const _OptionsBoard({
+    required this.metrics,
+    required this.question,
+    required this.tappedOptionId,
+    required this.onTap,
+  });
+
+  final KidMetrics metrics;
+  final QuizQuestion question;
+  final String? tappedOptionId;
+  final void Function(QuizOption) onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final options = question.options;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final spacing = metrics.gap * 0.6;
+        // Wrapping with a fitted card size means the answers can never run off
+        // the edge: on a narrow phone four options fall into two rows instead
+        // of clipping, which the old fixed Flex row did.
+        final cardSize = kidFitCardSize(
+          count: options.length,
+          box: Size(constraints.maxWidth, constraints.maxHeight),
+          spacing: spacing,
+          maxSize: 190,
+        );
+
+        return Center(
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            runAlignment: WrapAlignment.center,
+            spacing: spacing,
+            runSpacing: spacing,
+            children: [
+              for (final option in options) _optionCard(option, cardSize),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _optionCard(QuizOption option, double size) {
+    final tapped = tappedOptionId == option.id;
+    final state = tapped
+        ? (option.isCorrect ? KidCardState.correct : KidCardState.wrong)
+        : KidCardState.idle;
+
+    return KidPickCard<String>(
+      key: ValueKey('${question.id}_${option.id}'),
+      imageAsset: option.imagePath ?? '',
+      label: option.text,
+      size: size,
+      state: state,
+      onTap: () => onTap(option),
+    )
+        .animate(key: ValueKey('${question.id}_${option.id}_in'))
+        .fadeIn(duration: 350.ms)
+        .slideY(begin: 0.2, curve: Curves.easeOut);
   }
 }

@@ -1,9 +1,11 @@
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/base/protected_game_screen.dart';
+import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/shared/style/image_manager.dart';
 import '../Data/Logic/cubit/math_game_cubit.dart';
@@ -20,10 +22,58 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
     with TickerProviderStateMixin {
   late ConfettiController _confettiController;
 
+  /// The question index we have already read out, so a rebuild does not make
+  /// the app talk over itself.
+  int? _spokenQuestionIndex;
+  bool _ttsConfigured = false;
+
   @override
   void onGameInit() {
     _confettiController =
         ConfettiController(duration: const Duration(seconds: 3));
+  }
+
+  /// Turns "7 x 3 = ?" into a sentence worth hearing.
+  ///
+  /// Reading the raw label aloud gives a child "seven multiplication sign
+  /// three equals question mark"; the operator is spelled out in their own
+  /// language instead.
+  String _spokenQuestion(
+      Map<String, dynamic> question, AppLocalizations l10n) {
+    final left = '${question['left'] ?? ''}';
+    final right = '${question['right'] ?? ''}';
+    if (left.isEmpty || right.isEmpty) return question['question'] as String;
+
+    final String op;
+    switch (question['operation'] as String?) {
+      case 'subtraction':
+        op = l10n.mathOpMinus;
+        break;
+      case 'multiplication':
+        op = l10n.mathOpTimes;
+        break;
+      case 'division':
+        op = l10n.mathOpDividedBy;
+        break;
+      case 'addition':
+      default:
+        op = l10n.mathOpPlus;
+    }
+    return l10n.mathSpokenQuestion(left, op, right);
+  }
+
+  Future<void> _speakQuestion(
+      Map<String, dynamic> question, AppLocalizations l10n) async {
+    try {
+      final tts = context.read<FlutterTts>();
+      if (!_ttsConfigured) {
+        _ttsConfigured = true;
+        TtsService.applyLanguageTo(
+            tts, Localizations.localeOf(context).languageCode);
+      }
+      await tts.stop();
+      await tts.speak(_spokenQuestion(question, l10n));
+    } catch (_) {}
   }
 
   @override
@@ -38,6 +88,16 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
       create: (context) => MathGameCubit(level: widget.level),
       child: BlocConsumer<MathGameCubit, MathGameState>(
         listener: (context, state) {
+          // Read each new question aloud once, so a pre-reader can play too.
+          if (state.questions.isNotEmpty &&
+              !state.isCompleted &&
+              _spokenQuestionIndex != state.currentQuestionIndex) {
+            _spokenQuestionIndex = state.currentQuestionIndex;
+            _speakQuestion(
+              state.questions[state.currentQuestionIndex],
+              AppLocalizations.of(context),
+            );
+          }
           if (state.starsEarned > 0 && state.currentQuestionIndex > 0) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
@@ -407,13 +467,50 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                                     child: Column(
                                       mainAxisAlignment: MainAxisAlignment.center,
                                       children: [
-                                        Text(
-                                          currentQuestion['question'],
-                                          style: GoogleFonts.poppins(
-                                            fontSize: 40,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.purple,
-                                          ),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Flexible(
+                                              child: FittedBox(
+                                                fit: BoxFit.scaleDown,
+                                                child: Text(
+                                                  currentQuestion['question'],
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: 40,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.purple,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Semantics(
+                                              button: true,
+                                              label: AppLocalizations.of(context)
+                                                  .listenToQuestion,
+                                              child: Material(
+                                                color: Colors.purple.shade50,
+                                                shape: const CircleBorder(),
+                                                child: InkWell(
+                                                  customBorder:
+                                                      const CircleBorder(),
+                                                  onTap: () => _speakQuestion(
+                                                    currentQuestion,
+                                                    AppLocalizations.of(context),
+                                                  ),
+                                                  child: const Padding(
+                                                    padding: EdgeInsets.all(12),
+                                                    child: Icon(
+                                                      Icons.volume_up_rounded,
+                                                      color: Colors.purple,
+                                                      size: 28,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                         const SizedBox(height: 30),
                                         // Answer Options
@@ -524,6 +621,8 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
                             Colors.orange,
                           ],
                           numberOfParticles: 50,
+                          minimumSize: const Size(8, 8),
+                          maximumSize: const Size(16, 16),
                         ),
                       ),
                     ],

@@ -5,6 +5,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../models/paddle_bounce_models.dart';
+import 'paddle_ai.dart';
 import 'paddle_bounce_state.dart';
 
 class PaddleBounceCubit extends Cubit<PaddleBounceState> {
@@ -38,6 +39,7 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
       80.0; // Extra padding for top paddle in friend mode to avoid appbar
 
   late AudioPlayer _boopPlayer;
+  late PaddleAi _ai = PaddleAi(difficulty: state.aiDifficulty);
 
   @override
   Future<void> close() {
@@ -282,140 +284,25 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
 
   void _updateAIPaddle() {
     final aiPaddle = state.topPaddle;
-    final ball = state.ball;
-    
-    double targetX;
-    double maxSpeed;
-    
-    // Calculate the Y coordinate where the paddle can hit the ball
-    final targetY = aiPaddle.height + _paddlePadding + ball.radius;
-    
-    // AI configuration based on difficulty
-    switch (state.aiDifficulty) {
-      case AIDifficulty.easy:
-        // Follows the ball with delay and error
-        targetX = ball.x;
-        // Introduce some random error that oscillates
-        final error = math.sin(DateTime.now().millisecondsSinceEpoch / 500) * 40;
-        targetX += error;
-        maxSpeed = _paddleSpeed * 0.4;
-        break;
-        
-      case AIDifficulty.medium:
-        // Better tracking, simple short-term prediction
-        if (ball.velocityY < 0) { // Ball moving towards AI (top)
-          targetX = ball.x + (ball.velocityX * 10); 
-        } else {
-          // Ball moving away, return to center
-          targetX = state.screenWidth / 2;
-        }
-        maxSpeed = _paddleSpeed * 0.6;
-        break;
-        
-      case AIDifficulty.hard:
-        // Predicts trajectory without bounces if it's far, uses exact prediction if closer
-        if (ball.velocityY < 0) {
-          targetX = _predictBallX(ball.x, ball.y, ball.velocityX, ball.velocityY, targetY);
-          // Small error to allow player outplays
-          targetX += math.sin(DateTime.now().millisecondsSinceEpoch / 200) * 15;
-        } else {
-          // Follow ball loosely when moving away
-          targetX = state.screenWidth / 2 + (ball.x - state.screenWidth / 2) * 0.2;
-        }
-        maxSpeed = _paddleSpeed * 0.85;
-        break;
-        
-      case AIDifficulty.expert:
-        // Exact prediction, anticipates bounces perfectly
-        if (ball.velocityY < 0) {
-          targetX = _predictBallX(ball.x, ball.y, ball.velocityX, ball.velocityY, targetY);
-          // Very small micro-adjustments so it's not robotic
-          targetX += math.sin(DateTime.now().millisecondsSinceEpoch / 100) * 5;
-        } else {
-          // Anticipate by staying aligned with the ball even when it's moving away
-          targetX = state.screenWidth / 2 + (ball.x - state.screenWidth / 2) * 0.5;
-        }
-        maxSpeed = _paddleSpeed * 1.05; // Reduced from 1.2 so it is beatable
-        break;
-    }
-
-    // Expert AI has a "sweet spot" behavior to intentionally hit edges for sharp angles
-    final currentX = aiPaddle.x;
-    if (state.aiDifficulty == AIDifficulty.expert && ball.velocityY < 0) {
-      // If the AI is comfortably in position, it will try to hit with the edge 
-      // to return a difficult sharp angle smash.
-      final distanceToTarget = (currentX + aiPaddle.width / 2 - targetX).abs();
-      if (distanceToTarget < 30) {
-         // Shift target slightly to use paddle edge
-         if (ball.x < state.screenWidth / 2) {
-           targetX += aiPaddle.width * 0.3; // Hit to the right
-         } else {
-           targetX -= aiPaddle.width * 0.3; // Hit to the left
-         }
-      }
-    }
-
-    // Adjust target to be the left edge of the paddle
-    targetX -= aiPaddle.width / 2;
-    
-    // Smooth movement towards target
-    double deltaX = targetX - currentX;
-    
-    // Apply speed limits scaling with the ball speed to keep it fair and competitive
-    final currentBallSpeed = math.sqrt(ball.velocityX * ball.velocityX + ball.velocityY * ball.velocityY);
-    final speedMultiplier = (currentBallSpeed / _initialBallSpeed).clamp(1.0, 2.0);
-    final actualMaxSpeed = maxSpeed * speedMultiplier;
-    
-    if (deltaX.abs() > actualMaxSpeed) {
-      deltaX = actualMaxSpeed * deltaX.sign;
-    }
-
-    final newX = (currentX + deltaX).clamp(
-        _paddlePadding, state.screenWidth - aiPaddle.width - _paddlePadding);
+    final newX = _ai.nextPaddleX(
+      paddleX: aiPaddle.x,
+      paddleWidth: aiPaddle.width,
+      paddleHeight: aiPaddle.height,
+      ball: state.ball,
+      screenWidth: state.screenWidth,
+      paddlePadding: _paddlePadding,
+      maxBallSpeed: _maxBallSpeed,
+      baseBallSpeed: _initialBallSpeed,
+      basePaddleSpeed: _paddleSpeed,
+    );
 
     if ((newX - aiPaddle.x).abs() > 0.5) {
-      emit(state.copyWith(
-        topPaddle: aiPaddle.copyWith(x: newX),
-      ));
+      emit(state.copyWith(topPaddle: aiPaddle.copyWith(x: newX)));
     }
-  }
-
-  double _predictBallX(double startX, double startY, double velX, double velY, double targetY) {
-    if (velY >= 0) return startX; // Shouldn't happen if moving towards top AI
-    
-    // Time to reach target Y
-    final timeToReach = (targetY - startY) / velY; // velY is negative
-    
-    // Projected X without walls
-    double projectedX = startX + (velX * timeToReach);
-    
-    // Account for wall bounces
-    final leftWall = _paddlePadding + state.ball.radius;
-    final rightWall = state.screenWidth - _paddlePadding - state.ball.radius;
-    final width = rightWall - leftWall;
-    
-    if (width <= 0) return startX; // Guard against division by zero
-
-    // Shift coordinate system to 0 at left wall
-    projectedX -= leftWall;
-    
-    // Number of bounces
-    final int bounces = (projectedX / width).floor();
-    
-    // Calculate final X within the bounds
-    double finalX = projectedX % width;
-    if (finalX < 0) finalX += width;
-    
-    // If bounces is odd, it's moving right-to-left
-    if (bounces % 2 != 0) {
-      finalX = width - finalX;
-    }
-    
-    // Shift back to original coordinates
-    return finalX + leftWall;
   }
 
   void _resetBallAfterScore() {
+    _resetAiRallyState();
     emit(state.copyWith(
       ball: state.ball.copyWith(
         x: state.screenWidth / 2,
@@ -428,7 +315,10 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
     // Don't auto-start - wait for user to tap
   }
 
+  void _resetAiRallyState() => _ai.resetRally();
+
   void resetGame() {
+    _ai = PaddleAi(difficulty: state.aiDifficulty);
     emit(PaddleBounceState.initial(
       gameMode: state.gameMode,
       aiDifficulty: state.aiDifficulty,

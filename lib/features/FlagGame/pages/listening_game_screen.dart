@@ -248,6 +248,9 @@ class _ListeningGameScreenState extends State<ListeningGameScreen>
             child: ConfettiWidget(
               confettiController: _confettiController,
               blastDirectionality: BlastDirectionality.explosive,
+              numberOfParticles: 30,
+              minimumSize: const Size(6, 6),
+              maximumSize: const Size(12, 12),
               colors: const [
                 Colors.green,
                 Colors.blue,

@@ -93,10 +93,12 @@ class EnvironmentVehicleQuestion {
     required this.correctVehicle,
     required this.options,
   }) {
-    assert(options.length == 3, "Options must be exactly 3");
+    assert(options.length >= 3 && options.length <= 4,
+        'Options must be 3 (early rounds) or 4 (later rounds)');
     assert(options.contains(correctVehicle),
-        "Options must contain correct answer");
-    assert(options.toSet().length == 3, "Options must be unique");
+        'Options must contain correct answer');
+    assert(options.toSet().length == options.length,
+        'Options must be unique');
   }
   final String environmentAsset;
   final EnvironmentType environmentType;
@@ -167,14 +169,22 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
     }
     usedAnswers.add(correctVehicle);
 
-    // 3. Select 2 Invalid Vehicles from DIFFERENT environments
-    // To ensure distractors are very distinct, we pick from 2 distinct incorrect environments
-    final List<EnvironmentType> otherEnvs = EnvironmentType.values.where((e) => e != env).toList();
+    // 3. Select the distractors from DIFFERENT environments.
+    // Distractors can never come from the same environment as the answer:
+    // every vehicle that belongs to the scene is a defensible answer, so a
+    // same-environment distractor would make the question unfair.
+    // Difficulty instead ramps through the number of choices, which is the
+    // lever that actually changes how hard the discrimination is.
+    final int distractorCount = i < count * 0.4 ? 2 : 3;
+
+    final List<EnvironmentType> otherEnvs =
+        EnvironmentType.values.where((e) => e != env).toList();
     otherEnvs.shuffle(random);
-    
+
     final List<VehicleType> invalidVehicles = [];
-    for (int j = 0; j < 2; j++) {
-      final List<VehicleType> pool = List.from(environmentVehicles[otherEnvs[j]]!);
+    for (int j = 0; j < distractorCount && j < otherEnvs.length; j++) {
+      final List<VehicleType> pool =
+          List.from(environmentVehicles[otherEnvs[j]]!);
       pool.shuffle(random);
       invalidVehicles.add(pool.first);
     }

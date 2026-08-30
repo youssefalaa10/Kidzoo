@@ -33,6 +33,40 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
   Timer? _sequenceTimer;
   Timer? _gameTimer;
 
+  /// Everything the bloc schedules, so it can all be called off at once.
+  ///
+  /// The sequence display used to be driven by bare `Future.delayed` calls,
+  /// which cannot be cancelled. When a round ended those callbacks kept
+  /// firing: colours went on lighting up behind the results dialog, and the
+  /// extra state emissions re-triggered the dialog listener.
+  final List<Timer> _scheduled = [];
+
+  /// Bumped whenever pending work becomes stale, so a callback that survives
+  /// cancellation still knows to do nothing.
+  int _epoch = 0;
+
+  void _schedule(Duration delay, void Function() action) {
+    final epoch = _epoch;
+    late Timer timer;
+    timer = Timer(delay, () {
+      _scheduled.remove(timer);
+      if (isClosed || epoch != _epoch) return;
+      action();
+    });
+    _scheduled.add(timer);
+  }
+
+  /// Stops the sequence, the countdown and every pending callback.
+  void _cancelScheduled() {
+    _epoch++;
+    for (final timer in _scheduled) {
+      timer.cancel();
+    }
+    _scheduled.clear();
+    _gameTimer?.cancel();
+    _sequenceTimer?.cancel();
+  }
+
   Future<void> _loadBestScore() async {
     try {
       final prefs = await SharedPreferences.getInstance();
@@ -53,6 +87,7 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
   }
 
   void _onStartGame(StartGameEvent event, Emitter<ColorMemoryGameState> emit) {
+    _cancelScheduled();
     final config = LevelConfig.forLevel(event.level);
     final initialSequence = _generateSequence(
       config.colorCount,
@@ -72,10 +107,8 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
     ));
 
     // Auto-start showing sequence after a brief pause
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (!isClosed) {
-        add(const ShowSequenceEvent());
-      }
+    _schedule(const Duration(milliseconds: 500), () {
+      add(const ShowSequenceEvent());
     });
   }
 
@@ -115,34 +148,27 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
       highlightedColorIndex: colorIndex,
     ));
 
-    // Schedule reset and next color display using events
-    Future.delayed(
+    // Turn the highlight off, then move on to the next colour.
+    _schedule(
       Duration(
         milliseconds:
             (ColorMemoryConstants.colorHighlightDuration * 1000).toInt(),
       ),
-      () {
-        if (!isClosed) {
-          add(const ResetHighlightEvent());
-        }
-      },
+      () => add(const ResetHighlightEvent()),
     );
 
-    // Schedule next color display
-    Future.delayed(
+    _schedule(
       Duration(
         milliseconds:
             (ColorMemoryConstants.sequenceDisplayInterval * 1000).toInt(),
       ),
       () {
-        if (!isClosed && state.phase == GamePhase.showingSequence) {
-          // After the reset event has incremented currentSequenceIndex,
-          // check the current index against the sequence length.
-          if (state.currentSequenceIndex < state.sequence.length) {
-            add(const HighlightNextColorEvent());
-          } else {
-            add(const SequenceDisplayCompleteEvent());
-          }
+        if (state.phase != GamePhase.showingSequence) return;
+        // The reset event has already advanced currentSequenceIndex.
+        if (state.currentSequenceIndex < state.sequence.length) {
+          add(const HighlightNextColorEvent());
+        } else {
+          add(const SequenceDisplayCompleteEvent());
         }
       },
     );
@@ -223,7 +249,7 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
     ));
 
     // Reset highlight after short duration
-    Future.delayed(ColorMemoryConstants.tapAnimationDuration, () {
+    _schedule(ColorMemoryConstants.tapAnimationDuration, () {
       add(const ResetHighlightEvent());
     });
 
@@ -234,13 +260,13 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
     if (event.colorIndex != expectedColor) {
       // Wrong color
       _gameTimer?.cancel();
-      Future.delayed(const Duration(milliseconds: 300), () {
+      _schedule(const Duration(milliseconds: 300), () {
         add(PlayerMistakeEvent(expectedColor, event.colorIndex));
       });
     } else if (newPlayerSequence.length == state.sequence.length) {
       // Sequence complete and correct
       _gameTimer?.cancel();
-      Future.delayed(const Duration(milliseconds: 500), () {
+      _schedule(const Duration(milliseconds: 500), () {
         add(const RoundSuccessEvent());
       });
     }
@@ -280,50 +306,46 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
       longestSequence: max(state.score.longestSequence, sequenceLength),
     );
 
-    // Ensure no timers/highlights run under dialogs
-    _gameTimer?.cancel();
-    _sequenceTimer?.cancel();
+    // Nothing may keep running underneath the results dialog.
+    _cancelScheduled();
 
-    // Check if level is complete
     final isLevelComplete = newRound > config.maxRounds;
+    final isNewBest = newScore.currentScore > state.bestScore;
+    if (isNewBest) _saveBestScore(newScore.currentScore);
 
+    // One emit, not two. Emitting the phase and then the best score separately
+    // pushed the dialog listener twice and stacked two dialogs, so dismissing
+    // the top one left the game running behind the one underneath.
     emit(state.copyWith(
       phase: isLevelComplete ? GamePhase.levelComplete : GamePhase.success,
       score: newScore,
       highlightedColorIndex: -1,
+      bestScore: isNewBest ? newScore.currentScore : state.bestScore,
     ));
 
-    // Update best score if needed
-    if (newScore.currentScore > state.bestScore) {
-      _saveBestScore(newScore.currentScore);
-      emit(state.copyWith(bestScore: newScore.currentScore));
-    }
-
-    // Do not auto-advance; UI will advance on user action
+    // Do not auto-advance; the UI advances on user action.
   }
 
   void _onPlayerMistake(
     PlayerMistakeEvent event,
     Emitter<ColorMemoryGameState> emit,
   ) {
-    // Stop any timers/highlights and clear highlight
-    _gameTimer?.cancel();
-    _sequenceTimer?.cancel();
+    _cancelScheduled();
 
+    final isNewBest = state.score.currentScore > state.bestScore;
+    if (isNewBest) _saveBestScore(state.score.currentScore);
+
+    // Single emit, for the same reason as _onRoundSuccess.
     emit(state.copyWith(
       phase: GamePhase.failure,
       errorMessage: 'Wrong color! Try again.',
       highlightedColorIndex: -1,
+      bestScore: isNewBest ? state.score.currentScore : state.bestScore,
     ));
-
-    // Check if this is a high score
-    if (state.score.currentScore > state.bestScore) {
-      _saveBestScore(state.score.currentScore);
-      emit(state.copyWith(bestScore: state.score.currentScore));
-    }
   }
 
   void _onNextRound(NextRoundEvent event, Emitter<ColorMemoryGameState> emit) {
+    _cancelScheduled();
     final config = LevelConfig.forLevel(state.level);
 
     // Increase sequence length
@@ -347,16 +369,13 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
       currentSequenceIndex: 0,
     ));
 
-    // Auto-start next round
-    Future.delayed(
+    // Auto-start the next round. This runs only because the player dismissed
+    // the round dialog, so nothing plays while a dialog is up.
+    _schedule(
       Duration(
         milliseconds: (ColorMemoryConstants.pauseBetweenRounds * 1000).toInt(),
       ),
-      () {
-        if (!isClosed) {
-          add(const ShowSequenceEvent());
-        }
-      },
+      () => add(const ShowSequenceEvent()),
     );
   }
 
@@ -364,8 +383,7 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
     RestartGameEvent event,
     Emitter<ColorMemoryGameState> emit,
   ) {
-    _gameTimer?.cancel();
-    _sequenceTimer?.cancel();
+    _cancelScheduled();
 
     add(StartGameEvent(
       mode: state.mode,
@@ -403,8 +421,7 @@ class ColorMemoryBloc extends Bloc<ColorMemoryEvent, ColorMemoryGameState> {
 
   @override
   Future<void> close() {
-    _gameTimer?.cancel();
-    _sequenceTimer?.cancel();
+    _cancelScheduled();
     return super.close();
   }
 }

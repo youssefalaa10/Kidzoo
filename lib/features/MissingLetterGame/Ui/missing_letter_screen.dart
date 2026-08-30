@@ -3,14 +3,17 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:kidzo/core/localization/language_provider.dart';
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_cubit.dart';
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
 import 'package:kidzo/features/MissingLetterGame/Data/Model/word_model.dart';
 
+import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../../../shared/widgets/game_exit_button.dart';
 
@@ -29,6 +32,36 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
   late final AnimationController _letterBounceController;
 
   bool _completionDialogShown = false;
+
+  /// The option tile the child last pressed, so the tile itself can answer
+  /// them. Previously the only feedback was a banner over the whole screen and
+  /// a shake of the word card, which never said *which* letter was wrong.
+  String? _lastTappedLetter;
+
+  /// The word currently on screen, used to reset per-word UI state.
+  String? _currentWordKey;
+
+  /// The word already read out in celebration, so it is spoken once.
+  String? _celebratedWord;
+  bool _ttsConfigured = false;
+
+  /// Says the word out loud.
+  ///
+  /// Deliberately never called automatically *before* an answer: reading
+  /// "apple" aloud while the P is still blank simply tells the child what to
+  /// press. It runs when they have solved the word, and whenever they ask for
+  /// it with the speaker button.
+  Future<void> _speakWord(String word, String languageCode) async {
+    try {
+      final tts = context.read<FlutterTts>();
+      if (!_ttsConfigured) {
+        _ttsConfigured = true;
+        TtsService.applyLanguageTo(tts, languageCode);
+      }
+      await tts.stop();
+      await tts.speak(word);
+    } catch (_) {}
+  }
 
   @override
   void initState() {
@@ -116,6 +149,26 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                         final availableHeight = constraints.maxHeight;
                         final availableWidth = constraints.maxWidth;
                         final verticalGap = (availableHeight * 0.03).clamp(8.0, 28.0);
+
+                        // A new word clears the per-word UI state. The word
+                        // itself is not spoken here - that would give the
+                        // missing letter away before the child has answered.
+                        if (_currentWordKey != word.word) {
+                          _currentWordKey = word.word;
+                          _lastTappedLetter = null;
+                          _celebratedWord = null;
+                        }
+
+                        // Solved: now saying it aloud reinforces the spelling
+                        // instead of spoiling it.
+                        if (state.isCorrect && _celebratedWord != word.word) {
+                          _celebratedWord = word.word;
+                          WidgetsBinding.instance.addPostFrameCallback((_) {
+                            if (mounted) {
+                              _speakWord(word.word, state.languageCode);
+                            }
+                          });
+                        }
 
                         return SingleChildScrollView(
                           padding: EdgeInsets.symmetric(
@@ -209,15 +262,40 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
   ) {
     return Column(
       children: [
-        // Progress bar
-        ClipRRect(
-          borderRadius: BorderRadius.circular(10),
-          child: LinearProgressIndicator(
-            value: state.progress,
-            minHeight: 8,
-            backgroundColor: Colors.white.withValues(alpha: 0.3),
-            valueColor: const AlwaysStoppedAnimation<Color>(Colors.amber),
-          ),
+        // Progress: a thicker bar with the actual count beside it, because a
+        // bare 8px line tells a child nothing about how far they have come.
+        Row(
+          children: [
+            Expanded(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                child: LinearProgressIndicator(
+                  value: state.progress,
+                  minHeight: 14,
+                  backgroundColor: Colors.white.withValues(alpha: 0.35),
+                  valueColor: const AlwaysStoppedAnimation<Color>(KidUi.hint),
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                boxShadow: KidUi.shadow(Colors.black, strength: 0.5),
+              ),
+              child: Text(
+                '${state.completedWords}/${state.totalWords}',
+                style: GoogleFonts.nunito(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w900,
+                  color: KidUi.ink,
+                ),
+              ),
+            ),
+          ],
         ),
         SizedBox(height: (availableHeight * 0.03).clamp(10.0, 24.0)),
         AnimatedBuilder(
@@ -264,6 +342,29 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                       ),
                     ),
                   ).animate().scale(delay: 200.ms, duration: 500.ms, curve: Curves.easeOutBack),
+                  SizedBox(height: (availableHeight * 0.02).clamp(8.0, 16.0)),
+                  // An opt-in clue: the child chooses to hear the word.
+                  Semantics(
+                    button: true,
+                    label: word.word,
+                    child: Material(
+                      color: KidUi.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                        onTap: () {
+                          KidHaptics.tap();
+                          _speakWord(word.word, state.languageCode);
+                        },
+                        child: const Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 10),
+                          child: Icon(Icons.volume_up_rounded,
+                              color: KidUi.primary, size: 26),
+                        ),
+                      ),
+                    ),
+                  ),
                   SizedBox(height: (availableHeight * 0.03).clamp(12.0, 26.0)),
                   LayoutBuilder(
                     builder: (context, constraints) {
@@ -356,7 +457,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
     double availableWidth,
   ) {
     final options = word.options;
-    final tileSize = (availableWidth / max(options.length, 4) * 0.9).clamp(56.0, 84.0);
+    // Floor raised to 64: the old 56 was below the ~2cm target recommended for
+    // small hands, and these tiles are the only control in the game.
+    final tileSize =
+        (availableWidth / max(options.length, 4) * 0.9).clamp(64.0, 96.0);
     final locked = state.isCorrect || state.isTransitioning;
 
     return Wrap(
@@ -367,24 +471,50 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
         final index = entry.key;
         final option = entry.value;
 
+        // Answer on the tile the child actually touched.
+        final wasTapped = _lastTappedLetter == option;
+        final isWrongTile = wasTapped && state.isIncorrect;
+        final isRightTile = wasTapped && !state.isIncorrect;
+
+        final gradient = isWrongTile
+            ? const [Color(0xFFEE4964), Color(0xFFC62839)]
+            : isRightTile
+                ? const [Color(0xFF4AC49A), Color(0xFF2E9E77)]
+                : const [Color(0xFFFF9800), Color(0xFFFF5722)];
+        final glow = isWrongTile
+            ? KidUi.wrong
+            : isRightTile
+                ? KidUi.correct
+                : Colors.orange;
+
         return AnimatedOpacity(
           key: ValueKey('${word.word}_$option$index'),
           opacity: locked ? 0.5 : 1.0,
           duration: const Duration(milliseconds: 300),
           child: GestureDetector(
-            onTap: locked ? null : () => gameCubit.selectLetter(option),
-            child: Container(
+            onTap: locked
+                ? null
+                : () {
+                    setState(() => _lastTappedLetter = option);
+                    KidHaptics.tap();
+                    gameCubit.selectLetter(option);
+                  },
+            child: AnimatedContainer(
+              duration: KidUi.fast,
               width: tileSize,
               height: tileSize,
               decoration: BoxDecoration(
-                gradient: const LinearGradient(
+                gradient: LinearGradient(
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
-                  colors: [Color(0xFFFF9800), Color(0xFFFF5722)],
+                  colors: gradient,
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
-                  BoxShadow(color: Colors.orange.withValues(alpha: 0.3), blurRadius: 10, offset: const Offset(0, 4)),
+                  BoxShadow(
+                      color: glow.withValues(alpha: wasTapped ? 0.55 : 0.3),
+                      blurRadius: wasTapped ? 16 : 10,
+                      offset: const Offset(0, 4)),
                 ],
               ),
               child: Center(

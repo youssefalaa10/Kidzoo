@@ -2,7 +2,13 @@ import '../../utils/assets.dart';
 
 class ImageManager {
   // General images
-  static const String logo = Assets.genImagesHomeCloudyBg; // Fallback for missing Page Border
+  /// The launcher icon, copied out of the Android mipmaps so Flutter can load
+  /// it. `logo` used to point at a cloudy *background* image, which is why the
+  /// splash showed a stretched sky instead of the app's own mark.
+  static const String appIcon = 'assets/gen/icons/app_icon.png';
+  static const String appIconForeground =
+      'assets/gen/icons/app_icon_foreground.png';
+  static const String logo = appIcon;
 
   // Shapes
   static const String square = Assets.genImagesShapesSquare;

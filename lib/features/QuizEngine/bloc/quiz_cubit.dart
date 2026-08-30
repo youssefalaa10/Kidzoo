@@ -53,7 +53,11 @@ class QuizCubit extends Cubit<QuizState> {
 
   Future<void> _speakPrompt(String text) async {
     try {
-      await flutterTts.speak(text);
+      await flutterTts.stop();
+      final result = await flutterTts.speak(text);
+      if (result == 1) {
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
     } catch (_) {}
   }
 
@@ -62,11 +66,19 @@ class QuizCubit extends Cubit<QuizState> {
     if (isCorrect) {
       _score += 10;
       try {
-        await flutterTts.speak(option.text);
+        await flutterTts.stop();
+        final result = await flutterTts.speak(option.text);
+        if (result == 1) {
+          await Future.delayed(const Duration(milliseconds: 800));
+        }
       } catch (_) {}
     } else if (allowRetries) {
       try {
-        await flutterTts.speak(tryAgainText ?? 'Try again');
+        await flutterTts.stop();
+        final result = await flutterTts.speak(tryAgainText ?? 'Try again');
+        if (result == 1) {
+          await Future.delayed(const Duration(milliseconds: 600));
+        }
       } catch (_) {}
     }
 

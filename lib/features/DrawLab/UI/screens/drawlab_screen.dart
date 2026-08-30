@@ -51,6 +51,9 @@ class _DrawLabScreenState extends State<DrawLabScreen>
   final List<String> _strokeTools = []; // Track which tool made each stroke
   final List<ShapeItem> _shapes = [];
 
+  /// Strokes taken off by undo, newest last, so redo can put them back.
+  final List<_UndoneStroke> _undoneStrokes = [];
+
   @override
   void initState() {
     super.initState();
@@ -74,8 +77,58 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     _toolbarAnimationController.forward();
   }
 
+  /// Rubs out any shape or text the eraser passes over.
+  ///
+  /// The eraser was only ever a stroke: it painted opaque white rectangles
+  /// onto the stroke layer. Shapes and text are drawn *after* every stroke, so
+  /// no amount of scrubbing could remove them - the eraser marks went
+  /// underneath. Shapes and text are objects rather than pixels, so the fix is
+  /// to erase the object.
+  ///
+  /// Returns true when something was removed.
+  bool _eraseItemsAt(Offset position) {
+    // Match the eraser the child actually sees (drawn at _currentWidth * 2
+    // wide) and add a little slack, because aiming precisely is hard for them.
+    final reach = _currentWidth + 8;
+
+    final removedShapes = <ShapeItem>[];
+    for (final shape in _shapes) {
+      final hitRadius = (shape.size / 2) + reach;
+      if ((shape.position - position).distance <= hitRadius) {
+        removedShapes.add(shape);
+      }
+    }
+
+    final removedTexts = <TextItem>[];
+    for (final item in _textItems) {
+      final rect = Rect.fromCenter(
+        center: item.position,
+        width: (item.text.length * item.fontSize * 0.6) + reach * 2,
+        height: (item.fontSize * 1.5) + reach * 2,
+      );
+      if (rect.contains(position)) removedTexts.add(item);
+    }
+
+    if (removedShapes.isEmpty && removedTexts.isEmpty) return false;
+
+    setState(() {
+      _shapes.removeWhere(removedShapes.contains);
+      _textItems.removeWhere(removedTexts.contains);
+      _selectedShapeIndex = null;
+      _selectedTextIndex = null;
+      _hasUnsavedChanges = true;
+    });
+    HapticFeedback.selectionClick();
+    return true;
+  }
+
   void _onPanStart(DragStartDetails details) {
     final position = details.localPosition;
+
+    // The eraser clears objects as well as ink, wherever it lands.
+    if (_currentTool == 'eraser') {
+      _eraseItemsAt(position);
+    }
 
     // Handle text selection/dragging
     if (_currentTool == 'text') {
@@ -145,6 +198,10 @@ class _DrawLabScreenState extends State<DrawLabScreen>
 
   void _onPanUpdate(DragUpdateDetails details) {
     final position = details.localPosition;
+
+    if (_currentTool == 'eraser') {
+      _eraseItemsAt(position);
+    }
 
     // Drag text item
     if (_currentTool == 'text' && _selectedTextIndex != null) {
@@ -274,6 +331,8 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           }
         }
         _currentStroke.clear();
+        // Drawing something new makes the redo history meaningless.
+        _undoneStrokes.clear();
       }
     });
   }
@@ -631,16 +690,11 @@ class _DrawLabScreenState extends State<DrawLabScreen>
               mainAxisSize: MainAxisSize.min,
               children: [
                 // Top row - Tools and Actions
+                _buildToolSelector(),
+                const SizedBox(height: 8),
                 Row(
-                  children: [
-                    // Tool selector
-                    Expanded(
-                      child: _buildToolSelector(),
-                    ),
-                    const SizedBox(width: 12),
-                    // Quick actions
-                    _buildQuickActions(),
-                  ],
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [_buildQuickActions()],
                 ),
                 const SizedBox(height: 12),
                 // Bottom row - Color, Width, Opacity, and Save
@@ -664,40 +718,98 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     );
   }
 
+  /// Every tool, always on screen.
+  ///
+  /// Switching tools used to mean opening a dropdown dialog, picking, and
+  /// waiting for it to close - a modal round trip for the single most frequent
+  /// action in a drawing app. The tools are now one row of large, obvious
+  /// buttons that show which one is live.
   Widget _buildToolSelector() {
-    return GestureDetector(
-      onTap: _showToolSelector,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              _getToolIcon(_currentTool),
-              color: const Color(0xFF6366F1),
-              size: 20,
+    final l10n = AppLocalizations.of(context);
+    final tools = <List<Object>>[
+      ['brush', Icons.brush_rounded, l10n.brush],
+      ['pen', Icons.create_rounded, l10n.pen],
+      ['pencil', Icons.edit_rounded, l10n.pencil],
+      ['eraser', Icons.cleaning_services_rounded, l10n.eraser],
+      ['shape', Icons.category_rounded, l10n.shape],
+      ['text', Icons.text_fields_rounded, l10n.text],
+    ];
+
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: [
+          for (final tool in tools) ...[
+            _buildToolChip(
+              tool[0] as String,
+              tool[1] as IconData,
+              tool[2] as String,
             ),
             const SizedBox(width: 8),
-            Text(
-              _getToolName(context, _currentTool),
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF1F2937),
+          ],
+        ],
+      ),
+    );
+  }
+
+  Widget _buildToolChip(String tool, IconData icon, String label) {
+    final isSelected = _currentTool == tool;
+
+    return Semantics(
+      button: true,
+      selected: isSelected,
+      label: label,
+      child: Tooltip(
+        message: label,
+        child: Material(
+          color: isSelected
+              ? const Color(0xFF6366F1)
+              : const Color(0xFFF1F5F9),
+          borderRadius: BorderRadius.circular(16),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () {
+              HapticFeedback.selectionClick();
+              setState(() => _currentTool = tool);
+              // These three need a choice before they can draw anything.
+              if (tool == 'shape') {
+                _showShapeSelector();
+              } else if (tool == 'text') {
+                _showTextInput();
+              } else if (tool == 'pen') {
+                _showPenOptions();
+              }
+            },
+            child: Container(
+              // Comfortably past the ~48dp minimum, since small hands are
+              // aiming at these constantly.
+              constraints: const BoxConstraints(minWidth: 56, minHeight: 56),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    icon,
+                    size: 24,
+                    color: isSelected ? Colors.white : const Color(0xFF475569),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    label,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: 10,
+                      fontWeight: FontWeight.w700,
+                      color:
+                          isSelected ? Colors.white : const Color(0xFF475569),
+                    ),
+                  ),
+                ],
               ),
             ),
-            const SizedBox(width: 4),
-            const Icon(
-              Icons.arrow_drop_down,
-              color: Color(0xFF6B7280),
-              size: 16,
-            ),
-          ],
+          ),
         ),
       ),
     );
@@ -709,27 +821,27 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       children: [
         // Undo
         _buildActionButton(
-          icon: Icons.undo,
+          icon: Icons.undo_rounded,
           color: _strokes.isNotEmpty
               ? const Color(0xFF3B82F6)
               : const Color(0xFF9CA3AF),
-          onPressed: _strokes.isNotEmpty
-              ? () {
-                  setState(() {
-                    if (_strokes.isNotEmpty) {
-                      _strokes.removeLast();
-                      _strokeColors.removeLast();
-                      _strokeWidths.removeLast();
-                    }
-                  });
-                }
-              : null,
+          onPressed: _strokes.isNotEmpty ? _undoStroke : null,
+        ),
+        const SizedBox(width: 8),
+
+        // Redo
+        _buildActionButton(
+          icon: Icons.redo_rounded,
+          color: _undoneStrokes.isNotEmpty
+              ? const Color(0xFF3B82F6)
+              : const Color(0xFF9CA3AF),
+          onPressed: _undoneStrokes.isNotEmpty ? _redoStroke : null,
         ),
         const SizedBox(width: 8),
 
         // Clear
         _buildActionButton(
-          icon: Icons.clear,
+          icon: Icons.delete_outline_rounded,
           color: _strokes.isNotEmpty
               ? const Color(0xFFEF4444)
               : const Color(0xFF9CA3AF),
@@ -737,6 +849,39 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         ),
       ],
     );
+  }
+
+  /// Undo used to pop `_strokes`, `_strokeColors` and `_strokeWidths` but
+  /// leave `_strokeTools` untouched. The painter reads those four lists by the
+  /// same index, so a single undo shifted every tool label by one and strokes
+  /// started rendering as the wrong tool - an old pen line could suddenly draw
+  /// itself as an eraser. All four move together now, and what comes off is
+  /// kept so it can be put back.
+  void _undoStroke() {
+    if (_strokes.isEmpty) return;
+    setState(() {
+      _undoneStrokes.add(_UndoneStroke(
+        points: _strokes.removeLast(),
+        color: _strokeColors.removeLast(),
+        width: _strokeWidths.removeLast(),
+        tool: _strokeTools.isNotEmpty ? _strokeTools.removeLast() : 'brush',
+      ));
+      _hasUnsavedChanges = true;
+    });
+    HapticFeedback.selectionClick();
+  }
+
+  void _redoStroke() {
+    if (_undoneStrokes.isEmpty) return;
+    setState(() {
+      final entry = _undoneStrokes.removeLast();
+      _strokes.add(entry.points);
+      _strokeColors.add(entry.color);
+      _strokeWidths.add(entry.width);
+      _strokeTools.add(entry.tool);
+      _hasUnsavedChanges = true;
+    });
+    HapticFeedback.selectionClick();
   }
 
   Widget _buildActionButton({
@@ -1001,25 +1146,6 @@ class _DrawLabScreenState extends State<DrawLabScreen>
     );
   }
 
-  IconData _getToolIcon(String tool) {
-    switch (tool) {
-      case 'brush':
-        return Icons.brush;
-      case 'pencil':
-        return Icons.edit;
-      case 'eraser':
-        return Icons.cleaning_services;
-      case 'shape':
-        return Icons.category;
-      case 'text':
-        return Icons.text_fields;
-      case 'select':
-        return Icons.touch_app;
-      default:
-        return Icons.brush;
-    }
-  }
-
   String _getToolName(BuildContext context, String tool) {
     switch (tool) {
       case 'brush':
@@ -1266,113 +1392,6 @@ class _DrawLabScreenState extends State<DrawLabScreen>
         );
       }
     }
-  }
-
-  void _showToolSelector() {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Color(0xFFFFFFFF),
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                AppLocalizations.of(context).selectTool,
-                style: const TextStyle(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF1F2937),
-                ),
-              ),
-              const SizedBox(height: 20),
-              Wrap(
-                spacing: 12,
-                runSpacing: 12,
-                children: [
-                  _buildToolOption(
-                      'brush', Icons.brush, AppLocalizations.of(context).brush),
-                  _buildToolOption(
-                      'pen', Icons.create, AppLocalizations.of(context).pen),
-                  _buildToolOption('pencil', Icons.edit,
-                      AppLocalizations.of(context).pencil),
-                  _buildToolOption('eraser', Icons.cleaning_services,
-                      AppLocalizations.of(context).eraser),
-                  _buildToolOption('shape', Icons.category,
-                      AppLocalizations.of(context).shape),
-                  _buildToolOption('text', Icons.text_fields,
-                      AppLocalizations.of(context).text),
-                ],
-              ),
-              const SizedBox(height: 20),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildToolOption(String tool, IconData icon, String label) {
-    final isSelected = _currentTool == tool;
-    return GestureDetector(
-      onTap: () {
-        Navigator.pop(context);
-        setState(() {
-          _currentTool = tool;
-        });
-
-        // Show specific dialogs for shape, text, and pen tools
-        if (tool == 'shape') {
-          _showShapeSelector();
-        } else if (tool == 'text') {
-          _showTextInput();
-        } else if (tool == 'pen') {
-          _showPenOptions();
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? const Color(0xFF6366F1).withValues(alpha: 0.1)
-              : const Color(0xFFF8FAFC),
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color:
-                isSelected ? const Color(0xFF6366F1) : const Color(0xFFE2E8F0),
-            width: isSelected ? 2 : 1,
-          ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? const Color(0xFF6366F1)
-                  : const Color(0xFF6B7280),
-              size: 24,
-            ),
-            const SizedBox(height: 4),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: isSelected
-                    ? const Color(0xFF6366F1)
-                    : const Color(0xFF6B7280),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 
   void _showShapeSelector() {
@@ -1990,4 +2009,19 @@ class TextItem {
   final Color color;
   final double fontSize;
   bool isSelected;
+}
+
+/// A stroke removed by undo, held so redo can put it back exactly as it was.
+class _UndoneStroke {
+  const _UndoneStroke({
+    required this.points,
+    required this.color,
+    required this.width,
+    required this.tool,
+  });
+
+  final List<Offset> points;
+  final Color color;
+  final double width;
+  final String tool;
 }

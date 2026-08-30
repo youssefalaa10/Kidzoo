@@ -651,5 +651,16 @@
   "feedbackYouFoundIt": "You found it!",
   "feedbackAlmost": "Almost!",
   "feedbackYouCanDoIt": "You can do it!",
-  "currentLevelShort": "Level {level}"
+  "currentLevelShort": "Level {level}",
+  "tapOrDragHint": "Tap it, or drag it over",
+  "tapBasketHint": "Now tap the right basket",
+  "keepGoing": "Keep going!",
+  "mathSpokenQuestion": "What is {a} {op} {b}?",
+  "mathOpPlus": "plus",
+  "mathOpMinus": "minus",
+  "mathOpTimes": "times",
+  "mathOpDividedBy": "divided by",
+  "listenToQuestion": "Listen to the question",
+  "fullscreen": "Fullscreen",
+  "exitFullscreen": "Exit fullscreen"
 }

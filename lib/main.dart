@@ -11,8 +11,11 @@ import 'core/localization/app_localizations.dart';
 import 'core/localization/language_provider.dart';
 import 'core/managers/game_asset_manager.dart';
 import 'core/services/cubit/music_cubit.dart';
+import 'features/Alphabets/bloc/alphabet_bloc.dart';
 import 'features/Profile/profile_cubit.dart';
-import 'features/Splash/splash_screen.dart';
+import 'features/Profile/profile_setup_screen.dart';
+import 'features/Profile/profile_state.dart';
+import 'features/home/UI/character.dart';
 import 'features/settings/cubit/settings_cubit.dart';
 
 void main() async {
@@ -83,7 +86,21 @@ class MyApp extends StatelessWidget {
                 GlobalCupertinoLocalizations.delegate,
               ],
               supportedLocales: AppLocalizations.supportedLocales,
-              home: const SplashScreen(),
+              home: BlocBuilder<ProfileCubit, ProfileState>(
+                builder: (context, state) {
+                  if (state is ProfileLoaded) {
+                    return state.currentProfile == null
+                        ? const ProfileSetupScreen()
+                        : BlocProvider(
+                            create: (context) => AlphabetBloc(),
+                            child: const CharacterSelectionScreen(),
+                          );
+                  }
+                  return const Scaffold(
+                    body: Center(child: CircularProgressIndicator()),
+                  );
+                },
+              ),
             );
           },
         ),

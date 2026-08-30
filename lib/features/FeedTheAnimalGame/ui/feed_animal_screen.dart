@@ -7,25 +7,31 @@ import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
-import '../../../core/shared/widgets/fluid_container.dart';
+import '../../../core/shared/style/kid_ui.dart';
+import '../../../core/shared/widgets/kid_game_shell.dart';
+import '../../../core/shared/widgets/kid_pick_card.dart';
+import '../../../core/shared/widgets/kid_result_view.dart';
 import '../bloc/feed_animal_cubit.dart';
 import '../bloc/feed_animal_state.dart';
+import '../data/feed_animal_models.dart';
 import 'widgets/animal_target.dart';
-import 'widgets/fruit_draggable.dart';
 
 class FeedAnimalScreen extends StatelessWidget {
   const FeedAnimalScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    // Resolved in build, not in `create`: taking an InheritedWidget dependency
+    // inside the create callback throws, because that callback runs once and
+    // can never be rebuilt to see an update.
+    final l10n = AppLocalizations.of(context);
     final gameScoresDao = context.read<GameScoresDao>();
     final profileDao = context.read<ProfileDao>();
     final flutterTts = context.read<FlutterTts>();
     final audioPlayer = context.read<AudioPlayer>();
-    final l10n = AppLocalizations.of(context);
 
     return BlocProvider(
-      create: (context) => FeedAnimalCubit(
+      create: (_) => FeedAnimalCubit(
         gameScoresDao: gameScoresDao,
         profileDao: profileDao,
         flutterTts: flutterTts,
@@ -42,222 +48,185 @@ class _FeedAnimalView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppLocalizations.of(context).education),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.volume_up),
-            onPressed: () => context.read<FeedAnimalCubit>().replayPrompt(),
+    return BlocBuilder<FeedAnimalCubit, FeedAnimalState>(
+      builder: (context, state) {
+        final cubit = context.read<FeedAnimalCubit>();
+
+        // Each animal brings its own habitat. The old screen computed this and
+        // then threw it away, leaving every round on the same flat cream panel.
+        final backgroundType =
+            state.roundData?.animal.backgroundType ?? BackgroundType.education;
+        final background =
+            BackgroundResolver(context, backgroundType).resolveBackground();
+
+        return KidGameShell(
+          backgroundAsset: background,
+          builder: (context, metrics) {
+            if (state.phase == FeedPhase.complete) {
+              return KidResultView(
+                metrics: metrics,
+                score: state.score,
+                maxScore: cubit.maxScore,
+                onPlayAgain: cubit.restartGame,
+              );
+            }
+
+            final round = state.roundData;
+            if (round == null) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            return _FeedBoard(metrics: metrics, state: state, round: round);
+          },
+        );
+      },
+    );
+  }
+}
+
+class _FeedBoard extends StatelessWidget {
+  const _FeedBoard({
+    required this.metrics,
+    required this.state,
+    required this.round,
+  });
+
+  final KidMetrics metrics;
+  final FeedAnimalState state;
+  final GameRoundData round;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<FeedAnimalCubit>();
+    final m = metrics;
+    final hasSelection = state.selectedFoodId != null;
+
+    final animal = AnimalTarget(
+      key: ValueKey(round.animal.id),
+      animal: round.animal,
+      isSuccess: state.phase == FeedPhase.correct,
+      isError: state.phase == FeedPhase.wrong,
+      isArmed: hasSelection,
+      eatenFood: state.eatenFood,
+      onTap: cubit.tapAnimal,
+      onFoodDropped: cubit.onFoodDropped,
+    );
+
+    final tray = _FoodTray(metrics: m, state: state, round: round);
+
+    return Padding(
+      padding: EdgeInsets.all(m.pagePadding),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          KidTopBar(
+            metrics: m,
+            current: state.currentRound,
+            total: state.totalRounds,
+            score: state.score,
+            accent: KidUi.correct,
+            onReplayPrompt: cubit.replayPrompt,
+          ),
+          SizedBox(height: m.gap * 0.75),
+          KidPromptBanner(
+            metrics: m,
+            // The question was previously spoken only. A child who looked away
+            // had no way to recover it.
+            text: round.getPromptText(l10n),
+            hint: hasSelection ? l10n.keepGoing : l10n.tapOrDragHint,
+            accent: KidUi.correct,
+            onSpeak: cubit.replayPrompt,
+          ),
+          SizedBox(height: m.gap * 0.75),
+          Expanded(
+            child: m.isLandscape
+                ? Row(
+                    children: [
+                      Expanded(flex: 5, child: animal),
+                      SizedBox(width: m.gap),
+                      Expanded(flex: 5, child: tray),
+                    ],
+                  )
+                : Column(
+                    children: [
+                      Expanded(flex: 5, child: animal),
+                      SizedBox(height: m.gap),
+                      Expanded(flex: 4, child: tray),
+                    ],
+                  ),
           ),
         ],
       ),
-      body: BlocBuilder<FeedAnimalCubit, FeedAnimalState>(
-        builder: (context, state) {
-          if (state is FeedAnimalLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    );
+  }
+}
 
-          final roundData = state is FeedAnimalPlaying
-              ? state.roundData
-              : state is FeedAnimalSuccess
-                  ? state.roundData
-                  : state is FeedAnimalWrong
-                      ? state.roundData
-                      : null;
+class _FoodTray extends StatelessWidget {
+  const _FoodTray({
+    required this.metrics,
+    required this.state,
+    required this.round,
+  });
 
-          final backgroundType =
-              roundData?.animal.backgroundType ?? BackgroundType.education;
+  final KidMetrics metrics;
+  final FeedAnimalState state;
+  final GameRoundData round;
 
-          return Container(
-            width: double.infinity,
-            height: double.infinity,
-            color: const Color(0xfffaf5f1),
-            child: Builder(builder: (context) {
-              if (state is FeedAnimalComplete) {
-                return FluidContainer(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.star, color: Colors.amber, size: 100),
-                      const SizedBox(height: 20),
-                      Text(
-                        AppLocalizations.of(context).levelComplete,
-                        style: const TextStyle(
-                            fontSize: 32, fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 20),
-                      ElevatedButton.icon(
-                        icon: const Icon(Icons.replay),
-                        label: Text(AppLocalizations.of(context).playAgain),
-                        onPressed: () =>
-                            context.read<FeedAnimalCubit>().restartGame(),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 30, vertical: 15),
-                          textStyle: const TextStyle(fontSize: 20),
-                        ),
-                      ),
-                    ],
-                  ),
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final cubit = context.read<FeedAnimalCubit>();
+    final spacing = metrics.gap * 0.8;
+
+    return Container(
+      padding: EdgeInsets.all(metrics.gap * 0.6),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.55),
+        borderRadius: BorderRadius.circular(KidUi.radiusCard),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final size = kidFitCardSize(
+            count: round.choices.length,
+            box: Size(constraints.maxWidth, constraints.maxHeight),
+            spacing: spacing,
+            maxSize: 148,
+          );
+
+          return Center(
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              spacing: spacing,
+              runSpacing: spacing,
+              children: round.choices.map((food) {
+                return KidPickCard<FeedItem>(
+                  key: ValueKey('${state.currentRound}_${food.id}'),
+                  imageAsset: food.imageAsset,
+                  label: food.getLocalizedName(l10n),
+                  size: size,
+                  dragData: food,
+                  state: _cardState(food),
+                  accent: KidUi.correct,
+                  onTap: () => cubit.selectFood(food),
                 );
-              }
-
-              final isSuccess = state is FeedAnimalSuccess;
-              final isError = state is FeedAnimalWrong;
-              final showHint =
-                  state is FeedAnimalPlaying ? state.showHint : false;
-
-              final roundData = state is FeedAnimalPlaying
-                  ? state.roundData
-                  : state is FeedAnimalSuccess
-                      ? state.roundData
-                      : state is FeedAnimalWrong
-                          ? state.roundData
-                          : null;
-
-              final currentRound = state is FeedAnimalPlaying
-                  ? state.currentRound
-                  : state is FeedAnimalSuccess
-                      ? state.currentRound
-                      : state is FeedAnimalWrong
-                          ? state.currentRound
-                          : 1;
-
-              final totalRounds = state is FeedAnimalPlaying
-                  ? state.totalRounds
-                  : state is FeedAnimalSuccess
-                      ? state.totalRounds
-                      : state is FeedAnimalWrong
-                          ? state.totalRounds
-                          : 10;
-
-              final droppedFood =
-                  state is FeedAnimalSuccess ? state.droppedFood : null;
-
-              if (roundData == null) return const SizedBox.shrink();
-
-              final flutterTts = context.read<FlutterTts>();
-
-              return FluidContainer(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        'Round $currentRound/$totalRounds',
-                        style: const TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black54),
-                      ),
-                    ),
-                    Expanded(
-                      child: LayoutBuilder(
-                        builder: (context, constraints) {
-                          final isLandscape =
-                              constraints.maxWidth > constraints.maxHeight;
-
-                          // Available space for the animal (flex 3) and the
-                          // food tray (flex 2), matching the 3:2 split used
-                          // below, so sizes are derived from real space
-                          // instead of fixed pixels that could overflow and
-                          // force a scroll on small screens.
-                          final animalAreaHeight = isLandscape
-                              ? constraints.maxHeight - 40
-                              : (constraints.maxHeight * 3 / 5) - 40;
-                          final animalMaxHeight =
-                              animalAreaHeight.clamp(120.0, 350.0);
-
-                          final trayAreaWidth = isLandscape
-                              ? (constraints.maxWidth * 2 / 5) - 40
-                              : constraints.maxWidth - 40;
-                          final trayAreaHeight = isLandscape
-                              ? constraints.maxHeight - 40
-                              : (constraints.maxHeight * 2 / 5) - 40;
-
-                          final choiceCount = roundData.choices.length;
-                          final widthPerCard = (trayAreaWidth -
-                                  20 * (choiceCount + 1)) /
-                              choiceCount;
-                          var cardWidth = widthPerCard.clamp(60.0, 140.0);
-                          final approxCardHeight = cardWidth * 1.25;
-                          if (approxCardHeight > trayAreaHeight) {
-                            cardWidth =
-                                (trayAreaHeight / 1.25).clamp(60.0, cardWidth);
-                          }
-                          final cardScale = cardWidth / 140.0;
-
-                          final animalContent = Center(
-                            child: AnimalTarget(
-                              animal: roundData.animal,
-                              isSuccess: isSuccess,
-                              isError: isError,
-                              eatenFood: droppedFood,
-                              maxHeight: animalMaxHeight,
-                              onFoodDropped: (food) {
-                                context
-                                    .read<FeedAnimalCubit>()
-                                    .onFoodDropped(food);
-                              },
-                            ),
-                          );
-
-                          final trayContent = Center(
-                            child: Container(
-                              padding: const EdgeInsets.all(20),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.5),
-                                borderRadius: BorderRadius.circular(30),
-                              ),
-                              child: Wrap(
-                                alignment: WrapAlignment.center,
-                                spacing: 20,
-                                runSpacing: 20,
-                                children: roundData.choices.map((food) {
-                                  final isDropped = isSuccess &&
-                                      food.id == roundData.targetFood.id;
-                                  final isTarget =
-                                      food.id == roundData.targetFood.id;
-                                  return FruitDraggable(
-                                    food: food,
-                                    isDropped: isDropped,
-                                    showHint: showHint && isTarget,
-                                    flutterTts: flutterTts,
-                                    scale: cardScale,
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          );
-
-                          if (isLandscape) {
-                            return Row(
-                              children: [
-                                Expanded(flex: 3, child: animalContent),
-                                Expanded(flex: 2, child: trayContent),
-                              ],
-                            );
-                          } else {
-                            return Column(
-                              children: [
-                                const SizedBox(height: 12),
-                                Expanded(flex: 3, child: animalContent),
-                                const SizedBox(height: 12),
-                                Expanded(flex: 2, child: trayContent),
-                              ],
-                            );
-                          }
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-              );
-            }),
+              }).toList(),
+            ),
           );
         },
       ),
     );
+  }
+
+  KidCardState _cardState(FeedItem food) {
+    final isTarget = food.id == round.targetFood.id;
+    // The eaten food leaves its slot empty rather than collapsing the tray, so
+    // the remaining cards do not jump under the child's finger.
+    if (state.phase == FeedPhase.correct && isTarget) return KidCardState.done;
+    if (state.wrongFoodId == food.id) return KidCardState.wrong;
+    if (state.selectedFoodId == food.id) return KidCardState.selected;
+    if (state.showHint && isTarget) return KidCardState.hint;
+    return KidCardState.idle;
   }
 }

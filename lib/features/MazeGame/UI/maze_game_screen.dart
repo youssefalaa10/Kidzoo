@@ -3,6 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:kidzo/core/localization/app_localizations.dart';
+import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/style/kid_ui.dart';
+import '../../../core/shared/widgets/kid_game_shell.dart';
 import '../../LevelsMap/levelmap_screen.dart';
 import '../data/logic/maze_cubit.dart';
 import '../data/models/maze_models.dart';
@@ -41,48 +44,35 @@ class _MazeGameContentState extends State<_MazeGameContent> {
   bool _hasShownInstructions = false;
   bool _isFullScreen = false;
 
+  /// Guards the results dialog. The listener can fire more than once for the
+  /// same finished game (the timer keeps emitting), which used to stack two
+  /// identical dialogs on top of each other.
+  bool _resultDialogOpen = false;
+
   @override
   void initState() {
     super.initState();
-    _enableFullScreen();
-    // Show instructions after a short delay
-    Future.delayed(const Duration(milliseconds: 500), () {
+    // The game no longer opens straight into immersive mode. It used to, which
+    // meant a child arrived to a bare maze with the whole HUD hidden and a
+    // how-to-play dialog on top of it.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted && !_hasShownInstructions) {
-        _showInstructionsDialog();
         _hasShownInstructions = true;
+        _showInstructionsDialog();
       }
     });
   }
 
-  void _enableFullScreen() {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    if (mounted) {
-      setState(() {
-        _isFullScreen = true;
-      });
-    }
-  }
-
-  void _disableFullScreen({bool isDisposing = false}) {
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-    if (!isDisposing && mounted) {
-      setState(() {
-        _isFullScreen = false;
-      });
-    }
-  }
-
-  void _toggleFullScreen() {
-    if (_isFullScreen) {
-      _disableFullScreen();
-    } else {
-      _enableFullScreen();
-    }
+  void _setFullScreen(bool enabled) {
+    SystemChrome.setEnabledSystemUIMode(
+      enabled ? SystemUiMode.immersiveSticky : SystemUiMode.edgeToEdge,
+    );
+    if (mounted) setState(() => _isFullScreen = enabled);
   }
 
   @override
   void dispose() {
-    _disableFullScreen(isDisposing: true);
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
     super.dispose();
   }
 
@@ -97,7 +87,12 @@ class _MazeGameContentState extends State<_MazeGameContent> {
 
   @override
   Widget build(BuildContext context) {
+    final background =
+        BackgroundResolver(context, BackgroundType.game).resolveBackground();
+
     return BlocConsumer<MazeCubit, MazeState>(
+      // Only a change of status opens a dialog, never a plain timer tick.
+      listenWhen: (previous, current) => previous.status != current.status,
       listener: (context, state) {
         if (state.status == MazeGameStatus.won) {
           _showResultDialog(state, true);
@@ -106,197 +101,75 @@ class _MazeGameContentState extends State<_MazeGameContent> {
         }
       },
       builder: (context, state) {
-        return Scaffold(
-          backgroundColor: const Color(0xFFF5F5F5),
-          body: SafeArea(
-            top: !_isFullScreen,
-            bottom: !_isFullScreen,
-            child: Stack(
-              children: [
-                Column(
+        return KidGameShell(
+          backgroundAsset: _isFullScreen ? null : background,
+          maxContentWidth: 720,
+          builder: (context, metrics) => Stack(
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                  horizontal: _isFullScreen ? 4 : metrics.pagePadding,
+                  vertical: _isFullScreen ? 4 : metrics.pagePadding * 0.6,
+                ),
+                child: Column(
                   children: [
-                    if (!_isFullScreen) _buildHeader(context, state),
-                    if (!_isFullScreen) const SizedBox(height: 8),
-                    if (!_isFullScreen) _buildGameInfo(state),
-                    if (!_isFullScreen) const SizedBox(height: 8),
-                    if (!_isFullScreen) _buildHelpText(state),
-                    if (!_isFullScreen) const SizedBox(height: 8),
-                    Expanded(
-                      child: InteractiveMaze(
+                    if (!_isFullScreen) ...[
+                      _MazeHud(
+                        metrics: metrics,
                         state: state,
-                        onStartDrawing: (pos) =>
-                            context.read<MazeCubit>().startDrawing(pos),
-                        onContinueDrawing: (pos) =>
-                            context.read<MazeCubit>().continueDrawing(pos),
-                        onEndDrawing: () =>
-                            context.read<MazeCubit>().endDrawing(),
+                        onBack: () => _showExitConfirmation(context),
+                        onHelp: _showInstructionsDialog,
+                        onFullScreen: () => _setFullScreen(true),
+                      ),
+                      SizedBox(height: metrics.gap * 0.75),
+                      _MazeCoach(metrics: metrics, state: state),
+                      SizedBox(height: metrics.gap * 0.75),
+                    ],
+                    Expanded(
+                      child: _MazeBoard(
+                        metrics: metrics,
+                        flat: _isFullScreen,
+                        child: InteractiveMaze(
+                          state: state,
+                          onStartDrawing: (pos) =>
+                              context.read<MazeCubit>().startDrawing(pos),
+                          onContinueDrawing: (pos) =>
+                              context.read<MazeCubit>().continueDrawing(pos),
+                          onEndDrawing: () =>
+                              context.read<MazeCubit>().endDrawing(),
+                        ),
                       ),
                     ),
-                    if (!_isFullScreen) const SizedBox(height: 8),
-                    if (!_isFullScreen) _buildControls(context),
-                    if (!_isFullScreen) const SizedBox(height: 16),
+                    if (!_isFullScreen) ...[
+                      SizedBox(height: metrics.gap * 0.75),
+                      _NewMazeButton(
+                        metrics: metrics,
+                        onTap: () {
+                          KidHaptics.tap();
+                          context.read<MazeCubit>().resetGame();
+                        },
+                      ),
+                    ],
                   ],
                 ),
-                if (_isFullScreen)
-                  Positioned(
-                    top: 16,
-                    right: 16,
-                    child: SafeArea(
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.8),
-                          shape: BoxShape.circle,
-                        ),
-                        child: IconButton(
-                          icon: const Icon(Icons.fullscreen_exit,
-                              color: Colors.black87),
-                          onPressed: _toggleFullScreen,
-                        ),
-                      ),
+              ),
+              if (_isFullScreen)
+                Positioned(
+                  top: 12,
+                  right: 12,
+                  child: SafeArea(
+                    child: _RoundButton(
+                      icon: Icons.fullscreen_exit_rounded,
+                      size: metrics.size(48, min: 42, max: 56),
+                      onTap: () => _setFullScreen(false),
+                      tooltip: AppLocalizations.of(context).exitFullscreen,
                     ),
                   ),
-              ],
-            ),
+                ),
+            ],
           ),
         );
       },
-    );
-  }
-
-  Widget _buildHeader(BuildContext context, MazeState state) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            onPressed: () => _showExitConfirmation(context),
-            icon: const Icon(Icons.arrow_back, color: Colors.black87),
-          ),
-          Expanded(
-            child: Column(
-              children: [
-                Text(
-                  l10n.mazeGame,
-                  style: const TextStyle(
-                      fontSize: 18, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
-                ),
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: state.difficulty.color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: state.difficulty.color),
-                  ),
-                  child: Text(
-                    state.difficulty.displayName,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: state.difficulty.color,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          PopupMenuButton<String>(
-            icon: const Icon(Icons.more_vert, color: Colors.black87),
-            itemBuilder: (context) => [
-              PopupMenuItem(
-                value: 'restart',
-                child: Row(
-                  children: [
-                    const Icon(Icons.refresh, size: 20),
-                    const SizedBox(width: 8),
-                    Text(l10n.newMaze),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'instructions',
-                child: Row(
-                  children: [
-                    const Icon(Icons.help_outline, size: 20),
-                    const SizedBox(width: 8),
-                    Text(l10n.howToPlay),
-                  ],
-                ),
-              ),
-              PopupMenuItem(
-                value: 'fullscreen',
-                child: Row(
-                  children: [
-                    Icon(
-                        _isFullScreen
-                            ? Icons.fullscreen_exit
-                            : Icons.fullscreen,
-                        size: 20),
-                    const SizedBox(width: 8),
-                    Text(_isFullScreen ? 'Exit Fullscreen' : 'Fullscreen'),
-                  ],
-                ),
-              ),
-            ],
-            onSelected: (value) {
-              if (value == 'restart') {
-                context.read<MazeCubit>().resetGame();
-              } else if (value == 'instructions') {
-                _showInstructionsDialog();
-              } else if (value == 'fullscreen') {
-                _toggleFullScreen();
-              }
-            },
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildHelpText(MazeState state) {
-    String message;
-    Color color;
-    final l10n = AppLocalizations.of(context);
-
-    if (state.currentPosition == null) {
-      message = l10n.mazeInstruction1;
-      color = Colors.green.shade700;
-    } else if (state.currentPosition == state.endPosition) {
-      message = l10n.reachedEnd;
-      color = Colors.green.shade700;
-    } else {
-      message = l10n.keepDragging;
-      color = Colors.blue.shade700;
-    }
-
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      decoration: BoxDecoration(
-        color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
-      ),
-      child: Row(
-        children: [
-          Icon(Icons.info_outline, color: color, size: 20),
-          const SizedBox(width: 8),
-          Expanded(
-            child: Text(
-              message,
-              style: TextStyle(
-                color: color,
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ],
-      ),
     );
   }
 
@@ -305,9 +178,13 @@ class _MazeGameContentState extends State<_MazeGameContent> {
     showDialog<void>(
       context: context,
       builder: (dialogContext) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(l10n.exitGame),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+        title: Text(
+          l10n.exitGame,
+          style: const TextStyle(fontWeight: FontWeight.w900, color: KidUi.ink),
+        ),
         content: Text(l10n.exitGameConfirm),
+        actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(dialogContext),
@@ -319,8 +196,12 @@ class _MazeGameContentState extends State<_MazeGameContent> {
               Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+              backgroundColor: KidUi.wrong,
               foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(KidUi.radiusPill),
+              ),
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
             ),
             child: Text(l10n.exit),
           ),
@@ -329,125 +210,12 @@ class _MazeGameContentState extends State<_MazeGameContent> {
     );
   }
 
-  Widget _buildGameInfo(MazeState state) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          if (state.requiredStars > 0) ...[
-            _buildInfoChip(
-              Icons.star,
-              '${state.starsCollected}/${state.requiredStars}',
-              Colors.yellow.shade700,
-              state.hasCollectedAllStars,
-            ),
-            const SizedBox(width: 12),
-          ],
-          if (state.timeRemaining != null)
-            TweenAnimationBuilder<double>(
-              duration: const Duration(milliseconds: 300),
-              tween: Tween(
-                begin: 1.0,
-                end: state.timeRemaining! < 30 ? 1.1 : 1.0,
-              ),
-              builder: (context, scale, child) {
-                return Transform.scale(
-                  scale: scale,
-                  child: _buildInfoChip(
-                    Icons.timer,
-                    _formatTime(state.timeRemaining!),
-                    state.timeRemaining! < 30
-                        ? Colors.red
-                        : state.timeRemaining! < 60
-                            ? Colors.orange
-                            : Colors.blue,
-                    false,
-                  ),
-                );
-              },
-            ),
-        ],
-      ),
-    );
-  }
+  Future<void> _showResultDialog(MazeState state, bool won) async {
+    if (_resultDialogOpen) return;
+    _resultDialogOpen = true;
 
-  String _formatTime(int seconds) {
-    final minutes = seconds ~/ 60;
-    final secs = seconds % 60;
-    return '$minutes:${secs.toString().padLeft(2, '0')}';
-  }
-
-  Widget _buildInfoChip(
-      IconData icon, String text, Color color, bool isComplete) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            color.withValues(alpha: 0.15),
-            color.withValues(alpha: 0.05),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: color,
-          width: isComplete ? 2 : 1.5,
-        ),
-      ),
-      child: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 20, color: color),
-          const SizedBox(width: 6),
-          Text(
-            text,
-            style: TextStyle(
-              color: color,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-          if (isComplete) ...[
-            const SizedBox(width: 4),
-            Icon(Icons.check_circle, size: 16, color: color),
-          ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildControls(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Row(
-        children: [
-          Expanded(
-            child: ElevatedButton.icon(
-              onPressed: () => context.read<MazeCubit>().resetGame(),
-              icon: const Icon(Icons.refresh),
-              label: Text(l10n.newMaze),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blue.shade600,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 14),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
-      ),
-    );
-  }
-
-  void _showResultDialog(MazeState state, bool won) {
-    // Complete the level if won
     if (won) {
-      // Get the level from the parent widget
+      KidHaptics.success();
       final parentWidget =
           context.findAncestorWidgetOfExactType<MazeGameScreen>();
       if (parentWidget != null) {
@@ -456,9 +224,10 @@ class _MazeGameContentState extends State<_MazeGameContent> {
           LevelCompletionManager().completeLevel(stageNumber);
         }
       }
+    } else {
+      KidHaptics.error();
     }
 
-    // Use kid-friendly dialog
     showMazeResultDialog(
       context,
       won: won,
@@ -468,18 +237,19 @@ class _MazeGameContentState extends State<_MazeGameContent> {
       timeElapsed: state.timeElapsed,
       touchedWall: state.touchedWall,
       onPlayAgain: () {
-        Navigator.pop(context); // Close dialog
+        Navigator.pop(context);
+        _resultDialogOpen = false;
         context.read<MazeCubit>().resetGame();
       },
       onExit: () {
-        Navigator.pop(context); // Close dialog
-        Navigator.pop(context, won); // Return to map
+        Navigator.pop(context);
+        _resultDialogOpen = false;
+        Navigator.pop(context, won);
       },
     );
   }
 
   int? _getStageNumberForLevel(int level) {
-    // Map level (1, 2, 3) to stage numbers (6, 12, 18)
     switch (level) {
       case 1:
         return 6;
@@ -490,5 +260,332 @@ class _MazeGameContentState extends State<_MazeGameContent> {
       default:
         return null;
     }
+  }
+}
+
+/// Back, difficulty, stars, timer and the two utility buttons, on one line.
+///
+/// Replaces the old app-bar-plus-chip-row-plus-overflow-menu stack: a
+/// three-dot menu is not something a five-year-old opens, so the two actions
+/// it hid (how to play, fullscreen) are now buttons in their own right.
+class _MazeHud extends StatelessWidget {
+  const _MazeHud({
+    required this.metrics,
+    required this.state,
+    required this.onBack,
+    required this.onHelp,
+    required this.onFullScreen,
+  });
+
+  final KidMetrics metrics;
+  final MazeState state;
+  final VoidCallback onBack;
+  final VoidCallback onHelp;
+  final VoidCallback onFullScreen;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final buttonSize = metrics.size(48, min: 42, max: 58);
+    final remaining = state.timeRemaining;
+
+    return Row(
+      children: [
+        _RoundButton(
+          icon: Icons.arrow_back_rounded,
+          size: buttonSize,
+          onTap: onBack,
+          tooltip: l10n.goBack,
+        ),
+        SizedBox(width: metrics.gap * 0.5),
+        Expanded(
+          child: Wrap(
+            spacing: metrics.gap * 0.5,
+            runSpacing: metrics.gap * 0.4,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            children: [
+              _Pill(
+                metrics: metrics,
+                label: state.difficulty.displayName,
+                color: state.difficulty.color,
+              ),
+              if (state.requiredStars > 0)
+                _Pill(
+                  metrics: metrics,
+                  icon: Icons.star_rounded,
+                  label: '${state.starsCollected}/${state.requiredStars}',
+                  color: KidUi.hint,
+                  complete: state.hasCollectedAllStars,
+                ),
+              if (remaining != null)
+                _Pill(
+                  metrics: metrics,
+                  icon: Icons.timer_rounded,
+                  label: _formatTime(remaining),
+                  color: remaining < 30
+                      ? KidUi.wrong
+                      : (remaining < 60 ? KidUi.fruit : KidUi.primary),
+                ),
+            ],
+          ),
+        ),
+        SizedBox(width: metrics.gap * 0.5),
+        _RoundButton(
+          icon: Icons.help_outline_rounded,
+          size: buttonSize,
+          onTap: onHelp,
+          tooltip: l10n.howToPlay,
+        ),
+        SizedBox(width: metrics.gap * 0.4),
+        _RoundButton(
+          icon: Icons.fullscreen_rounded,
+          size: buttonSize,
+          onTap: onFullScreen,
+          tooltip: l10n.fullscreen,
+        ),
+      ],
+    );
+  }
+
+  static String _formatTime(int seconds) {
+    final safe = seconds < 0 ? 0 : seconds;
+    return '${safe ~/ 60}:${(safe % 60).toString().padLeft(2, '0')}';
+  }
+}
+
+/// The one line of guidance a child needs right now.
+class _MazeCoach extends StatelessWidget {
+  const _MazeCoach({required this.metrics, required this.state});
+
+  final KidMetrics metrics;
+  final MazeState state;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
+    late final String message;
+    late final Color color;
+    late final IconData icon;
+
+    if (state.currentPosition == null) {
+      message = l10n.mazeInstruction1;
+      color = KidUi.correct;
+      icon = Icons.touch_app_rounded;
+    } else if (state.currentPosition == state.endPosition) {
+      message = l10n.reachedEnd;
+      color = KidUi.correct;
+      icon = Icons.emoji_events_rounded;
+    } else {
+      message = l10n.keepDragging;
+      color = KidUi.primary;
+      icon = Icons.swipe_rounded;
+    }
+
+    return AnimatedContainer(
+      duration: KidUi.medium,
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: metrics.size(16, min: 12, max: 22),
+        vertical: metrics.size(12, min: 9, max: 16),
+      ),
+      decoration: BoxDecoration(
+        color: KidUi.surface.withValues(alpha: 0.95),
+        borderRadius: BorderRadius.circular(KidUi.radiusCard),
+        boxShadow: KidUi.shadow(color, strength: 0.9),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: metrics.size(36, min: 30, max: 44),
+            height: metrics.size(36, min: 30, max: 44),
+            decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            child: Icon(
+              icon,
+              color: Colors.white,
+              size: metrics.size(20, min: 16, max: 24),
+            ),
+          ),
+          SizedBox(width: metrics.gap * 0.6),
+          Expanded(
+            child: Text(
+              message,
+              style: TextStyle(
+                color: KidUi.ink,
+                fontSize: metrics.size(16, min: 13, max: 20),
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// The maze itself, lifted onto a card so it reads as a physical board.
+class _MazeBoard extends StatelessWidget {
+  const _MazeBoard({
+    required this.metrics,
+    required this.child,
+    required this.flat,
+  });
+
+  final KidMetrics metrics;
+  final Widget child;
+  final bool flat;
+
+  @override
+  Widget build(BuildContext context) {
+    if (flat) return child;
+
+    return Container(
+      padding: EdgeInsets.all(metrics.size(12, min: 8, max: 18)),
+      decoration: BoxDecoration(
+        color: KidUi.surface,
+        borderRadius: BorderRadius.circular(KidUi.radiusCard),
+        boxShadow: KidUi.shadow(Colors.black, strength: 1.1),
+      ),
+      child: child,
+    );
+  }
+}
+
+class _NewMazeButton extends StatelessWidget {
+  const _NewMazeButton({required this.metrics, required this.onTap});
+
+  final KidMetrics metrics;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final fontSize = metrics.size(20, min: 15, max: 24);
+
+    return SizedBox(
+      width: double.infinity,
+      child: Material(
+        color: KidUi.primary,
+        borderRadius: BorderRadius.circular(KidUi.radiusPill),
+        elevation: 6,
+        shadowColor: Colors.black38,
+        child: InkWell(
+          onTap: onTap,
+          borderRadius: BorderRadius.circular(KidUi.radiusPill),
+          child: Container(
+            height: metrics.size(58, min: 48, max: 68),
+            alignment: Alignment.center,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.refresh_rounded,
+                    color: Colors.white, size: fontSize * 1.3),
+                SizedBox(width: fontSize * 0.5),
+                Text(
+                  l10n.newMaze,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: fontSize,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _RoundButton extends StatelessWidget {
+  const _RoundButton({
+    required this.icon,
+    required this.size,
+    required this.onTap,
+    this.tooltip,
+  });
+
+  final IconData icon;
+  final double size;
+  final VoidCallback onTap;
+  final String? tooltip;
+
+  @override
+  Widget build(BuildContext context) {
+    final button = Material(
+      color: KidUi.surface,
+      shape: const CircleBorder(),
+      elevation: 4,
+      shadowColor: Colors.black26,
+      child: InkWell(
+        onTap: () {
+          KidHaptics.tap();
+          onTap();
+        },
+        customBorder: const CircleBorder(),
+        child: SizedBox(
+          width: size,
+          height: size,
+          child: Icon(icon, color: KidUi.ink, size: size * 0.5),
+        ),
+      ),
+    );
+    return tooltip == null ? button : Tooltip(message: tooltip, child: button);
+  }
+}
+
+class _Pill extends StatelessWidget {
+  const _Pill({
+    required this.metrics,
+    required this.label,
+    required this.color,
+    this.icon,
+    this.complete = false,
+  });
+
+  final KidMetrics metrics;
+  final String label;
+  final Color color;
+  final IconData? icon;
+  final bool complete;
+
+  @override
+  Widget build(BuildContext context) {
+    final fontSize = metrics.size(15, min: 12, max: 18);
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        horizontal: metrics.size(12, min: 9, max: 16),
+        vertical: metrics.size(7, min: 5, max: 10),
+      ),
+      decoration: BoxDecoration(
+        color: KidUi.surface,
+        borderRadius: BorderRadius.circular(KidUi.radiusPill),
+        border: Border.all(color: color, width: complete ? 2.5 : 1.5),
+        boxShadow: KidUi.shadow(color, strength: 0.6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (icon != null) ...[
+            Icon(icon, size: fontSize * 1.2, color: color),
+            SizedBox(width: fontSize * 0.3),
+          ],
+          Text(
+            label,
+            style: TextStyle(
+              color: KidUi.ink,
+              fontSize: fontSize,
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          if (complete) ...[
+            SizedBox(width: fontSize * 0.25),
+            Icon(Icons.check_circle_rounded, size: fontSize, color: color),
+          ],
+        ],
+      ),
+    );
   }
 }
