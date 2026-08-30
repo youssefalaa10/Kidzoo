@@ -1,0 +1,389 @@
+[
+  {
+    "capital": "Algiers",
+    "code": "dz",
+    "continent": "Africa",
+    "flag_1x1": "flags/1x1/dz.svg",
+    "flag_4x3": "flags/4x3/dz.svg",
+    "iso": true,
+    "name": "Algeria"
+  },
+  {
+    "capital": "Buenos Aires",
+    "code": "ar",
+    "continent": "South America",
+    "flag_1x1": "flags/1x1/ar.svg",
+    "flag_4x3": "flags/4x3/ar.svg",
+    "iso": true,
+    "name": "Argentina"
+  },
+  {
+    "capital": "Canberra",
+    "code": "au",
+    "continent": "Oceania",
+    "flag_1x1": "flags/1x1/au.svg",
+    "flag_4x3": "flags/4x3/au.svg",
+    "iso": true,
+    "name": "Australia"
+  },
+  {
+    "capital": "Manama",
+    "code": "bh",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/bh.svg",
+    "flag_4x3": "flags/4x3/bh.svg",
+    "iso": true,
+    "name": "Bahrain"
+  },
+  {
+    "capital": "Brussels",
+    "code": "be",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/be.svg",
+    "flag_4x3": "flags/4x3/be.svg",
+    "iso": true,
+    "name": "Belgium"
+  },
+  {
+    "capital": "Kralendijk",
+    "code": "bq",
+    "continent": "South America",
+    "flag_1x1": "flags/1x1/bq.svg",
+    "flag_4x3": "flags/4x3/bq.svg",
+    "iso": true,
+    "name": "Bonaire, Sint Eustatius and Saba"
+  },
+  {
+    "capital": "Bras\u00edlia",
+    "code": "br",
+    "continent": "South America",
+    "flag_1x1": "flags/1x1/br.svg",
+    "flag_4x3": "flags/4x3/br.svg",
+    "iso": true,
+    "name": "Brazil"
+  },
+  {
+    "capital": "Ottawa",
+    "code": "ca",
+    "continent": "North America",
+    "flag_1x1": "flags/1x1/ca.svg",
+    "flag_4x3": "flags/4x3/ca.svg",
+    "iso": true,
+    "name": "Canada"
+  },
+  {
+    "capital": "Beijing",
+    "code": "cn",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/cn.svg",
+    "flag_4x3": "flags/4x3/cn.svg",
+    "iso": true,
+    "name": "China"
+  },
+  {
+    "capital": "Bogot\u00e1",
+    "code": "co",
+    "continent": "South America",
+    "flag_1x1": "flags/1x1/co.svg",
+    "flag_4x3": "flags/4x3/co.svg",
+    "iso": true,
+    "name": "Colombia"
+  },
+  {
+    "capital": "Copenhagen",
+    "code": "dk",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/dk.svg",
+    "flag_4x3": "flags/4x3/dk.svg",
+    "iso": true,
+    "name": "Denmark"
+  },
+  {
+    "capital": "Cairo",
+    "code": "eg",
+    "continent": "Africa",
+    "flag_1x1": "flags/1x1/eg.svg",
+    "flag_4x3": "flags/4x3/eg.svg",
+    "iso": true,
+    "name": "Egypt"
+  },
+  {
+    "capital": "Helsinki",
+    "code": "fi",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/fi.svg",
+    "flag_4x3": "flags/4x3/fi.svg",
+    "iso": true,
+    "name": "Finland"
+  },
+  {
+    "capital": "Paris",
+    "code": "fr",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/fr.svg",
+    "flag_4x3": "flags/4x3/fr.svg",
+    "iso": true,
+    "name": "France"
+  },
+  {
+    "capital": "Berlin",
+    "code": "de",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/de.svg",
+    "flag_4x3": "flags/4x3/de.svg",
+    "iso": true,
+    "name": "Germany"
+  },
+  {
+    "capital": "New Delhi",
+    "code": "in",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/in.svg",
+    "flag_4x3": "flags/4x3/in.svg",
+    "iso": true,
+    "name": "India"
+  },
+  {
+    "capital": "Tehran",
+    "code": "ir",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/ir.svg",
+    "flag_4x3": "flags/4x3/ir.svg",
+    "iso": true,
+    "name": "Iran"
+  },
+  {
+    "capital": "Baghdad",
+    "code": "iq",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/iq.svg",
+    "flag_4x3": "flags/4x3/iq.svg",
+    "iso": true,
+    "name": "Iraq"
+  },
+  {
+    "capital": "Rome",
+    "code": "it",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/it.svg",
+    "flag_4x3": "flags/4x3/it.svg",
+    "iso": true,
+    "name": "Italy"
+  },
+  {
+    "capital": "Tokyo",
+    "code": "jp",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/jp.svg",
+    "flag_4x3": "flags/4x3/jp.svg",
+    "iso": true,
+    "name": "Japan"
+  },
+  {
+    "capital": "Amman",
+    "code": "jo",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/jo.svg",
+    "flag_4x3": "flags/4x3/jo.svg",
+    "iso": true,
+    "name": "Jordan"
+  },
+  {
+    "capital": "Kuwait City",
+    "code": "kw",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/kw.svg",
+    "flag_4x3": "flags/4x3/kw.svg",
+    "iso": true,
+    "name": "Kuwait"
+  },
+  {
+    "capital": "Beirut",
+    "code": "lb",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/lb.svg",
+    "flag_4x3": "flags/4x3/lb.svg",
+    "iso": true,
+    "name": "Lebanon"
+  },
+  {
+    "capital": "Tripoli",
+    "code": "ly",
+    "continent": "Africa",
+    "flag_1x1": "flags/1x1/ly.svg",
+    "flag_4x3": "flags/4x3/ly.svg",
+    "iso": true,
+    "name": "Libya"
+  },
+  {
+    "capital": "Mexico City",
+    "code": "mx",
+    "continent": "North America",
+    "flag_1x1": "flags/1x1/mx.svg",
+    "flag_4x3": "flags/4x3/mx.svg",
+    "iso": true,
+    "name": "Mexico"
+  },
+  {
+    "capital": "Rabat",
+    "code": "ma",
+    "continent": "Africa",
+    "flag_1x1": "flags/1x1/ma.svg",
+    "flag_4x3": "flags/4x3/ma.svg",
+    "iso": true,
+    "name": "Morocco"
+  },
+  {
+    "capital": "Muscat",
+    "code": "om",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/om.svg",
+    "flag_4x3": "flags/4x3/om.svg",
+    "iso": true,
+    "name": "Oman"
+  },
+  {
+    "capital": "Lisbon",
+    "code": "pt",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/pt.svg",
+    "flag_4x3": "flags/4x3/pt.svg",
+    "iso": true,
+    "name": "Portugal"
+  },
+  {
+    "capital": "Doha",
+    "code": "qa",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/qa.svg",
+    "flag_4x3": "flags/4x3/qa.svg",
+    "iso": true,
+    "name": "Qatar"
+  },
+  {
+    "capital": "Moscow",
+    "code": "ru",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/ru.svg",
+    "flag_4x3": "flags/4x3/ru.svg",
+    "iso": true,
+    "name": "Russia"
+  },
+  {
+    "capital": "Riyadh",
+    "code": "sa",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/sa.svg",
+    "flag_4x3": "flags/4x3/sa.svg",
+    "iso": true,
+    "name": "Saudi Arabia"
+  },
+  {
+    "capital": "Seoul",
+    "code": "kr",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/kr.svg",
+    "flag_4x3": "flags/4x3/kr.svg",
+    "iso": true,
+    "name": "South Korea"
+  },
+  {
+    "capital": "Madrid",
+    "code": "es",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/es.svg",
+    "flag_4x3": "flags/4x3/es.svg",
+    "iso": true,
+    "name": "Spain"
+  },
+  {
+    "capital": "Khartoum",
+    "code": "sd",
+    "continent": "Africa",
+    "flag_1x1": "flags/1x1/sd.svg",
+    "flag_4x3": "flags/4x3/sd.svg",
+    "iso": true,
+    "name": "Sudan"
+  },
+  {
+    "capital": "Bern",
+    "code": "ch",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/ch.svg",
+    "flag_4x3": "flags/4x3/ch.svg",
+    "iso": true,
+    "name": "Switzerland"
+  },
+  {
+    "capital": "Damascus",
+    "code": "sy",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/sy.svg",
+    "flag_4x3": "flags/4x3/sy.svg",
+    "iso": true,
+    "name": "Syria"
+  },
+  {
+    "capital": "Tunis",
+    "code": "tn",
+    "continent": "Africa",
+    "flag_1x1": "flags/1x1/tn.svg",
+    "flag_4x3": "flags/4x3/tn.svg",
+    "iso": true,
+    "name": "Tunisia"
+  },
+  {
+    "capital": "Ankara",
+    "code": "tr",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/tr.svg",
+    "flag_4x3": "flags/4x3/tr.svg",
+    "iso": true,
+    "name": "T\u00fcrkiye"
+  },
+  {
+    "capital": "Abu Dhabi",
+    "code": "ae",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/ae.svg",
+    "flag_4x3": "flags/4x3/ae.svg",
+    "iso": true,
+    "name": "United Arab Emirates"
+  },
+  {
+    "capital": "London",
+    "code": "gb",
+    "continent": "Europe",
+    "flag_1x1": "flags/1x1/gb.svg",
+    "flag_4x3": "flags/4x3/gb.svg",
+    "iso": true,
+    "name": "United Kingdom"
+  },
+  {
+    "capital": "Washington, D.C.",
+    "code": "us",
+    "continent": "North America",
+    "flag_1x1": "flags/1x1/us.svg",
+    "flag_4x3": "flags/4x3/us.svg",
+    "iso": true,
+    "name": "United States of America"
+  },
+  {
+    "capital": "Montevideo",
+    "code": "uy",
+    "continent": "South America",
+    "flag_1x1": "flags/1x1/uy.svg",
+    "flag_4x3": "flags/4x3/uy.svg",
+    "iso": true,
+    "name": "Uruguay"
+  },
+  {
+    "capital": "Sana'a",
+    "code": "ye",
+    "continent": "Asia",
+    "flag_1x1": "flags/1x1/ye.svg",
+    "flag_4x3": "flags/4x3/ye.svg",
+    "iso": true,
+    "name": "Yemen"
+  }
+]

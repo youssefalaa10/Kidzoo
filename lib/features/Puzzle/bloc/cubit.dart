@@ -1,0 +1,89 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/Puzzle/bloc/state.dart';
+import 'package:kidzo/features/Puzzle/data/model/puzzle_model.dart';
+
+class PuzzleCubit extends Cubit<PuzzleState> {
+  PuzzleCubit() : super(PuzzleInitial());
+
+  int score = 0;
+  bool gameOver = false;
+  List<PuzzleModel> puzzle = [];
+  List<PuzzleModel> choosePiece = [];
+  void selectImage(int index) {
+    if (index == 0) {
+      puzzle = [
+        PuzzleModel(
+          image: ImageManager.gazelle1,
+          index: 0,
+        ),
+        PuzzleModel(
+          image: ImageManager.gazelle2,
+          index: 1,
+        ),
+        PuzzleModel(
+          image: ImageManager.gazelle3,
+          index: 2,
+        ),
+        PuzzleModel(
+          image: ImageManager.gazelle4,
+          index: 3,
+        ),
+      ];
+    } else if (index == 1) {
+      puzzle = [
+        PuzzleModel(
+          image: ImageManager.ghost1,
+          index: 0,
+        ),
+        PuzzleModel(
+          image: ImageManager.ghost2,
+          index: 1,
+        ),
+        PuzzleModel(
+          image: ImageManager.ghost3,
+          index: 2,
+        ),
+        PuzzleModel(
+          image: ImageManager.ghost4,
+          index: 3,
+        ),
+      ];
+    } else if (index == 2) {
+      puzzle = [
+        PuzzleModel(image: ImageManager.party1, index: 0),
+        PuzzleModel(image: ImageManager.party2, index: 1),
+        PuzzleModel(image: ImageManager.party3, index: 2),
+        PuzzleModel(image: ImageManager.party4, index: 3),
+        PuzzleModel(image: ImageManager.party5, index: 4),
+        PuzzleModel(image: ImageManager.party6, index: 5),
+        PuzzleModel(image: ImageManager.party7, index: 6),
+        PuzzleModel(image: ImageManager.party8, index: 7),
+        PuzzleModel(image: ImageManager.party9, index: 8),
+      ];
+    }
+    emit(PuzzleImageSelected());
+  }
+
+  void initGame() {
+    gameOver = false;
+    score = 0;
+    choosePiece = List<PuzzleModel>.from(puzzle);
+    //puzzle.shuffle(); // We want puzzle pieces to stay in order as targets
+    choosePiece.shuffle();
+  }
+
+  void loadPuzzle(Widget puzzleWidget) {
+    emit(PuzzleLoaded(puzzleWidget: puzzleWidget));
+  }
+
+  void updateScore(int points) {
+    score += points;
+    emit(PuzzleScoreUpdated()); // Make sure to create this state
+  }
+
+  void showError() {
+    emit(PuzzleError());
+  }
+}

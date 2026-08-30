@@ -1,0 +1,315 @@
+import 'dart:async';
+
+import 'package:audioplayers/audioplayers.dart';
+import 'package:flame/components.dart';
+import 'package:flame/events.dart';
+import 'package:flame/game.dart';
+import 'package:flutter/material.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/features/FlappyBird/components/background.dart';
+import 'package:kidzo/features/FlappyBird/components/bird.dart';
+import 'package:kidzo/features/FlappyBird/components/flappygame_constants.dart';
+import 'package:kidzo/features/FlappyBird/components/pipemanager.dart';
+
+import 'components/ground.dart';
+import 'components/pipe.dart';
+import 'components/score.dart';
+
+enum GameState { waiting, playing, gameOver }
+
+class FlappyBirdGame extends FlameGame
+    with TapCallbacks, HasCollisionDetection {
+  /* 
+  Basic Game Componenets:
+  -bird
+  -background
+  -ground
+  -pipes
+  -score
+  
+   */
+
+  late Bird bird;
+  late Background background;
+  late Ground ground;
+  late PipeManager pipeManager;
+  ScoreText? scoreText;
+  TextComponent? startText;
+
+  GameState gameState = GameState.waiting;
+  bool isSoundEnabled = true;
+
+  double get groundHeight => size.x > size.y ? size.y * 0.10 : size.y * 0.15;
+
+  double get currentPipeSpeed {
+    if (score >= 60) return pipeSpeed * 1.15;
+    if (score >= 40) return pipeSpeed * 1.10;
+    if (score >= 20) return pipeSpeed * 1.05;
+    return pipeSpeed;
+  }
+
+  double get currentPipeGap {
+    if (score >= 60) return pipeGap * 0.90;
+    if (score >= 40) return pipeGap * 0.92;
+    if (score >= 20) return pipeGap * 0.95;
+    return pipeGap;
+  }
+
+  double get currentGroundSpeed {
+    if (score >= 60) return groundSpeed * 1.15;
+    if (score >= 40) return groundSpeed * 1.10;
+    if (score >= 20) return groundSpeed * 1.05;
+    return groundSpeed;
+  }
+
+  final AudioPlayer _flapPlayer = AudioPlayer();
+  final AudioPlayer _scorePlayer = AudioPlayer();
+
+  Future<void> playFlap() async {
+    if (!isSoundEnabled) return;
+    try {
+      await _flapPlayer.stop();
+      await _flapPlayer.play(AssetSource('audio/boop.wav'));
+    } catch (_) {}
+  }
+
+  Future<void> playScore() async {
+    if (!isSoundEnabled) return;
+    try {
+      await _scorePlayer.stop();
+      await _scorePlayer.play(AssetSource('audio/boop.wav'));
+    } catch (_) {}
+  }
+
+  @override
+  void onRemove() {
+    _flapPlayer.dispose();
+    _scorePlayer.dispose();
+    super.onRemove();
+  }
+
+  @override
+  Future<void> onLoad() async {
+    await _flapPlayer.setPlayerMode(PlayerMode.lowLatency);
+    await _scorePlayer.setPlayerMode(PlayerMode.lowLatency);
+    images.prefix = '';
+    background = Background(size);
+    add(background);
+    bird = Bird();
+    add(bird);
+    ground = Ground();
+    add(ground);
+    pipeManager = PipeManager();
+    add(pipeManager);
+    scoreText = ScoreText();
+    add(scoreText!);
+
+    // Add start instruction text
+    String startMsg = 'Tap to Start';
+    if (buildContext != null) {
+      try {
+        startMsg = AppLocalizations.of(buildContext!).tapToStart;
+      } catch (_) {}
+    }
+
+    startText = TextComponent(
+      text: startMsg,
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 48,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              offset: Offset(2, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+      ),
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2 - 100),
+    );
+    if (startText != null) {
+      add(startText!);
+    }
+  }
+
+  @override
+  void onTapDown(TapDownEvent event) {
+    if (gameState == GameState.waiting) {
+      // Start the game on first tap
+      gameState = GameState.playing;
+      startText?.removeFromParent();
+      bird.flap();
+    } else if (gameState == GameState.playing) {
+      // Flap during gameplay
+      bird.flap();
+    }
+  }
+
+  /*
+  Score
+   */
+  int score = 0;
+  void incrementScore() {
+    score++;
+  }
+
+  void resetScore() {
+    score = 0;
+  }
+
+  /*
+  
+  Game Over  
+  */
+
+  void gameOver() {
+    if (gameState == GameState.gameOver) return;
+    gameState = GameState.gameOver;
+    pauseEngine();
+
+    //show Dialog Box to restart
+
+    showDialog<void>(
+        barrierDismissible: false,
+        context: buildContext!,
+        builder: (context) => AlertDialog(
+              backgroundColor: Colors.orange.shade100,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              title: Text(
+                AppLocalizations.of(context).gameOver,
+                style: const TextStyle(
+                  fontSize: 32,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.deepOrange,
+                ),
+                textAlign: TextAlign.center,
+              ),
+              content: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(
+                      Icons.emoji_events,
+                      size: 60,
+                      color: Colors.amber,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      '${AppLocalizations.of(context).score}: $score',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              actions: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context); // close dialog
+                          Navigator.pop(context); // exit game
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context).exit,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          resetGame();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.green,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 12,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                        ),
+                        child: Text(
+                          AppLocalizations.of(context).playAgain,
+                          style: const TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ));
+  }
+
+  void resetGame() {
+    bird.position = Vector2(birdStartX, size.y / 2);
+    bird.velocity = 0;
+    resetScore();
+    gameState = GameState.waiting;
+    //
+    children.whereType<Pipe>().forEach((pipe) => pipe.removeFromParent());
+
+    // Re-add start text
+    String startMsg = 'Tap to Start';
+    if (buildContext != null) {
+      try {
+        startMsg = AppLocalizations.of(buildContext!).tapToStart;
+      } catch (_) {}
+    }
+
+    startText = TextComponent(
+      text: startMsg,
+      textRenderer: TextPaint(
+        style: const TextStyle(
+          fontSize: 48,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+          shadows: [
+            Shadow(
+              offset: Offset(2, 2),
+              blurRadius: 4,
+            ),
+          ],
+        ),
+      ),
+      anchor: Anchor.center,
+      position: Vector2(size.x / 2, size.y / 2 - 100),
+    );
+    add(startText!);
+
+    resumeEngine();
+  }
+}
