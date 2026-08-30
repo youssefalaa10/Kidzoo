@@ -1,0 +1,30 @@
+import 'package:flutter/material.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+
+class NumberAppBar extends StatelessWidget {
+  const NumberAppBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 50, horizontal: 30),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: const Icon(
+                Icons.arrow_back,
+                size: 30,
+              )),
+          Text(
+            AppLocalizations.of(context).numbers,
+            style: const TextStyle(fontSize: 30, fontWeight: FontWeight.w400),
+          ),
+        ],
+      ),
+    );
+  }
+}

@@ -1,0 +1,362 @@
+import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../core/localization/app_localizations.dart';
+import '../data/logic/game_cubit.dart';
+import '../data/logic/game_logic.dart';
+import '../data/models/game_state_model.dart';
+import 'widgets/game_board.dart';
+import 'widgets/game_dialog.dart';
+
+class Game2048Screen extends StatefulWidget {
+  const Game2048Screen({super.key});
+
+  @override
+  State<Game2048Screen> createState() => _Game2048ScreenState();
+}
+
+class _Game2048ScreenState extends State<Game2048Screen> {
+  late GameCubit _gameCubit;
+
+  @override
+  void initState() {
+    super.initState();
+    _gameCubit = context.read<GameCubit>();
+  }
+
+  void _handleSwipe(DragEndDetails details) {
+    final velocity = details.velocity.pixelsPerSecond;
+    final dx = velocity.dx.abs();
+    final dy = velocity.dy.abs();
+
+    if (dx > dy) {
+      // Horizontal swipe
+      if (velocity.dx > 0) {
+        _gameCubit.move(SwipeDirection.right);
+      } else {
+        _gameCubit.move(SwipeDirection.left);
+      }
+    } else {
+      // Vertical swipe
+      if (velocity.dy > 0) {
+        _gameCubit.move(SwipeDirection.down);
+      } else {
+        _gameCubit.move(SwipeDirection.up);
+      }
+    }
+  }
+
+  void _handleKeyPress(KeyEvent event) {
+    if (event is KeyDownEvent) {
+      if (event.logicalKey == LogicalKeyboardKey.arrowUp) {
+        _gameCubit.move(SwipeDirection.up);
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowDown) {
+        _gameCubit.move(SwipeDirection.down);
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowLeft) {
+        _gameCubit.move(SwipeDirection.left);
+      } else if (event.logicalKey == LogicalKeyboardKey.arrowRight) {
+        _gameCubit.move(SwipeDirection.right);
+      }
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isLandscape = screenWidth > screenHeight;
+
+    return KeyboardListener(
+      focusNode: FocusNode()..requestFocus(),
+      onKeyEvent: _handleKeyPress,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFFAF8EF),
+        body: BlocConsumer<GameCubit, GameState>(
+          listener: (context, state) {
+            if (state.status == GameStatus.won) {
+              showWinDialog(
+                context,
+                score: state.currentScore,
+                maxTile: state.maxTileAchieved,
+                onNewGame: () => _gameCubit.newGame(),
+                onContinue: () => _gameCubit.continueAfterWin(),
+              );
+            } else if (state.status == GameStatus.lost) {
+              showLoseDialog(
+                context,
+                score: state.currentScore,
+                maxTile: state.maxTileAchieved,
+                onNewGame: () => _gameCubit.newGame(),
+                onRetry: () => _gameCubit.restart(),
+              );
+            }
+          },
+          builder: (context, state) {
+            return SafeArea(
+              child: isLandscape ? _buildLandscapeLayout(state) : _buildPortraitLayout(state),
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPortraitLayout(GameState state) {
+    return Column(
+      children: [
+        _buildHeader(state),
+        const SizedBox(height: 20),
+        _buildScoreBoard(state),
+        const SizedBox(height: 20),
+        _buildControlButtons(state),
+        const Spacer(),
+        Expanded(
+          flex: 4,
+          child: _buildGameBoardArea(state),
+        ),
+        const Spacer(flex: 2),
+      ],
+    );
+  }
+
+  Widget _buildLandscapeLayout(GameState state) {
+    return Row(
+      children: [
+        Expanded(
+          flex: 5,
+          child: _buildGameBoardArea(state),
+        ),
+        const SizedBox(width: 16),
+        Expanded(
+          flex: 4,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              _buildHeader(state),
+              const SizedBox(height: 20),
+              _buildScoreBoard(state),
+              const SizedBox(height: 20),
+              _buildControlButtons(state),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildGameBoardArea(GameState state) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final size = constraints.maxWidth < constraints.maxHeight
+            ? constraints.maxWidth
+            : constraints.maxHeight;
+        final boardSize = (size - 32.0).clamp(150.0, 500.0);
+        
+        return Center(
+          child: SingleChildScrollView(
+            child: GameBoard(
+              board: state.board,
+              onSwipe: _handleSwipe,
+              boardSize: boardSize,
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _buildHeader(GameState state) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: () => Navigator.pop(context),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, size: 28),
+            color: const Color(0xFF776E65),
+          ),
+          const Text(
+            '2048',
+            style: TextStyle(
+              fontSize: 48,
+              fontWeight: FontWeight.bold,
+              color: Color(0xFF776E65),
+            ),
+          ),
+          IconButton(
+            onPressed: () {
+              // Show settings or info
+              _showInfoDialog();
+            },
+            icon: const Icon(Icons.info_outline_rounded, size: 28),
+            color: const Color(0xFF776E65),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreBoard(GameState state) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildScoreCard(AppLocalizations.of(context).scoreLabel,
+              state.currentScore, Colors.orange),
+          const SizedBox(width: 16),
+          _buildScoreCard(AppLocalizations.of(context).bestLabel,
+              state.bestScore, Colors.amber),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildScoreCard(String label, int score, Color color) {
+    return Container(
+      width: 120,
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.1),
+            blurRadius: 4,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Column(
+        children: [
+          Text(
+            label,
+            style: const TextStyle(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            '$score',
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.white,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlButtons(GameState state) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          _buildControlButton(
+            icon: Icons.refresh_rounded,
+            label: AppLocalizations.of(context).newGame,
+            color: Colors.blue,
+            onPressed: () => _showNewGameConfirmation(),
+          ),
+          const SizedBox(width: 12),
+          if (_gameCubit.settings.undoEnabled)
+            _buildControlButton(
+              icon: Icons.undo_rounded,
+              label: AppLocalizations.of(context).undo,
+              color: Colors.purple,
+              onPressed: () => _gameCubit.undo(),
+            ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildControlButton({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onPressed,
+  }) {
+    return ElevatedButton.icon(
+      onPressed: onPressed,
+      icon: Icon(icon, size: 20),
+      label: Text(
+        label,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        elevation: 2,
+      ),
+    );
+  }
+
+  void _showNewGameConfirmation() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context).startNewGame),
+        content: Text(
+          AppLocalizations.of(context).currentGameProgressWillBeLost,
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context).cancel),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _gameCubit.newGame();
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.blue,
+              foregroundColor: Colors.white,
+            ),
+            child: Text(AppLocalizations.of(context).newGame),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showInfoDialog() {
+    showDialog<void>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context).howToPlay),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              AppLocalizations.of(context).goal2048,
+              style: const TextStyle(fontSize: 14),
+            ),
+          ],
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(AppLocalizations.of(context).gotIt),
+          ),
+        ],
+      ),
+    );
+  }
+}

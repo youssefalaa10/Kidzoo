@@ -1,0 +1,183 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+import 'package:kidzo/core/helpers/tts_helper.dart';
+import 'package:kidzo/core/helpers/tts_service.dart';
+import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/mixins/background_music_mixin.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
+
+import '../data/flag_data_manager.dart';
+import '../models/country_model.dart';
+
+class TapToLearnScreen extends StatefulWidget {
+  const TapToLearnScreen({super.key});
+
+  @override
+  State<TapToLearnScreen> createState() => _TapToLearnScreenState();
+}
+
+class _TapToLearnScreenState extends State<TapToLearnScreen>
+    with TTSMusicMixin {
+  late TtsHelper _ttsHelper;
+  List<Country> countries = [];
+  String searchQuery = '';
+
+  @override
+  void initState() {
+    super.initState();
+    countries = FlagDataManager.countries;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) {
+        final lang = Localizations.localeOf(context).languageCode;
+        if (lang == 'ar') {
+          TtsService.checkAndRequestArabicVoice(context);
+        }
+      }
+    });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final languageCode = Localizations.localeOf(context).languageCode;
+    _ttsHelper = TtsHelper(
+      musicCubit: context.read<MusicCubit>(),
+      languageCode: languageCode,
+    );
+  }
+
+  void _showCountryDialog(Country country) {
+    _ttsHelper.speak(country.localizedName(context));
+
+    showDialog<void>(
+      context: context,
+      builder: (context) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+              SvgPicture.asset(
+                country.flagAsset,
+                width: 200,
+                placeholderBuilder: (context) =>
+                    const CircularProgressIndicator(),
+              ).animate().shake(),
+              const SizedBox(height: 20),
+              Text(
+                country.localizedName(context),
+                style:
+                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                '${AppLocalizations.of(context).continent}: ${country.continent}',
+                style: const TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+              Text(
+                '${AppLocalizations.of(context).capital}: ${country.capital}',
+                style: const TextStyle(fontSize: 18, color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.green,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10)),
+                ),
+                child: Text(AppLocalizations.of(context).close,
+                    style: const TextStyle(color: Colors.white)),
+              ),
+            ],
+          ),
+        ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+    final filteredCountries = countries
+        .where((c) => c
+            .localizedName(context)
+            .toLowerCase()
+            .contains(searchQuery.toLowerCase()))
+        .toList();
+
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(l10n.tapToLearnFlags),
+        backgroundColor: Colors.blue,
+        foregroundColor: Colors.white,
+      ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: l10n.searchCountries,
+                prefixIcon: const Icon(Icons.search),
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(20)),
+              ),
+              onChanged: (value) => setState(() => searchQuery = value),
+            ),
+          ),
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(10),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                childAspectRatio: 1.2,
+              ),
+              itemCount: filteredCountries.length,
+              itemBuilder: (context, index) {
+                final country = filteredCountries[index];
+                return GestureDetector(
+                  onTap: () => _showCountryDialog(country),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Expanded(
+                            child: SvgPicture.asset(
+                              country.flagAsset,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            country.localizedName(context),
+                            textAlign: TextAlign.center,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                                fontSize: 10, fontWeight: FontWeight.bold),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ).animate().fadeIn(delay: (index % 20).ms * 50).scale(),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
