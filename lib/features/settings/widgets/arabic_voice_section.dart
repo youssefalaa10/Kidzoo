@@ -125,31 +125,34 @@ class _ArabicVoiceSectionState extends State<ArabicVoiceSection> {
               : l10n.ttsInstalledNo,
           good: report?.hasEgyptianFemale ?? false,
         ),
-        const SizedBox(height: 16),
-        Wrap(
-          spacing: 10,
-          runSpacing: 10,
-          children: [
-            if (Platform.isAndroid)
+        const SizedBox(height: 18),
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: KidUi.ink.withValues(alpha: 0.02),
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: KidUi.ink.withValues(alpha: 0.08)),
+          ),
+          child: Wrap(
+            spacing: 10,
+            runSpacing: 10,
+            children: [
+              if (Platform.isAndroid)
+                _Action(
+                  icon: Icons.download_rounded,
+                  label: l10n.ttsInstallVoice,
+                  onTap: _install,
+                  filled: !(report?.hasEgyptianFemale ?? false),
+                ),
               _Action(
-                icon: Icons.download_rounded,
-                label: l10n.ttsInstallVoice,
-                onTap: _install,
-                filled: !(report?.hasEgyptianFemale ?? false),
+                icon: _speaking
+                    ? Icons.graphic_eq_rounded
+                    : Icons.play_arrow_rounded,
+                label: l10n.ttsTestVoice,
+                onTap: _speaking ? null : _test,
               ),
-            _Action(
-              icon: _speaking
-                  ? Icons.graphic_eq_rounded
-                  : Icons.play_arrow_rounded,
-              label: l10n.ttsTestVoice,
-              onTap: _speaking ? null : _test,
-            ),
-            _Action(
-              icon: Icons.refresh_rounded,
-              label: l10n.ttsRefreshVoices,
-              onTap: _busy ? null : () => _load(rescan: true),
-            ),
-          ],
+            ],
+          ),
         ),
       ],
     );
