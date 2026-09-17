@@ -9,6 +9,7 @@ import 'package:kidzo/features/AppCategory/games_screen.dart';
 import 'package:kidzo/features/Profile/kid_profile_screen.dart';
 import 'package:kidzo/features/settings/settings_screen.dart';
 
+import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/language_provider.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
@@ -326,6 +327,13 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
       viewportFraction: 0.8,
       initialPage: widget.selectedIndex,
     );
+
+    // First launch: if the device has no Arabic voice at all, offer the system
+    // installer here rather than letting a child hit silence inside a game.
+    // Shows at most once; the same check also lives in Settings.
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (mounted) TtsService.checkAndRequestArabicVoice(context);
+    });
   }
 
   @override

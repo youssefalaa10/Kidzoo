@@ -7,6 +7,7 @@ import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
 import '../../../core/services/background_resolver.dart';
 import '../data/model/animal_quiz_model.dart';
+import '../../../core/helpers/speech.dart';
 
 class AnimalQuizScreen extends ProtectedGameScreen {
   const AnimalQuizScreen({required super.level, super.key});
@@ -226,7 +227,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
 
     final languageCode = Localizations.localeOf(context).languageCode;
     await _ttsService.setLanguage(languageCode);
-    await _ttsService.speak(text);
+    await Speech.speak(text);
   }
 
   @override

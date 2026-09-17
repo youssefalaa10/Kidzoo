@@ -10,6 +10,21 @@ class ProfileCubit extends Cubit<ProfileState> {
   ProfileCubit(this.profileDao) : super(ProfileInitial());
   final ProfileDao profileDao;
 
+  /// Mirrors the Profiles table constraint
+  /// (name: text().withLength(min: 3, max: 16)).
+  static const int minNameLength = 3;
+  static const int maxNameLength = 16;
+
+  /// Trims and clamps [name] to what the table accepts, or returns null when
+  /// it is too short to be stored.
+  static String? _sanitizeName(String name) {
+    final trimmed = name.trim();
+    if (trimmed.length < minNameLength) return null;
+    return trimmed.length > maxNameLength
+        ? trimmed.substring(0, maxNameLength)
+        : trimmed;
+  }
+
   Future<void> checkProfile() async {
     emit(ProfileLoading());
     try {
@@ -25,11 +40,16 @@ class ProfileCubit extends Cubit<ProfileState> {
   }
 
   Future<void> createProfile(String name, int avatarIndex) async {
+    final safeName = _sanitizeName(name);
+    if (safeName == null) {
+      emit(const ProfileError('Name must be at least $minNameLength characters'));
+      return;
+    }
     emit(ProfileLoading());
     try {
       await profileDao.insertProfile(
         ProfilesCompanion.insert(
-          name: name,
+          name: safeName,
           avatarIndex: Value(avatarIndex),
         ),
       );
@@ -47,6 +67,12 @@ class ProfileCubit extends Cubit<ProfileState> {
     required int avatarIndex,
   }) async {
     final previous = state;
+    final safeName = _sanitizeName(name);
+    if (safeName == null) {
+      emit(const ProfileError('Name must be at least $minNameLength characters'));
+      emit(previous);
+      return;
+    }
     emit(ProfileLoading());
     try {
       final existing = await profileDao.getProfileById(id);
@@ -55,7 +81,7 @@ class ProfileCubit extends Cubit<ProfileState> {
         return;
       }
       final updated = existing.copyWith(
-        name: name,
+        name: safeName,
         age: age,
         avatarIndex: avatarIndex,
       );

@@ -42,6 +42,8 @@ class _KidProfileView extends StatefulWidget {
 }
 
 class _KidProfileViewState extends State<_KidProfileView> {
+  static const int _minNameLength = 3;
+
   final _nameController = TextEditingController();
   final _nameFieldKey = GlobalKey();
   final _random = Random();
@@ -108,6 +110,14 @@ class _KidProfileViewState extends State<_KidProfileView> {
     final l10n = AppLocalizations.of(context);
     if (name.isEmpty) {
       setState(() => _nameError = l10n.nameEmptyError);
+      _scrollToName();
+      return;
+    }
+    // The Profiles table stores name with a min length of 3, so stop short
+    // names here instead of letting drift throw an InvalidDataException.
+    if (name.length < _minNameLength) {
+      setState(() => _nameError = l10n.nameTooShortError);
+      _scrollToName();
       return;
     }
     setState(() {

@@ -34,7 +34,6 @@ bool _aiSavesRally({
     y: _screenHeight - _paddlePadding - _paddleHeight - _ballRadius,
     velocityX: ballSpeed * math.sin(angle),
     velocityY: -ballSpeed * math.cos(angle),
-    radius: _ballRadius,
   );
 
   var paddleX = (_screenWidth - _paddleWidth) / 2;

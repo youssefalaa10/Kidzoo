@@ -11,6 +11,7 @@ import '../../../core/localization/app_localizations.dart';
 import '../data/feed_animal_data.dart';
 import '../data/feed_animal_models.dart';
 import 'feed_animal_state.dart';
+import '../../../core/helpers/speech.dart';
 
 const int kFeedMaxRoundScore = 10;
 const int kFeedMinRoundScore = 4;
@@ -130,7 +131,7 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
 
   Future<void> _speak(String text) async {
     try {
-      await flutterTts.speak(text);
+      await Speech.speak(text);
     } catch (_) {}
   }
 

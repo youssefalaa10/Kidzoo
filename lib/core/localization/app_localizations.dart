@@ -620,6 +620,29 @@ class AppLocalizations {
   String get fullscreen => _localizedValues['fullscreen']!;
   String get exitFullscreen => _localizedValues['exitFullscreen']!;
 
+  // Arabic voice / TTS setup
+  String get ttsSetupTitle => _localizedValues['ttsSetupTitle']!;
+  String get ttsSetupDesc => _localizedValues['ttsSetupDesc']!;
+  String get ttsEngineLabel => _localizedValues['ttsEngineLabel']!;
+  String get ttsVoiceLabel => _localizedValues['ttsVoiceLabel']!;
+  String get ttsEgyptianLabel => _localizedValues['ttsEgyptianLabel']!;
+  String get ttsInstalledYes => _localizedValues['ttsInstalledYes']!;
+  String get ttsInstalledNo => _localizedValues['ttsInstalledNo']!;
+  String get ttsInstallVoice => _localizedValues['ttsInstallVoice']!;
+  String get ttsTestVoice => _localizedValues['ttsTestVoice']!;
+  String get ttsRefreshVoices => _localizedValues['ttsRefreshVoices']!;
+  String get ttsStatusIdeal => _localizedValues['ttsStatusIdeal']!;
+  String get ttsStatusEgyptianWrongGender => _localizedValues['ttsStatusEgyptianWrongGender']!;
+  String get ttsStatusArabicNotEgyptian => _localizedValues['ttsStatusArabicNotEgyptian']!;
+  String get ttsStatusMissing => _localizedValues['ttsStatusMissing']!;
+  String get ttsStatusCloud => _localizedValues['ttsStatusCloud']!;
+  String get ttsNone => _localizedValues['ttsNone']!;
+  String get ttsFirstRunTitle => _localizedValues['ttsFirstRunTitle']!;
+  String get ttsFirstRunBody => _localizedValues['ttsFirstRunBody']!;
+  String get ttsNotNow => _localizedValues['ttsNotNow']!;
+  String get ttsOpenSettings => _localizedValues['ttsOpenSettings']!;
+  String get ttsInstallHint => _localizedValues['ttsInstallHint']!;
+
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;
   }
@@ -677,6 +700,7 @@ class AppLocalizations {
   String get whatsYourName => _localizedValues['whatsYourName']!;
   String get namePlaceholder => _localizedValues['namePlaceholder']!;
   String get nameEmptyError => _localizedValues['nameEmptyError']!;
+  String get nameTooShortError => _localizedValues['nameTooShortError']!;
   String get age => _localizedValues['age']!;
   String iAmYearsOld(int age) =>
       _localizedValues['iAmYearsOld']!.replaceAll('{age}', age.toString());

@@ -10,6 +10,7 @@ import '../../../core/localization/app_localizations.dart';
 import '../../../core/shared/style/image_manager.dart';
 import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
+import '../../../core/helpers/speech.dart';
 
 class MathGame extends ProtectedGameScreen {
   const MathGame({required super.level, super.key});
@@ -72,7 +73,7 @@ class _MathGameState extends ProtectedGameScreenState<MathGame>
             tts, Localizations.localeOf(context).languageCode);
       }
       await tts.stop();
-      await tts.speak(_spokenQuestion(question, l10n));
+      await Speech.speak(_spokenQuestion(question, l10n));
     } catch (_) {}
   }
 

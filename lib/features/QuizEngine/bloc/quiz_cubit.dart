@@ -7,6 +7,7 @@ import 'package:kidzo/core/database/daos/profile_dao.dart';
 
 import '../data/quiz_models.dart';
 import 'quiz_state.dart';
+import '../../../core/helpers/speech.dart';
 
 class QuizCubit extends Cubit<QuizState> {
 
@@ -53,10 +54,10 @@ class QuizCubit extends Cubit<QuizState> {
 
   Future<void> _speakPrompt(String text) async {
     try {
-      await flutterTts.stop();
-      final result = await flutterTts.speak(text);
-      if (result == 1) {
-        await Future.delayed(const Duration(milliseconds: 500));
+      await Speech.stop();
+      final spoke = await Speech.speak(text);
+      if (spoke) {
+        await Future<void>.delayed(const Duration(milliseconds: 500));
       }
     } catch (_) {}
   }
@@ -66,18 +67,18 @@ class QuizCubit extends Cubit<QuizState> {
     if (isCorrect) {
       _score += 10;
       try {
-        await flutterTts.stop();
-        final result = await flutterTts.speak(option.text);
-        if (result == 1) {
-          await Future.delayed(const Duration(milliseconds: 800));
+        await Speech.stop();
+        final spoke = await Speech.speak(option.text);
+        if (spoke) {
+          await Future<void>.delayed(const Duration(milliseconds: 800));
         }
       } catch (_) {}
     } else if (allowRetries) {
       try {
-        await flutterTts.stop();
-        final result = await flutterTts.speak(tryAgainText ?? 'Try again');
-        if (result == 1) {
-          await Future.delayed(const Duration(milliseconds: 600));
+        await Speech.stop();
+        final spoke = await Speech.speak(tryAgainText ?? 'Try again');
+        if (spoke) {
+          await Future<void>.delayed(const Duration(milliseconds: 600));
         }
       } catch (_) {}
     }
@@ -86,7 +87,7 @@ class QuizCubit extends Cubit<QuizState> {
         _questions[_currentIndex], isCorrect, _score, _currentIndex));
 
     final delay = isCorrect ? transitionDuration : wrongFeedbackDuration;
-    await Future.delayed(delay);
+    await Future<void>.delayed(delay);
 
     if (isClosed) return;
 

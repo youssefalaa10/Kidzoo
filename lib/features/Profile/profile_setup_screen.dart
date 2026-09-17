@@ -16,8 +16,14 @@ class ProfileSetupScreen extends StatefulWidget {
 }
 
 class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
+  // Must stay in sync with the Profiles table constraint
+  // (name: text().withLength(min: 3, max: 16)).
+  static const int _minNameLength = 3;
+  static const int _maxNameLength = 16;
+
   final _nameController = TextEditingController();
   int _selectedAvatarIndex = 0;
+  String? _nameError;
 
   final List<String> _avatars = ImageManager.kidAvatars;
 
@@ -29,13 +35,26 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   void _saveProfile() {
     final name = _nameController.text.trim();
-    if (name.isNotEmpty) {
-      context.read<ProfileCubit>().createProfile(name, _selectedAvatarIndex);
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppLocalizations.of(context).pleaseEnterNameError)),
-      );
+    final l10n = AppLocalizations.of(context);
+
+    if (name.isEmpty) {
+      _showNameError(l10n.pleaseEnterNameError);
+      return;
     }
+    if (name.length < _minNameLength) {
+      _showNameError(l10n.nameTooShortError);
+      return;
+    }
+
+    setState(() => _nameError = null);
+    context.read<ProfileCubit>().createProfile(name, _selectedAvatarIndex);
+  }
+
+  void _showNameError(String message) {
+    setState(() => _nameError = message);
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   void _nextAvatar() {
@@ -127,7 +146,13 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                   textCapitalization:
                                       TextCapitalization.characters,
                                   textInputAction: TextInputAction.done,
+                                  maxLength: _maxNameLength,
                                   onSubmitted: (_) => _saveProfile(),
+                                  onChanged: (_) {
+                                    if (_nameError != null) {
+                                      setState(() => _nameError = null);
+                                    }
+                                  },
                                   style: TextStyle(
                                     fontSize: nameFontSize,
                                     fontWeight: FontWeight.w900,
@@ -150,6 +175,14 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                     ),
                                     border: InputBorder.none,
                                     isDense: true,
+                                    counterText: '',
+                                    errorText: _nameError,
+                                    errorStyle: TextStyle(
+                                      fontSize: subtitleFontSize,
+                                      fontWeight: FontWeight.w700,
+                                      color: Colors.white,
+                                    ),
+                                    errorMaxLines: 2,
                                   ),
                                 ),
                               ),

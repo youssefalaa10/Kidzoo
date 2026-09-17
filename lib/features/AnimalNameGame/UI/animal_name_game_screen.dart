@@ -12,6 +12,7 @@ import 'package:kidzo/core/utils/assets.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../data/model/animal_name_model.dart';
 import 'widgets/animal_name_success_overlay.dart';
+import '../../../core/helpers/speech.dart';
 
 class AnimalNameGameScreen extends StatefulWidget {
   const AnimalNameGameScreen({super.key});
@@ -104,7 +105,7 @@ class _AnimalNameGameScreenState extends State<AnimalNameGameScreen>
 
     final languageCode = Localizations.localeOf(context).languageCode;
     await _ttsService.setLanguage(languageCode);
-    await _ttsService.speak(name);
+    await Speech.speak(name);
   }
 
   void _onCorrectMatch(AnimalNameModel animal) {

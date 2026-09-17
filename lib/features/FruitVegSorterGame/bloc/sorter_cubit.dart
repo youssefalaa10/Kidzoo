@@ -11,6 +11,7 @@ import '../../../core/localization/app_localizations.dart';
 import '../data/sorter_data.dart';
 import '../data/sorter_models.dart';
 import 'sorter_state.dart';
+import '../../../core/helpers/speech.dart';
 
 /// Points for a round solved first try. Mistakes cost a little but never zero,
 /// so a struggling child still sees the score move.
@@ -85,7 +86,7 @@ class SorterGameCubit extends Cubit<SorterGameState> {
 
   Future<void> _speak(String text) async {
     try {
-      await flutterTts.speak(text);
+      await Speech.speak(text);
     } catch (_) {}
   }
 

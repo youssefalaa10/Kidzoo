@@ -16,6 +16,7 @@ import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../../../shared/widgets/game_exit_button.dart';
+import '../../../core/helpers/speech.dart';
 
 class MissingLetterScreen extends StatefulWidget {
   const MissingLetterScreen({super.key});
@@ -59,7 +60,7 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
         TtsService.applyLanguageTo(tts, languageCode);
       }
       await tts.stop();
-      await tts.speak(word);
+      await Speech.speak(word);
     } catch (_) {}
   }
 

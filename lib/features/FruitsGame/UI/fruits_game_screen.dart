@@ -2,7 +2,6 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../core/database/config.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
@@ -10,6 +9,7 @@ import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../data/fruits_game_engine.dart';
 import 'widgets/conveyor_belt.dart';
+import '../../../core/helpers/speech.dart';
 
 class FruitsGameScreen extends StatefulWidget {
   const FruitsGameScreen({super.key});
@@ -74,8 +74,7 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
 
   void _speakPrompt() {
     if (mounted) {
-      final tts = context.read<FlutterTts>();
-      tts.speak(_engine.currentPrompt);
+      Speech.speak(_engine.currentPrompt);
     }
   }
 
@@ -112,8 +111,7 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
     });
 
     final l10n = AppLocalizations.of(context);
-    final tts = context.read<FlutterTts>();
-    tts.speak(l10n.excellent);
+    Speech.speak(l10n.excellent);
 
     try {
       final audioPlayer = context.read<AudioPlayer>();
@@ -133,8 +131,7 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
     });
 
     final l10n = AppLocalizations.of(context);
-    final tts = context.read<FlutterTts>();
-    tts.speak(l10n.tryAgain);
+    Speech.speak(l10n.tryAgain);
 
     try {
       final audioPlayer = context.read<AudioPlayer>();

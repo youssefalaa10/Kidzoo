@@ -8,6 +8,7 @@ import '../../Model/word_model.dart';
 import '../../game_storage.dart';
 import '../../word_list.dart';
 import 'missing_letter_state.dart';
+import '../../../../../core/helpers/speech.dart';
 
 class MissingLetterCubit extends Cubit<MissingLetterState> {
   MissingLetterCubit({
@@ -131,7 +132,7 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
   Future<void> _speakWord(String word) async {
     try {
       await _initializeTts();
-      await _tts.speak(word);
+      await Speech.speak(word);
     } catch (_) {
       // Speech is a nice-to-have; ignore TTS failures.
     }

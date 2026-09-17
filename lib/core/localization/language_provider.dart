@@ -9,6 +9,16 @@ class LanguageCubit extends Cubit<Locale> {
 
   static const String _languageKey = 'selected_language';
 
+  /// The language the user last chose, readable before the cubit exists.
+  static Future<String> savedLanguageCode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_languageKey) ?? 'en';
+    } catch (_) {
+      return 'en';
+    }
+  }
+
   Future<void> _loadLanguage() async {
     try {
       final prefs = await SharedPreferences.getInstance();

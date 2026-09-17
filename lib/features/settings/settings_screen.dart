@@ -8,6 +8,7 @@ import '../../core/localization/language_provider.dart';
 import '../../core/mixins/background_music_mixin.dart';
 import '../../core/services/cubit/music_cubit.dart';
 import '../../core/shared/widgets/fluid_container.dart';
+import 'widgets/arabic_voice_section.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -92,6 +93,18 @@ class _SettingsScreenState extends State<SettingsScreen>
                           description: l10n.backgroundMusicDesc,
                           child: _buildMusicTrackSelector(context, l10n),
                           color: Colors.deepPurple,
+                        ),
+                        SizedBox(height: mq.height(2)),
+
+                        // Arabic Voice / TTS setup
+                        _buildSettingsCard(
+                          context,
+                          mq,
+                          icon: Icons.record_voice_over,
+                          title: l10n.ttsSetupTitle,
+                          description: l10n.ttsSetupDesc,
+                          child: const ArabicVoiceSection(),
+                          color: Colors.pink,
                         ),
                         SizedBox(height: mq.height(2)),
 

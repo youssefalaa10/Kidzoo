@@ -19,6 +19,7 @@ import '../../QuizEngine/bloc/quiz_cubit.dart';
 import '../../QuizEngine/bloc/quiz_state.dart';
 import '../../QuizEngine/data/quiz_models.dart';
 import '../data/environment_vehicle_question.dart';
+import '../../../core/helpers/speech.dart';
 
 const int _kPointsPerQuestion = 10;
 
@@ -195,13 +196,12 @@ class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
       ...l10n.positiveFeedbackMessages,
     ];
     final phrase = phrases[_random.nextInt(phrases.length)];
-    final tts = context.read<FlutterTts>();
     Future.delayed(const Duration(milliseconds: 550), () async {
       if (!mounted) return;
       try {
-        await tts.stop();
-        final result = await tts.speak(phrase);
-        if (result == 1 && mounted) {
+        await Speech.stop();
+        final spoke = await Speech.speak(phrase);
+        if (spoke && mounted) {
           await Future<void>.delayed(const Duration(milliseconds: 800));
         }
       } catch (_) {}

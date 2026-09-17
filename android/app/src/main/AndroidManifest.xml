@@ -45,6 +45,13 @@
             <action android:name="android.intent.action.PROCESS_TEXT"/>
             <data android:mimeType="text/plain"/>
         </intent>
+        <!-- Required on Android 11+ (package visibility) for the app to see any
+             text-to-speech engine at all. Without it getEngines/getVoices come
+             back empty and setEngine silently fails, so no Arabic voice can be
+             discovered or selected. -->
+        <intent>
+            <action android:name="android.intent.action.TTS_SERVICE"/>
+        </intent>
         <!-- Required for TTS language data installation checks -->
         <intent>
             <action android:name="android.speech.tts.engine.CHECK_TTS_DATA"/>
