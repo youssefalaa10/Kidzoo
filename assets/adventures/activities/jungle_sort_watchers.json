@@ -9,8 +9,8 @@
   },
   "narration": {
     "prompt": {
-      "en": "Send each animal back to where it was watching from.",
-      "ar": "أَعِدْ كُلَّ حَيَوَانٍ إِلَى المَكَانِ الَّذِي كَانَ يُرَاقِبُ مِنْه."
+      "en": "Send each watcher back to where it was watching from.",
+      "ar": "أَعِدْ كُلَّ مُرَاقِبٍ إِلَى المَكَانِ الَّذِي كَانَ يُرَاقِبُ مِنْه."
     },
     "hint1": {
       "en": "Think about where it lives.",
@@ -25,16 +25,16 @@
       "ar": "هُنَا مَكَانُه. جَرِّبْ أَنْتَ الآن."
     },
     "success": {
-      "en": "Now it can point the way.",
-      "ar": "الآنَ يُمْكِنُهُ أَنْ يَدُلَّكَ عَلَى الطَّرِيق."
+      "en": "Every watcher is home, and every one is pointing the same way.",
+      "ar": "عَادَ كُلُّ مُرَاقِبٍ إِلَى مَكَانِه، وَكُلُّهُمْ يُشِيرُونَ إِلَى الاِتِّجَاهِ نَفْسِه."
     }
   },
   "payload": {
-    "_comment": "activeAttribute is the ONE thing being taught. heldConstant records what deliberately does not vary, because young children attend to the most salient attribute even when it is irrelevant - teaching 'sort by habitat' while sizes also differ risks teaching size instead.",
+    "_comment": "activeAttribute is the ONE thing being taught. heldConstant records what deliberately does not vary, because young children attend to the most salient attribute even when it is irrelevant - teaching 'sort by habitat' while sizes also differ risks teaching size instead. That claim is now enforced by test, which is what caught the original cast: it paired three small animals with a lion, so size varied exactly as the comment promised it would not. The cast here - monkey, bird, rabbit, fish - is all size=small, and is the same four watchers the child met in the two nodes before this one.",
     "activeAttribute": "watchedFrom",
     "heldConstant": ["size"],
     "itemsRef": "packs/animals",
-    "itemIds": ["monkey", "bird", "rabbit", "lion"],
+    "itemIds": ["monkey", "bird", "rabbit", "fish"],
     "itemsPerRound": 4,
     "roundCount": 1,
     "bins": [
@@ -47,6 +47,11 @@
         "id": "bin_ground",
         "value": "ground",
         "label": { "en": "the ground", "ar": "الأَرْض" }
+      },
+      {
+        "id": "bin_river",
+        "value": "river",
+        "label": { "en": "the river", "ar": "النَّهْر" }
       }
     ]
   },

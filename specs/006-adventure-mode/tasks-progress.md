@@ -27,6 +27,7 @@ This is the **single** progress ledger for Spec 006 — there is no second statu
 | 4 — Adventure 1 end-to-end | complete | 2026-09-18 | 2026-09-18 |
 | 4N — Local story reminders *(new requirement)* | complete | 2026-09-18 | 2026-09-18 |
 | 5 — Polish + real scores | partial — see notes | 2026-09-18 | — |
+| 5P — Adventure 1 UX / story / content polish pass | complete | 2026-09-18 | 2026-09-18 |
 | 6 — Adventures 2–4 | not started (content only) | — | — |
 
 ---
@@ -158,6 +159,238 @@ Scope: tune Adventure 1 until it feels good — an explicit iteration phase, not
 
 ---
 
+## Phase 5P: Adventure 1 polish pass
+
+*Requested after playing V1 end to end. Scope: UX, story flow, content, visuals
+and interaction. **Not** an architecture change, and no AAB.*
+
+Each item below is written as the symptom a child would have hit, because that
+is what has to stay fixed. Everything ticked is covered by a test named in the
+same line.
+
+### 1. Flow and navigation
+
+- [x] **P001 The "next" button said `...`.** Three dots is not an instruction: a
+  pre-reader learns nothing from it and an adult reading over their shoulder
+  cannot tell them whether it means "tap me" or "loading". `StoryBeatView` now
+  takes an explicit `nextLabel` (`Next` / `التَّالِي`) for mid-beat lines and a
+  `continueLabel` for the last one, which says what actually happens next —
+  `Next` before a beat, `Let's play` / `هَيَّا نَلْعَب` before an activity. The
+  whole beat stays tappable; the button is a label on the gesture, not the only
+  target. Test: *labels the action in words, never as an ellipsis*.
+- [x] **P002 Fast tapping skipped beats.** Three taps in half a second is
+  ordinary at this age, and every one of them fired `onContinue` — skipping two
+  beats, or racing two pushes of the same activity screen. `StoryBeatView` hands
+  off exactly once, and the runner keys the beat on `nodeId` so no state survives
+  into the next one. Test: *hands off exactly once however fast the child taps*.
+- [x] **P003 The activity result screen lied.** In a story, `KidResultView`
+  offered "Play again" and "Exit" — and **both popped back to the story**. The
+  prominent button was labelled with something it did not do, and the child was
+  asked to choose between two buttons that were the same button. A story result
+  now shows stars and one button saying `Next`. Free play is unchanged.
+- [x] **P004 Narration overlapped itself.** `Speech.speak` dispatches to an
+  engine that happily plays two utterances at once. `ActivityNarrator.speak` is
+  now **latest-wins**: it stops first, and an in-flight call that loses the race
+  returns instead of sitting out its own estimate.
+- [x] **P005 The beat and the activity talked over each other.** Opening an
+  activity cancels the story narration first — that is exactly the moment the
+  child most needs to hear one thing clearly.
+- [x] **P006 Leaving the app left a sentence hanging.** Both the runner and the
+  activity host observe the lifecycle and silence narration on anything but
+  `resumed`. Backgrounding is not an edge case at this age; it is most of how a
+  session ends.
+- [x] **P007 Closing an activity cut off the next beat.** A route is disposed at
+  the *end* of its pop transition, by which time the story beat underneath has
+  already started speaking — and `ActivityCubit.close()` cancelled
+  unconditionally, reaching forward in time to cut off a sentence belonging to a
+  screen it never knew about, on the most common path through the Adventure. It
+  now cancels only when the activity was still running.
+- [x] **P008 A line the child missed was gone.** Every beat carries a replay
+  button, matching the one the activity host already puts on its prompt banner.
+  Test: *a child who missed a line can hear it again*.
+
+### 2. Questions and content
+
+- [x] **P010 The clue lines were never spoken.** The worst finding of the pass.
+  Every `multiple_choice` question carried an authored `revealLine` — *"the
+  monkey says: something green flew past the tall trees"* — and **nothing ever
+  said it**. The child picked the monkey, heard a chime, and was told nothing;
+  the next beat then talked as though they had been told. `ActivityStepView`
+  gained `revealLine` and the base cubit speaks it on a correct step, including
+  for a child who needed every rung of the ladder. Tests: *a correct answer
+  speaks the clue the next beat depends on*, *the clue is still spoken for a
+  child who needed every hint*, and the end-to-end *speaks every authored clue*.
+- [x] **P011 `narration.success` was authored for every activity and spoken by
+  none.** It is the payoff line, so it now lands once, at the end — after every
+  step it would be wallpaper. Test: *the closing line is spoken once, at the end*.
+- [x] **P012 Sorting said the same sentence four times running.** Found by the
+  new end-to-end transcript test, not by review. Two fixes: the base cubit never
+  says the same line twice **consecutively**, and sorting speaks the instruction
+  for the first token and then just names each animal after it — which is what
+  an adult beside the child would do, and costs no new content because pack
+  labels are already authored per locale with harakat. Test: *never says the same
+  thing twice in a row*, in both locales.
+- [x] **P013 Counting rounds could repeat.** Counts were drawn independently per
+  round, so a three-round activity could legitimately ask the same question three
+  times — which a child reads as the app being stuck, not as bad luck. Authored
+  `rounds` now replace the random path for this activity: each names its own
+  item, count and wording. The generated path survives for content whose counts
+  carry no story weight, and it now draws **without replacement**. Tests: *a
+  generated activity does not ask the same question twice*, *no two rounds ask
+  the same question* (content), and the engine rejects a duplicate round at parse
+  time.
+- [x] **P014 The count now means something.** Because the rounds are authored
+  (3 monkeys, 4 birds, 2 rabbits), the beat after the activity can say **"nine
+  watchers"** and be telling the truth. It could not before: no story line can
+  refer to a number drawn at random. Test: *authored rounds are the same every
+  time, on purpose*.
+- [x] **P015 Both locales verified independently.** The end-to-end suite plays
+  the whole Adventure in `en` and `ar` and asserts no run ever mixes the two —
+  which catches a line assembled in code, the one failure mode per-file locale
+  parity cannot see.
+
+### 3. Story and asset consistency
+
+- [x] **P020 The Green Page was orange.** The story called it "the Green Page" in
+  both locales and the art the child tapped was `shapes/square.png`, which is
+  orange. There is now a real `assets/gen/images/story/page_green.png`, and
+  `hint2` — *"it is green, and flat like paper"* — is true. Two tests: the reward
+  art is checked **pixel by pixel** for being green, because no schema can check
+  that words match a picture; and the object searched for must be the same asset
+  as the object awarded.
+- [x] **P021 `heldConstant: ["size"]` was false.** The comment above it explained
+  that young children attend to the most salient attribute even when irrelevant,
+  and the four items directly beneath it were three small animals and a lion.
+  The cast is now monkey, bird, rabbit and fish — all `size: small` — sorted into
+  trees / ground / river, and they are the same four watchers the child meets in
+  the two nodes before. A test asserts every `heldConstant` attribute really is
+  constant, and it fails on the old cast.
+- [x] **P022 The cast is consistent across the whole Adventure.** The three
+  animals questioned are the three the child counts and sorts; distractors are
+  drawn only from animals that appear nowhere else, so a wrong tap is never a
+  half-right one. The node that used to say "there are leaves everywhere" over a
+  scene full of animals now describes the scene that is actually drawn.
+- [x] **P023 A reward is one picture, everywhere.** `rewardArt` is authored on
+  the Adventure and used by the search scene, the flight into the book, the book
+  itself and the completion screen. Tests assert it exists and that nothing
+  disagrees about it.
+
+### 4. Counting activity
+
+- [x] **P030 Items were too small.** The board clamped item size to a *maximum*
+  of `KidUi.minTouchYoung` — the young-child **floor** used as a ceiling — and
+  produced 56dp animals on a phone. Items are now laid out in real cells and take
+  the largest size the cell allows, floored at 76dp. Test: *countable items are
+  big enough for a young child to hit*, at three screen sizes.
+- [x] **P031 Tapping an item now marks it, with its number.** The mark is a ring,
+  a wash **and an ordinal badge** — this one is the first, this one is the
+  second — so a child who loses their place can recover it without starting over,
+  and so the state change does not depend on colour vision.
+- [x] **P032 The running count is spoken and shown.** A new `TallyAttempt`
+  control attempt reports the count to the cubit, which speaks it — `one, two,
+  three` / `وَاحِد، اِثْنَان، ثَلَاثَة`, authored words rather than digits handed
+  to a TTS engine. A tally is never judged, never recorded and never burns a rung
+  of the ladder. Tests: *a tally speaks the number and is not an attempt*, *the
+  numbers are spoken in Arabic, not read out as digits*.
+- [x] **P033 Double-counting is impossible, and the old behaviour was worse than
+  that.** Tapping used to *toggle*, so a child who double-tapped silently lost a
+  count with no way to see why. A re-tap is now a no-op with a haptic. A reset
+  control exists for a genuinely muddled count. Test: *the same object cannot be
+  counted twice*.
+- [x] **P034 The total is obvious and connects back.** The tally strip turns
+  solid green with a check when every object is counted, and the activity closes
+  on *"nine watchers in all. That is nine clues!"*, which the next beat repeats
+  back. Test: *counting every item marks the total as complete*.
+
+### 5. Visual clarity
+
+- [x] **P040 Hidden-clue targets were about 50dp.** Under half `minTouchYoung`,
+  and inside the band where children miss roughly a third of the time — so "did
+  not find it" was partly a measurement of finger size. Clue art is now 0.24 of
+  the scene's short side (floor 72dp), decoys scale with it so the search stays a
+  real search, and the keep-out radius between decoy and clue grew to match.
+- [x] **P041 The reveal points at something.** At `modelled` the clue grows as
+  well as glowing, because a glow alone is easy to miss on a painted background.
+- [x] **P042 The numeral row could overflow.** Fixed sizes plus fixed padding
+  overflowed a small phone as soon as a fourth numeral appeared, and an
+  overflowing answer row is an unanswerable question. Numerals now size to the
+  row they have to fit in and wrap.
+- [x] **P043 Every engine is pumped at phone portrait, phone landscape and
+  tablet, in both locales**, and `takeException()` must be null each time.
+
+### 6. Page recovery and achievements
+
+- [x] **P050 Recovering the page is a moment.** `AdventureRewardOverlay`: the
+  page springs forward over a dimmed screen with a turning burst behind it, holds
+  long enough to be looked at while its name fades in, then **flies into the
+  book**. Phase three is the point — a page that simply disappears has been
+  *taken*; a page the child watches fly into the book has been put somewhere, and
+  that place is on screen and still there afterwards.
+- [x] **P051 The destination is a real widget.** The book badge sits in the
+  progress row throughout, and the flight target is read off its actual position
+  rather than guessed at a corner. A page that flies to an empty corner has not
+  been put anywhere.
+- [x] **P052 It is skippable and fires exactly once.** The story is blocked
+  behind its callback: never firing strands the child, firing twice advances the
+  beat twice. A tap ends it, for the child who has seen it before.
+- [x] **P053 A reusable reward system, not a jungle special case.**
+  `AdventureReward` and `AdventureRewardBook` are built from content, so
+  Adventure 2 gets the same moment by authoring a `rewardArt` — no code change.
+  Test: *the reward book is built from content, not from a hardcoded list*.
+- [x] **P054 The book shows the page.** It used to show a generic document glyph,
+  which quietly undid the reward: a child who watched a green page fly in and
+  then found a grey icon has been shown a receipt, not their page. Counts are
+  rendered in the child's own digits.
+
+### 7. The map is a journey
+
+- [x] **P060 Upcoming destinations are visible and locked.** The map was a flat
+  list with one row in it. It is now a path of stops: the current Adventure open
+  and gently pulsing, finished ones wearing the page they gave up, and the places
+  still to come shown as named, locked stops. The road already walked is solid
+  and coloured; the road ahead is dotted and grey.
+- [x] **P061 Locked stops do not spoil themselves.** A locked stop carries a name
+  and nothing else. Its one teaser line appears only once the Adventure before it
+  is finished — which is what makes finishing feel like it opened something.
+  Tests: *a locked stop is visible, named and not playable*, *gives nothing away
+  until it is earned*.
+- [x] **P062 Unlocking is a small, clear animation** on the stop that changed —
+  not a whole-screen celebration, which would compete with the page that flew
+  into the book thirty seconds earlier.
+- [x] **P063 `upcoming` is content, and deliberately separate from
+  `adventures`.** That list is validated to name real playable content; this one
+  names places that do not exist yet. A test asserts they never overlap, that
+  every upcoming stop is named in both locales, and that a teaser stays short
+  enough to be a tease.
+
+### 8. Final QA
+
+- [x] **P070 Adventure 1 plays start to finish in English and in Arabic**, driven
+  through the real engines, in `test/adventure/adventure_e2e_test.dart`. The
+  spoken transcript is the main assertion, because it is the only representation
+  of the Adventure that matches what a child actually receives.
+- [x] **P071 Adversarial paths covered:** every answer wrong (still reaches the
+  page — the house rule, end to end), fast repeated taps (the page is granted
+  exactly once), backing out mid-Adventure (resumes on the same beat), and an
+  abandoned activity (does not advance the story).
+- [x] **P072 Tests added or updated for every regression above.** Suite:
+  **302 passing, 0 failing** (was 250). `flutter analyze`: 0 errors, 0 warnings.
+- [x] **P073 `assets/gen/images/story/` added to pubspec.** Caught by the board
+  widget tests, which is exactly the failure this project already guards against:
+  pubspec asset entries are not recursive, so a new directory ships nothing.
+
+### Still outstanding after this pass
+
+- **No device run.** Everything above is verified by tests, the analyzer and
+  rendered widget snapshots — not by a human watching a child play. The spec is
+  explicit that the real test is a child, and that has still not happened.
+- **Phase 5's score centralisation is untouched**, as recorded under Phase 5. The
+  five legacy `insertScore` call sites are still correct and still uncentralised.
+- **Adventures 2–4 remain unwritten.** The map now shows them as locked stops,
+  which is a promise the content has to keep.
+
+---
+
 ## Phase 6: Adventures 2–4
 
 *Expanded at the Phase 5 checkpoint.*
@@ -169,6 +402,32 @@ Scope: tune Adventure 1 until it feels good — an explicit iteration phase, not
 ## Notes and decisions
 
 *Append dated entries as work proceeds. Newest first.*
+
+- **2026-09-18** — **The polish pass found more by listening than by looking.**
+  Three of the worst findings were silent, not visual: authored reveal lines that
+  nothing spoke, an authored closing line that nothing spoke, and one sentence
+  repeated four times in a row. None of them were visible in a screenshot, none
+  were caught by any per-layer test, and the third was found only once a test
+  captured the **spoken transcript of a whole run** and asserted no line follows
+  itself. For an app whose users mostly cannot read, the transcript is closer to
+  the product than the widget tree is, and it is now a first-class fixture in
+  `adventure_e2e_test.dart`.
+
+- **2026-09-18** — **Two bugs were the same bug: a comment that outlived its
+  content.** `heldConstant: ["size"]` sat directly under a paragraph explaining
+  why holding size constant matters, above four items whose sizes varied. The
+  Green Page sat in a file that said "green" five times and pointed at an orange
+  square. Prose cannot be checked, so both are now assertions: `heldConstant` is
+  verified against the actual items, and the reward art is checked pixel by pixel
+  for being the colour the story claims. Both tests were confirmed to fail on the
+  original content before being kept.
+
+- **2026-09-18** — **`KidUi.minTouchYoung` was used backwards.** The counting
+  board clamped item size to a *maximum* of the young-child **minimum**, so the
+  constant that exists to keep targets large was the thing making them small.
+  Worth remembering as a review heuristic: a floor appearing as a `max` argument
+  is almost always wrong.
+
 
 ### Adventure Mode V1 — what shipped
 

@@ -13,6 +13,8 @@ class CountingStep extends ActivityStep {
     required this.numeralOptions,
     required this.layout,
     required this.mode,
+    this.prompt,
+    this.revealLine,
   }) : super(stepId);
 
   final int targetCount;
@@ -25,6 +27,10 @@ class CountingStep extends ActivityStep {
   final CountingLayout layout;
   final CountingMode mode;
 
+  /// This round's authored wording, when it has its own.
+  final LocalizedText? prompt;
+  final LocalizedText? revealLine;
+
   String optionIdFor(int value) => 'count_$value';
   int valueOfOptionId(String id) => int.parse(id.split('_').last);
 }
@@ -34,14 +40,49 @@ class CountingCubit extends ActivityCubit<CountingContent, CountingStep> {
 
   @override
   List<CountingStep> buildSteps() {
+    if (content.isAuthored) {
+      return _authoredSteps();
+    }
+    return _generatedSteps();
+  }
+
+  List<CountingStep> _authoredSteps() {
+    final List<CountingStep> steps = <CountingStep>[];
+    for (int round = 0; round < content.rounds.length; round++) {
+      final CountingRound authored = content.rounds[round];
+      steps.add(CountingStep(
+        stepId: 'count_${round}_${authored.item.id}',
+        targetCount: authored.targetCount,
+        item: authored.item,
+        numeralOptions: _optionsAround(authored.targetCount),
+        layout: content.layout,
+        mode: content.mode,
+        prompt: authored.prompt,
+        revealLine: authored.revealLine,
+      ));
+    }
+    return steps;
+  }
+
+  /// The generated path, for content whose counts carry no story weight.
+  ///
+  /// It draws **without replacement** where it can. The previous version drew
+  /// each round independently, so a three-round activity could legitimately ask
+  /// "how many?" about three monkeys, three times — and to a four-year-old that
+  /// is not randomness, it is the app repeating itself. Repeats are only
+  /// allowed once the range has genuinely run out of distinct answers.
+  List<CountingStep> _generatedSteps() {
+    final List<int> pool = <int>[
+      for (int value = content.minCount; value <= content.maxCount; value++)
+        value,
+    ]..shuffle(services.random);
+    final List<PackItem> itemPool = List<PackItem>.of(content.items)
+      ..shuffle(services.random);
+
     final List<CountingStep> steps = <CountingStep>[];
     for (int round = 0; round < content.roundCount; round++) {
-      final int target = content.fixedTargetCount ??
-          (content.minCount +
-              services.random
-                  .nextInt(content.maxCount - content.minCount + 1));
-      final PackItem item =
-          content.items[services.random.nextInt(content.items.length)];
+      final int target = content.fixedTargetCount ?? pool[round % pool.length];
+      final PackItem item = itemPool[round % itemPool.length];
       steps.add(CountingStep(
         stepId: 'count_$round',
         targetCount: target,
@@ -103,15 +144,20 @@ class CountingCubit extends ActivityCubit<CountingContent, CountingStep> {
       random: services.random,
     );
 
-    // The prompt is authored whole per locale on the spec. It is not assembled
-    // here, and that is a hard rule rather than a style preference: Arabic
-    // number-noun agreement is irregular (3-10 take a broken plural, 11+ a
-    // singular accusative), so "How many {n} {noun}?" cannot be built by
+    // The prompt is authored whole per locale — per round when the round has
+    // its own wording, otherwise on the spec. It is never assembled here, and
+    // that is a hard rule rather than a style preference: Arabic number-noun
+    // agreement is irregular (dual for 2, a broken plural for 3-10, a singular
+    // accusative for 11+), so "How many {n} {noun}?" cannot be built by
     // substitution without producing wrong Arabic.
+    final LocalizedText prompt = step.prompt ??
+        (spec.narration.prompt.isEmpty
+            ? const LocalizedText(<String, String>{'en': 'How many?'})
+            : spec.narration.prompt);
+
     return ActivityStepView(
-      prompt: spec.narration.prompt.isEmpty
-          ? const LocalizedText(<String, String>{'en': 'How many?'})
-          : spec.narration.prompt,
+      prompt: prompt,
+      revealLine: step.revealLine,
       liveOptionIds: live,
       dimmedOptionIds:
           allIds.where((String id) => !live.contains(id)).toList(growable: false),

@@ -21,6 +21,8 @@ import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_soundboard.dart';
 import 'package:kidzo/features/Adventure/story/adventure_runner_cubit.dart';
 import 'package:kidzo/features/Adventure/story/models/story_models.dart';
+import 'package:kidzo/features/Adventure/story/rewards/adventure_reward.dart';
+import 'package:kidzo/features/Adventure/story/rewards/adventure_reward_overlay.dart';
 import 'package:kidzo/features/Adventure/story/ui/story_beat_view.dart';
 
 /// Plays one Adventure end to end.
@@ -55,12 +57,17 @@ class AdventureRunnerScreen extends StatefulWidget {
   State<AdventureRunnerScreen> createState() => _AdventureRunnerScreenState();
 }
 
-class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
+class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
+    with WidgetsBindingObserver {
   static const BackgroundResolver _backgrounds = BackgroundResolver();
 
   late final AdventureRunnerCubit _runner;
   late final ActivityNarrator _narrator;
   late final ActivitySoundboard _soundboard;
+
+  /// Where a recovered page flies to. Read off the real widget rather than
+  /// guessed at, so the animation lands on the book the child then sees.
+  final GlobalKey _bookKey = GlobalKey();
 
   /// Whether the activity screen is currently on top.
   ///
@@ -69,6 +76,12 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
   /// than a plain flag: when the child backs out, this screen has to swap the
   /// bare backdrop for a way back in, and that needs a rebuild.
   bool _isActivityOpen = false;
+
+  /// The reward currently being celebrated, if any.
+  AdventureReward? _celebrating;
+
+  /// Bumped when a page lands in the book, so the book badge can react.
+  int _pagesInBook = 0;
 
   void _setActivityOpen(bool isOpen) {
     if (!mounted) {
@@ -81,6 +94,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _narrator = widget.narrator ?? SpeechActivityNarrator();
     _soundboard = widget.soundboard ?? AudioActivitySoundboard();
     _runner = AdventureRunnerCubit(
@@ -92,8 +106,24 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _runner.start());
   }
 
+  /// Stops talking when the app goes away.
+  ///
+  /// Without this, a child who is handed the phone back — or who takes a call,
+  /// or whose parent switches apps — comes back to a half-finished sentence
+  /// from a beat they may no longer be on, or to two voices once the beat they
+  /// *are* on starts speaking. Backgrounding is not a rare path at this age; it
+  /// is most of how a session ends.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state != AppLifecycleState.resumed) {
+      _narrator.cancel();
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _runner.close();
     _narrator.cancel();
     _soundboard.dispose();
@@ -123,6 +153,14 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
       return;
     }
     _setActivityOpen(true);
+    // The beat that introduced this activity may still be talking. The activity
+    // opens by speaking its own prompt, so without this the child hears the
+    // instruction and the set-up on top of each other — which is exactly the
+    // moment they most need to hear one thing clearly.
+    await _narrator.cancel();
+    if (!mounted) {
+      return;
+    }
     try {
       final ActivitySpec spec = widget.bundle.requireActivity(node.activityRef!);
       final ActivityEngine<ActivityContent> engine =
@@ -133,6 +171,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
         packs: widget.bundle.packResolver,
         storyNodeId: node.nodeId,
       );
+      final AppLocalizations l10n = AppLocalizations.of(context);
 
       ActivityResult? result;
       await Navigator.of(context).push<void>(
@@ -144,6 +183,11 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
                     .requireAdventure(widget.adventureId)
                     .title
                     .resolve(_languageCode),
+            // Present, and that is what switches the host's result screen from
+            // the free-play one — two equal buttons, one of them labelled
+            // "Play again" while actually leaving — to a single button that
+            // says what really happens next: the story carries on.
+            continueLabel: l10n.resolve('storyContinue', fallback: 'Next'),
             onFinished: (ActivityResult value) => result = value,
           ),
         ),
@@ -172,6 +216,51 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
     }
   }
 
+  /// Works out where the book badge is, in the overlay's coordinates.
+  Offset? _bookDestination() {
+    final BuildContext? bookContext = _bookKey.currentContext;
+    final RenderBox? book = bookContext?.findRenderObject() as RenderBox?;
+    final RenderBox? overlay = context.findRenderObject() as RenderBox?;
+    if (book == null || overlay == null || !book.hasSize) {
+      return null;
+    }
+    return overlay.globalToLocal(
+      book.localToGlobal(book.size.center(Offset.zero)),
+    );
+  }
+
+  void _startCelebration(AdventureRunnerState state) {
+    final String? rewardId = state.justEarnedRewardId;
+    final Adventure? adventure = state.adventure;
+    if (rewardId == null || adventure == null || _celebrating != null) {
+      return;
+    }
+    // Silence whatever the activity left in the air before the beat that
+    // introduces the page starts speaking over it. The beat's own lines are
+    // the right soundtrack for the flight, so this clears the way for them
+    // rather than replacing them.
+    _narrator.cancel();
+    setState(() {
+      _celebrating = AdventureReward(
+        rewardId: rewardId,
+        adventureId: adventure.adventureId,
+        title: adventure.rewardTitle,
+        art: adventure.rewardArt,
+        accentValue: adventure.accentColorValue,
+      );
+    });
+  }
+
+  void _endCelebration() {
+    if (_celebrating == null) {
+      return;
+    }
+    setState(() {
+      _celebrating = null;
+      _pagesInBook++;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final AppLocalizations l10n = AppLocalizations.of(context);
@@ -184,6 +273,9 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
         listenWhen: (AdventureRunnerState previous, AdventureRunnerState current) =>
             previous.node?.nodeId != current.node?.nodeId,
         listener: (BuildContext context, AdventureRunnerState state) {
+          if (state.justEarnedRewardId != null) {
+            _startCelebration(state);
+          }
           if (state.isOnActivity && state.node != null) {
             _openActivity(state.node!);
           }
@@ -196,34 +288,61 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
           return KidGameShell(
             backgroundAsset: background,
             builder: (BuildContext context, KidMetrics metrics) {
-              switch (state.status) {
-                case AdventureRunnerStatus.loading:
-                  return const Center(child: CircularProgressIndicator());
-                case AdventureRunnerStatus.contentError:
-                  return _StoryMessage(
-                    metrics: metrics,
-                    languageCode: _languageCode,
-                    message: state.errorMessage ?? '',
-                    buttonLabel: l10n.resolve('goBack', fallback: 'Back'),
-                    onTap: () => Navigator.of(context).maybePop(),
-                  );
-                case AdventureRunnerStatus.finished:
-                  return _AdventureCompleteView(
-                    metrics: metrics,
-                    adventure: state.adventure!,
-                    languageCode: _languageCode,
-                    onDone: () => Navigator.of(context).maybePop(),
-                    doneLabel:
-                        l10n.resolve('adventureBackToMap', fallback: 'Back'),
-                  );
-                case AdventureRunnerStatus.playing:
-                  return _buildPlaying(context, metrics, state, l10n);
-              }
+              return Stack(
+                children: <Widget>[
+                  Positioned.fill(
+                    child: _buildBody(context, metrics, state, l10n),
+                  ),
+                  if (_celebrating != null)
+                    Positioned.fill(
+                      child: AdventureRewardOverlay(
+                        reward: _celebrating!,
+                        languageCode: _languageCode,
+                        destination: _bookDestination(),
+                        caption: l10n.resolve('adventurePageHome',
+                            fallback: 'A page came home!'),
+                        onDone: _endCelebration,
+                      ),
+                    ),
+                ],
+              );
             },
           );
         },
       ),
     );
+  }
+
+  Widget _buildBody(
+    BuildContext context,
+    KidMetrics metrics,
+    AdventureRunnerState state,
+    AppLocalizations l10n,
+  ) {
+    switch (state.status) {
+      case AdventureRunnerStatus.loading:
+        return const Center(child: CircularProgressIndicator());
+      case AdventureRunnerStatus.contentError:
+        return _StoryMessage(
+          metrics: metrics,
+          languageCode: _languageCode,
+          message: state.errorMessage ?? '',
+          buttonLabel: l10n.resolve('goBack', fallback: 'Back'),
+          onTap: () => Navigator.of(context).maybePop(),
+        );
+      case AdventureRunnerStatus.finished:
+        return _AdventureCompleteView(
+          metrics: metrics,
+          adventure: state.adventure!,
+          languageCode: _languageCode,
+          onDone: () => Navigator.of(context).maybePop(),
+          title: l10n.resolve('adventureFinishedTitle',
+              fallback: 'The page is back in the book'),
+          doneLabel: l10n.resolve('adventureBackToMap', fallback: 'Back'),
+        );
+      case AdventureRunnerStatus.playing:
+        return _buildPlaying(context, metrics, state, l10n);
+    }
   }
 
   Widget _buildPlaying(
@@ -236,43 +355,18 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
     if (node == null) {
       return const SizedBox.shrink();
     }
-    if (node.isActivity) {
-      if (_isActivityOpen) {
-        // The activity screen is on top; show the backdrop rather than a
-        // spinner so the transition reads as the story continuing.
-        return const SizedBox.shrink();
-      }
-      // The child backed out of this activity, so the runner deliberately kept
-      // them on the node rather than skipping the beat. Without something here
-      // they would be looking at an empty backdrop with no way forward, so
-      // offer the way back in. The node's own lines explain why it matters.
-      return Column(
-        children: <Widget>[
-          Padding(
-            padding: EdgeInsets.fromLTRB(
-              metrics.pagePadding,
-              metrics.pagePadding * 0.6,
-              metrics.pagePadding,
-              0,
-            ),
-            child: _StoryProgressBar(
-              metrics: metrics,
-              progress: state.progress,
-              onBack: () => Navigator.of(context).maybePop(),
-            ),
-          ),
-          Expanded(
-            child: StoryBeatView(
-              node: node,
-              languageCode: _languageCode,
-              onSpeak: _narrator.speak,
-              onContinue: () => _openActivity(node),
-              continueLabel: l10n.resolve('adventureResume', fallback: 'Continue'),
-            ),
-          ),
-        ],
-      );
+
+    // An activity node with its screen on top shows the backdrop, so the
+    // transition reads as the story continuing rather than as a spinner.
+    if (node.isActivity && _isActivityOpen) {
+      return const SizedBox.shrink();
     }
+
+    // For an activity node the child has backed out of, the runner deliberately
+    // kept them on the node rather than skipping the beat. Without something
+    // here they would be looking at an empty backdrop with no way forward, so
+    // the node's own lines explain why it matters and the button goes back in.
+    final bool isReentry = node.isActivity;
 
     return Column(
       children: <Widget>[
@@ -286,20 +380,38 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen> {
           child: _StoryProgressBar(
             metrics: metrics,
             progress: state.progress,
+            bookKey: _bookKey,
+            pagesInBook: _pagesInBook,
+            accent: _accentOf(state.adventure),
             onBack: () => Navigator.of(context).maybePop(),
           ),
         ),
         Expanded(
           child: StoryBeatView(
+            // Keyed on the node so a beat's own state — which line is showing,
+            // whether it has handed off — cannot survive into the next beat.
+            key: ValueKey<String>(node.nodeId),
             node: node,
             languageCode: _languageCode,
+            accent: _accentOf(state.adventure),
             onSpeak: _narrator.speak,
-            onContinue: _runner.continueStory,
-            continueLabel: l10n.resolve('storyContinue', fallback: 'Next'),
+            onContinue:
+                isReentry ? () => _openActivity(node) : _runner.continueStory,
+            continueLabel: isReentry
+                ? l10n.resolve('storyBeginActivity', fallback: "Let's play")
+                : l10n.resolve('storyContinue', fallback: 'Next'),
+            nextLabel: l10n.resolve('storyContinue', fallback: 'Next'),
+            replayLabel:
+                l10n.resolve('storyReplayLine', fallback: 'Say it again'),
           ),
         ),
       ],
     );
+  }
+
+  Color _accentOf(Adventure? adventure) {
+    final int? value = adventure?.accentColorValue;
+    return value == null ? KidUi.primary : Color(value);
   }
 }
 
@@ -333,15 +445,26 @@ class _StoryProgressBar extends StatelessWidget {
   const _StoryProgressBar({
     required this.metrics,
     required this.progress,
+    required this.bookKey,
+    required this.pagesInBook,
+    required this.accent,
     required this.onBack,
   });
 
   final KidMetrics metrics;
   final double progress;
+
+  /// Identifies the book badge so a recovered page can fly to it.
+  final GlobalKey bookKey;
+
+  final int pagesInBook;
+  final Color accent;
   final VoidCallback onBack;
 
   @override
   Widget build(BuildContext context) {
+    final double badge = metrics.size(KidUi.minTouch, min: 56, max: 88);
+
     return Row(
       children: <Widget>[
         Semantics(
@@ -353,8 +476,8 @@ class _StoryProgressBar extends StatelessWidget {
               onBack();
             },
             child: Container(
-              width: KidUi.minTouch,
-              height: KidUi.minTouch,
+              width: badge,
+              height: badge,
               decoration: BoxDecoration(
                 color: Colors.white.withValues(alpha: 0.9),
                 shape: BoxShape.circle,
@@ -372,7 +495,33 @@ class _StoryProgressBar extends StatelessWidget {
               value: progress.clamp(0.0, 1.0),
               minHeight: metrics.size(16, min: 12, max: 22),
               backgroundColor: Colors.white.withValues(alpha: 0.65),
-              valueColor: const AlwaysStoppedAnimation<Color>(KidUi.primary),
+              valueColor: AlwaysStoppedAnimation<Color>(accent),
+            ),
+          ),
+        ),
+        SizedBox(width: metrics.gap),
+        // The book, on screen throughout. It is the destination the recovered
+        // page flies into, and it has to be visible *before* the flight for
+        // that flight to mean anything.
+        AnimatedScale(
+          key: bookKey,
+          duration: KidUi.celebrate,
+          curve: Curves.elasticOut,
+          scale: pagesInBook > 0 ? 1.12 : 1,
+          child: Container(
+            width: badge,
+            height: badge,
+            decoration: BoxDecoration(
+              color: pagesInBook > 0
+                  ? accent
+                  : Colors.white.withValues(alpha: 0.9),
+              shape: BoxShape.circle,
+              boxShadow: KidUi.shadow(accent, strength: 0.6),
+            ),
+            child: Icon(
+              Icons.auto_stories_rounded,
+              color: pagesInBook > 0 ? Colors.white : accent,
+              size: badge * 0.5,
             ),
           ),
         ),
@@ -387,6 +536,7 @@ class _AdventureCompleteView extends StatelessWidget {
     required this.adventure,
     required this.languageCode,
     required this.onDone,
+    required this.title,
     required this.doneLabel,
   });
 
@@ -394,6 +544,7 @@ class _AdventureCompleteView extends StatelessWidget {
   final Adventure adventure;
   final String languageCode;
   final VoidCallback onDone;
+  final String title;
   final String doneLabel;
 
   @override
@@ -401,7 +552,12 @@ class _AdventureCompleteView extends StatelessWidget {
     return _StoryMessage(
       metrics: metrics,
       languageCode: languageCode,
-      message: adventure.rewardTitle.resolve(languageCode),
+      message: title,
+      subtitle: adventure.rewardTitle.resolve(languageCode),
+      // The page the child actually recovered, not a generic glyph. Ending on
+      // the same picture that flew into the book is what ties the whole
+      // Adventure to one object.
+      art: adventure.rewardArt,
       buttonLabel: doneLabel,
       onTap: onDone,
       icon: Icons.auto_stories_rounded,
@@ -416,20 +572,26 @@ class _StoryMessage extends StatelessWidget {
     required this.message,
     required this.buttonLabel,
     required this.onTap,
+    this.subtitle,
+    this.art,
     this.icon = Icons.map_outlined,
   });
 
   final KidMetrics metrics;
   final String languageCode;
   final String message;
+  final String? subtitle;
+  final String? art;
   final String buttonLabel;
   final VoidCallback onTap;
   final IconData icon;
 
   @override
   Widget build(BuildContext context) {
+    final double artSize = metrics.size(140, min: 96, max: 190);
+
     return Center(
-      child: Padding(
+      child: SingleChildScrollView(
         padding: EdgeInsets.all(metrics.pagePadding),
         child: Container(
           padding: EdgeInsets.all(metrics.pagePadding),
@@ -441,15 +603,27 @@ class _StoryMessage extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: <Widget>[
-              Icon(icon,
-                  size: metrics.size(72, min: 52, max: 96),
-                  color: KidUi.primary),
+              if (art != null)
+                Image.asset(art!, width: artSize, height: artSize)
+              else
+                Icon(icon,
+                    size: metrics.size(72, min: 52, max: 96),
+                    color: KidUi.primary),
               SizedBox(height: metrics.gap),
               ActivityGlyphText(
                 message,
                 languageCode: languageCode,
                 fontSize: metrics.size(22, min: 16, max: 28),
               ),
+              if (subtitle != null) ...<Widget>[
+                SizedBox(height: metrics.gap * 0.3),
+                ActivityGlyphText(
+                  subtitle!,
+                  languageCode: languageCode,
+                  fontSize: metrics.size(17, min: 13, max: 21),
+                  color: KidUi.inkSoft,
+                ),
+              ],
               SizedBox(height: metrics.gap),
               GestureDetector(
                 onTap: () {

@@ -15,8 +15,14 @@ import 'package:kidzo/core/helpers/speech.dart';
 /// An interface, not a static facade, so engine cubits are unit-testable with
 /// no TTS engine anywhere near them.
 abstract class ActivityNarrator {
-  /// Speaks [text], resolving when it has plausibly finished. Returns early if
-  /// [cancel] is called.
+  /// Speaks [text], resolving when it has plausibly finished.
+  ///
+  /// **Latest wins.** A second `speak` while one is in flight silences the
+  /// first rather than layering over it, and the abandoned call returns early.
+  /// That is the only sequencing rule that survives a real child: they tap
+  /// ahead, they tap fast, and they re-enter a node while the last line is
+  /// still playing. Queueing would make the app talk at them for ten seconds
+  /// after they moved on; overlapping would make it unintelligible.
   Future<void> speak(String text);
 
   /// Abandons anything queued or in flight.
@@ -56,6 +62,15 @@ class SpeechActivityNarrator implements ActivityNarrator {
       return;
     }
     final int generation = ++_generation;
+    // Stop first, always. `Speech.speak` dispatches to a platform engine that
+    // happily plays two utterances at once, so without this a child who taps
+    // through a beat hears the old line and the new one together. Bumping the
+    // generation *before* stopping means an in-flight `speak` sees it lost the
+    // race and returns instead of sitting out its own estimate.
+    await Speech.stop();
+    if (generation != _generation) {
+      return;
+    }
     await Speech.speak(trimmed);
     if (generation != _generation) {
       return;
@@ -75,8 +90,13 @@ class RecordingActivityNarrator implements ActivityNarrator {
   final List<String> spoken = <String>[];
   int cancelCount = 0;
 
+  /// The last thing asked for, whether or not it was empty. Lets a test assert
+  /// "nothing new was said" without inferring it from list length.
+  String? lastRequested;
+
   @override
   Future<void> speak(String text) async {
+    lastRequested = text;
     if (text.trim().isNotEmpty) {
       spoken.add(text.trim());
     }

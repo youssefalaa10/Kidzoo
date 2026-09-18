@@ -12,18 +12,27 @@ import 'package:kidzo/features/Adventure/data/story_reminder_service.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_engine_registry.dart';
 import 'package:kidzo/features/Adventure/engine/default_engines.dart';
 import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text.dart';
+import 'package:kidzo/features/Adventure/engine/support/localized_text.dart';
 import 'package:kidzo/features/Adventure/story/models/story_models.dart';
 import 'package:kidzo/features/Adventure/story/ui/adventure_runner_screen.dart';
+import 'package:kidzo/features/Adventure/story/ui/map_stop_tile.dart';
 import 'package:kidzo/features/Adventure/story/ui/story_book_view.dart';
 import 'package:kidzo/features/Profile/profile_cubit.dart';
 import 'package:kidzo/features/Profile/profile_state.dart';
 
-/// The entry point for Adventure Mode: the book, and the Adventures to play.
+/// The entry point for Adventure Mode: the book, and the journey.
 ///
 /// This replaces the old Challenge level map. The difference is not cosmetic —
 /// the level map was 18 hand-placed nodes over a background with no story, and
-/// nothing about it could grow except by hardcoding more nodes. Here the
-/// Adventures come from content, and the book is the progress meter.
+/// nothing about it could grow except by hardcoding more nodes. Here the stops
+/// come from content, and the book is the progress meter.
+///
+/// It is still a **map**, and deliberately so. A flat list of Adventures says
+/// "here is what is available"; a path of stops says "here is where you are and
+/// here is where this goes", which is the thing that makes a child want the
+/// next one. The locked stops carry a name and nothing more until the Adventure
+/// before them is finished — enough to promise a journey, not enough to spend
+/// the surprise.
 class AdventureMapScreen extends StatefulWidget {
   const AdventureMapScreen({
     super.key,
@@ -148,7 +157,7 @@ class _AdventureMapScreenState extends State<AdventureMapScreen> {
               );
             }
 
-            return _AdventureList(
+            return _AdventureJourney(
               bundle: bundle,
               registry: _registry,
               profileId: profileId,
@@ -165,8 +174,9 @@ class _AdventureMapScreenState extends State<AdventureMapScreen> {
   }
 }
 
-class _AdventureList extends StatefulWidget {
-  const _AdventureList({
+/// The map itself: the book, then the stops in order.
+class _AdventureJourney extends StatefulWidget {
+  const _AdventureJourney({
     required this.bundle,
     required this.registry,
     required this.profileId,
@@ -189,12 +199,23 @@ class _AdventureList extends StatefulWidget {
   final Future<void> Function() onAdventureClosed;
 
   @override
-  State<_AdventureList> createState() => _AdventureListState();
+  State<_AdventureJourney> createState() => _AdventureJourneyState();
 }
 
-class _AdventureListState extends State<_AdventureList> {
-  /// Bumped after returning from an Adventure so the row and the book refresh.
+class _AdventureJourneyState extends State<_AdventureJourney> {
+  /// Bumped after returning from an Adventure so the stops and the book refresh.
   int _refreshToken = 0;
+
+  /// Which Adventure ids were already finished when this screen last rendered.
+  ///
+  /// Kept so the screen can tell "finished a while ago" from "finished just
+  /// now". Only the second one earns an unlock animation, and the difference
+  /// matters: a stop that celebrates every time the child walks past it stops
+  /// meaning anything the second time.
+  Set<String>? _knownCompleted;
+
+  /// The stop to play the unlock animation on, once.
+  String? _justUnlockedStopId;
 
   Future<void> _openAdventure(String adventureId) async {
     await Navigator.of(context).push<void>(
@@ -218,157 +239,160 @@ class _AdventureListState extends State<_AdventureList> {
     await widget.onAdventureClosed();
   }
 
+  /// Works out each stop's state from what the child has actually finished.
+  List<MapStop> _stopsFor(Set<String> completed) {
+    final StoryArc arc = widget.bundle.primaryArc;
+    final List<MapStop> stops = <MapStop>[];
+
+    // A stop is open when every playable stop before it is done. That rule,
+    // rather than a stored "highest unlocked" counter, is what the old level
+    // map got wrong: a counter drifts out of step with the content the moment
+    // an Adventure is inserted, reordered or replayed.
+    bool isNextOpen = true;
+    for (final String adventureId in arc.adventureIds) {
+      final Adventure? adventure = widget.bundle.adventures[adventureId];
+      if (adventure == null) {
+        continue;
+      }
+      final bool isCompleted = completed.contains(adventureId);
+      stops.add(MapStop(
+        id: adventureId,
+        title: adventure.title,
+        teaser: const LocalizedText.empty(),
+        accentValue: adventure.accentColorValue,
+        art: adventure.rewardArt,
+        state: isCompleted
+            ? MapStopState.completed
+            : isNextOpen
+                ? MapStopState.open
+                : MapStopState.locked,
+      ));
+      if (!isCompleted) {
+        isNextOpen = false;
+      }
+    }
+
+    // Everything after the playable content is a place, not an Adventure. Its
+    // one teaser line appears only once the child has reached the end of what
+    // exists — before that it is a silhouette with a name.
+    final bool hasFinishedEverythingPlayable =
+        arc.adventureIds.every(completed.contains);
+    for (int index = 0; index < arc.upcoming.length; index++) {
+      final UpcomingDestination destination = arc.upcoming[index];
+      stops.add(MapStop(
+        id: destination.id,
+        title: destination.title,
+        // Only the very next place gets its line, and only once the road to it
+        // is clear. Two teasers at once reads as a menu of things the child
+        // cannot have.
+        teaser: hasFinishedEverythingPlayable && index == 0
+            ? destination.peek
+            : const LocalizedText.empty(),
+        state: MapStopState.comingSoon,
+      ));
+    }
+    return stops;
+  }
+
+  /// Detects the moment a stop opens, so it can be animated exactly once.
+  void _noteUnlocks(Set<String> completed) {
+    final Set<String>? previous = _knownCompleted;
+    _knownCompleted = completed;
+    if (previous == null || completed.length <= previous.length) {
+      return;
+    }
+    final List<MapStop> stops = _stopsFor(completed);
+    for (final MapStop stop in stops) {
+      if (stop.state == MapStopState.open ||
+          stop.state == MapStopState.comingSoon) {
+        // The first stop that is not already finished is the one that just
+        // became reachable.
+        _justUnlockedStopId = stop.id;
+        return;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final StoryArc arc = widget.bundle.primaryArc;
     final KidMetrics metrics = widget.metrics;
 
-    return ListView(
-      padding: EdgeInsets.all(metrics.pagePadding),
-      children: <Widget>[
-        ActivityGlyphText(
-          arc.title.resolve(widget.languageCode),
-          languageCode: widget.languageCode,
-          fontSize: metrics.size(30, min: 22, max: 40),
-          color: Colors.white,
-        ),
-        SizedBox(height: metrics.gap * 0.4),
-        ActivityGlyphText(
-          arc.premise.resolve(widget.languageCode),
-          languageCode: widget.languageCode,
-          fontSize: metrics.size(16, min: 13, max: 20),
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
-        ),
-        SizedBox(height: metrics.gap),
-        StoryBookView(
-          key: ValueKey<int>(_refreshToken),
-          bundle: widget.bundle,
-          storyDao: widget.storyDao,
-          profileId: widget.profileId,
-          languageCode: widget.languageCode,
-          metrics: metrics,
-          l10n: widget.l10n,
-        ),
-        SizedBox(height: metrics.gap),
-        for (final String adventureId in arc.adventureIds)
-          if (widget.bundle.adventures.containsKey(adventureId))
-            Padding(
-              padding: EdgeInsets.only(bottom: metrics.gap),
-              child: _AdventureRow(
-                key: ValueKey<String>('$adventureId-$_refreshToken'),
-                adventure: widget.bundle.requireAdventure(adventureId),
-                storyDao: widget.storyDao,
-                profileId: widget.profileId,
+    return FutureBuilder<List<StoryChapterProgressData>>(
+      key: ValueKey<int>(_refreshToken),
+      future: widget.storyDao.chaptersFor(widget.profileId),
+      builder: (
+        BuildContext context,
+        AsyncSnapshot<List<StoryChapterProgressData>> snapshot,
+      ) {
+        final List<StoryChapterProgressData> chapters =
+            snapshot.data ?? const <StoryChapterProgressData>[];
+        final Set<String> completed = chapters
+            .where((StoryChapterProgressData chapter) => chapter.isCompleted)
+            .map((StoryChapterProgressData chapter) => chapter.adventureId)
+            .toSet();
+        final Set<String> started = chapters
+            .where((StoryChapterProgressData chapter) =>
+                !chapter.isCompleted && chapter.currentNodeId != null)
+            .map((StoryChapterProgressData chapter) => chapter.adventureId)
+            .toSet();
+
+        if (snapshot.connectionState == ConnectionState.done) {
+          _noteUnlocks(completed);
+        }
+        final List<MapStop> stops = _stopsFor(completed);
+
+        return ListView(
+          padding: EdgeInsets.all(metrics.pagePadding),
+          children: <Widget>[
+            ActivityGlyphText(
+              arc.title.resolve(widget.languageCode),
+              languageCode: widget.languageCode,
+              fontSize: metrics.size(30, min: 22, max: 40),
+              color: Colors.white,
+            ),
+            SizedBox(height: metrics.gap * 0.4),
+            ActivityGlyphText(
+              arc.premise.resolve(widget.languageCode),
+              languageCode: widget.languageCode,
+              fontSize: metrics.size(16, min: 13, max: 20),
+              fontWeight: FontWeight.w600,
+              color: Colors.white,
+            ),
+            SizedBox(height: metrics.gap),
+            StoryBookView(
+              key: ValueKey<int>(_refreshToken),
+              bundle: widget.bundle,
+              storyDao: widget.storyDao,
+              profileId: widget.profileId,
+              languageCode: widget.languageCode,
+              metrics: metrics,
+              l10n: widget.l10n,
+            ),
+            SizedBox(height: metrics.gap * 1.2),
+            ActivityGlyphText(
+              widget.l10n.resolve('adventureJourney', fallback: 'Your journey'),
+              languageCode: widget.languageCode,
+              fontSize: metrics.size(20, min: 16, max: 26),
+              color: Colors.white,
+              textAlign: TextAlign.start,
+            ),
+            SizedBox(height: metrics.gap * 0.6),
+            for (int index = 0; index < stops.length; index++)
+              MapStopTile(
+                stop: stops[index],
+                isLast: index == stops.length - 1,
+                isJustUnlocked: stops[index].id == _justUnlockedStopId,
+                isInProgress: started.contains(stops[index].id),
                 languageCode: widget.languageCode,
                 metrics: metrics,
                 l10n: widget.l10n,
-                onOpen: () => _openAdventure(adventureId),
+                onOpen: stops[index].state == MapStopState.comingSoon ||
+                        stops[index].state == MapStopState.locked
+                    ? null
+                    : () => _openAdventure(stops[index].id),
               ),
-            ),
-      ],
-    );
-  }
-}
-
-class _AdventureRow extends StatelessWidget {
-  const _AdventureRow({
-    required this.adventure,
-    required this.storyDao,
-    required this.profileId,
-    required this.languageCode,
-    required this.metrics,
-    required this.l10n,
-    required this.onOpen,
-    super.key,
-  });
-
-  final Adventure adventure;
-  final StoryDao storyDao;
-  final int profileId;
-  final String languageCode;
-  final KidMetrics metrics;
-  final AppLocalizations l10n;
-  final VoidCallback onOpen;
-
-  @override
-  Widget build(BuildContext context) {
-    return FutureBuilder<StoryChapterProgressData?>(
-      future: storyDao.chapterFor(profileId, adventure.adventureId),
-      builder: (
-        BuildContext context,
-        AsyncSnapshot<StoryChapterProgressData?> snapshot,
-      ) {
-        final StoryChapterProgressData? chapter = snapshot.data;
-        final bool isCompleted = chapter?.isCompleted ?? false;
-        final bool isInProgress =
-            chapter != null && !isCompleted && chapter.currentNodeId != null;
-
-        final String label = isCompleted
-            ? l10n.resolve('adventureReplay')
-            : isInProgress
-                ? l10n.resolve('adventureResume')
-                : l10n.resolve('adventureStart');
-
-        return Semantics(
-          button: true,
-          label: adventure.title.resolve(languageCode),
-          child: GestureDetector(
-            onTap: () {
-              KidHaptics.tap();
-              onOpen();
-            },
-            child: Container(
-              padding: EdgeInsets.all(metrics.size(18, min: 12, max: 26)),
-              decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.94),
-                borderRadius: BorderRadius.circular(KidUi.radiusCard),
-                boxShadow: KidUi.shadow(KidUi.primary),
-              ),
-              child: Row(
-                children: <Widget>[
-                  Container(
-                    width: metrics.size(64, min: 52, max: 80),
-                    height: metrics.size(64, min: 52, max: 80),
-                    decoration: BoxDecoration(
-                      color: KidUi.primary.withValues(alpha: 0.15),
-                      shape: BoxShape.circle,
-                    ),
-                    child: Icon(
-                      isCompleted
-                          ? Icons.check_circle_rounded
-                          : Icons.play_arrow_rounded,
-                      size: metrics.size(36, min: 28, max: 46),
-                      color: KidUi.primary,
-                    ),
-                  ),
-                  SizedBox(width: metrics.gap),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        ActivityGlyphText(
-                          adventure.title.resolve(languageCode),
-                          languageCode: languageCode,
-                          fontSize: metrics.size(20, min: 16, max: 26),
-                          textAlign: TextAlign.start,
-                        ),
-                        SizedBox(height: metrics.gap * 0.25),
-                        ActivityGlyphText(
-                          label,
-                          languageCode: languageCode,
-                          fontSize: metrics.size(15, min: 12, max: 19),
-                          fontWeight: FontWeight.w600,
-                          textAlign: TextAlign.start,
-                          color: KidUi.primary,
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
+          ],
         );
       },
     );

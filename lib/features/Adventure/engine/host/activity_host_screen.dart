@@ -52,7 +52,8 @@ class ActivityHostScreen extends StatefulWidget {
   State<ActivityHostScreen> createState() => _ActivityHostScreenState();
 }
 
-class _ActivityHostScreenState extends State<ActivityHostScreen> {
+class _ActivityHostScreenState extends State<ActivityHostScreen>
+    with WidgetsBindingObserver {
   static const BackgroundResolver _backgrounds = BackgroundResolver();
 
   late final ActivityCubit<ActivityContent, dynamic> _cubit;
@@ -63,6 +64,7 @@ class _ActivityHostScreenState extends State<ActivityHostScreen> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _cubit = widget.engine.createCubit(widget.session);
     _board = widget.engine.createBoard();
     // Kicked off after the first frame so the shell paints immediately rather
@@ -87,8 +89,22 @@ class _ActivityHostScreenState extends State<ActivityHostScreen> {
     }
   }
 
+  /// Silences narration the moment the app stops being in front of the child.
+  ///
+  /// An activity talks more than a story beat does — prompt, hint, reveal — so
+  /// it is the likelier place to leave a sentence hanging in the air across a
+  /// backgrounding and have it collide with whatever speaks on resume.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state != AppLifecycleState.resumed) {
+      widget.session.services.narrator.cancel();
+    }
+  }
+
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _cubit.close();
     super.dispose();
   }
@@ -226,17 +242,138 @@ class _ActivityHostScreenState extends State<ActivityHostScreen> {
     KidMetrics metrics,
     ActivityState state,
   ) {
+    final String? continueLabel = widget.continueLabel;
+    if (continueLabel != null) {
+      // Inside a story. The free-play result view offers "Play again" and
+      // "Exit", and in this context **both of them popped back to the story** —
+      // so the prominent button was labelled with something it did not do, and
+      // the child was asked to choose between two buttons that were the same
+      // button. One button, saying the one thing that happens.
+      return _StoryResultView(
+        metrics: metrics,
+        score: state.result.score,
+        maxScore: state.result.maxScore,
+        title: widget.title,
+        continueLabel: continueLabel,
+        languageCode: _languageCode,
+        onContinue: () => Navigator.of(context).maybePop(),
+      );
+    }
     return KidResultView(
       metrics: metrics,
       score: state.result.score,
       maxScore: state.result.maxScore,
       title: widget.title,
-      onPlayAgain: () {
-        // In a story the primary action continues the narrative; the host does
-        // not restart an activity the child has already resolved.
-        Navigator.of(context).maybePop();
-      },
+      onPlayAgain: () => Navigator.of(context).maybePop(),
       onExit: () => Navigator.of(context).maybePop(),
+    );
+  }
+}
+
+/// The end of an activity that is part of a story.
+///
+/// Stars, because finishing should feel like finishing, and then exactly one
+/// way onward. Nothing here offers a replay: the story has already moved, and
+/// a child who replays a beat the narrative has passed ends up in a loop with
+/// no visible way out of it.
+class _StoryResultView extends StatelessWidget {
+  const _StoryResultView({
+    required this.metrics,
+    required this.score,
+    required this.maxScore,
+    required this.title,
+    required this.continueLabel,
+    required this.languageCode,
+    required this.onContinue,
+  });
+
+  final KidMetrics metrics;
+  final int score;
+  final int maxScore;
+  final String title;
+  final String continueLabel;
+  final String languageCode;
+  final VoidCallback onContinue;
+
+  @override
+  Widget build(BuildContext context) {
+    final int stars = KidResultView.starsFor(score, maxScore);
+    final double starSize = metrics.size(64, min: 42, max: 88);
+    final bool isRtl = ActivityGlyphText.isRightToLeft(languageCode);
+
+    return Center(
+      child: SingleChildScrollView(
+        padding: EdgeInsets.all(metrics.pagePadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                for (int index = 0; index < 3; index++)
+                  Icon(
+                    index < stars
+                        ? Icons.star_rounded
+                        : Icons.star_border_rounded,
+                    size: starSize * (index == 1 ? 1.2 : 1),
+                    color: index < stars ? KidUi.hint : Colors.white70,
+                  ),
+              ],
+            ),
+            SizedBox(height: metrics.gap),
+            ActivityGlyphText(
+              title,
+              languageCode: languageCode,
+              fontSize: metrics.size(28, min: 20, max: 36),
+              color: Colors.white,
+            ),
+            SizedBox(height: metrics.gap * 1.4),
+            Semantics(
+              button: true,
+              label: continueLabel,
+              child: GestureDetector(
+                onTap: () {
+                  KidHaptics.tap();
+                  onContinue();
+                },
+                child: Container(
+                  constraints: BoxConstraints(
+                    minHeight: metrics.size(KidUi.minTouch, min: 56, max: 88),
+                  ),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: metrics.size(34, min: 24, max: 48),
+                  ),
+                  decoration: BoxDecoration(
+                    color: KidUi.correct,
+                    borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                    boxShadow: KidUi.shadow(KidUi.correct),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ActivityGlyphText(
+                        continueLabel,
+                        languageCode: languageCode,
+                        fontSize: metrics.size(22, min: 16, max: 28),
+                        color: Colors.white,
+                        maxLines: 1,
+                      ),
+                      SizedBox(width: metrics.gap * 0.4),
+                      Icon(
+                        isRtl
+                            ? Icons.arrow_back_rounded
+                            : Icons.arrow_forward_rounded,
+                        color: Colors.white,
+                        size: metrics.size(24, min: 18, max: 30),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -401,18 +401,89 @@ void main() {
   });
 
   group('Randomness', () {
+    /// Builds a counting activity from an inline payload.
+    ///
+    /// The authored Adventure now uses fixed rounds, so it is the wrong fixture
+    /// for a question about randomness. This one exercises the generated path
+    /// the engine still offers to content whose counts carry no story weight.
+    CountingCubit generatedCounting({required int seed, int roundCount = 3}) {
+      final ActivitySpec spec = ActivitySpec.fromJson(
+        <String, dynamic>{
+          'instanceId': 'test.generated_counting',
+          'engineId': 'counting',
+          'locales': <String>['en'],
+          'narration': <String, dynamic>{
+            'prompt': <String, String>{'en': 'How many?'},
+          },
+          'payload': <String, dynamic>{
+            'mode': 'countAndPick',
+            'layout': 'tenFrame',
+            'countRange': <int>[2, 6],
+            'roundCount': roundCount,
+            'itemsRef': 'packs/animals',
+            'itemIds': <String>['monkey', 'bird', 'rabbit'],
+          },
+        },
+        sourcePath: 'test/generated_counting.json',
+      );
+      final ActivityEngine<ActivityContent> engine = registry.require('counting');
+      return engine.createCubit(engine.createSession(
+        spec: spec,
+        services: ActivityServices.forTest(seed: seed),
+        packs: bundle.packResolver,
+        storyNodeId: 'test.node',
+      )) as CountingCubit;
+    }
+
     test('different seeds do produce different activities', () async {
       // The mirror of the determinism test: a "random" engine that ignores its
       // seed would pass that one and still be broken.
       final Set<String> firstTargets = <String>{};
       for (int seed = 0; seed < 25; seed++) {
-        final CountingCubit cubit =
-            cubitFor('jungle_count_watchers', seed: seed) as CountingCubit;
+        final CountingCubit cubit = generatedCounting(seed: seed);
         await cubit.start();
         firstTargets.add(cubit.currentStep.targetCount.toString());
         await cubit.close();
       }
       expect(firstTargets.length, greaterThan(1));
+    });
+
+    test('a generated activity does not ask the same question twice', () async {
+      // Regression. Rounds used to be drawn independently, so a three-round
+      // counting activity could deal 4, 4, 4 — which a child reads not as bad
+      // luck but as the app being stuck. Distinct answers are now drawn without
+      // replacement while the range has any left.
+      for (int seed = 0; seed < 60; seed++) {
+        final CountingCubit cubit = generatedCounting(seed: seed);
+        await cubit.start();
+        final List<int> targets = cubit
+            .buildSteps()
+            .map((CountingStep step) => step.targetCount)
+            .toList();
+        expect(targets.toSet().length, targets.length,
+            reason: 'seed $seed repeated a count within one activity: $targets');
+        await cubit.close();
+      }
+    });
+
+    test('authored rounds are the same every time, on purpose', () async {
+      // The opposite guarantee, and it is just as load-bearing: the story beat
+      // after this activity says "nine watchers", and it can only say that
+      // because the counts do not move between runs.
+      final Set<String> shapes = <String>{};
+      for (int seed = 0; seed < 25; seed++) {
+        final CountingCubit cubit =
+            cubitFor('jungle_count_watchers', seed: seed) as CountingCubit;
+        await cubit.start();
+        shapes.add(cubit
+            .buildSteps()
+            .map((CountingStep step) => '${step.item.id}x${step.targetCount}')
+            .join(','));
+        await cubit.close();
+      }
+      expect(shapes.length, 1,
+          reason: 'authored counts must not vary with the seed');
+      expect(shapes.single, 'monkeyx3,birdx4,rabbitx2');
     });
 
     test('an injected Random is actually used', () {

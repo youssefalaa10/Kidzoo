@@ -13,8 +13,8 @@
       "ar": "اِسْأَلِ الحَيَوَانَاتِ مَاذَا رَأَتْ."
     },
     "hint1": {
-      "en": "Look again. Who would be up high?",
-      "ar": "اُنْظُرْ مَرَّةً أُخْرَى. مَنْ يَكُونُ فِي الأَعْلَى؟"
+      "en": "Look again. Where would that animal be?",
+      "ar": "اُنْظُرْ مَرَّةً أُخْرَى. أَيْنَ يَكُونُ ذَلِكَ الحَيَوَان؟"
     },
     "hint2": {
       "en": "It is one of these two.",
@@ -25,22 +25,23 @@
       "ar": "هَذَا هُوَ. اِلْمِسْهُ وَسَيُخْبِرُك."
     },
     "success": {
-      "en": "It saw something!",
-      "ar": "لَقَدْ رَأَى شَيْئًا!"
+      "en": "Three watchers, three clues. Well done!",
+      "ar": "ثَلَاثَةُ مُرَاقِبِينَ، وَثَلَاثَةُ أَدِلَّة. أَحْسَنْت!"
     }
   },
   "payload": {
+    "_comment": "The three correct answers - monkey, bird, fish - are the three watchers the child meets again in the counting and sorting nodes. Distractors are drawn from animals that appear nowhere else in this Adventure, so a wrong tap is never a half-right one that muddles the cast.",
     "itemsRef": "packs/animals",
     "optionCount": 3,
     "questions": [
       {
         "id": "who_was_high",
         "prompt": {
-          "en": "Who was high up in the branches?",
-          "ar": "مَنْ كَانَ فِي أَعْلَى الأَغْصَان؟"
+          "en": "Who was watching from the high branches?",
+          "ar": "مَنْ كَانَ يُرَاقِبُ مِنَ الأَغْصَانِ العَالِيَة؟"
         },
         "correctItemId": "monkey",
-        "distractorItemIds": ["elephant", "fish"],
+        "distractorItemIds": ["elephant", "giraffe"],
         "revealLine": {
           "en": "The monkey says: something green flew past the tall trees.",
           "ar": "يَقُولُ القِرْد: شَيْءٌ أَخْضَرُ طَارَ بِجَانِبِ الأَشْجَارِ العَالِيَة."
@@ -49,27 +50,27 @@
       {
         "id": "who_was_flying",
         "prompt": {
-          "en": "Who was flying over the river?",
-          "ar": "مَنْ كَانَ يَطِيرُ فَوْقَ النَّهْر؟"
+          "en": "Who was flying above the leaves?",
+          "ar": "مَنْ كَانَ يَطِيرُ فَوْقَ الأَوْرَاق؟"
         },
         "correctItemId": "bird",
-        "distractorItemIds": ["lion", "rabbit"],
+        "distractorItemIds": ["lion", "panda"],
         "revealLine": {
           "en": "The bird says: it came down near the wide leaves.",
           "ar": "يَقُولُ الطَّائِر: لَقَدْ نَزَلَ قُرْبَ الأَوْرَاقِ العَرِيضَة."
         }
       },
       {
-        "id": "who_was_drinking",
+        "id": "who_was_in_the_river",
         "prompt": {
-          "en": "Who was drinking at the water?",
-          "ar": "مَنْ كَانَ يَشْرَبُ عِنْدَ المَاء؟"
+          "en": "Who was watching from the river?",
+          "ar": "مَنْ كَانَ يُرَاقِبُ مِنَ النَّهْر؟"
         },
-        "correctItemId": "elephant",
-        "distractorItemIds": ["monkey", "bird"],
+        "correctItemId": "fish",
+        "distractorItemIds": ["elephant", "lion"],
         "revealLine": {
-          "en": "The elephant says: many eyes were watching it fall.",
-          "ar": "يَقُولُ الفِيل: عُيُونٌ كَثِيرَةٌ رَأَتْهُ يَسْقُط."
+          "en": "The fish says: it landed low, where the leaves are widest.",
+          "ar": "تَقُولُ السَّمَكَة: لَقَدْ حَطَّتْ فِي الأَسْفَل، حَيْثُ الأَوْرَاقُ أَعْرَض."
         }
       }
     ]

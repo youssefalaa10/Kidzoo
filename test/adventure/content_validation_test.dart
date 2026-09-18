@@ -220,7 +220,12 @@ void main() {
     test('no activity sets a parameter its engine does not declare', () {
       // Without this, "make this harder" can silently do nothing: an author
       // adds a knob, the engine never reads it, and the file still loads.
-      const Set<String> envelopeKeys = <String>{'_comment'};
+      // Any key starting with `_` is an authoring note, not a parameter. One
+      // `_comment` per file was not enough once files grew sections worth
+      // explaining separately, and the alternative — one giant comment at the
+      // top describing four unrelated decisions — is the kind of comment
+      // nobody updates.
+      bool isAuthoringNote(String key) => key.startsWith('_');
 
       for (final ActivitySpec spec in bundle.activities.values) {
         final ActivityEngineDescriptor descriptor =
@@ -230,7 +235,7 @@ void main() {
             .toSet();
 
         for (final String key in spec.payload.keys) {
-          if (envelopeKeys.contains(key)) {
+          if (isAuthoringNote(key)) {
             continue;
           }
           expect(declared, contains(key),
@@ -599,6 +604,216 @@ void main() {
           expect(binValues, contains(value),
               reason: '${spec.sourcePath}: item "${item.id}" is '
                   '"$attribute=$value" but no bin accepts it');
+        }
+      }
+    });
+  });
+
+  group('The words and the pictures agree', () {
+    // The class of bug this group exists for: the story called the recovered
+    // object "the Green Page" in both locales, a hint said "it is green, and
+    // flat like paper", and the art the child actually tapped was
+    // `shapes/square.png`, which is orange. Nothing caught it, because every
+    // individual file was internally valid.
+
+    test('every adventure names reward art, and it exists', () {
+      for (final Adventure adventure in bundle.adventures.values) {
+        expect(adventure.rewardArt, isNotNull,
+            reason: '${adventure.adventureId} hands over a page with no '
+                'picture, so the child cannot be shown what they earned');
+        expect(File(adventure.rewardArt!).existsSync(), isTrue,
+            reason: '${adventure.adventureId} reward art '
+                '"${adventure.rewardArt}" is missing');
+      }
+    });
+
+    test('the object searched for is the object awarded', () {
+      // A hidden_clue whose clue id matches the adventure reward IS that
+      // reward. The two must be one picture, or the child searches for one
+      // thing and is handed another.
+      for (final Adventure adventure in bundle.adventures.values) {
+        for (final StoryNode node in adventure.nodes) {
+          if (!node.isActivity) {
+            continue;
+          }
+          final ActivitySpec spec =
+              bundle.requireActivity(node.activityRef!);
+          if (spec.engineId != 'hidden_clue') {
+            continue;
+          }
+          final List<dynamic> clues =
+              spec.payload['clues'] as List<dynamic>? ?? <dynamic>[];
+          for (final dynamic raw in clues) {
+            final Map<dynamic, dynamic> clue = raw as Map<dynamic, dynamic>;
+            if ('${clue['id']}' != adventure.rewardId) {
+              continue;
+            }
+            expect('${clue['image']}', adventure.rewardArt,
+                reason: '${spec.sourcePath}: the child searches for '
+                    '"${clue['image']}" but ${adventure.adventureId} awards '
+                    '"${adventure.rewardArt}". One object, one picture.');
+          }
+        }
+      }
+    });
+
+    test('art referenced anywhere in an adventure exists on disk', () {
+      for (final Adventure adventure in bundle.adventures.values) {
+        for (final String? asset in <String?>[adventure.rewardArt]) {
+          if (asset == null) {
+            continue;
+          }
+          expect(File(asset).existsSync(), isTrue);
+        }
+      }
+    });
+  });
+
+  group('A sorting activity holds constant what it says it holds constant', () {
+    test('every heldConstant attribute really is constant across its items', () {
+      // `heldConstant` is a pedagogical claim: young children attend to the
+      // most salient attribute even when it is irrelevant, so an activity
+      // teaching "sort by habitat" while the sizes also vary risks teaching
+      // size. The claim was documented in a comment and contradicted by the
+      // content directly beneath it - three small animals and a lion.
+      for (final ActivitySpec spec in bundle.activities.values) {
+        if (spec.engineId != 'sorting') {
+          continue;
+        }
+        final List<String> held =
+            (spec.payload['heldConstant'] as List<dynamic>? ?? <dynamic>[])
+                .map((e) => '$e')
+                .toList();
+        if (held.isEmpty) {
+          continue;
+        }
+        final ItemPack pack = bundle.packResolver.require(
+          '${spec.payload['itemsRef']}',
+          debugPath: spec.sourcePath,
+        );
+        final List<PackItem> items = pack.select(
+          (spec.payload['itemIds'] as List<dynamic>? ?? <dynamic>[])
+              .map((e) => '$e')
+              .toList(),
+          debugPath: spec.sourcePath,
+        );
+
+        for (final String attribute in held) {
+          final Set<String?> values = items
+              .map((PackItem item) => item.attribute(attribute))
+              .toSet();
+          expect(values.length, 1,
+              reason: '${spec.sourcePath} claims "$attribute" is held '
+                  'constant, but its items span $values. Either the claim is '
+                  'wrong or the cast is.');
+        }
+      }
+    });
+  });
+
+  group('Counting rounds are authored, distinct and bilingual', () {
+    List<Map<String, dynamic>> roundsOf(ActivitySpec spec) =>
+        (spec.payload['rounds'] as List<dynamic>? ?? <dynamic>[])
+            .cast<Map<String, dynamic>>();
+
+    test('no two rounds ask the same question', () {
+      // A repeat inside one activity reads to a child as the app being stuck,
+      // not as a coincidence.
+      for (final ActivitySpec spec in bundle.activities.values) {
+        if (spec.engineId != 'counting') {
+          continue;
+        }
+        final List<String> signatures = roundsOf(spec)
+            .map((Map<String, dynamic> round) =>
+                '${round['itemId']}:${round['targetCount']}')
+            .toList();
+        expect(signatures.toSet().length, signatures.length,
+            reason: '${spec.sourcePath} repeats a round: $signatures');
+      }
+    });
+
+    test('each round carries its own wording in every declared locale', () {
+      for (final ActivitySpec spec in bundle.activities.values) {
+        if (spec.engineId != 'counting') {
+          continue;
+        }
+        for (final Map<String, dynamic> round in roundsOf(spec)) {
+          for (final String field in <String>['prompt', 'revealLine']) {
+            final LocalizedText text = LocalizedText.fromJson(round[field],
+                debugPath: '${spec.sourcePath}.rounds.$field');
+            for (final String locale in spec.locales) {
+              expect(text.hasLanguage(locale), isTrue,
+                  reason: '${spec.sourcePath}: a round has no "$locale" '
+                      '$field, so that child would hear the generic prompt '
+                      'three times running');
+            }
+          }
+        }
+      }
+    });
+
+    test('a round never interpolates a count into Arabic', () {
+      // Arabic number-noun agreement is irregular - dual for 2, a broken plural
+      // for 3-10, a singular accusative for 11+ - so a count substituted into a
+      // template produces wrong Arabic. The same rule the narration block
+      // already obeys, now applied where the counts actually live.
+      final RegExp placeholder = RegExp(r'\{[a-zA-Z_]+\}');
+      for (final ActivitySpec spec in bundle.activities.values) {
+        if (spec.engineId != 'counting') {
+          continue;
+        }
+        for (final Map<String, dynamic> round in roundsOf(spec)) {
+          for (final String field in <String>['prompt', 'revealLine']) {
+            final LocalizedText text = LocalizedText.fromJson(round[field],
+                debugPath: '${spec.sourcePath}.rounds.$field');
+            if (!text.hasLanguage('ar')) {
+              continue;
+            }
+            expect(placeholder.hasMatch(text.resolve('ar')), isFalse,
+                reason: '${spec.sourcePath}: a round Arabic $field is a '
+                    'template. Author the sentence whole.');
+          }
+        }
+      }
+    });
+  });
+
+  group('A locked destination promises without spoiling', () {
+    test('an upcoming id is never a real adventure id', () {
+      // They are separate lists for a reason: `adventures` is validated to name
+      // playable content, `upcoming` names places that do not exist yet.
+      for (final StoryArc arc in bundle.arcs.values) {
+        for (final UpcomingDestination destination in arc.upcoming) {
+          expect(bundle.adventures.containsKey(destination.id), isFalse,
+              reason: 'arc "${arc.arcId}" lists "${destination.id}" as '
+                  'upcoming, but it is a real adventure - move it into '
+                  '`adventures` so it can be played');
+          expect(arc.adventureIds, isNot(contains(destination.id)));
+        }
+      }
+    });
+
+    test('an upcoming destination is named in every locale', () {
+      for (final StoryArc arc in bundle.arcs.values) {
+        for (final UpcomingDestination destination in arc.upcoming) {
+          for (final String locale in declaredLocales()) {
+            expect(destination.title.resolve(locale), isNotEmpty,
+                reason: 'a stop with no name in "$locale" is a blank on the '
+                    'map, which promises nothing');
+          }
+        }
+      }
+    });
+
+    test('a teaser stays short enough to be a tease', () {
+      for (final StoryArc arc in bundle.arcs.values) {
+        for (final UpcomingDestination destination in arc.upcoming) {
+          for (final String locale in declaredLocales()) {
+            expect(destination.peek.resolve(locale).length,
+                lessThanOrEqualTo(90),
+                reason: '"${destination.id}" gives away too much of a chapter '
+                    'the child has not reached');
+          }
         }
       }
     });

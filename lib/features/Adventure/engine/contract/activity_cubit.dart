@@ -7,6 +7,7 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_soundboard.dart';
+import 'package:kidzo/features/Adventure/engine/support/number_words.dart';
 
 /// Everything one run of an activity needs.
 class ActivitySession<TContent extends ActivityContent> {
@@ -58,6 +59,9 @@ abstract class ActivityCubit<TContent extends ActivityContent,
   int _stepsIndependent = 0;
   int _hintsUsed = 0;
   bool _hasStarted = false;
+
+  /// The last thing said, so the same sentence is never said twice running.
+  String? _lastSpokenLine;
 
   // ---------------------------------------------------------------- engine API
 
@@ -145,6 +149,11 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       return;
     }
 
+    if (attempt is TallyAttempt) {
+      await _handleTally(attempt);
+      return;
+    }
+
     _attemptsOnStep++;
     final ActivityJudgement judgement = judge(currentStep, attempt);
     await _recordAttempt(judgement.outcome);
@@ -175,6 +184,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       _unlockBoard();
       return;
     }
+    await _speakReveal();
     await _advance();
   }
 
@@ -244,6 +254,9 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       lastAttemptedOptionId: _optionIdOf(attempt),
     ));
     await services.soundboard.play(ActivitySound.success);
+    // The child still gets the clue. Withholding the story beat from the one
+    // child who needed every rung of the ladder would be exactly backwards.
+    await _speakReveal();
     await _advance();
   }
 
@@ -286,7 +299,15 @@ abstract class ActivityCubit<TContent extends ActivityContent,
 
   Future<void> _finish(ActivityCompletion completion) async {
     _stopwatch.stop();
-    await services.soundboard.play(ActivitySound.celebrate);
+    if (completion == ActivityCompletion.completed) {
+      await services.soundboard.play(ActivitySound.celebrate);
+      // Spoken once, here, and not after every step. `narration.success` is
+      // the activity's closing line — "that is nine clues!" — and saying it
+      // three times in a row would turn a payoff into wallpaper.
+      await _speak(spec.narration.success.resolve(services.languageCode));
+    }
+    // Nothing celebratory when the child backed out. A fanfare for leaving
+    // teaches the wrong thing and, more simply, is confusing.
     _emitSafely(state.copyWith(
       status: ActivityStatus.finished,
       isBoardLocked: true,
@@ -307,13 +328,56 @@ abstract class ActivityCubit<TContent extends ActivityContent,
 
   // ------------------------------------------------------------------ helpers
 
+  /// Says [line], unless it is word for word what was just said.
+  ///
+  /// Back-to-back repetition is the one narration fault a child reads as the
+  /// app being broken rather than as the app being thorough. It happened on the
+  /// most ordinary path there is: an activity whose steps share one prompt —
+  /// sorting four animals into bins — re-spoke that prompt on entering every
+  /// step, so the same sentence played four times with nothing in between.
+  ///
+  /// Only *consecutive* duplicates are dropped. A line that comes round again
+  /// later, with other speech between, is a reminder rather than a stutter, and
+  /// the help button re-speaking on demand is a different path entirely.
+  Future<void> _speak(String line) async {
+    final String trimmed = line.trim();
+    if (trimmed.isEmpty || trimmed == _lastSpokenLine) {
+      return;
+    }
+    _lastSpokenLine = trimmed;
+    await services.narrator.speak(trimmed);
+  }
+
   Future<void> _speakPrompt() async {
     final ActivityStepView? view = state.view;
     final String line = (view?.spokenPrompt ?? view?.prompt)
             ?.resolve(services.languageCode) ??
         '';
     final String fallback = spec.narration.prompt.resolve(services.languageCode);
-    await services.narrator.speak(line.isNotEmpty ? line : fallback);
+    await _speak(line.isNotEmpty ? line : fallback);
+  }
+
+  /// Says the running count aloud as the child tags objects.
+  ///
+  /// Deliberately does not lock the board, record an attempt or touch the
+  /// ladder. A child sweeping across five animals taps faster than any
+  /// utterance finishes, and the narrator's latest-wins rule turns that into
+  /// the right behaviour on its own: they hear the count land on the number
+  /// they are on, not a backlog of the numbers they already passed.
+  Future<void> _handleTally(TallyAttempt attempt) async {
+    if (attempt.runningCount < 1) {
+      return;
+    }
+    // Not de-duplicated: counting two of something after two of something
+    // else is a real "two, two", and a child sweeping back over the same
+    // object hears nothing new because the board already refused the tap.
+    _lastSpokenLine = null;
+    await services.narrator
+        .speak(NumberWords.spoken(attempt.runningCount, services.languageCode));
+  }
+
+  Future<void> _speakReveal() async {
+    await _speak(state.view?.revealLine?.resolve(services.languageCode) ?? '');
   }
 
   Future<void> _speakForLevel(ScaffoldLevel level) async {
@@ -332,9 +396,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
         line = '';
         break;
     }
-    if (line.isNotEmpty) {
-      await services.narrator.speak(line);
-    }
+    await _speak(line);
   }
 
   Future<void> _recordAttempt(AttemptOutcome outcome) async {
@@ -380,9 +442,25 @@ abstract class ActivityCubit<TContent extends ActivityContent,
     emit(withResult);
   }
 
+  /// Cleans up, **without** silencing whatever is speaking now.
+  ///
+  /// The distinction matters because of when this runs. A route is disposed at
+  /// the end of its pop transition, roughly a third of a second after the
+  /// child tapped "Next" — by which time the story beat underneath has already
+  /// started its first line. An unconditional cancel here reached forward in
+  /// time and cut off a sentence belonging to a screen this cubit never knew
+  /// about, and it did it on the most common path through the whole Adventure.
+  ///
+  /// So: cancel only when this activity was still running, which is the case
+  /// the cancel is actually for — a child killed mid-prompt by a system back
+  /// or a route torn down under them. A finished activity has already spoken
+  /// its closing line to completion and has nothing left in flight, and
+  /// [abandon] cancels explicitly before it finishes.
   @override
   Future<void> close() async {
-    await services.narrator.cancel();
+    if (state.status != ActivityStatus.finished) {
+      await services.narrator.cancel();
+    }
     _stopwatch.stop();
     return super.close();
   }

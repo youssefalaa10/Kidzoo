@@ -50,6 +50,14 @@ class CountingEngine extends ActivityEngine<CountingContent> {
           ContentParameter.text('itemsRef', description: 'e.g. packs/animals'),
           ContentParameter.list('itemIds',
               description: 'narrow the pack to specific items'),
+          ContentParameter.list('rounds',
+              description: 'authored rounds: each names its own itemId, '
+                  'targetCount and wording. Present them and the generated '
+                  'path is not used at all. Use these whenever the number '
+                  'matters to the story — a later beat cannot say "nine '
+                  'watchers" about a count drawn at random, and two random '
+                  'rounds can land on the same answer, which reads to a child '
+                  'as the app repeating itself'),
         ],
         adaptationAxis: 'targetCount',
         supportedLocales: <String>{'en', 'ar'},

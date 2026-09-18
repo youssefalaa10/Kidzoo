@@ -64,6 +64,10 @@ class MultipleChoiceCubit
     );
     return ActivityStepView(
       prompt: step.question.prompt,
+      // The authored clue. Without this the animal gets picked, a chime plays
+      // and it says nothing — which drops the link the whole Adventure is
+      // built on, because the next beat assumes the child was told something.
+      revealLine: step.question.revealLine,
       liveOptionIds: live,
       dimmedOptionIds:
           allIds.where((String id) => !live.contains(id)).toList(growable: false),

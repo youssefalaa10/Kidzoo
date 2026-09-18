@@ -56,6 +56,12 @@ flutter:
     - assets/gen/images/home/
     - assets/gen/images/flappy/
     - assets/gen/images/shapes/
+    # Story art: recovered pages and other Adventure reward objects. A
+    # reward has to be one picture the child sees in the search scene, in
+    # the flight to the book and in the book afterwards, so it lives here
+    # rather than being borrowed from whichever game folder had something
+    # roughly the right shape.
+    - assets/gen/images/story/
     - assets/gen/images/numbers/
     - assets/gen/images/alphabet/
     - assets/gen/images/animal/

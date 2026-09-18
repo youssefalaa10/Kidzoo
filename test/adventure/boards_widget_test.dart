@@ -195,6 +195,30 @@ void main() {
   });
 
   group('StoryBeatView', () {
+    /// One beat, wired up the way the runner wires it.
+    Widget beat({
+      required StoryNode node,
+      required String languageCode,
+      required Future<void> Function(String) onSpeak,
+      required VoidCallback onContinue,
+      String continueLabel = 'Play',
+      String nextLabel = 'Next',
+    }) {
+      return MaterialApp(
+        home: Scaffold(
+          body: StoryBeatView(
+            node: node,
+            languageCode: languageCode,
+            onSpeak: onSpeak,
+            onContinue: onContinue,
+            continueLabel: continueLabel,
+            nextLabel: nextLabel,
+            replayLabel: 'Say it again',
+          ),
+        ),
+      );
+    }
+
     testWidgets('reveals one line at a time, then continues',
         (WidgetTester tester) async {
       final Adventure adventure = bundle.requireAdventure('jungle');
@@ -204,16 +228,11 @@ void main() {
       int continued = 0;
       final RecordingActivityNarrator narrator = RecordingActivityNarrator();
 
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: StoryBeatView(
-            node: node,
-            languageCode: 'en',
-            onSpeak: narrator.speak,
-            onContinue: () => continued++,
-            continueLabel: 'Next',
-          ),
-        ),
+      await tester.pumpWidget(beat(
+        node: node,
+        languageCode: 'en',
+        onSpeak: narrator.speak,
+        onContinue: () => continued++,
       ));
       await tester.pump();
 
@@ -221,13 +240,70 @@ void main() {
       expect(find.text(node.lines[1].resolve('en')), findsNothing,
           reason: 'a wall of text a pre-reader cannot read is not a story');
 
-      await tester.tap(find.byType(StoryBeatView));
+      await tester.tap(find.text('Next'));
       await tester.pump();
       expect(find.text(node.lines[1].resolve('en')), findsOneWidget);
       expect(continued, 0);
 
-      await tester.tap(find.byType(StoryBeatView));
+      await tester.tap(find.text('Play'));
       await tester.pump();
+      expect(continued, 1);
+    });
+
+    testWidgets('labels the action in words, never as an ellipsis',
+        (WidgetTester tester) async {
+      // Regression. Every line but the last used to show "..." as its button,
+      // which tells a child nothing and tells a parent reading over their
+      // shoulder nothing either - it could equally mean "loading".
+      final Adventure adventure = bundle.requireAdventure('jungle');
+      final StoryNode node = adventure.nodes
+          .firstWhere((StoryNode n) => !n.isActivity && n.lines.length > 1);
+
+      await tester.pumpWidget(beat(
+        node: node,
+        languageCode: 'en',
+        onSpeak: (String _) async {},
+        onContinue: () {},
+      ));
+      await tester.pump();
+
+      expect(find.text('...'), findsNothing);
+      expect(find.text('Next'), findsOneWidget);
+
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+      // On the last line the label becomes what actually happens next.
+      expect(find.text('Play'), findsOneWidget);
+      expect(find.text('...'), findsNothing);
+    });
+
+    testWidgets('hands off exactly once however fast the child taps',
+        (WidgetTester tester) async {
+      // Regression. Three taps in half a second is ordinary behaviour at this
+      // age, and each one used to fire onContinue - skipping two beats, or
+      // racing three pushes of the same activity screen.
+      final Adventure adventure = bundle.requireAdventure('jungle');
+      final StoryNode node = adventure.nodes
+          .firstWhere((StoryNode n) => !n.isActivity && n.lines.length > 1);
+
+      int continued = 0;
+      await tester.pumpWidget(beat(
+        node: node,
+        languageCode: 'en',
+        onSpeak: (String _) async {},
+        onContinue: () => continued++,
+      ));
+      await tester.pump();
+
+      // Get to the last line, where the next tap hands off.
+      await tester.tap(find.text('Next'));
+      await tester.pump();
+
+      await tester.tap(find.text('Play'), warnIfMissed: false);
+      await tester.tap(find.text('Play'), warnIfMissed: false);
+      await tester.tap(find.text('Play'), warnIfMissed: false);
+      await tester.pump();
+
       expect(continued, 1);
     });
 
@@ -237,52 +313,74 @@ void main() {
           .firstWhere((StoryNode n) => !n.isActivity && n.lines.length > 1);
       final RecordingActivityNarrator narrator = RecordingActivityNarrator();
 
-      await tester.pumpWidget(MaterialApp(
-        home: Scaffold(
-          body: StoryBeatView(
-            node: node,
-            languageCode: 'en',
-            onSpeak: narrator.speak,
-            onContinue: () {},
-            continueLabel: 'Next',
-          ),
-        ),
+      await tester.pumpWidget(beat(
+        node: node,
+        languageCode: 'en',
+        onSpeak: narrator.speak,
+        onContinue: () {},
       ));
       await tester.pump();
       expect(narrator.spoken.length, 1,
           reason: 'audio is primary for a pre-reader; text is decoration');
 
-      await tester.tap(find.byType(StoryBeatView));
+      await tester.tap(find.text('Next'));
       await tester.pump();
       expect(narrator.spoken.length, 2);
     });
 
-    testWidgets('works in Arabic without overflow at phone size',
+    testWidgets('a child who missed a line can hear it again',
         (WidgetTester tester) async {
-      tester.view.physicalSize = const Size(360, 640);
-      tester.view.devicePixelRatio = 1.0;
+      final Adventure adventure = bundle.requireAdventure('jungle');
+      final StoryNode node = adventure.nodes
+          .firstWhere((StoryNode n) => !n.isActivity && n.lines.length > 1);
+      final RecordingActivityNarrator narrator = RecordingActivityNarrator();
+
+      await tester.pumpWidget(beat(
+        node: node,
+        languageCode: 'en',
+        onSpeak: narrator.speak,
+        onContinue: () {},
+      ));
+      await tester.pump();
+      expect(narrator.spoken, <String>[node.lines.first.resolve('en')]);
+
+      await tester.tap(find.bySemanticsLabel('Say it again'));
+      await tester.pump();
+
+      expect(narrator.spoken, <String>[
+        node.lines.first.resolve('en'),
+        node.lines.first.resolve('en'),
+      ], reason: 'replay must repeat the line the child is on, not advance');
+    });
+
+    testWidgets('works in both locales without overflow at every size',
+        (WidgetTester tester) async {
       addTearDown(tester.view.resetPhysicalSize);
       addTearDown(tester.view.resetDevicePixelRatio);
 
       final Adventure adventure = bundle.requireAdventure('jungle');
-      for (final StoryNode node in adventure.nodes) {
-        if (node.isActivity) {
-          continue;
-        }
-        await tester.pumpWidget(MaterialApp(
-          home: Scaffold(
-            body: StoryBeatView(
+      for (final Size size in testSizes) {
+        tester.view.physicalSize = size;
+        tester.view.devicePixelRatio = 1.0;
+        for (final StoryNode node in adventure.nodes) {
+          for (final String locale in <String>['en', 'ar']) {
+            await tester.pumpWidget(beat(
               node: node,
-              languageCode: 'ar',
+              languageCode: locale,
               onSpeak: (String _) async {},
               onContinue: () {},
-              continueLabel: 'التَّالِي',
-            ),
-          ),
-        ));
-        await tester.pump();
-        expect(tester.takeException(), isNull,
-            reason: '${node.nodeId} overflowed in Arabic');
+              continueLabel: locale == 'ar'
+                  ? 'هَيَّا نَلْعَب'
+                  : 'Lets play',
+              nextLabel: locale == 'ar'
+                  ? 'التَّالِي'
+                  : 'Next',
+            ));
+            await tester.pump();
+            expect(tester.takeException(), isNull,
+                reason: '${node.nodeId} overflowed in $locale at $size');
+          }
+        }
       }
     });
   });

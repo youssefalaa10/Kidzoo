@@ -124,6 +124,7 @@ class Adventure {
     required this.nodes,
     required this.rewardId,
     required this.rewardTitle,
+    this.rewardArt,
     this.accent,
   });
 
@@ -148,6 +149,7 @@ class Adventure {
       rewardId: reader.requireString('rewardId'),
       rewardTitle: LocalizedText.fromJson(json['rewardTitle'],
           debugPath: '$sourcePath.rewardTitle'),
+      rewardArt: reader.optionalString('rewardArt'),
       accent: reader.optionalString('accent'),
     );
   }
@@ -160,6 +162,15 @@ class Adventure {
   /// The page this Adventure returns to the book.
   final String rewardId;
   final LocalizedText rewardTitle;
+
+  /// The art for the recovered page.
+  ///
+  /// Authored, not derived from the id, and validated to exist on disk. It is
+  /// the one image the child sees three times — flying into the book at the
+  /// end of the Adventure, sitting in the book afterwards, and inside the
+  /// search scene they found it in — so all three showing the *same* picture is
+  /// what makes it feel like one object rather than three unrelated icons.
+  final String? rewardArt;
 
   /// An `#RRGGBB` accent, or null. Kept as the authored string and parsed by
   /// [accentColorValue] so a typo degrades to the default rather than throwing
@@ -209,6 +220,54 @@ class Adventure {
 }
 
 /// A season: several Adventures under one premise.
+/// A destination the child can see on the map but cannot play yet.
+///
+/// Deliberately thin. A locked stop carries a name and, once the Adventure
+/// before it is finished, a single line — and nothing else. Showing the whole
+/// premise of a chapter the child has not reached spends the surprise before
+/// they get there, and showing *nothing at all* leaves the map looking like a
+/// single button, which is what it was.
+///
+/// These are not [StoryArc.adventureIds]. That list is validated to name real,
+/// playable content; this one names places that do not exist yet, and keeping
+/// them apart is what lets the map promise a journey without the content tests
+/// having to pretend three unwritten Adventures are shippable.
+@immutable
+class UpcomingDestination {
+  const UpcomingDestination({
+    required this.id,
+    required this.title,
+    required this.peek,
+    this.icon,
+  });
+
+  factory UpcomingDestination.fromJson(
+    Map<String, dynamic> json,
+    String sourcePath,
+  ) {
+    final JsonReader reader = JsonReader(json, sourcePath);
+    return UpcomingDestination(
+      id: reader.requireString('id'),
+      title:
+          LocalizedText.fromJson(json['title'], debugPath: '$sourcePath.title'),
+      peek: json['peek'] == null
+          ? const LocalizedText.empty()
+          : LocalizedText.fromJson(json['peek'], debugPath: '$sourcePath.peek'),
+      icon: reader.optionalString('icon'),
+    );
+  }
+
+  final String id;
+  final LocalizedText title;
+
+  /// One line, revealed only once the previous Adventure is complete.
+  final LocalizedText peek;
+
+  /// A named motif the map maps to an icon. A name, not an asset path: what a
+  /// locked stop looks like is the map's business, not content's.
+  final String? icon;
+}
+
 @immutable
 class StoryArc {
   const StoryArc({
@@ -218,6 +277,7 @@ class StoryArc {
     required this.adventureIds,
     required this.companionName,
     required this.bookName,
+    this.upcoming = const <UpcomingDestination>[],
   });
 
   factory StoryArc.fromJson(Map<String, dynamic> json, String sourcePath) {
@@ -233,6 +293,15 @@ class StoryArc {
           debugPath: '$sourcePath.companionName'),
       bookName: LocalizedText.fromJson(json['bookName'],
           debugPath: '$sourcePath.bookName'),
+      upcoming: <UpcomingDestination>[
+        for (int index = 0;
+            index < reader.optionalMapList('upcoming').length;
+            index++)
+          UpcomingDestination.fromJson(
+            reader.optionalMapList('upcoming')[index],
+            '$sourcePath.upcoming[$index]',
+          ),
+      ],
     );
   }
 
@@ -245,4 +314,10 @@ class StoryArc {
   /// nearly every narration line and renaming them must never be a code change.
   final LocalizedText companionName;
   final LocalizedText bookName;
+
+  /// Places the map shows as locked, in the order they will be played.
+  final List<UpcomingDestination> upcoming;
+
+  /// Every stop on the journey: the playable ones first, then the teasers.
+  int get stopCount => adventureIds.length + upcoming.length;
 }

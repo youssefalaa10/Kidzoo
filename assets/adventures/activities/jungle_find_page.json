@@ -9,16 +9,16 @@
   },
   "narration": {
     "prompt": {
-      "en": "The Green Page is hiding in the leaves. Can you find it?",
-      "ar": "الصَّفْحَةُ الخَضْرَاءُ مُخْتَبِئَةٌ بَيْنَ الأَوْرَاق. هَلْ تَجِدُهَا؟"
+      "en": "The Green Page is hiding down here. Can you find it?",
+      "ar": "الصَّفْحَةُ الخَضْرَاءُ مُخْتَبِئَةٌ هُنَا فِي الأَسْفَل. هَلْ تَجِدُهَا؟"
     },
     "hint1": {
-      "en": "Look near the big leaves.",
-      "ar": "اُنْظُرْ قُرْبَ الأَوْرَاقِ الكَبِيرَة."
+      "en": "Look near the bottom, past the wide leaves.",
+      "ar": "اُنْظُرْ قُرْبَ الأَسْفَل، خَلْفَ الأَوْرَاقِ العَرِيضَة."
     },
     "hint2": {
-      "en": "It is lower down, not up in the sky.",
-      "ar": "إِنَّهَا فِي الأَسْفَل، لَيْسَتْ فِي السَّمَاء."
+      "en": "It is green, and flat like paper.",
+      "ar": "إِنَّهَا خَضْرَاء، وَمُسَطَّحَةٌ مِثْلُ الوَرَق."
     },
     "model": {
       "en": "There it is. Touch it and it is yours.",
@@ -30,13 +30,13 @@
     }
   },
   "payload": {
-    "_comment": "Positions are whole percentages of the scene box, so one authored scene works on a phone, a tablet and in landscape. Hidden-object scenes do NOT mirror in Arabic: a painted jungle is a picture, not a line of text.",
+    "_comment": "Positions are whole percentages of the scene box, so one authored scene works on a phone, a tablet and in landscape. Hidden-object scenes do NOT mirror in Arabic: a painted jungle is a picture, not a line of text. The clue art is `page_green.png` and not a coloured shape - the story calls this the GREEN page in both locales, and the previous art was `shapes/square.png`, which is orange. A child who is told to find something green and then hands back an orange square has been lied to, and hint2 ('it is green, and flat like paper') only works because the asset now actually is. A content test asserts the thing searched for and the thing awarded are one picture.",
     "clues": [
       {
         "id": "green_page",
         "positionPercent": [68, 61],
-        "image": "assets/gen/images/shapes/square.png",
-        "scale": 0.9,
+        "image": "assets/gen/images/story/page_green.png",
+        "scale": 1.0,
         "label": { "en": "the Green Page", "ar": "الصَّفْحَةُ الخَضْرَاء" }
       }
     ],

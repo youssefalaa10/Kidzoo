@@ -11,13 +11,14 @@
     "en": "The Green Page",
     "ar": "الصَّفْحَةُ الخَضْرَاء"
   },
-  "_comment": "Every activity node sits inside a beat, and the result of each activity causes the next beat. That is the difference between a story and a themed list of drills: ask the animals and they SPEAK a clue; the count IS how many clues you hold; sorting them is what makes them point the way.",
+  "rewardArt": "assets/gen/images/story/page_green.png",
+  "_comment": "Every activity node sits inside a beat, and the result of each activity causes the next beat. That is the difference between a story and a themed list of drills: ask the animals and they SPEAK a clue; the count IS how many clues you hold; sorting them is what makes them point the way. The counts in n3 are authored (3 monkeys, 4 birds, 2 rabbits), which is why n5 can say 'nine' and mean it - a randomised count range would have made that line a lie on most runs.",
   "nodes": [
     {
       "nodeId": "jungle.n1",
       "beat": "openingProblem",
       "type": "storyBeat",
-      "speakerArt": "assets/gen/images/animal/bird.png",
+      "speakerArt": "assets/gen/images/story/page_green.png",
       "lines": [
         {
           "en": "Noor's book came apart, and the Green Page blew into the jungle.",
@@ -48,8 +49,8 @@
       "activityRef": "activities/jungle_count_watchers",
       "lines": [
         {
-          "en": "More animals were watching than you thought. Count them - that is how many clues you have.",
-          "ar": "كَانَتْ حَيَوَانَاتٌ أَكْثَرُ مِمَّا ظَنَنْتَ تُرَاقِب. عُدَّهَا، فَهَذَا عَدَدُ الأَدِلَّةِ الَّتِي مَعَك."
+          "en": "More animals were watching than you thought. Count each group.",
+          "ar": "كَانَتْ حَيَوَانَاتٌ أَكْثَرُ مِمَّا ظَنَنْتَ تُرَاقِب. عُدَّ كُلَّ مَجْمُوعَة."
         }
       ]
     },
@@ -60,8 +61,8 @@
       "activityRef": "activities/jungle_sort_watchers",
       "lines": [
         {
-          "en": "The animals came down to help. Send each one back where it was watching from, so it can point the way.",
-          "ar": "نَزَلَتِ الحَيَوَانَاتُ لِتُسَاعِد. أَعِدْ كُلَّ وَاحِدٍ إِلَى مَكَانِ مُرَاقَبَتِه، لِيَدُلَّكَ عَلَى الطَّرِيق."
+          "en": "Send each watcher back to its own place, so it can point the way.",
+          "ar": "أَعِدْ كُلَّ مُرَاقِبٍ إِلَى مَكَانِه، لِيَدُلَّكَ عَلَى الطَّرِيق."
         }
       ]
     },
@@ -72,12 +73,12 @@
       "speakerArt": "assets/gen/images/animal/monkey.png",
       "lines": [
         {
-          "en": "Every animal is pointing the same way now - down, past the wide leaves.",
-          "ar": "كُلُّ الحَيَوَانَاتِ تُشِيرُ إِلَى الاِتِّجَاهِ نَفْسِهِ الآن: إِلَى الأَسْفَل، خَلْفَ الأَوْرَاقِ العَرِيضَة."
+          "en": "Nine watchers, and every one of them points the same way.",
+          "ar": "تِسْعَةُ مُرَاقِبِينَ، وَكُلُّهُمْ يُشِيرُونَ إِلَى الاِتِّجَاهِ نَفْسِه."
         },
         {
-          "en": "Noor says: it must be very close.",
-          "ar": "تَقُولُ نُور: لَا بُدَّ أَنَّهَا قَرِيبَةٌ جِدًّا."
+          "en": "Down, past the wide leaves. Noor says it must be very close.",
+          "ar": "إِلَى الأَسْفَل، خَلْفَ الأَوْرَاقِ العَرِيضَة. تَقُولُ نُور إِنَّهَا قَرِيبَةٌ جِدًّا."
         }
       ]
     },
@@ -88,8 +89,8 @@
       "activityRef": "activities/jungle_find_page",
       "lines": [
         {
-          "en": "There are leaves everywhere. Look carefully.",
-          "ar": "الأَوْرَاقُ فِي كُلِّ مَكَان. اُنْظُرْ بِتَمَعُّن."
+          "en": "Down past the wide leaves, the watchers are all around. Look carefully.",
+          "ar": "تَحْتَ الأَوْرَاقِ العَرِيضَة، المُرَاقِبُونَ فِي كُلِّ مَكَان. اُنْظُرْ بِتَمَعُّن."
         }
       ]
     },
@@ -98,7 +99,7 @@
       "beat": "resolution",
       "type": "storyBeat",
       "rewardId": "green_page",
-      "speakerArt": "assets/gen/images/animal/monkey.png",
+      "speakerArt": "assets/gen/images/story/page_green.png",
       "lines": [
         {
           "en": "You found it! The Green Page goes back into the book.",

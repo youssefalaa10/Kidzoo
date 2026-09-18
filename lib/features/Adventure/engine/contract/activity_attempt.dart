@@ -3,9 +3,17 @@ import 'package:flutter/painting.dart';
 
 /// What a child did on one step.
 ///
-/// The set is capped at eight variants. A ninth deserves the same scrutiny as a
+/// The **judged** set is capped at eight variants — the ones [ActivityCubit]
+/// hands to `judge`. A ninth judged variant deserves the same scrutiny as a
 /// whole new engine, because it means engines are leaking their internals into
 /// the shared contract rather than expressing themselves in content.
+///
+/// Alongside them sit the *control* attempts — [HelpRequestedAttempt] and
+/// [TallyAttempt] — which never reach `judge`, never count against the
+/// no-fail ladder's attempt budget and never change the score. They are here
+/// rather than on a second channel because a board already has exactly one way
+/// to talk to the cubit, and giving it a second one to say "speak this" would
+/// be two paths where one will do.
 ///
 /// [TextAttempt] and [StrokeAttempt] ship with **no consumer**. That is
 /// deliberate: they are the seam for Arabic literacy engines (tracing, phonics,
@@ -84,7 +92,27 @@ class StrokeAttempt extends ActivityAttempt {
 
 /// The child asked for help rather than answering. Never counts as wrong, but
 /// it does advance the scaffold ladder so asking twice gets real help.
+///
+/// A **control** attempt: never judged.
 @immutable
 class HelpRequestedAttempt extends ActivityAttempt {
   const HelpRequestedAttempt();
+}
+
+/// The child tagged one more object while counting. A **control** attempt.
+///
+/// Counting out loud is the activity, not a step toward it: the one-to-one
+/// principle needs the child to hear each object land on a number as they touch
+/// it. The board cannot say that itself — it has no narrator, deliberately — so
+/// it reports the running total and the cubit speaks it.
+///
+/// It is explicitly *not* an answer. It is not judged, not recorded, does not
+/// advance the ladder and does not lock the board, because a child sweeping
+/// across five animals must not be throttled by narration between taps.
+@immutable
+class TallyAttempt extends ActivityAttempt {
+  const TallyAttempt(this.runningCount);
+
+  /// How many distinct objects are now tagged, counting from one.
+  final int runningCount;
 }

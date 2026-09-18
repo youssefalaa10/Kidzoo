@@ -42,6 +42,7 @@ class ActivityStepView {
   const ActivityStepView({
     required this.prompt,
     this.spokenPrompt,
+    this.revealLine,
     this.liveOptionIds = const <String>[],
     this.dimmedOptionIds = const <String>[],
     this.highlightOptionId,
@@ -51,6 +52,15 @@ class ActivityStepView {
 
   /// Spoken instead of [prompt] when the written and heard forms differ.
   final LocalizedText? spokenPrompt;
+
+  /// Spoken **after** this step is answered correctly, before the next one.
+  ///
+  /// This is what makes an activity causal rather than decorative: the animal
+  /// does not merely get picked, it says what it saw, and that line is the clue
+  /// the next beat depends on. Content authored these from the start and
+  /// nothing ever spoke them, so the story's whole chain of cause ran silently
+  /// — the child picked the monkey, heard a chime, and was told nothing.
+  final LocalizedText? revealLine;
 
   /// Ids the child can still act on. Shrinks as the scaffold ladder narrows.
   final List<String> liveOptionIds;

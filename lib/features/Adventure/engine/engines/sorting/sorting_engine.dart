@@ -66,10 +66,19 @@ class SortingContent extends ActivityContent {
 class SortingStep extends ActivityStep {
   const SortingStep({
     required String stepId,
+    required this.index,
     required this.item,
     required this.correctBinId,
     required this.bins,
   }) : super(stepId);
+
+  /// Where this token sits in the round, from zero.
+  ///
+  /// Carried because the *first* token is the one the instruction is for. Every
+  /// token after it gets its own name spoken instead, which is what an adult
+  /// sitting beside the child would do: say what to do once, then just name the
+  /// next thing as they hand it over.
+  final int index;
 
   final PackItem item;
   final String correctBinId;
@@ -119,6 +128,7 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
       );
       steps.add(SortingStep(
         stepId: 'sort_${index}_${item.id}',
+        index: index,
         item: item,
         correctBinId: bin.id,
         bins: content.bins,
@@ -164,6 +174,12 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
     );
     return ActivityStepView(
       prompt: spec.narration.prompt,
+      // The written prompt stays the instruction — it is on screen the whole
+      // time — while what is *said* changes per token. Repeating one sentence
+      // once per animal made the activity sound stuck; naming the animal tells
+      // the child something new every time and costs no new content, because
+      // pack labels are already authored per locale with harakat.
+      spokenPrompt: step.index == 0 ? null : step.item.label,
       liveOptionIds: live,
       dimmedOptionIds:
           allIds.where((String id) => !live.contains(id)).toList(growable: false),

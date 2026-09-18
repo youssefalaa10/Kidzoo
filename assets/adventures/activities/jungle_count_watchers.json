@@ -8,7 +8,7 @@
     "accent": "#4AC49A"
   },
   "narration": {
-    "_comment": "Authored whole per locale. Arabic number-noun agreement is irregular (3-10 take a broken plural, 11+ a singular accusative), so a sentence built by substituting a count into a template produces wrong Arabic. The validator rejects a {count} placeholder in an ar string for exactly this reason.",
+    "_comment": "Authored whole per locale. Arabic number-noun agreement is irregular (dual for 2, a broken plural for 3-10, a singular accusative for 11+), so a sentence built by substituting a count into a template produces wrong Arabic. The validator rejects a {count} placeholder in an ar string for exactly this reason - which is also why every round below carries its OWN authored prompt and reveal rather than one template reused three times.",
     "prompt": {
       "en": "How many animals are watching?",
       "ar": "كَمْ حَيَوَانًا يُرَاقِب؟"
@@ -26,19 +26,55 @@
       "ar": "شَاهِدْنِي أَعُدُّهَا، ثُمَّ جَرِّبْ أَنْت."
     },
     "success": {
-      "en": "That is how many clues you have!",
-      "ar": "هَذَا عَدَدُ الأَدِلَّةِ الَّتِي مَعَك!"
+      "en": "Nine watchers in all. That is nine clues!",
+      "ar": "تِسْعَةُ مُرَاقِبِينَ فِي المَجْمُوع. تِسْعَةُ أَدِلَّة!"
     }
   },
   "payload": {
     "mode": "countAndPick",
     "_comment": "tenFrame sits second on the arrangement ladder (dice, tenFrame, linear, scatter, random). It is the right place to start a first Adventure: structured enough to support the one-to-one sweep, not so structured that it gives the answer away.",
     "layout": "tenFrame",
-    "countRange": [2, 5],
-    "roundCount": 3,
     "optionSpread": 2,
     "itemsRef": "packs/animals",
-    "itemIds": ["monkey", "bird", "rabbit"]
+    "_roundsComment": "Authored rounds, not a random count in a range. Three reasons, all of them story reasons: the counts are FIXED so the next beat can truthfully say 'nine watchers'; each round names its own animal so no two rounds of the same activity ask the same question; and the totals differ (3, 4, 2) so a child cannot answer the second round from the first. A randomised countRange gave none of that and could repeat the same number three times in a row.",
+    "rounds": [
+      {
+        "itemId": "monkey",
+        "targetCount": 3,
+        "prompt": {
+          "en": "How many monkeys are up in the branches?",
+          "ar": "كَمْ قِرْدًا فِي الأَغْصَان؟"
+        },
+        "revealLine": {
+          "en": "Three monkeys saw it go by.",
+          "ar": "ثَلَاثَةُ قُرُودٍ رَأَتْهَا تَمُرّ."
+        }
+      },
+      {
+        "itemId": "bird",
+        "targetCount": 4,
+        "prompt": {
+          "en": "How many birds are watching from the sky?",
+          "ar": "كَمْ طَائِرًا يُرَاقِبُ مِنَ السَّمَاء؟"
+        },
+        "revealLine": {
+          "en": "Four birds saw it go by.",
+          "ar": "أَرْبَعَةُ طُيُورٍ رَأَتْهَا تَمُرّ."
+        }
+      },
+      {
+        "itemId": "rabbit",
+        "targetCount": 2,
+        "prompt": {
+          "en": "How many rabbits are hiding in the grass?",
+          "ar": "كَمْ أَرْنَبًا يَخْتَبِئُ فِي العُشْب؟"
+        },
+        "revealLine": {
+          "en": "Two rabbits saw it go by.",
+          "ar": "أَرْنَبَانِ رَأَيَاهَا تَمُرّ."
+        }
+      }
+    ]
   },
   "support": {
     "distractorCount": 2,
