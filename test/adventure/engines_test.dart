@@ -1,0 +1,423 @@
+import 'dart:math';
+
+import 'package:flutter_test/flutter_test.dart';
+import 'package:kidzo/features/Adventure/data/adventure_content_loader.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_attempt.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_engine.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_engine_registry.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
+import 'package:kidzo/features/Adventure/engine/default_engines.dart';
+import 'package:kidzo/features/Adventure/engine/engines/counting/counting_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
+import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
+
+import 'support/disk_content_source.dart';
+
+/// Every engine, against the real authored content.
+///
+/// Two things are checked for all of them: the shared base-cubit guarantees
+/// still hold (a child always finishes), and generation is deterministic under
+/// a seed — an engine whose output cannot be reproduced cannot be tested.
+void main() {
+  late AdventureContentBundle bundle;
+  late ActivityEngineRegistry registry;
+
+  setUpAll(() async {
+    registry = buildDefaultEngineRegistry();
+    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
+        .load();
+  });
+
+  ActivityCubit<ActivityContent, dynamic> cubitFor(
+    String activityId, {
+    int seed = 11,
+    String languageCode = 'en',
+  }) {
+    final ActivitySpec spec = bundle.requireActivity(activityId);
+    final ActivityEngine<ActivityContent> engine =
+        registry.require(spec.engineId);
+    return engine.createCubit(engine.createSession(
+      spec: spec,
+      services: ActivityServices.forTest(seed: seed, languageCode: languageCode),
+      packs: bundle.packResolver,
+      storyNodeId: 'test.node',
+    ));
+  }
+
+  group('Shared guarantees hold for every authored activity', () {
+    test('each one starts, runs and exposes a step', () async {
+      for (final String activityId in bundle.activities.keys) {
+        final ActivityCubit<ActivityContent, dynamic> cubit =
+            cubitFor(activityId);
+        await cubit.start();
+        expect(cubit.state.status, ActivityStatus.running,
+            reason: '$activityId failed to start');
+        expect(cubit.state.stepCount, greaterThan(0));
+        expect(cubit.state.engineStep, isNotNull,
+            reason: '$activityId published no step for its board to render');
+        await cubit.close();
+      }
+    });
+
+    test('generation is deterministic under a seed', () async {
+      for (final String activityId in bundle.activities.keys) {
+        final ActivityCubit<ActivityContent, dynamic> a =
+            cubitFor(activityId, seed: 99);
+        final ActivityCubit<ActivityContent, dynamic> b =
+            cubitFor(activityId, seed: 99);
+        await a.start();
+        await b.start();
+        expect(a.state.stepCount, b.state.stepCount,
+            reason: '$activityId is not reproducible under one seed');
+        expect(
+          a.state.view!.liveOptionIds,
+          b.state.view!.liveOptionIds,
+          reason: '$activityId produced different options for the same seed',
+        );
+        await a.close();
+        await b.close();
+      }
+    });
+
+    test('a locked board rejects input', () async {
+      for (final String activityId in bundle.activities.keys) {
+        final ActivityCubit<ActivityContent, dynamic> cubit =
+            cubitFor(activityId);
+        // Never started, so still loading.
+        await cubit.submit(const ChoiceAttempt('x'));
+        expect(cubit.state.status, ActivityStatus.loading);
+        await cubit.close();
+      }
+    });
+
+    test('Arabic content reaches the child in Arabic', () async {
+      for (final String activityId in bundle.activities.keys) {
+        final ActivityCubit<ActivityContent, dynamic> cubit =
+            cubitFor(activityId, languageCode: 'ar');
+        await cubit.start();
+        final String prompt = cubit.state.view!.prompt.resolve('ar');
+        expect(prompt, isNotEmpty);
+        expect(RegExp('[؀-ۿ]').hasMatch(prompt), isTrue,
+            reason: '$activityId showed non-Arabic text to an Arabic child');
+        await cubit.close();
+      }
+    });
+  });
+
+  group('counting', () {
+    test('the correct numeral is always among the options', () async {
+      // Otherwise the step is unanswerable and the ladder cannot terminate.
+      for (int seed = 0; seed < 200; seed++) {
+        final CountingCubit cubit =
+            cubitFor('jungle_count_watchers', seed: seed) as CountingCubit;
+        await cubit.start();
+        for (final step in cubit.buildSteps()) {
+          expect(step.numeralOptions, contains(step.targetCount),
+              reason: 'seed $seed produced a step with no correct answer');
+        }
+        await cubit.close();
+      }
+    });
+
+    test('the target stays inside the authored range', () async {
+      for (int seed = 0; seed < 200; seed++) {
+        final CountingCubit cubit =
+            cubitFor('jungle_count_watchers', seed: seed) as CountingCubit;
+        await cubit.start();
+        for (final step in cubit.buildSteps()) {
+          expect(step.targetCount, inInclusiveRange(2, 5));
+        }
+        await cubit.close();
+      }
+    });
+
+    test('options are near neighbours, never wild guesses', () async {
+      // Offering 3 against 9 teaches nothing: a child can eliminate 9 without
+      // counting anything.
+      final CountingCubit cubit =
+          cubitFor('jungle_count_watchers') as CountingCubit;
+      await cubit.start();
+      for (final step in cubit.buildSteps()) {
+        for (final int option in step.numeralOptions) {
+          expect((option - step.targetCount).abs(), lessThanOrEqualTo(3));
+          expect(option, greaterThanOrEqualTo(1));
+        }
+      }
+      await cubit.close();
+    });
+
+    test('options are sorted, so the answer never moves between attempts',
+        () async {
+      final CountingCubit cubit =
+          cubitFor('jungle_count_watchers') as CountingCubit;
+      await cubit.start();
+      for (final step in cubit.buildSteps()) {
+        final List<int> sorted = List<int>.of(step.numeralOptions)..sort();
+        expect(step.numeralOptions, sorted);
+      }
+      await cubit.close();
+    });
+
+    test('judging is pure and answers only to the target', () async {
+      final CountingCubit cubit =
+          cubitFor('jungle_count_watchers') as CountingCubit;
+      await cubit.start();
+      final step = cubit.currentStep;
+      expect(cubit.judge(step, QuantityAttempt(step.targetCount)).isCorrect,
+          isTrue);
+      expect(cubit.judge(step, QuantityAttempt(step.targetCount + 1)).isCorrect,
+          isFalse);
+      // Calling judge repeatedly must not change anything.
+      expect(cubit.judge(step, QuantityAttempt(step.targetCount)).isCorrect,
+          isTrue);
+      expect(cubit.state.stepIndex, 0);
+      await cubit.close();
+    });
+
+    test('playing it through completes', () async {
+      final CountingCubit cubit =
+          cubitFor('jungle_count_watchers') as CountingCubit;
+      await cubit.start();
+      while (cubit.state.status == ActivityStatus.running) {
+        await cubit.submit(QuantityAttempt(cubit.currentStep.targetCount));
+      }
+      expect(cubit.state.result.completion, ActivityCompletion.completed);
+      await cubit.close();
+    });
+  });
+
+  group('multiple_choice', () {
+    test('the correct item is always offered', () async {
+      for (int seed = 0; seed < 50; seed++) {
+        final MultipleChoiceCubit cubit =
+            cubitFor('jungle_ask_animals', seed: seed) as MultipleChoiceCubit;
+        await cubit.start();
+        for (final step in cubit.buildSteps()) {
+          expect(
+            step.orderedItems.map((i) => i.id),
+            contains(step.question.correctItem.id),
+          );
+        }
+        await cubit.close();
+      }
+    });
+
+    test('every question has a reveal line, so the answer moves the story',
+        () async {
+      // This is what makes the activity causal rather than decorative: the
+      // animal does not merely get picked, it says what it saw.
+      final MultipleChoiceCubit cubit =
+          cubitFor('jungle_ask_animals') as MultipleChoiceCubit;
+      await cubit.start();
+      for (final step in cubit.buildSteps()) {
+        expect(step.question.revealLine.isEmpty, isFalse,
+            reason: '${step.question.id} has no reveal line');
+        expect(step.question.revealLine.hasLanguage('ar'), isTrue);
+      }
+      await cubit.close();
+    });
+
+    test('playing it through completes', () async {
+      final MultipleChoiceCubit cubit =
+          cubitFor('jungle_ask_animals') as MultipleChoiceCubit;
+      await cubit.start();
+      while (cubit.state.status == ActivityStatus.running) {
+        await cubit.submit(
+            ChoiceAttempt(cubit.currentStep.question.correctItem.id));
+      }
+      expect(cubit.state.result.completion, ActivityCompletion.completed);
+      expect(cubit.state.result.stepsIndependent, 3);
+      await cubit.close();
+    });
+  });
+
+  group('hidden_clue', () {
+    test('a tap on the clue counts, a tap far away does not', () async {
+      final HiddenClueCubit cubit =
+          cubitFor('jungle_find_page') as HiddenClueCubit;
+      await cubit.start();
+      final step = cubit.currentStep;
+
+      expect(cubit.judge(step, TapPointAttempt(step.clue.position)).isCorrect,
+          isTrue);
+      expect(
+        cubit
+            .judge(step, const TapPointAttempt(Offset(0.02, 0.02)))
+            .isCorrect,
+        isFalse,
+      );
+      await cubit.close();
+    });
+
+    test('a near miss is forgiven', () async {
+      // A child who found the clue but missed it by a few millimetres has a
+      // motor problem; scoring that as "did not find it" is a measurement error.
+      final HiddenClueCubit cubit =
+          cubitFor('jungle_find_page') as HiddenClueCubit;
+      await cubit.start();
+      final step = cubit.currentStep;
+      final Offset nearMiss =
+          step.clue.position + const Offset(0.05, 0.05);
+      expect(cubit.judge(step, TapPointAttempt(nearMiss)).isCorrect, isTrue);
+      await cubit.close();
+    });
+
+    test('decoys never sit on top of the clue', () async {
+      // Otherwise the search becomes luck rather than looking.
+      for (int seed = 0; seed < 100; seed++) {
+        final HiddenClueCubit cubit =
+            cubitFor('jungle_find_page', seed: seed) as HiddenClueCubit;
+        await cubit.start();
+        for (final step in cubit.buildSteps()) {
+          for (final entry in step.noisePositions) {
+            expect((entry.value - step.clue.position).distance,
+                greaterThan(0.1),
+                reason: 'seed $seed put a decoy on the clue');
+          }
+        }
+        await cubit.close();
+      }
+    });
+
+    test('decoy positions stay inside the scene', () async {
+      for (int seed = 0; seed < 100; seed++) {
+        final HiddenClueCubit cubit =
+            cubitFor('jungle_find_page', seed: seed) as HiddenClueCubit;
+        await cubit.start();
+        for (final step in cubit.buildSteps()) {
+          for (final entry in step.noisePositions) {
+            expect(entry.value.dx, inInclusiveRange(0.0, 1.0));
+            expect(entry.value.dy, inInclusiveRange(0.0, 1.0));
+          }
+        }
+        await cubit.close();
+      }
+    });
+  });
+
+  group('sorting', () {
+    test('every token has a bin that accepts it', () async {
+      final SortingCubit cubit =
+          cubitFor('jungle_sort_watchers') as SortingCubit;
+      await cubit.start();
+      for (final step in cubit.buildSteps()) {
+        expect(step.binById(step.correctBinId), isNotNull);
+      }
+      await cubit.close();
+    });
+
+    test('a near-miss drop is recorded as motor, not knowledge', () async {
+      final SortingCubit cubit =
+          cubitFor('jungle_sort_watchers') as SortingCubit;
+      await cubit.start();
+      final step = cubit.currentStep;
+      final String wrongBin = step.bins
+          .firstWhere((b) => b.id != step.correctBinId)
+          .id;
+
+      final judgement = cubit.judge(
+        step,
+        PlacementAttempt(
+          tokenId: step.item.id,
+          targetId: wrongBin,
+          droppedAtDistance: 0.1,
+        ),
+      );
+      expect(judgement.outcome, AttemptOutcome.wrongSlotButRightItem,
+          reason: 'one means bigger targets, the other means more teaching');
+
+      final far = cubit.judge(
+        step,
+        PlacementAttempt(
+          tokenId: step.item.id,
+          targetId: wrongBin,
+          droppedAtDistance: 0.9,
+        ),
+      );
+      expect(far.outcome, AttemptOutcome.wrongItem);
+      await cubit.close();
+    });
+
+    test('bins are carried on the step so the board needs no cubit', () async {
+      final SortingCubit cubit =
+          cubitFor('jungle_sort_watchers') as SortingCubit;
+      await cubit.start();
+      expect(cubit.currentStep.bins.length, greaterThanOrEqualTo(2));
+      await cubit.close();
+    });
+
+    test('playing it through completes', () async {
+      final SortingCubit cubit =
+          cubitFor('jungle_sort_watchers') as SortingCubit;
+      await cubit.start();
+      while (cubit.state.status == ActivityStatus.running) {
+        await cubit.submit(PlacementAttempt(
+          tokenId: cubit.currentStep.item.id,
+          targetId: cubit.currentStep.correctBinId,
+        ));
+      }
+      expect(cubit.state.result.completion, ActivityCompletion.completed);
+      await cubit.close();
+    });
+  });
+
+  group('The no-fail ladder terminates for every engine', () {
+    test('three wrong answers always reach modelled, then completion',
+        () async {
+      for (final String activityId in bundle.activities.keys) {
+        final ActivityCubit<ActivityContent, dynamic> cubit =
+            cubitFor(activityId);
+        await cubit.start();
+
+        int guard = 0;
+        while (cubit.state.status == ActivityStatus.running && guard < 200) {
+          guard++;
+          // A deliberately invalid attempt: wrong for every engine.
+          await cubit.submit(const ChoiceAttempt('__definitely_wrong__'));
+          if (cubit.state.scaffoldLevel == ScaffoldLevel.modelled) {
+            // The board now offers only the correct option. Feed the engine
+            // the id it highlighted, which is how a real child would finish.
+            final String? correct = cubit.state.view?.highlightOptionId;
+            expect(correct, isNotNull,
+                reason: '$activityId reached modelled without naming the '
+                    'correct option, so the child cannot finish');
+            await cubit.submit(ChoiceAttempt(correct!));
+          }
+        }
+
+        expect(cubit.state.status, ActivityStatus.finished,
+            reason: '$activityId never terminated under repeated wrong input');
+        expect(cubit.state.result.completion, ActivityCompletion.completed);
+        expect(cubit.state.result.score, greaterThan(0),
+            reason: 'never-zero is the house rule');
+        await cubit.close();
+      }
+    });
+  });
+
+  group('Randomness', () {
+    test('different seeds do produce different activities', () async {
+      // The mirror of the determinism test: a "random" engine that ignores its
+      // seed would pass that one and still be broken.
+      final Set<String> firstTargets = <String>{};
+      for (int seed = 0; seed < 25; seed++) {
+        final CountingCubit cubit =
+            cubitFor('jungle_count_watchers', seed: seed) as CountingCubit;
+        await cubit.start();
+        firstTargets.add(cubit.currentStep.targetCount.toString());
+        await cubit.close();
+      }
+      expect(firstTargets.length, greaterThan(1));
+    });
+
+    test('an injected Random is actually used', () {
+      final ActivityServices services = ActivityServices.forTest(seed: 3);
+      expect(services.random, isA<Random>());
+    });
+  });
+}

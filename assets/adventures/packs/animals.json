@@ -1,0 +1,54 @@
+{
+  "packId": "animals",
+  "_comment": "Reusable items. Arabic labels carry full harakat: diacritics are not optional for ages 3-8, and the benefit of vowelisation is strongest in exactly this age band.",
+  "items": [
+    {
+      "id": "monkey",
+      "image": "assets/gen/images/animal/monkey.png",
+      "label": { "en": "monkey", "ar": "قِرْد" },
+      "attributes": { "watchedFrom": "trees", "size": "small" }
+    },
+    {
+      "id": "bird",
+      "image": "assets/gen/images/animal/bird.png",
+      "label": { "en": "bird", "ar": "طَائِر" },
+      "attributes": { "watchedFrom": "trees", "size": "small" }
+    },
+    {
+      "id": "panda",
+      "image": "assets/gen/images/animal/panda.png",
+      "label": { "en": "panda", "ar": "بَانْدَا" },
+      "attributes": { "watchedFrom": "trees", "size": "big" }
+    },
+    {
+      "id": "elephant",
+      "image": "assets/gen/images/animal/elephant.png",
+      "label": { "en": "elephant", "ar": "فِيل" },
+      "attributes": { "watchedFrom": "ground", "size": "big" }
+    },
+    {
+      "id": "lion",
+      "image": "assets/gen/images/animal/lion.png",
+      "label": { "en": "lion", "ar": "أَسَد" },
+      "attributes": { "watchedFrom": "ground", "size": "big" }
+    },
+    {
+      "id": "giraffe",
+      "image": "assets/gen/images/animal/giraffe.png",
+      "label": { "en": "giraffe", "ar": "زَرَافَة" },
+      "attributes": { "watchedFrom": "ground", "size": "big" }
+    },
+    {
+      "id": "rabbit",
+      "image": "assets/gen/images/animal/rabbit.png",
+      "label": { "en": "rabbit", "ar": "أَرْنَب" },
+      "attributes": { "watchedFrom": "ground", "size": "small" }
+    },
+    {
+      "id": "fish",
+      "image": "assets/gen/images/animal/fish.png",
+      "label": { "en": "fish", "ar": "سَمَكَة" },
+      "attributes": { "watchedFrom": "river", "size": "small" }
+    }
+  ]
+}

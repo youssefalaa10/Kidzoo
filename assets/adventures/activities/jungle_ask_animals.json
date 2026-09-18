@@ -1,0 +1,88 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "jungle.ask_animals",
+  "engineId": "multiple_choice",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "jungle",
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Ask the animals what they saw.",
+      "ar": "اِسْأَلِ الحَيَوَانَاتِ مَاذَا رَأَتْ."
+    },
+    "hint1": {
+      "en": "Look again. Who would be up high?",
+      "ar": "اُنْظُرْ مَرَّةً أُخْرَى. مَنْ يَكُونُ فِي الأَعْلَى؟"
+    },
+    "hint2": {
+      "en": "It is one of these two.",
+      "ar": "إِنَّهُ وَاحِدٌ مِنْ هَذَيْنِ."
+    },
+    "model": {
+      "en": "This one. Touch it and it will tell you.",
+      "ar": "هَذَا هُوَ. اِلْمِسْهُ وَسَيُخْبِرُك."
+    },
+    "success": {
+      "en": "It saw something!",
+      "ar": "لَقَدْ رَأَى شَيْئًا!"
+    }
+  },
+  "payload": {
+    "itemsRef": "packs/animals",
+    "optionCount": 3,
+    "questions": [
+      {
+        "id": "who_was_high",
+        "prompt": {
+          "en": "Who was high up in the branches?",
+          "ar": "مَنْ كَانَ فِي أَعْلَى الأَغْصَان؟"
+        },
+        "correctItemId": "monkey",
+        "distractorItemIds": ["elephant", "fish"],
+        "revealLine": {
+          "en": "The monkey says: something green flew past the tall trees.",
+          "ar": "يَقُولُ القِرْد: شَيْءٌ أَخْضَرُ طَارَ بِجَانِبِ الأَشْجَارِ العَالِيَة."
+        }
+      },
+      {
+        "id": "who_was_flying",
+        "prompt": {
+          "en": "Who was flying over the river?",
+          "ar": "مَنْ كَانَ يَطِيرُ فَوْقَ النَّهْر؟"
+        },
+        "correctItemId": "bird",
+        "distractorItemIds": ["lion", "rabbit"],
+        "revealLine": {
+          "en": "The bird says: it came down near the wide leaves.",
+          "ar": "يَقُولُ الطَّائِر: لَقَدْ نَزَلَ قُرْبَ الأَوْرَاقِ العَرِيضَة."
+        }
+      },
+      {
+        "id": "who_was_drinking",
+        "prompt": {
+          "en": "Who was drinking at the water?",
+          "ar": "مَنْ كَانَ يَشْرَبُ عِنْدَ المَاء؟"
+        },
+        "correctItemId": "elephant",
+        "distractorItemIds": ["monkey", "bird"],
+        "revealLine": {
+          "en": "The elephant says: many eyes were watching it fall.",
+          "ar": "يَقُولُ الفِيل: عُيُونٌ كَثِيرَةٌ رَأَتْهُ يَسْقُط."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 2,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 2,
+    "max": 4
+  },
+  "elofGoal": "LANG.vocabulary.listening_comprehension",
+  "prereqSkills": [],
+  "masteryThreshold": 0.7
+}

@@ -1,0 +1,22 @@
+{
+  "arcId": "lost_pages",
+  "title": {
+    "en": "The Lost Pages",
+    "ar": "الصَّفَحَاتُ الضَّائِعَة"
+  },
+  "premise": {
+    "en": "Noor's storybook came apart, and its pages blew away into different worlds. Every page you bring back makes the book stronger.",
+    "ar": "تَمَزَّقَ كِتَابُ نُور، وَطَارَتْ صَفَحَاتُهُ إِلَى عَوَالِمَ بَعِيدَة. كُلُّ صَفْحَةٍ تُعِيدُهَا تَجْعَلُ الكِتَابَ أَقْوَى."
+  },
+  "companionName": {
+    "en": "Noor",
+    "ar": "نُور"
+  },
+  "bookName": {
+    "en": "the Story Book",
+    "ar": "كِتَابُ الحِكَايَات"
+  },
+  "adventures": [
+    "jungle"
+  ]
+}

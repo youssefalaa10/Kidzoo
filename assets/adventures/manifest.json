@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "_comment": "The index of every content file. Asset bundles cannot be listed at runtime, so this is the directory. A test asserts it agrees with the disk in BOTH directions, which is what stops a file being added and silently never shipping.",
+  "arcs": [
+    "lost_pages"
+  ],
+  "adventures": [
+    "jungle"
+  ],
+  "activities": [
+    "jungle_ask_animals",
+    "jungle_count_watchers",
+    "jungle_sort_watchers",
+    "jungle_find_page"
+  ],
+  "packs": [
+    "animals"
+  ]
+}

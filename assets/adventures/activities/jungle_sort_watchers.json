@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "jungle.sort_watchers",
+  "engineId": "sorting",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "jungle",
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Send each animal back to where it was watching from.",
+      "ar": "أَعِدْ كُلَّ حَيَوَانٍ إِلَى المَكَانِ الَّذِي كَانَ يُرَاقِبُ مِنْه."
+    },
+    "hint1": {
+      "en": "Think about where it lives.",
+      "ar": "فَكِّرْ أَيْنَ يَعِيش."
+    },
+    "hint2": {
+      "en": "It belongs in one of these two.",
+      "ar": "إِنَّهُ يَنْتَمِي إِلَى وَاحِدٍ مِنْ هَذَيْن."
+    },
+    "model": {
+      "en": "This is where it goes. Now you try.",
+      "ar": "هُنَا مَكَانُه. جَرِّبْ أَنْتَ الآن."
+    },
+    "success": {
+      "en": "Now it can point the way.",
+      "ar": "الآنَ يُمْكِنُهُ أَنْ يَدُلَّكَ عَلَى الطَّرِيق."
+    }
+  },
+  "payload": {
+    "_comment": "activeAttribute is the ONE thing being taught. heldConstant records what deliberately does not vary, because young children attend to the most salient attribute even when it is irrelevant - teaching 'sort by habitat' while sizes also differ risks teaching size instead.",
+    "activeAttribute": "watchedFrom",
+    "heldConstant": ["size"],
+    "itemsRef": "packs/animals",
+    "itemIds": ["monkey", "bird", "rabbit", "lion"],
+    "itemsPerRound": 4,
+    "roundCount": 1,
+    "bins": [
+      {
+        "id": "bin_trees",
+        "value": "trees",
+        "label": { "en": "the trees", "ar": "الأَشْجَار" }
+      },
+      {
+        "id": "bin_ground",
+        "value": "ground",
+        "label": { "en": "the ground", "ar": "الأَرْض" }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless",
+    "allowTapToSelect": true
+  },
+  "adaptation": {
+    "min": 3,
+    "max": 6
+  },
+  "elofGoal": "COG.classification.single_attribute",
+  "prereqSkills": [],
+  "masteryThreshold": 0.75
+}

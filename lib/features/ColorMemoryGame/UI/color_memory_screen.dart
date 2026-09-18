@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/base/protected_game_screen.dart';
+import '../../../core/base/kid_game_screen.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../bloc/color_memory_bloc.dart';
@@ -16,7 +16,7 @@ import 'widgets/game_over_dialog.dart';
 import 'widgets/level_complete_dialog.dart';
 import 'widgets/success_dialog.dart';
 
-class ColorMemoryScreen extends ProtectedGameScreen {
+class ColorMemoryScreen extends KidGameScreen {
   const ColorMemoryScreen({
     required super.level,
     super.key,
@@ -27,7 +27,7 @@ class ColorMemoryScreen extends ProtectedGameScreen {
 }
 
 class _ColorMemoryScreenState
-    extends ProtectedGameScreenState<ColorMemoryScreen> {
+    extends KidGameScreenState<ColorMemoryScreen> {
   late ColorMemoryBloc _bloc;
   late AudioPlayer _sfxPlayer;
 

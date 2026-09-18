@@ -390,9 +390,43 @@ class $GameScoresTable extends GameScores
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
+  static const VerificationMeta _maxScoreMeta =
+      const VerificationMeta('maxScore');
   @override
-  List<GeneratedColumn> get $columns =>
-      [id, profileId, gameKey, score, level, playedAt];
+  late final GeneratedColumn<int> maxScore = GeneratedColumn<int>(
+      'max_score', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _starsEarnedMeta =
+      const VerificationMeta('starsEarned');
+  @override
+  late final GeneratedColumn<int> starsEarned = GeneratedColumn<int>(
+      'stars_earned', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _durationSecondsMeta =
+      const VerificationMeta('durationSeconds');
+  @override
+  late final GeneratedColumn<int> durationSeconds = GeneratedColumn<int>(
+      'duration_seconds', aliasedName, true,
+      type: DriftSqlType.int, requiredDuringInsert: false);
+  static const VerificationMeta _storyNodeIdMeta =
+      const VerificationMeta('storyNodeId');
+  @override
+  late final GeneratedColumn<String> storyNodeId = GeneratedColumn<String>(
+      'story_node_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        profileId,
+        gameKey,
+        score,
+        level,
+        playedAt,
+        maxScore,
+        starsEarned,
+        durationSeconds,
+        storyNodeId
+      ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -432,6 +466,28 @@ class $GameScoresTable extends GameScores
       context.handle(_playedAtMeta,
           playedAt.isAcceptableOrUnknown(data['played_at']!, _playedAtMeta));
     }
+    if (data.containsKey('max_score')) {
+      context.handle(_maxScoreMeta,
+          maxScore.isAcceptableOrUnknown(data['max_score']!, _maxScoreMeta));
+    }
+    if (data.containsKey('stars_earned')) {
+      context.handle(
+          _starsEarnedMeta,
+          starsEarned.isAcceptableOrUnknown(
+              data['stars_earned']!, _starsEarnedMeta));
+    }
+    if (data.containsKey('duration_seconds')) {
+      context.handle(
+          _durationSecondsMeta,
+          durationSeconds.isAcceptableOrUnknown(
+              data['duration_seconds']!, _durationSecondsMeta));
+    }
+    if (data.containsKey('story_node_id')) {
+      context.handle(
+          _storyNodeIdMeta,
+          storyNodeId.isAcceptableOrUnknown(
+              data['story_node_id']!, _storyNodeIdMeta));
+    }
     return context;
   }
 
@@ -453,6 +509,14 @@ class $GameScoresTable extends GameScores
           .read(DriftSqlType.int, data['${effectivePrefix}level']),
       playedAt: attachedDatabase.typeMapping
           .read(DriftSqlType.dateTime, data['${effectivePrefix}played_at'])!,
+      maxScore: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}max_score']),
+      starsEarned: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}stars_earned']),
+      durationSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}duration_seconds']),
+      storyNodeId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}story_node_id']),
     );
   }
 
@@ -469,13 +533,26 @@ class GameScore extends DataClass implements Insertable<GameScore> {
   final int score;
   final int? level;
   final DateTime playedAt;
+
+  /// Added in schema v3 for Adventure results. All nullable, because every row
+  /// the older games already wrote has none of them.
+  final int? maxScore;
+  final int? starsEarned;
+  final int? durationSeconds;
+
+  /// Joins a score back to the story beat it served, when it came from one.
+  final String? storyNodeId;
   const GameScore(
       {required this.id,
       required this.profileId,
       required this.gameKey,
       required this.score,
       this.level,
-      required this.playedAt});
+      required this.playedAt,
+      this.maxScore,
+      this.starsEarned,
+      this.durationSeconds,
+      this.storyNodeId});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -487,6 +564,18 @@ class GameScore extends DataClass implements Insertable<GameScore> {
       map['level'] = Variable<int>(level);
     }
     map['played_at'] = Variable<DateTime>(playedAt);
+    if (!nullToAbsent || maxScore != null) {
+      map['max_score'] = Variable<int>(maxScore);
+    }
+    if (!nullToAbsent || starsEarned != null) {
+      map['stars_earned'] = Variable<int>(starsEarned);
+    }
+    if (!nullToAbsent || durationSeconds != null) {
+      map['duration_seconds'] = Variable<int>(durationSeconds);
+    }
+    if (!nullToAbsent || storyNodeId != null) {
+      map['story_node_id'] = Variable<String>(storyNodeId);
+    }
     return map;
   }
 
@@ -499,6 +588,18 @@ class GameScore extends DataClass implements Insertable<GameScore> {
       level:
           level == null && nullToAbsent ? const Value.absent() : Value(level),
       playedAt: Value(playedAt),
+      maxScore: maxScore == null && nullToAbsent
+          ? const Value.absent()
+          : Value(maxScore),
+      starsEarned: starsEarned == null && nullToAbsent
+          ? const Value.absent()
+          : Value(starsEarned),
+      durationSeconds: durationSeconds == null && nullToAbsent
+          ? const Value.absent()
+          : Value(durationSeconds),
+      storyNodeId: storyNodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(storyNodeId),
     );
   }
 
@@ -512,6 +613,10 @@ class GameScore extends DataClass implements Insertable<GameScore> {
       score: serializer.fromJson<int>(json['score']),
       level: serializer.fromJson<int?>(json['level']),
       playedAt: serializer.fromJson<DateTime>(json['playedAt']),
+      maxScore: serializer.fromJson<int?>(json['maxScore']),
+      starsEarned: serializer.fromJson<int?>(json['starsEarned']),
+      durationSeconds: serializer.fromJson<int?>(json['durationSeconds']),
+      storyNodeId: serializer.fromJson<String?>(json['storyNodeId']),
     );
   }
   @override
@@ -524,6 +629,10 @@ class GameScore extends DataClass implements Insertable<GameScore> {
       'score': serializer.toJson<int>(score),
       'level': serializer.toJson<int?>(level),
       'playedAt': serializer.toJson<DateTime>(playedAt),
+      'maxScore': serializer.toJson<int?>(maxScore),
+      'starsEarned': serializer.toJson<int?>(starsEarned),
+      'durationSeconds': serializer.toJson<int?>(durationSeconds),
+      'storyNodeId': serializer.toJson<String?>(storyNodeId),
     };
   }
 
@@ -533,7 +642,11 @@ class GameScore extends DataClass implements Insertable<GameScore> {
           String? gameKey,
           int? score,
           Value<int?> level = const Value.absent(),
-          DateTime? playedAt}) =>
+          DateTime? playedAt,
+          Value<int?> maxScore = const Value.absent(),
+          Value<int?> starsEarned = const Value.absent(),
+          Value<int?> durationSeconds = const Value.absent(),
+          Value<String?> storyNodeId = const Value.absent()}) =>
       GameScore(
         id: id ?? this.id,
         profileId: profileId ?? this.profileId,
@@ -541,6 +654,12 @@ class GameScore extends DataClass implements Insertable<GameScore> {
         score: score ?? this.score,
         level: level.present ? level.value : this.level,
         playedAt: playedAt ?? this.playedAt,
+        maxScore: maxScore.present ? maxScore.value : this.maxScore,
+        starsEarned: starsEarned.present ? starsEarned.value : this.starsEarned,
+        durationSeconds: durationSeconds.present
+            ? durationSeconds.value
+            : this.durationSeconds,
+        storyNodeId: storyNodeId.present ? storyNodeId.value : this.storyNodeId,
       );
   GameScore copyWithCompanion(GameScoresCompanion data) {
     return GameScore(
@@ -550,6 +669,14 @@ class GameScore extends DataClass implements Insertable<GameScore> {
       score: data.score.present ? data.score.value : this.score,
       level: data.level.present ? data.level.value : this.level,
       playedAt: data.playedAt.present ? data.playedAt.value : this.playedAt,
+      maxScore: data.maxScore.present ? data.maxScore.value : this.maxScore,
+      starsEarned:
+          data.starsEarned.present ? data.starsEarned.value : this.starsEarned,
+      durationSeconds: data.durationSeconds.present
+          ? data.durationSeconds.value
+          : this.durationSeconds,
+      storyNodeId:
+          data.storyNodeId.present ? data.storyNodeId.value : this.storyNodeId,
     );
   }
 
@@ -561,14 +688,18 @@ class GameScore extends DataClass implements Insertable<GameScore> {
           ..write('gameKey: $gameKey, ')
           ..write('score: $score, ')
           ..write('level: $level, ')
-          ..write('playedAt: $playedAt')
+          ..write('playedAt: $playedAt, ')
+          ..write('maxScore: $maxScore, ')
+          ..write('starsEarned: $starsEarned, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('storyNodeId: $storyNodeId')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode =>
-      Object.hash(id, profileId, gameKey, score, level, playedAt);
+  int get hashCode => Object.hash(id, profileId, gameKey, score, level,
+      playedAt, maxScore, starsEarned, durationSeconds, storyNodeId);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -578,7 +709,11 @@ class GameScore extends DataClass implements Insertable<GameScore> {
           other.gameKey == this.gameKey &&
           other.score == this.score &&
           other.level == this.level &&
-          other.playedAt == this.playedAt);
+          other.playedAt == this.playedAt &&
+          other.maxScore == this.maxScore &&
+          other.starsEarned == this.starsEarned &&
+          other.durationSeconds == this.durationSeconds &&
+          other.storyNodeId == this.storyNodeId);
 }
 
 class GameScoresCompanion extends UpdateCompanion<GameScore> {
@@ -588,6 +723,10 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
   final Value<int> score;
   final Value<int?> level;
   final Value<DateTime> playedAt;
+  final Value<int?> maxScore;
+  final Value<int?> starsEarned;
+  final Value<int?> durationSeconds;
+  final Value<String?> storyNodeId;
   const GameScoresCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
@@ -595,6 +734,10 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
     this.score = const Value.absent(),
     this.level = const Value.absent(),
     this.playedAt = const Value.absent(),
+    this.maxScore = const Value.absent(),
+    this.starsEarned = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.storyNodeId = const Value.absent(),
   });
   GameScoresCompanion.insert({
     this.id = const Value.absent(),
@@ -603,6 +746,10 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
     required int score,
     this.level = const Value.absent(),
     this.playedAt = const Value.absent(),
+    this.maxScore = const Value.absent(),
+    this.starsEarned = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.storyNodeId = const Value.absent(),
   })  : profileId = Value(profileId),
         gameKey = Value(gameKey),
         score = Value(score);
@@ -613,6 +760,10 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
     Expression<int>? score,
     Expression<int>? level,
     Expression<DateTime>? playedAt,
+    Expression<int>? maxScore,
+    Expression<int>? starsEarned,
+    Expression<int>? durationSeconds,
+    Expression<String>? storyNodeId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -621,6 +772,10 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
       if (score != null) 'score': score,
       if (level != null) 'level': level,
       if (playedAt != null) 'played_at': playedAt,
+      if (maxScore != null) 'max_score': maxScore,
+      if (starsEarned != null) 'stars_earned': starsEarned,
+      if (durationSeconds != null) 'duration_seconds': durationSeconds,
+      if (storyNodeId != null) 'story_node_id': storyNodeId,
     });
   }
 
@@ -630,7 +785,11 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
       Value<String>? gameKey,
       Value<int>? score,
       Value<int?>? level,
-      Value<DateTime>? playedAt}) {
+      Value<DateTime>? playedAt,
+      Value<int?>? maxScore,
+      Value<int?>? starsEarned,
+      Value<int?>? durationSeconds,
+      Value<String?>? storyNodeId}) {
     return GameScoresCompanion(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
@@ -638,6 +797,10 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
       score: score ?? this.score,
       level: level ?? this.level,
       playedAt: playedAt ?? this.playedAt,
+      maxScore: maxScore ?? this.maxScore,
+      starsEarned: starsEarned ?? this.starsEarned,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      storyNodeId: storyNodeId ?? this.storyNodeId,
     );
   }
 
@@ -662,6 +825,18 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
     if (playedAt.present) {
       map['played_at'] = Variable<DateTime>(playedAt.value);
     }
+    if (maxScore.present) {
+      map['max_score'] = Variable<int>(maxScore.value);
+    }
+    if (starsEarned.present) {
+      map['stars_earned'] = Variable<int>(starsEarned.value);
+    }
+    if (durationSeconds.present) {
+      map['duration_seconds'] = Variable<int>(durationSeconds.value);
+    }
+    if (storyNodeId.present) {
+      map['story_node_id'] = Variable<String>(storyNodeId.value);
+    }
     return map;
   }
 
@@ -673,7 +848,1921 @@ class GameScoresCompanion extends UpdateCompanion<GameScore> {
           ..write('gameKey: $gameKey, ')
           ..write('score: $score, ')
           ..write('level: $level, ')
-          ..write('playedAt: $playedAt')
+          ..write('playedAt: $playedAt, ')
+          ..write('maxScore: $maxScore, ')
+          ..write('starsEarned: $starsEarned, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('storyNodeId: $storyNodeId')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StoryNodeProgressTable extends StoryNodeProgress
+    with TableInfo<$StoryNodeProgressTable, StoryNodeProgressData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StoryNodeProgressTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _profileIdMeta =
+      const VerificationMeta('profileId');
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+      'profile_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES profiles (id)'));
+  static const VerificationMeta _adventureIdMeta =
+      const VerificationMeta('adventureId');
+  @override
+  late final GeneratedColumn<String> adventureId = GeneratedColumn<String>(
+      'adventure_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _nodeIdMeta = const VerificationMeta('nodeId');
+  @override
+  late final GeneratedColumn<String> nodeId = GeneratedColumn<String>(
+      'node_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _completionMeta =
+      const VerificationMeta('completion');
+  @override
+  late final GeneratedColumn<String> completion = GeneratedColumn<String>(
+      'completion', aliasedName, false,
+      type: DriftSqlType.string,
+      requiredDuringInsert: false,
+      defaultValue: const Constant('completed'));
+  static const VerificationMeta _stepsTotalMeta =
+      const VerificationMeta('stepsTotal');
+  @override
+  late final GeneratedColumn<int> stepsTotal = GeneratedColumn<int>(
+      'steps_total', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _stepsIndependentMeta =
+      const VerificationMeta('stepsIndependent');
+  @override
+  late final GeneratedColumn<int> stepsIndependent = GeneratedColumn<int>(
+      'steps_independent', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _hintsUsedMeta =
+      const VerificationMeta('hintsUsed');
+  @override
+  late final GeneratedColumn<int> hintsUsed = GeneratedColumn<int>(
+      'hints_used', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _scoreMeta = const VerificationMeta('score');
+  @override
+  late final GeneratedColumn<int> score = GeneratedColumn<int>(
+      'score', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _durationSecondsMeta =
+      const VerificationMeta('durationSeconds');
+  @override
+  late final GeneratedColumn<int> durationSeconds = GeneratedColumn<int>(
+      'duration_seconds', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultValue: const Constant(0));
+  static const VerificationMeta _updatedAtMeta =
+      const VerificationMeta('updatedAt');
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+      'updated_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        profileId,
+        adventureId,
+        nodeId,
+        completion,
+        stepsTotal,
+        stepsIndependent,
+        hintsUsed,
+        score,
+        durationSeconds,
+        updatedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'story_node_progress';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<StoryNodeProgressData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(_profileIdMeta,
+          profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta));
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('adventure_id')) {
+      context.handle(
+          _adventureIdMeta,
+          adventureId.isAcceptableOrUnknown(
+              data['adventure_id']!, _adventureIdMeta));
+    } else if (isInserting) {
+      context.missing(_adventureIdMeta);
+    }
+    if (data.containsKey('node_id')) {
+      context.handle(_nodeIdMeta,
+          nodeId.isAcceptableOrUnknown(data['node_id']!, _nodeIdMeta));
+    } else if (isInserting) {
+      context.missing(_nodeIdMeta);
+    }
+    if (data.containsKey('completion')) {
+      context.handle(
+          _completionMeta,
+          completion.isAcceptableOrUnknown(
+              data['completion']!, _completionMeta));
+    }
+    if (data.containsKey('steps_total')) {
+      context.handle(
+          _stepsTotalMeta,
+          stepsTotal.isAcceptableOrUnknown(
+              data['steps_total']!, _stepsTotalMeta));
+    }
+    if (data.containsKey('steps_independent')) {
+      context.handle(
+          _stepsIndependentMeta,
+          stepsIndependent.isAcceptableOrUnknown(
+              data['steps_independent']!, _stepsIndependentMeta));
+    }
+    if (data.containsKey('hints_used')) {
+      context.handle(_hintsUsedMeta,
+          hintsUsed.isAcceptableOrUnknown(data['hints_used']!, _hintsUsedMeta));
+    }
+    if (data.containsKey('score')) {
+      context.handle(
+          _scoreMeta, score.isAcceptableOrUnknown(data['score']!, _scoreMeta));
+    }
+    if (data.containsKey('duration_seconds')) {
+      context.handle(
+          _durationSecondsMeta,
+          durationSeconds.isAcceptableOrUnknown(
+              data['duration_seconds']!, _durationSecondsMeta));
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(_updatedAtMeta,
+          updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {profileId, nodeId},
+      ];
+  @override
+  StoryNodeProgressData map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoryNodeProgressData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      profileId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}profile_id'])!,
+      adventureId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}adventure_id'])!,
+      nodeId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}node_id'])!,
+      completion: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}completion'])!,
+      stepsTotal: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}steps_total'])!,
+      stepsIndependent: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}steps_independent'])!,
+      hintsUsed: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}hints_used'])!,
+      score: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}score'])!,
+      durationSeconds: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}duration_seconds'])!,
+      updatedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}updated_at'])!,
+    );
+  }
+
+  @override
+  $StoryNodeProgressTable createAlias(String alias) {
+    return $StoryNodeProgressTable(attachedDatabase, alias);
+  }
+}
+
+class StoryNodeProgressData extends DataClass
+    implements Insertable<StoryNodeProgressData> {
+  final int id;
+  final int profileId;
+  final String adventureId;
+  final String nodeId;
+
+  /// `inProgress`, `completed` or `abandoned`.
+  ///
+  /// There is deliberately no `failed`. Every child who reaches the last step
+  /// of an activity completes it, so the story can never stall on performance.
+  final String completion;
+
+  /// Mastery signals. They feed the parent report and the adaptive nudge, and
+  /// they **never** branch the narrative.
+  final int stepsTotal;
+  final int stepsIndependent;
+  final int hintsUsed;
+  final int score;
+  final int durationSeconds;
+  final DateTime updatedAt;
+  const StoryNodeProgressData(
+      {required this.id,
+      required this.profileId,
+      required this.adventureId,
+      required this.nodeId,
+      required this.completion,
+      required this.stepsTotal,
+      required this.stepsIndependent,
+      required this.hintsUsed,
+      required this.score,
+      required this.durationSeconds,
+      required this.updatedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['adventure_id'] = Variable<String>(adventureId);
+    map['node_id'] = Variable<String>(nodeId);
+    map['completion'] = Variable<String>(completion);
+    map['steps_total'] = Variable<int>(stepsTotal);
+    map['steps_independent'] = Variable<int>(stepsIndependent);
+    map['hints_used'] = Variable<int>(hintsUsed);
+    map['score'] = Variable<int>(score);
+    map['duration_seconds'] = Variable<int>(durationSeconds);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  StoryNodeProgressCompanion toCompanion(bool nullToAbsent) {
+    return StoryNodeProgressCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      adventureId: Value(adventureId),
+      nodeId: Value(nodeId),
+      completion: Value(completion),
+      stepsTotal: Value(stepsTotal),
+      stepsIndependent: Value(stepsIndependent),
+      hintsUsed: Value(hintsUsed),
+      score: Value(score),
+      durationSeconds: Value(durationSeconds),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory StoryNodeProgressData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoryNodeProgressData(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      adventureId: serializer.fromJson<String>(json['adventureId']),
+      nodeId: serializer.fromJson<String>(json['nodeId']),
+      completion: serializer.fromJson<String>(json['completion']),
+      stepsTotal: serializer.fromJson<int>(json['stepsTotal']),
+      stepsIndependent: serializer.fromJson<int>(json['stepsIndependent']),
+      hintsUsed: serializer.fromJson<int>(json['hintsUsed']),
+      score: serializer.fromJson<int>(json['score']),
+      durationSeconds: serializer.fromJson<int>(json['durationSeconds']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'adventureId': serializer.toJson<String>(adventureId),
+      'nodeId': serializer.toJson<String>(nodeId),
+      'completion': serializer.toJson<String>(completion),
+      'stepsTotal': serializer.toJson<int>(stepsTotal),
+      'stepsIndependent': serializer.toJson<int>(stepsIndependent),
+      'hintsUsed': serializer.toJson<int>(hintsUsed),
+      'score': serializer.toJson<int>(score),
+      'durationSeconds': serializer.toJson<int>(durationSeconds),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  StoryNodeProgressData copyWith(
+          {int? id,
+          int? profileId,
+          String? adventureId,
+          String? nodeId,
+          String? completion,
+          int? stepsTotal,
+          int? stepsIndependent,
+          int? hintsUsed,
+          int? score,
+          int? durationSeconds,
+          DateTime? updatedAt}) =>
+      StoryNodeProgressData(
+        id: id ?? this.id,
+        profileId: profileId ?? this.profileId,
+        adventureId: adventureId ?? this.adventureId,
+        nodeId: nodeId ?? this.nodeId,
+        completion: completion ?? this.completion,
+        stepsTotal: stepsTotal ?? this.stepsTotal,
+        stepsIndependent: stepsIndependent ?? this.stepsIndependent,
+        hintsUsed: hintsUsed ?? this.hintsUsed,
+        score: score ?? this.score,
+        durationSeconds: durationSeconds ?? this.durationSeconds,
+        updatedAt: updatedAt ?? this.updatedAt,
+      );
+  StoryNodeProgressData copyWithCompanion(StoryNodeProgressCompanion data) {
+    return StoryNodeProgressData(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      adventureId:
+          data.adventureId.present ? data.adventureId.value : this.adventureId,
+      nodeId: data.nodeId.present ? data.nodeId.value : this.nodeId,
+      completion:
+          data.completion.present ? data.completion.value : this.completion,
+      stepsTotal:
+          data.stepsTotal.present ? data.stepsTotal.value : this.stepsTotal,
+      stepsIndependent: data.stepsIndependent.present
+          ? data.stepsIndependent.value
+          : this.stepsIndependent,
+      hintsUsed: data.hintsUsed.present ? data.hintsUsed.value : this.hintsUsed,
+      score: data.score.present ? data.score.value : this.score,
+      durationSeconds: data.durationSeconds.present
+          ? data.durationSeconds.value
+          : this.durationSeconds,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryNodeProgressData(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('adventureId: $adventureId, ')
+          ..write('nodeId: $nodeId, ')
+          ..write('completion: $completion, ')
+          ..write('stepsTotal: $stepsTotal, ')
+          ..write('stepsIndependent: $stepsIndependent, ')
+          ..write('hintsUsed: $hintsUsed, ')
+          ..write('score: $score, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      profileId,
+      adventureId,
+      nodeId,
+      completion,
+      stepsTotal,
+      stepsIndependent,
+      hintsUsed,
+      score,
+      durationSeconds,
+      updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoryNodeProgressData &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.adventureId == this.adventureId &&
+          other.nodeId == this.nodeId &&
+          other.completion == this.completion &&
+          other.stepsTotal == this.stepsTotal &&
+          other.stepsIndependent == this.stepsIndependent &&
+          other.hintsUsed == this.hintsUsed &&
+          other.score == this.score &&
+          other.durationSeconds == this.durationSeconds &&
+          other.updatedAt == this.updatedAt);
+}
+
+class StoryNodeProgressCompanion
+    extends UpdateCompanion<StoryNodeProgressData> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> adventureId;
+  final Value<String> nodeId;
+  final Value<String> completion;
+  final Value<int> stepsTotal;
+  final Value<int> stepsIndependent;
+  final Value<int> hintsUsed;
+  final Value<int> score;
+  final Value<int> durationSeconds;
+  final Value<DateTime> updatedAt;
+  const StoryNodeProgressCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.adventureId = const Value.absent(),
+    this.nodeId = const Value.absent(),
+    this.completion = const Value.absent(),
+    this.stepsTotal = const Value.absent(),
+    this.stepsIndependent = const Value.absent(),
+    this.hintsUsed = const Value.absent(),
+    this.score = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  StoryNodeProgressCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String adventureId,
+    required String nodeId,
+    this.completion = const Value.absent(),
+    this.stepsTotal = const Value.absent(),
+    this.stepsIndependent = const Value.absent(),
+    this.hintsUsed = const Value.absent(),
+    this.score = const Value.absent(),
+    this.durationSeconds = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  })  : profileId = Value(profileId),
+        adventureId = Value(adventureId),
+        nodeId = Value(nodeId);
+  static Insertable<StoryNodeProgressData> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? adventureId,
+    Expression<String>? nodeId,
+    Expression<String>? completion,
+    Expression<int>? stepsTotal,
+    Expression<int>? stepsIndependent,
+    Expression<int>? hintsUsed,
+    Expression<int>? score,
+    Expression<int>? durationSeconds,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (adventureId != null) 'adventure_id': adventureId,
+      if (nodeId != null) 'node_id': nodeId,
+      if (completion != null) 'completion': completion,
+      if (stepsTotal != null) 'steps_total': stepsTotal,
+      if (stepsIndependent != null) 'steps_independent': stepsIndependent,
+      if (hintsUsed != null) 'hints_used': hintsUsed,
+      if (score != null) 'score': score,
+      if (durationSeconds != null) 'duration_seconds': durationSeconds,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  StoryNodeProgressCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? profileId,
+      Value<String>? adventureId,
+      Value<String>? nodeId,
+      Value<String>? completion,
+      Value<int>? stepsTotal,
+      Value<int>? stepsIndependent,
+      Value<int>? hintsUsed,
+      Value<int>? score,
+      Value<int>? durationSeconds,
+      Value<DateTime>? updatedAt}) {
+    return StoryNodeProgressCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      adventureId: adventureId ?? this.adventureId,
+      nodeId: nodeId ?? this.nodeId,
+      completion: completion ?? this.completion,
+      stepsTotal: stepsTotal ?? this.stepsTotal,
+      stepsIndependent: stepsIndependent ?? this.stepsIndependent,
+      hintsUsed: hintsUsed ?? this.hintsUsed,
+      score: score ?? this.score,
+      durationSeconds: durationSeconds ?? this.durationSeconds,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (adventureId.present) {
+      map['adventure_id'] = Variable<String>(adventureId.value);
+    }
+    if (nodeId.present) {
+      map['node_id'] = Variable<String>(nodeId.value);
+    }
+    if (completion.present) {
+      map['completion'] = Variable<String>(completion.value);
+    }
+    if (stepsTotal.present) {
+      map['steps_total'] = Variable<int>(stepsTotal.value);
+    }
+    if (stepsIndependent.present) {
+      map['steps_independent'] = Variable<int>(stepsIndependent.value);
+    }
+    if (hintsUsed.present) {
+      map['hints_used'] = Variable<int>(hintsUsed.value);
+    }
+    if (score.present) {
+      map['score'] = Variable<int>(score.value);
+    }
+    if (durationSeconds.present) {
+      map['duration_seconds'] = Variable<int>(durationSeconds.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryNodeProgressCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('adventureId: $adventureId, ')
+          ..write('nodeId: $nodeId, ')
+          ..write('completion: $completion, ')
+          ..write('stepsTotal: $stepsTotal, ')
+          ..write('stepsIndependent: $stepsIndependent, ')
+          ..write('hintsUsed: $hintsUsed, ')
+          ..write('score: $score, ')
+          ..write('durationSeconds: $durationSeconds, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StoryChapterProgressTable extends StoryChapterProgress
+    with TableInfo<$StoryChapterProgressTable, StoryChapterProgressData> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StoryChapterProgressTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _profileIdMeta =
+      const VerificationMeta('profileId');
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+      'profile_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES profiles (id)'));
+  static const VerificationMeta _adventureIdMeta =
+      const VerificationMeta('adventureId');
+  @override
+  late final GeneratedColumn<String> adventureId = GeneratedColumn<String>(
+      'adventure_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _currentNodeIdMeta =
+      const VerificationMeta('currentNodeId');
+  @override
+  late final GeneratedColumn<String> currentNodeId = GeneratedColumn<String>(
+      'current_node_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _isUnlockedMeta =
+      const VerificationMeta('isUnlocked');
+  @override
+  late final GeneratedColumn<bool> isUnlocked = GeneratedColumn<bool>(
+      'is_unlocked', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('CHECK ("is_unlocked" IN (0, 1))'),
+      defaultValue: const Constant(true));
+  static const VerificationMeta _isCompletedMeta =
+      const VerificationMeta('isCompleted');
+  @override
+  late final GeneratedColumn<bool> isCompleted = GeneratedColumn<bool>(
+      'is_completed', aliasedName, false,
+      type: DriftSqlType.bool,
+      requiredDuringInsert: false,
+      defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("is_completed" IN (0, 1))'),
+      defaultValue: const Constant(false));
+  static const VerificationMeta _startedAtMeta =
+      const VerificationMeta('startedAt');
+  @override
+  late final GeneratedColumn<DateTime> startedAt = GeneratedColumn<DateTime>(
+      'started_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  static const VerificationMeta _completedAtMeta =
+      const VerificationMeta('completedAt');
+  @override
+  late final GeneratedColumn<DateTime> completedAt = GeneratedColumn<DateTime>(
+      'completed_at', aliasedName, true,
+      type: DriftSqlType.dateTime, requiredDuringInsert: false);
+  static const VerificationMeta _lastPlayedAtMeta =
+      const VerificationMeta('lastPlayedAt');
+  @override
+  late final GeneratedColumn<DateTime> lastPlayedAt = GeneratedColumn<DateTime>(
+      'last_played_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        profileId,
+        adventureId,
+        currentNodeId,
+        isUnlocked,
+        isCompleted,
+        startedAt,
+        completedAt,
+        lastPlayedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'story_chapter_progress';
+  @override
+  VerificationContext validateIntegrity(
+      Insertable<StoryChapterProgressData> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(_profileIdMeta,
+          profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta));
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('adventure_id')) {
+      context.handle(
+          _adventureIdMeta,
+          adventureId.isAcceptableOrUnknown(
+              data['adventure_id']!, _adventureIdMeta));
+    } else if (isInserting) {
+      context.missing(_adventureIdMeta);
+    }
+    if (data.containsKey('current_node_id')) {
+      context.handle(
+          _currentNodeIdMeta,
+          currentNodeId.isAcceptableOrUnknown(
+              data['current_node_id']!, _currentNodeIdMeta));
+    }
+    if (data.containsKey('is_unlocked')) {
+      context.handle(
+          _isUnlockedMeta,
+          isUnlocked.isAcceptableOrUnknown(
+              data['is_unlocked']!, _isUnlockedMeta));
+    }
+    if (data.containsKey('is_completed')) {
+      context.handle(
+          _isCompletedMeta,
+          isCompleted.isAcceptableOrUnknown(
+              data['is_completed']!, _isCompletedMeta));
+    }
+    if (data.containsKey('started_at')) {
+      context.handle(_startedAtMeta,
+          startedAt.isAcceptableOrUnknown(data['started_at']!, _startedAtMeta));
+    }
+    if (data.containsKey('completed_at')) {
+      context.handle(
+          _completedAtMeta,
+          completedAt.isAcceptableOrUnknown(
+              data['completed_at']!, _completedAtMeta));
+    }
+    if (data.containsKey('last_played_at')) {
+      context.handle(
+          _lastPlayedAtMeta,
+          lastPlayedAt.isAcceptableOrUnknown(
+              data['last_played_at']!, _lastPlayedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {profileId, adventureId},
+      ];
+  @override
+  StoryChapterProgressData map(Map<String, dynamic> data,
+      {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoryChapterProgressData(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      profileId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}profile_id'])!,
+      adventureId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}adventure_id'])!,
+      currentNodeId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}current_node_id']),
+      isUnlocked: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_unlocked'])!,
+      isCompleted: attachedDatabase.typeMapping
+          .read(DriftSqlType.bool, data['${effectivePrefix}is_completed'])!,
+      startedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}started_at'])!,
+      completedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at']),
+      lastPlayedAt: attachedDatabase.typeMapping.read(
+          DriftSqlType.dateTime, data['${effectivePrefix}last_played_at'])!,
+    );
+  }
+
+  @override
+  $StoryChapterProgressTable createAlias(String alias) {
+    return $StoryChapterProgressTable(attachedDatabase, alias);
+  }
+}
+
+class StoryChapterProgressData extends DataClass
+    implements Insertable<StoryChapterProgressData> {
+  final int id;
+  final int profileId;
+  final String adventureId;
+
+  /// The node to resume at. Null once the Adventure is finished.
+  final String? currentNodeId;
+
+  /// Carries a future entitlement check. Nothing reads it as a paywall today;
+  /// Adventure boundaries are natural gates by construction, so the hook costs
+  /// nothing now and would be expensive to add later.
+  final bool isUnlocked;
+  final bool isCompleted;
+  final DateTime startedAt;
+  final DateTime? completedAt;
+
+  /// Drives the "let's continue the story" reminder: a notification is only
+  /// worth sending to a child who actually has a story in progress.
+  final DateTime lastPlayedAt;
+  const StoryChapterProgressData(
+      {required this.id,
+      required this.profileId,
+      required this.adventureId,
+      this.currentNodeId,
+      required this.isUnlocked,
+      required this.isCompleted,
+      required this.startedAt,
+      this.completedAt,
+      required this.lastPlayedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['adventure_id'] = Variable<String>(adventureId);
+    if (!nullToAbsent || currentNodeId != null) {
+      map['current_node_id'] = Variable<String>(currentNodeId);
+    }
+    map['is_unlocked'] = Variable<bool>(isUnlocked);
+    map['is_completed'] = Variable<bool>(isCompleted);
+    map['started_at'] = Variable<DateTime>(startedAt);
+    if (!nullToAbsent || completedAt != null) {
+      map['completed_at'] = Variable<DateTime>(completedAt);
+    }
+    map['last_played_at'] = Variable<DateTime>(lastPlayedAt);
+    return map;
+  }
+
+  StoryChapterProgressCompanion toCompanion(bool nullToAbsent) {
+    return StoryChapterProgressCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      adventureId: Value(adventureId),
+      currentNodeId: currentNodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentNodeId),
+      isUnlocked: Value(isUnlocked),
+      isCompleted: Value(isCompleted),
+      startedAt: Value(startedAt),
+      completedAt: completedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(completedAt),
+      lastPlayedAt: Value(lastPlayedAt),
+    );
+  }
+
+  factory StoryChapterProgressData.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoryChapterProgressData(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      adventureId: serializer.fromJson<String>(json['adventureId']),
+      currentNodeId: serializer.fromJson<String?>(json['currentNodeId']),
+      isUnlocked: serializer.fromJson<bool>(json['isUnlocked']),
+      isCompleted: serializer.fromJson<bool>(json['isCompleted']),
+      startedAt: serializer.fromJson<DateTime>(json['startedAt']),
+      completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
+      lastPlayedAt: serializer.fromJson<DateTime>(json['lastPlayedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'adventureId': serializer.toJson<String>(adventureId),
+      'currentNodeId': serializer.toJson<String?>(currentNodeId),
+      'isUnlocked': serializer.toJson<bool>(isUnlocked),
+      'isCompleted': serializer.toJson<bool>(isCompleted),
+      'startedAt': serializer.toJson<DateTime>(startedAt),
+      'completedAt': serializer.toJson<DateTime?>(completedAt),
+      'lastPlayedAt': serializer.toJson<DateTime>(lastPlayedAt),
+    };
+  }
+
+  StoryChapterProgressData copyWith(
+          {int? id,
+          int? profileId,
+          String? adventureId,
+          Value<String?> currentNodeId = const Value.absent(),
+          bool? isUnlocked,
+          bool? isCompleted,
+          DateTime? startedAt,
+          Value<DateTime?> completedAt = const Value.absent(),
+          DateTime? lastPlayedAt}) =>
+      StoryChapterProgressData(
+        id: id ?? this.id,
+        profileId: profileId ?? this.profileId,
+        adventureId: adventureId ?? this.adventureId,
+        currentNodeId:
+            currentNodeId.present ? currentNodeId.value : this.currentNodeId,
+        isUnlocked: isUnlocked ?? this.isUnlocked,
+        isCompleted: isCompleted ?? this.isCompleted,
+        startedAt: startedAt ?? this.startedAt,
+        completedAt: completedAt.present ? completedAt.value : this.completedAt,
+        lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,
+      );
+  StoryChapterProgressData copyWithCompanion(
+      StoryChapterProgressCompanion data) {
+    return StoryChapterProgressData(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      adventureId:
+          data.adventureId.present ? data.adventureId.value : this.adventureId,
+      currentNodeId: data.currentNodeId.present
+          ? data.currentNodeId.value
+          : this.currentNodeId,
+      isUnlocked:
+          data.isUnlocked.present ? data.isUnlocked.value : this.isUnlocked,
+      isCompleted:
+          data.isCompleted.present ? data.isCompleted.value : this.isCompleted,
+      startedAt: data.startedAt.present ? data.startedAt.value : this.startedAt,
+      completedAt:
+          data.completedAt.present ? data.completedAt.value : this.completedAt,
+      lastPlayedAt: data.lastPlayedAt.present
+          ? data.lastPlayedAt.value
+          : this.lastPlayedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryChapterProgressData(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('adventureId: $adventureId, ')
+          ..write('currentNodeId: $currentNodeId, ')
+          ..write('isUnlocked: $isUnlocked, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('lastPlayedAt: $lastPlayedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, profileId, adventureId, currentNodeId,
+      isUnlocked, isCompleted, startedAt, completedAt, lastPlayedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoryChapterProgressData &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.adventureId == this.adventureId &&
+          other.currentNodeId == this.currentNodeId &&
+          other.isUnlocked == this.isUnlocked &&
+          other.isCompleted == this.isCompleted &&
+          other.startedAt == this.startedAt &&
+          other.completedAt == this.completedAt &&
+          other.lastPlayedAt == this.lastPlayedAt);
+}
+
+class StoryChapterProgressCompanion
+    extends UpdateCompanion<StoryChapterProgressData> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> adventureId;
+  final Value<String?> currentNodeId;
+  final Value<bool> isUnlocked;
+  final Value<bool> isCompleted;
+  final Value<DateTime> startedAt;
+  final Value<DateTime?> completedAt;
+  final Value<DateTime> lastPlayedAt;
+  const StoryChapterProgressCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.adventureId = const Value.absent(),
+    this.currentNodeId = const Value.absent(),
+    this.isUnlocked = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.lastPlayedAt = const Value.absent(),
+  });
+  StoryChapterProgressCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String adventureId,
+    this.currentNodeId = const Value.absent(),
+    this.isUnlocked = const Value.absent(),
+    this.isCompleted = const Value.absent(),
+    this.startedAt = const Value.absent(),
+    this.completedAt = const Value.absent(),
+    this.lastPlayedAt = const Value.absent(),
+  })  : profileId = Value(profileId),
+        adventureId = Value(adventureId);
+  static Insertable<StoryChapterProgressData> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? adventureId,
+    Expression<String>? currentNodeId,
+    Expression<bool>? isUnlocked,
+    Expression<bool>? isCompleted,
+    Expression<DateTime>? startedAt,
+    Expression<DateTime>? completedAt,
+    Expression<DateTime>? lastPlayedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (adventureId != null) 'adventure_id': adventureId,
+      if (currentNodeId != null) 'current_node_id': currentNodeId,
+      if (isUnlocked != null) 'is_unlocked': isUnlocked,
+      if (isCompleted != null) 'is_completed': isCompleted,
+      if (startedAt != null) 'started_at': startedAt,
+      if (completedAt != null) 'completed_at': completedAt,
+      if (lastPlayedAt != null) 'last_played_at': lastPlayedAt,
+    });
+  }
+
+  StoryChapterProgressCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? profileId,
+      Value<String>? adventureId,
+      Value<String?>? currentNodeId,
+      Value<bool>? isUnlocked,
+      Value<bool>? isCompleted,
+      Value<DateTime>? startedAt,
+      Value<DateTime?>? completedAt,
+      Value<DateTime>? lastPlayedAt}) {
+    return StoryChapterProgressCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      adventureId: adventureId ?? this.adventureId,
+      currentNodeId: currentNodeId ?? this.currentNodeId,
+      isUnlocked: isUnlocked ?? this.isUnlocked,
+      isCompleted: isCompleted ?? this.isCompleted,
+      startedAt: startedAt ?? this.startedAt,
+      completedAt: completedAt ?? this.completedAt,
+      lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (adventureId.present) {
+      map['adventure_id'] = Variable<String>(adventureId.value);
+    }
+    if (currentNodeId.present) {
+      map['current_node_id'] = Variable<String>(currentNodeId.value);
+    }
+    if (isUnlocked.present) {
+      map['is_unlocked'] = Variable<bool>(isUnlocked.value);
+    }
+    if (isCompleted.present) {
+      map['is_completed'] = Variable<bool>(isCompleted.value);
+    }
+    if (startedAt.present) {
+      map['started_at'] = Variable<DateTime>(startedAt.value);
+    }
+    if (completedAt.present) {
+      map['completed_at'] = Variable<DateTime>(completedAt.value);
+    }
+    if (lastPlayedAt.present) {
+      map['last_played_at'] = Variable<DateTime>(lastPlayedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryChapterProgressCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('adventureId: $adventureId, ')
+          ..write('currentNodeId: $currentNodeId, ')
+          ..write('isUnlocked: $isUnlocked, ')
+          ..write('isCompleted: $isCompleted, ')
+          ..write('startedAt: $startedAt, ')
+          ..write('completedAt: $completedAt, ')
+          ..write('lastPlayedAt: $lastPlayedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $StoryRewardsTable extends StoryRewards
+    with TableInfo<$StoryRewardsTable, StoryReward> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $StoryRewardsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _profileIdMeta =
+      const VerificationMeta('profileId');
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+      'profile_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES profiles (id)'));
+  static const VerificationMeta _rewardIdMeta =
+      const VerificationMeta('rewardId');
+  @override
+  late final GeneratedColumn<String> rewardId = GeneratedColumn<String>(
+      'reward_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _adventureIdMeta =
+      const VerificationMeta('adventureId');
+  @override
+  late final GeneratedColumn<String> adventureId = GeneratedColumn<String>(
+      'adventure_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _earnedAtMeta =
+      const VerificationMeta('earnedAt');
+  @override
+  late final GeneratedColumn<DateTime> earnedAt = GeneratedColumn<DateTime>(
+      'earned_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns =>
+      [id, profileId, rewardId, adventureId, earnedAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'story_rewards';
+  @override
+  VerificationContext validateIntegrity(Insertable<StoryReward> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(_profileIdMeta,
+          profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta));
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('reward_id')) {
+      context.handle(_rewardIdMeta,
+          rewardId.isAcceptableOrUnknown(data['reward_id']!, _rewardIdMeta));
+    } else if (isInserting) {
+      context.missing(_rewardIdMeta);
+    }
+    if (data.containsKey('adventure_id')) {
+      context.handle(
+          _adventureIdMeta,
+          adventureId.isAcceptableOrUnknown(
+              data['adventure_id']!, _adventureIdMeta));
+    } else if (isInserting) {
+      context.missing(_adventureIdMeta);
+    }
+    if (data.containsKey('earned_at')) {
+      context.handle(_earnedAtMeta,
+          earnedAt.isAcceptableOrUnknown(data['earned_at']!, _earnedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+        {profileId, rewardId},
+      ];
+  @override
+  StoryReward map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return StoryReward(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      profileId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}profile_id'])!,
+      rewardId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}reward_id'])!,
+      adventureId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}adventure_id'])!,
+      earnedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}earned_at'])!,
+    );
+  }
+
+  @override
+  $StoryRewardsTable createAlias(String alias) {
+    return $StoryRewardsTable(attachedDatabase, alias);
+  }
+}
+
+class StoryReward extends DataClass implements Insertable<StoryReward> {
+  final int id;
+  final int profileId;
+  final String rewardId;
+  final String adventureId;
+  final DateTime earnedAt;
+  const StoryReward(
+      {required this.id,
+      required this.profileId,
+      required this.rewardId,
+      required this.adventureId,
+      required this.earnedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['reward_id'] = Variable<String>(rewardId);
+    map['adventure_id'] = Variable<String>(adventureId);
+    map['earned_at'] = Variable<DateTime>(earnedAt);
+    return map;
+  }
+
+  StoryRewardsCompanion toCompanion(bool nullToAbsent) {
+    return StoryRewardsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      rewardId: Value(rewardId),
+      adventureId: Value(adventureId),
+      earnedAt: Value(earnedAt),
+    );
+  }
+
+  factory StoryReward.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return StoryReward(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      rewardId: serializer.fromJson<String>(json['rewardId']),
+      adventureId: serializer.fromJson<String>(json['adventureId']),
+      earnedAt: serializer.fromJson<DateTime>(json['earnedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'rewardId': serializer.toJson<String>(rewardId),
+      'adventureId': serializer.toJson<String>(adventureId),
+      'earnedAt': serializer.toJson<DateTime>(earnedAt),
+    };
+  }
+
+  StoryReward copyWith(
+          {int? id,
+          int? profileId,
+          String? rewardId,
+          String? adventureId,
+          DateTime? earnedAt}) =>
+      StoryReward(
+        id: id ?? this.id,
+        profileId: profileId ?? this.profileId,
+        rewardId: rewardId ?? this.rewardId,
+        adventureId: adventureId ?? this.adventureId,
+        earnedAt: earnedAt ?? this.earnedAt,
+      );
+  StoryReward copyWithCompanion(StoryRewardsCompanion data) {
+    return StoryReward(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      rewardId: data.rewardId.present ? data.rewardId.value : this.rewardId,
+      adventureId:
+          data.adventureId.present ? data.adventureId.value : this.adventureId,
+      earnedAt: data.earnedAt.present ? data.earnedAt.value : this.earnedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryReward(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('rewardId: $rewardId, ')
+          ..write('adventureId: $adventureId, ')
+          ..write('earnedAt: $earnedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(id, profileId, rewardId, adventureId, earnedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is StoryReward &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.rewardId == this.rewardId &&
+          other.adventureId == this.adventureId &&
+          other.earnedAt == this.earnedAt);
+}
+
+class StoryRewardsCompanion extends UpdateCompanion<StoryReward> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> rewardId;
+  final Value<String> adventureId;
+  final Value<DateTime> earnedAt;
+  const StoryRewardsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.rewardId = const Value.absent(),
+    this.adventureId = const Value.absent(),
+    this.earnedAt = const Value.absent(),
+  });
+  StoryRewardsCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String rewardId,
+    required String adventureId,
+    this.earnedAt = const Value.absent(),
+  })  : profileId = Value(profileId),
+        rewardId = Value(rewardId),
+        adventureId = Value(adventureId);
+  static Insertable<StoryReward> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? rewardId,
+    Expression<String>? adventureId,
+    Expression<DateTime>? earnedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (rewardId != null) 'reward_id': rewardId,
+      if (adventureId != null) 'adventure_id': adventureId,
+      if (earnedAt != null) 'earned_at': earnedAt,
+    });
+  }
+
+  StoryRewardsCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? profileId,
+      Value<String>? rewardId,
+      Value<String>? adventureId,
+      Value<DateTime>? earnedAt}) {
+    return StoryRewardsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      rewardId: rewardId ?? this.rewardId,
+      adventureId: adventureId ?? this.adventureId,
+      earnedAt: earnedAt ?? this.earnedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (rewardId.present) {
+      map['reward_id'] = Variable<String>(rewardId.value);
+    }
+    if (adventureId.present) {
+      map['adventure_id'] = Variable<String>(adventureId.value);
+    }
+    if (earnedAt.present) {
+      map['earned_at'] = Variable<DateTime>(earnedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('StoryRewardsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('rewardId: $rewardId, ')
+          ..write('adventureId: $adventureId, ')
+          ..write('earnedAt: $earnedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ActivityAttemptLogsTable extends ActivityAttemptLogs
+    with TableInfo<$ActivityAttemptLogsTable, ActivityAttemptLog> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ActivityAttemptLogsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+      'id', aliasedName, false,
+      hasAutoIncrement: true,
+      type: DriftSqlType.int,
+      requiredDuringInsert: false,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('PRIMARY KEY AUTOINCREMENT'));
+  static const VerificationMeta _profileIdMeta =
+      const VerificationMeta('profileId');
+  @override
+  late final GeneratedColumn<int> profileId = GeneratedColumn<int>(
+      'profile_id', aliasedName, false,
+      type: DriftSqlType.int,
+      requiredDuringInsert: true,
+      defaultConstraints:
+          GeneratedColumn.constraintIsAlways('REFERENCES profiles (id)'));
+  static const VerificationMeta _activityIdMeta =
+      const VerificationMeta('activityId');
+  @override
+  late final GeneratedColumn<String> activityId = GeneratedColumn<String>(
+      'activity_id', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _storyNodeIdMeta =
+      const VerificationMeta('storyNodeId');
+  @override
+  late final GeneratedColumn<String> storyNodeId = GeneratedColumn<String>(
+      'story_node_id', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _stepIndexMeta =
+      const VerificationMeta('stepIndex');
+  @override
+  late final GeneratedColumn<int> stepIndex = GeneratedColumn<int>(
+      'step_index', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _attemptIndexMeta =
+      const VerificationMeta('attemptIndex');
+  @override
+  late final GeneratedColumn<int> attemptIndex = GeneratedColumn<int>(
+      'attempt_index', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _outcomeMeta =
+      const VerificationMeta('outcome');
+  @override
+  late final GeneratedColumn<String> outcome = GeneratedColumn<String>(
+      'outcome', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _scaffoldLevelMeta =
+      const VerificationMeta('scaffoldLevel');
+  @override
+  late final GeneratedColumn<String> scaffoldLevel = GeneratedColumn<String>(
+      'scaffold_level', aliasedName, false,
+      type: DriftSqlType.string, requiredDuringInsert: true);
+  static const VerificationMeta _elapsedMillisecondsMeta =
+      const VerificationMeta('elapsedMilliseconds');
+  @override
+  late final GeneratedColumn<int> elapsedMilliseconds = GeneratedColumn<int>(
+      'elapsed_milliseconds', aliasedName, false,
+      type: DriftSqlType.int, requiredDuringInsert: true);
+  static const VerificationMeta _recordedAtMeta =
+      const VerificationMeta('recordedAt');
+  @override
+  late final GeneratedColumn<DateTime> recordedAt = GeneratedColumn<DateTime>(
+      'recorded_at', aliasedName, false,
+      type: DriftSqlType.dateTime,
+      requiredDuringInsert: false,
+      defaultValue: currentDateAndTime);
+  @override
+  List<GeneratedColumn> get $columns => [
+        id,
+        profileId,
+        activityId,
+        storyNodeId,
+        stepIndex,
+        attemptIndex,
+        outcome,
+        scaffoldLevel,
+        elapsedMilliseconds,
+        recordedAt
+      ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'activity_attempt_logs';
+  @override
+  VerificationContext validateIntegrity(Insertable<ActivityAttemptLog> instance,
+      {bool isInserting = false}) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('profile_id')) {
+      context.handle(_profileIdMeta,
+          profileId.isAcceptableOrUnknown(data['profile_id']!, _profileIdMeta));
+    } else if (isInserting) {
+      context.missing(_profileIdMeta);
+    }
+    if (data.containsKey('activity_id')) {
+      context.handle(
+          _activityIdMeta,
+          activityId.isAcceptableOrUnknown(
+              data['activity_id']!, _activityIdMeta));
+    } else if (isInserting) {
+      context.missing(_activityIdMeta);
+    }
+    if (data.containsKey('story_node_id')) {
+      context.handle(
+          _storyNodeIdMeta,
+          storyNodeId.isAcceptableOrUnknown(
+              data['story_node_id']!, _storyNodeIdMeta));
+    }
+    if (data.containsKey('step_index')) {
+      context.handle(_stepIndexMeta,
+          stepIndex.isAcceptableOrUnknown(data['step_index']!, _stepIndexMeta));
+    } else if (isInserting) {
+      context.missing(_stepIndexMeta);
+    }
+    if (data.containsKey('attempt_index')) {
+      context.handle(
+          _attemptIndexMeta,
+          attemptIndex.isAcceptableOrUnknown(
+              data['attempt_index']!, _attemptIndexMeta));
+    } else if (isInserting) {
+      context.missing(_attemptIndexMeta);
+    }
+    if (data.containsKey('outcome')) {
+      context.handle(_outcomeMeta,
+          outcome.isAcceptableOrUnknown(data['outcome']!, _outcomeMeta));
+    } else if (isInserting) {
+      context.missing(_outcomeMeta);
+    }
+    if (data.containsKey('scaffold_level')) {
+      context.handle(
+          _scaffoldLevelMeta,
+          scaffoldLevel.isAcceptableOrUnknown(
+              data['scaffold_level']!, _scaffoldLevelMeta));
+    } else if (isInserting) {
+      context.missing(_scaffoldLevelMeta);
+    }
+    if (data.containsKey('elapsed_milliseconds')) {
+      context.handle(
+          _elapsedMillisecondsMeta,
+          elapsedMilliseconds.isAcceptableOrUnknown(
+              data['elapsed_milliseconds']!, _elapsedMillisecondsMeta));
+    } else if (isInserting) {
+      context.missing(_elapsedMillisecondsMeta);
+    }
+    if (data.containsKey('recorded_at')) {
+      context.handle(
+          _recordedAtMeta,
+          recordedAt.isAcceptableOrUnknown(
+              data['recorded_at']!, _recordedAtMeta));
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  ActivityAttemptLog map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ActivityAttemptLog(
+      id: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}id'])!,
+      profileId: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}profile_id'])!,
+      activityId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}activity_id'])!,
+      storyNodeId: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}story_node_id']),
+      stepIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}step_index'])!,
+      attemptIndex: attachedDatabase.typeMapping
+          .read(DriftSqlType.int, data['${effectivePrefix}attempt_index'])!,
+      outcome: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}outcome'])!,
+      scaffoldLevel: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}scaffold_level'])!,
+      elapsedMilliseconds: attachedDatabase.typeMapping.read(
+          DriftSqlType.int, data['${effectivePrefix}elapsed_milliseconds'])!,
+      recordedAt: attachedDatabase.typeMapping
+          .read(DriftSqlType.dateTime, data['${effectivePrefix}recorded_at'])!,
+    );
+  }
+
+  @override
+  $ActivityAttemptLogsTable createAlias(String alias) {
+    return $ActivityAttemptLogsTable(attachedDatabase, alias);
+  }
+}
+
+class ActivityAttemptLog extends DataClass
+    implements Insertable<ActivityAttemptLog> {
+  final int id;
+  final int profileId;
+  final String activityId;
+  final String? storyNodeId;
+  final int stepIndex;
+  final int attemptIndex;
+  final String outcome;
+  final String scaffoldLevel;
+  final int elapsedMilliseconds;
+  final DateTime recordedAt;
+  const ActivityAttemptLog(
+      {required this.id,
+      required this.profileId,
+      required this.activityId,
+      this.storyNodeId,
+      required this.stepIndex,
+      required this.attemptIndex,
+      required this.outcome,
+      required this.scaffoldLevel,
+      required this.elapsedMilliseconds,
+      required this.recordedAt});
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['profile_id'] = Variable<int>(profileId);
+    map['activity_id'] = Variable<String>(activityId);
+    if (!nullToAbsent || storyNodeId != null) {
+      map['story_node_id'] = Variable<String>(storyNodeId);
+    }
+    map['step_index'] = Variable<int>(stepIndex);
+    map['attempt_index'] = Variable<int>(attemptIndex);
+    map['outcome'] = Variable<String>(outcome);
+    map['scaffold_level'] = Variable<String>(scaffoldLevel);
+    map['elapsed_milliseconds'] = Variable<int>(elapsedMilliseconds);
+    map['recorded_at'] = Variable<DateTime>(recordedAt);
+    return map;
+  }
+
+  ActivityAttemptLogsCompanion toCompanion(bool nullToAbsent) {
+    return ActivityAttemptLogsCompanion(
+      id: Value(id),
+      profileId: Value(profileId),
+      activityId: Value(activityId),
+      storyNodeId: storyNodeId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(storyNodeId),
+      stepIndex: Value(stepIndex),
+      attemptIndex: Value(attemptIndex),
+      outcome: Value(outcome),
+      scaffoldLevel: Value(scaffoldLevel),
+      elapsedMilliseconds: Value(elapsedMilliseconds),
+      recordedAt: Value(recordedAt),
+    );
+  }
+
+  factory ActivityAttemptLog.fromJson(Map<String, dynamic> json,
+      {ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ActivityAttemptLog(
+      id: serializer.fromJson<int>(json['id']),
+      profileId: serializer.fromJson<int>(json['profileId']),
+      activityId: serializer.fromJson<String>(json['activityId']),
+      storyNodeId: serializer.fromJson<String?>(json['storyNodeId']),
+      stepIndex: serializer.fromJson<int>(json['stepIndex']),
+      attemptIndex: serializer.fromJson<int>(json['attemptIndex']),
+      outcome: serializer.fromJson<String>(json['outcome']),
+      scaffoldLevel: serializer.fromJson<String>(json['scaffoldLevel']),
+      elapsedMilliseconds:
+          serializer.fromJson<int>(json['elapsedMilliseconds']),
+      recordedAt: serializer.fromJson<DateTime>(json['recordedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'profileId': serializer.toJson<int>(profileId),
+      'activityId': serializer.toJson<String>(activityId),
+      'storyNodeId': serializer.toJson<String?>(storyNodeId),
+      'stepIndex': serializer.toJson<int>(stepIndex),
+      'attemptIndex': serializer.toJson<int>(attemptIndex),
+      'outcome': serializer.toJson<String>(outcome),
+      'scaffoldLevel': serializer.toJson<String>(scaffoldLevel),
+      'elapsedMilliseconds': serializer.toJson<int>(elapsedMilliseconds),
+      'recordedAt': serializer.toJson<DateTime>(recordedAt),
+    };
+  }
+
+  ActivityAttemptLog copyWith(
+          {int? id,
+          int? profileId,
+          String? activityId,
+          Value<String?> storyNodeId = const Value.absent(),
+          int? stepIndex,
+          int? attemptIndex,
+          String? outcome,
+          String? scaffoldLevel,
+          int? elapsedMilliseconds,
+          DateTime? recordedAt}) =>
+      ActivityAttemptLog(
+        id: id ?? this.id,
+        profileId: profileId ?? this.profileId,
+        activityId: activityId ?? this.activityId,
+        storyNodeId: storyNodeId.present ? storyNodeId.value : this.storyNodeId,
+        stepIndex: stepIndex ?? this.stepIndex,
+        attemptIndex: attemptIndex ?? this.attemptIndex,
+        outcome: outcome ?? this.outcome,
+        scaffoldLevel: scaffoldLevel ?? this.scaffoldLevel,
+        elapsedMilliseconds: elapsedMilliseconds ?? this.elapsedMilliseconds,
+        recordedAt: recordedAt ?? this.recordedAt,
+      );
+  ActivityAttemptLog copyWithCompanion(ActivityAttemptLogsCompanion data) {
+    return ActivityAttemptLog(
+      id: data.id.present ? data.id.value : this.id,
+      profileId: data.profileId.present ? data.profileId.value : this.profileId,
+      activityId:
+          data.activityId.present ? data.activityId.value : this.activityId,
+      storyNodeId:
+          data.storyNodeId.present ? data.storyNodeId.value : this.storyNodeId,
+      stepIndex: data.stepIndex.present ? data.stepIndex.value : this.stepIndex,
+      attemptIndex: data.attemptIndex.present
+          ? data.attemptIndex.value
+          : this.attemptIndex,
+      outcome: data.outcome.present ? data.outcome.value : this.outcome,
+      scaffoldLevel: data.scaffoldLevel.present
+          ? data.scaffoldLevel.value
+          : this.scaffoldLevel,
+      elapsedMilliseconds: data.elapsedMilliseconds.present
+          ? data.elapsedMilliseconds.value
+          : this.elapsedMilliseconds,
+      recordedAt:
+          data.recordedAt.present ? data.recordedAt.value : this.recordedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivityAttemptLog(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('activityId: $activityId, ')
+          ..write('storyNodeId: $storyNodeId, ')
+          ..write('stepIndex: $stepIndex, ')
+          ..write('attemptIndex: $attemptIndex, ')
+          ..write('outcome: $outcome, ')
+          ..write('scaffoldLevel: $scaffoldLevel, ')
+          ..write('elapsedMilliseconds: $elapsedMilliseconds, ')
+          ..write('recordedAt: $recordedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+      id,
+      profileId,
+      activityId,
+      storyNodeId,
+      stepIndex,
+      attemptIndex,
+      outcome,
+      scaffoldLevel,
+      elapsedMilliseconds,
+      recordedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ActivityAttemptLog &&
+          other.id == this.id &&
+          other.profileId == this.profileId &&
+          other.activityId == this.activityId &&
+          other.storyNodeId == this.storyNodeId &&
+          other.stepIndex == this.stepIndex &&
+          other.attemptIndex == this.attemptIndex &&
+          other.outcome == this.outcome &&
+          other.scaffoldLevel == this.scaffoldLevel &&
+          other.elapsedMilliseconds == this.elapsedMilliseconds &&
+          other.recordedAt == this.recordedAt);
+}
+
+class ActivityAttemptLogsCompanion extends UpdateCompanion<ActivityAttemptLog> {
+  final Value<int> id;
+  final Value<int> profileId;
+  final Value<String> activityId;
+  final Value<String?> storyNodeId;
+  final Value<int> stepIndex;
+  final Value<int> attemptIndex;
+  final Value<String> outcome;
+  final Value<String> scaffoldLevel;
+  final Value<int> elapsedMilliseconds;
+  final Value<DateTime> recordedAt;
+  const ActivityAttemptLogsCompanion({
+    this.id = const Value.absent(),
+    this.profileId = const Value.absent(),
+    this.activityId = const Value.absent(),
+    this.storyNodeId = const Value.absent(),
+    this.stepIndex = const Value.absent(),
+    this.attemptIndex = const Value.absent(),
+    this.outcome = const Value.absent(),
+    this.scaffoldLevel = const Value.absent(),
+    this.elapsedMilliseconds = const Value.absent(),
+    this.recordedAt = const Value.absent(),
+  });
+  ActivityAttemptLogsCompanion.insert({
+    this.id = const Value.absent(),
+    required int profileId,
+    required String activityId,
+    this.storyNodeId = const Value.absent(),
+    required int stepIndex,
+    required int attemptIndex,
+    required String outcome,
+    required String scaffoldLevel,
+    required int elapsedMilliseconds,
+    this.recordedAt = const Value.absent(),
+  })  : profileId = Value(profileId),
+        activityId = Value(activityId),
+        stepIndex = Value(stepIndex),
+        attemptIndex = Value(attemptIndex),
+        outcome = Value(outcome),
+        scaffoldLevel = Value(scaffoldLevel),
+        elapsedMilliseconds = Value(elapsedMilliseconds);
+  static Insertable<ActivityAttemptLog> custom({
+    Expression<int>? id,
+    Expression<int>? profileId,
+    Expression<String>? activityId,
+    Expression<String>? storyNodeId,
+    Expression<int>? stepIndex,
+    Expression<int>? attemptIndex,
+    Expression<String>? outcome,
+    Expression<String>? scaffoldLevel,
+    Expression<int>? elapsedMilliseconds,
+    Expression<DateTime>? recordedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (profileId != null) 'profile_id': profileId,
+      if (activityId != null) 'activity_id': activityId,
+      if (storyNodeId != null) 'story_node_id': storyNodeId,
+      if (stepIndex != null) 'step_index': stepIndex,
+      if (attemptIndex != null) 'attempt_index': attemptIndex,
+      if (outcome != null) 'outcome': outcome,
+      if (scaffoldLevel != null) 'scaffold_level': scaffoldLevel,
+      if (elapsedMilliseconds != null)
+        'elapsed_milliseconds': elapsedMilliseconds,
+      if (recordedAt != null) 'recorded_at': recordedAt,
+    });
+  }
+
+  ActivityAttemptLogsCompanion copyWith(
+      {Value<int>? id,
+      Value<int>? profileId,
+      Value<String>? activityId,
+      Value<String?>? storyNodeId,
+      Value<int>? stepIndex,
+      Value<int>? attemptIndex,
+      Value<String>? outcome,
+      Value<String>? scaffoldLevel,
+      Value<int>? elapsedMilliseconds,
+      Value<DateTime>? recordedAt}) {
+    return ActivityAttemptLogsCompanion(
+      id: id ?? this.id,
+      profileId: profileId ?? this.profileId,
+      activityId: activityId ?? this.activityId,
+      storyNodeId: storyNodeId ?? this.storyNodeId,
+      stepIndex: stepIndex ?? this.stepIndex,
+      attemptIndex: attemptIndex ?? this.attemptIndex,
+      outcome: outcome ?? this.outcome,
+      scaffoldLevel: scaffoldLevel ?? this.scaffoldLevel,
+      elapsedMilliseconds: elapsedMilliseconds ?? this.elapsedMilliseconds,
+      recordedAt: recordedAt ?? this.recordedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (profileId.present) {
+      map['profile_id'] = Variable<int>(profileId.value);
+    }
+    if (activityId.present) {
+      map['activity_id'] = Variable<String>(activityId.value);
+    }
+    if (storyNodeId.present) {
+      map['story_node_id'] = Variable<String>(storyNodeId.value);
+    }
+    if (stepIndex.present) {
+      map['step_index'] = Variable<int>(stepIndex.value);
+    }
+    if (attemptIndex.present) {
+      map['attempt_index'] = Variable<int>(attemptIndex.value);
+    }
+    if (outcome.present) {
+      map['outcome'] = Variable<String>(outcome.value);
+    }
+    if (scaffoldLevel.present) {
+      map['scaffold_level'] = Variable<String>(scaffoldLevel.value);
+    }
+    if (elapsedMilliseconds.present) {
+      map['elapsed_milliseconds'] = Variable<int>(elapsedMilliseconds.value);
+    }
+    if (recordedAt.present) {
+      map['recorded_at'] = Variable<DateTime>(recordedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ActivityAttemptLogsCompanion(')
+          ..write('id: $id, ')
+          ..write('profileId: $profileId, ')
+          ..write('activityId: $activityId, ')
+          ..write('storyNodeId: $storyNodeId, ')
+          ..write('stepIndex: $stepIndex, ')
+          ..write('attemptIndex: $attemptIndex, ')
+          ..write('outcome: $outcome, ')
+          ..write('scaffoldLevel: $scaffoldLevel, ')
+          ..write('elapsedMilliseconds: $elapsedMilliseconds, ')
+          ..write('recordedAt: $recordedAt')
           ..write(')'))
         .toString();
   }
@@ -684,11 +2773,25 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $ProfilesTable profiles = $ProfilesTable(this);
   late final $GameScoresTable gameScores = $GameScoresTable(this);
+  late final $StoryNodeProgressTable storyNodeProgress =
+      $StoryNodeProgressTable(this);
+  late final $StoryChapterProgressTable storyChapterProgress =
+      $StoryChapterProgressTable(this);
+  late final $StoryRewardsTable storyRewards = $StoryRewardsTable(this);
+  late final $ActivityAttemptLogsTable activityAttemptLogs =
+      $ActivityAttemptLogsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [profiles, gameScores];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+        profiles,
+        gameScores,
+        storyNodeProgress,
+        storyChapterProgress,
+        storyRewards,
+        activityAttemptLogs
+      ];
 }
 
 typedef $$ProfilesTableCreateCompanionBuilder = ProfilesCompanion Function({
@@ -722,6 +2825,72 @@ final class $$ProfilesTableReferences
         .filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(_gameScoresRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$StoryNodeProgressTable,
+      List<StoryNodeProgressData>> _storyNodeProgressRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.storyNodeProgress,
+          aliasName: 'profiles__id__story_node_progress__profile_id');
+
+  $$StoryNodeProgressTableProcessedTableManager get storyNodeProgressRefs {
+    final manager =
+        $$StoryNodeProgressTableTableManager($_db, $_db.storyNodeProgress)
+            .filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_storyNodeProgressRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$StoryChapterProgressTable,
+      List<StoryChapterProgressData>> _storyChapterProgressRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.storyChapterProgress,
+          aliasName: 'profiles__id__story_chapter_progress__profile_id');
+
+  $$StoryChapterProgressTableProcessedTableManager
+      get storyChapterProgressRefs {
+    final manager =
+        $$StoryChapterProgressTableTableManager($_db, $_db.storyChapterProgress)
+            .filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_storyChapterProgressRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$StoryRewardsTable, List<StoryReward>>
+      _storyRewardsRefsTable(_$AppDatabase db) =>
+          MultiTypedResultKey.fromTable(db.storyRewards,
+              aliasName: 'profiles__id__story_rewards__profile_id');
+
+  $$StoryRewardsTableProcessedTableManager get storyRewardsRefs {
+    final manager = $$StoryRewardsTableTableManager($_db, $_db.storyRewards)
+        .filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_storyRewardsRefsTable($_db));
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: cache));
+  }
+
+  static MultiTypedResultKey<$ActivityAttemptLogsTable,
+      List<ActivityAttemptLog>> _activityAttemptLogsRefsTable(
+          _$AppDatabase db) =>
+      MultiTypedResultKey.fromTable(db.activityAttemptLogs,
+          aliasName: 'profiles__id__activity_attempt_logs__profile_id');
+
+  $$ActivityAttemptLogsTableProcessedTableManager get activityAttemptLogsRefs {
+    final manager =
+        $$ActivityAttemptLogsTableTableManager($_db, $_db.activityAttemptLogs)
+            .filter((f) => f.profileId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache =
+        $_typedResult.readTableOrNull(_activityAttemptLogsRefsTable($_db));
     return ProcessedTableManager(
         manager.$state.copyWith(prefetchedData: cache));
   }
@@ -767,6 +2936,91 @@ class $$ProfilesTableFilterComposer
             $$GameScoresTableFilterComposer(
               $db: $db,
               $table: $db.gameScores,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> storyNodeProgressRefs(
+      Expression<bool> Function($$StoryNodeProgressTableFilterComposer f) f) {
+    final $$StoryNodeProgressTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.storyNodeProgress,
+        getReferencedColumn: (t) => t.profileId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$StoryNodeProgressTableFilterComposer(
+              $db: $db,
+              $table: $db.storyNodeProgress,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> storyChapterProgressRefs(
+      Expression<bool> Function($$StoryChapterProgressTableFilterComposer f)
+          f) {
+    final $$StoryChapterProgressTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.storyChapterProgress,
+        getReferencedColumn: (t) => t.profileId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$StoryChapterProgressTableFilterComposer(
+              $db: $db,
+              $table: $db.storyChapterProgress,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> storyRewardsRefs(
+      Expression<bool> Function($$StoryRewardsTableFilterComposer f) f) {
+    final $$StoryRewardsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.storyRewards,
+        getReferencedColumn: (t) => t.profileId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$StoryRewardsTableFilterComposer(
+              $db: $db,
+              $table: $db.storyRewards,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<bool> activityAttemptLogsRefs(
+      Expression<bool> Function($$ActivityAttemptLogsTableFilterComposer f) f) {
+    final $$ActivityAttemptLogsTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.activityAttemptLogs,
+        getReferencedColumn: (t) => t.profileId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ActivityAttemptLogsTableFilterComposer(
+              $db: $db,
+              $table: $db.activityAttemptLogs,
               $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
               joinBuilder: joinBuilder,
               $removeJoinBuilderFromRootComposer:
@@ -851,6 +3105,95 @@ class $$ProfilesTableAnnotationComposer
             ));
     return f(composer);
   }
+
+  Expression<T> storyNodeProgressRefs<T extends Object>(
+      Expression<T> Function($$StoryNodeProgressTableAnnotationComposer a) f) {
+    final $$StoryNodeProgressTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.storyNodeProgress,
+            getReferencedColumn: (t) => t.profileId,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$StoryNodeProgressTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.storyNodeProgress,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
+
+  Expression<T> storyChapterProgressRefs<T extends Object>(
+      Expression<T> Function($$StoryChapterProgressTableAnnotationComposer a)
+          f) {
+    final $$StoryChapterProgressTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.storyChapterProgress,
+            getReferencedColumn: (t) => t.profileId,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$StoryChapterProgressTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.storyChapterProgress,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
+
+  Expression<T> storyRewardsRefs<T extends Object>(
+      Expression<T> Function($$StoryRewardsTableAnnotationComposer a) f) {
+    final $$StoryRewardsTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.id,
+        referencedTable: $db.storyRewards,
+        getReferencedColumn: (t) => t.profileId,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$StoryRewardsTableAnnotationComposer(
+              $db: $db,
+              $table: $db.storyRewards,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return f(composer);
+  }
+
+  Expression<T> activityAttemptLogsRefs<T extends Object>(
+      Expression<T> Function($$ActivityAttemptLogsTableAnnotationComposer a)
+          f) {
+    final $$ActivityAttemptLogsTableAnnotationComposer composer =
+        $composerBuilder(
+            composer: this,
+            getCurrentColumn: (t) => t.id,
+            referencedTable: $db.activityAttemptLogs,
+            getReferencedColumn: (t) => t.profileId,
+            builder: (joinBuilder,
+                    {$addJoinBuilderToRootComposer,
+                    $removeJoinBuilderFromRootComposer}) =>
+                $$ActivityAttemptLogsTableAnnotationComposer(
+                  $db: $db,
+                  $table: $db.activityAttemptLogs,
+                  $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+                  joinBuilder: joinBuilder,
+                  $removeJoinBuilderFromRootComposer:
+                      $removeJoinBuilderFromRootComposer,
+                ));
+    return f(composer);
+  }
 }
 
 class $$ProfilesTableTableManager extends RootTableManager<
@@ -864,7 +3207,12 @@ class $$ProfilesTableTableManager extends RootTableManager<
     $$ProfilesTableUpdateCompanionBuilder,
     (Profile, $$ProfilesTableReferences),
     Profile,
-    PrefetchHooks Function({bool gameScoresRefs})> {
+    PrefetchHooks Function(
+        {bool gameScoresRefs,
+        bool storyNodeProgressRefs,
+        bool storyChapterProgressRefs,
+        bool storyRewardsRefs,
+        bool activityAttemptLogsRefs})> {
   $$ProfilesTableTableManager(_$AppDatabase db, $ProfilesTable table)
       : super(TableManagerState(
           db: db,
@@ -911,10 +3259,21 @@ class $$ProfilesTableTableManager extends RootTableManager<
               .map((e) =>
                   (e.readTable(table), $$ProfilesTableReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({gameScoresRefs = false}) {
+          prefetchHooksCallback: (
+              {gameScoresRefs = false,
+              storyNodeProgressRefs = false,
+              storyChapterProgressRefs = false,
+              storyRewardsRefs = false,
+              activityAttemptLogsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [if (gameScoresRefs) db.gameScores],
+              explicitlyWatchedTables: [
+                if (gameScoresRefs) db.gameScores,
+                if (storyNodeProgressRefs) db.storyNodeProgress,
+                if (storyChapterProgressRefs) db.storyChapterProgress,
+                if (storyRewardsRefs) db.storyRewards,
+                if (activityAttemptLogsRefs) db.activityAttemptLogs
+              ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
@@ -927,6 +3286,57 @@ class $$ProfilesTableTableManager extends RootTableManager<
                         managerFromTypedResult: (p0) =>
                             $$ProfilesTableReferences(db, table, p0)
                                 .gameScoresRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.profileId == item.id),
+                        typedResults: items),
+                  if (storyNodeProgressRefs)
+                    await $_getPrefetchedData<Profile, $ProfilesTable,
+                            StoryNodeProgressData>(
+                        currentTable: table,
+                        referencedTable: $$ProfilesTableReferences
+                            ._storyNodeProgressRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ProfilesTableReferences(db, table, p0)
+                                .storyNodeProgressRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.profileId == item.id),
+                        typedResults: items),
+                  if (storyChapterProgressRefs)
+                    await $_getPrefetchedData<Profile, $ProfilesTable, StoryChapterProgressData>(
+                        currentTable: table,
+                        referencedTable: $$ProfilesTableReferences
+                            ._storyChapterProgressRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ProfilesTableReferences(db, table, p0)
+                                .storyChapterProgressRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.profileId == item.id),
+                        typedResults: items),
+                  if (storyRewardsRefs)
+                    await $_getPrefetchedData<Profile, $ProfilesTable,
+                            StoryReward>(
+                        currentTable: table,
+                        referencedTable: $$ProfilesTableReferences
+                            ._storyRewardsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ProfilesTableReferences(db, table, p0)
+                                .storyRewardsRefs,
+                        referencedItemsForCurrentItem:
+                            (item, referencedItems) => referencedItems
+                                .where((e) => e.profileId == item.id),
+                        typedResults: items),
+                  if (activityAttemptLogsRefs)
+                    await $_getPrefetchedData<Profile, $ProfilesTable,
+                            ActivityAttemptLog>(
+                        currentTable: table,
+                        referencedTable: $$ProfilesTableReferences
+                            ._activityAttemptLogsRefsTable(db),
+                        managerFromTypedResult: (p0) =>
+                            $$ProfilesTableReferences(db, table, p0)
+                                .activityAttemptLogsRefs,
                         referencedItemsForCurrentItem:
                             (item, referencedItems) => referencedItems
                                 .where((e) => e.profileId == item.id),
@@ -949,7 +3359,12 @@ typedef $$ProfilesTableProcessedTableManager = ProcessedTableManager<
     $$ProfilesTableUpdateCompanionBuilder,
     (Profile, $$ProfilesTableReferences),
     Profile,
-    PrefetchHooks Function({bool gameScoresRefs})>;
+    PrefetchHooks Function(
+        {bool gameScoresRefs,
+        bool storyNodeProgressRefs,
+        bool storyChapterProgressRefs,
+        bool storyRewardsRefs,
+        bool activityAttemptLogsRefs})>;
 typedef $$GameScoresTableCreateCompanionBuilder = GameScoresCompanion Function({
   Value<int> id,
   required int profileId,
@@ -957,6 +3372,10 @@ typedef $$GameScoresTableCreateCompanionBuilder = GameScoresCompanion Function({
   required int score,
   Value<int?> level,
   Value<DateTime> playedAt,
+  Value<int?> maxScore,
+  Value<int?> starsEarned,
+  Value<int?> durationSeconds,
+  Value<String?> storyNodeId,
 });
 typedef $$GameScoresTableUpdateCompanionBuilder = GameScoresCompanion Function({
   Value<int> id,
@@ -965,6 +3384,10 @@ typedef $$GameScoresTableUpdateCompanionBuilder = GameScoresCompanion Function({
   Value<int> score,
   Value<int?> level,
   Value<DateTime> playedAt,
+  Value<int?> maxScore,
+  Value<int?> starsEarned,
+  Value<int?> durationSeconds,
+  Value<String?> storyNodeId,
 });
 
 final class $$GameScoresTableReferences
@@ -1009,6 +3432,19 @@ class $$GameScoresTableFilterComposer
 
   ColumnFilters<DateTime> get playedAt => $composableBuilder(
       column: $table.playedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get maxScore => $composableBuilder(
+      column: $table.maxScore, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get starsEarned => $composableBuilder(
+      column: $table.starsEarned, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get storyNodeId => $composableBuilder(
+      column: $table.storyNodeId, builder: (column) => ColumnFilters(column));
 
   $$ProfilesTableFilterComposer get profileId {
     final $$ProfilesTableFilterComposer composer = $composerBuilder(
@@ -1055,6 +3491,19 @@ class $$GameScoresTableOrderingComposer
   ColumnOrderings<DateTime> get playedAt => $composableBuilder(
       column: $table.playedAt, builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<int> get maxScore => $composableBuilder(
+      column: $table.maxScore, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get starsEarned => $composableBuilder(
+      column: $table.starsEarned, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get storyNodeId => $composableBuilder(
+      column: $table.storyNodeId, builder: (column) => ColumnOrderings(column));
+
   $$ProfilesTableOrderingComposer get profileId {
     final $$ProfilesTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -1099,6 +3548,18 @@ class $$GameScoresTableAnnotationComposer
 
   GeneratedColumn<DateTime> get playedAt =>
       $composableBuilder(column: $table.playedAt, builder: (column) => column);
+
+  GeneratedColumn<int> get maxScore =>
+      $composableBuilder(column: $table.maxScore, builder: (column) => column);
+
+  GeneratedColumn<int> get starsEarned => $composableBuilder(
+      column: $table.starsEarned, builder: (column) => column);
+
+  GeneratedColumn<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds, builder: (column) => column);
+
+  GeneratedColumn<String> get storyNodeId => $composableBuilder(
+      column: $table.storyNodeId, builder: (column) => column);
 
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
@@ -1150,6 +3611,10 @@ class $$GameScoresTableTableManager extends RootTableManager<
             Value<int> score = const Value.absent(),
             Value<int?> level = const Value.absent(),
             Value<DateTime> playedAt = const Value.absent(),
+            Value<int?> maxScore = const Value.absent(),
+            Value<int?> starsEarned = const Value.absent(),
+            Value<int?> durationSeconds = const Value.absent(),
+            Value<String?> storyNodeId = const Value.absent(),
           }) =>
               GameScoresCompanion(
             id: id,
@@ -1158,6 +3623,10 @@ class $$GameScoresTableTableManager extends RootTableManager<
             score: score,
             level: level,
             playedAt: playedAt,
+            maxScore: maxScore,
+            starsEarned: starsEarned,
+            durationSeconds: durationSeconds,
+            storyNodeId: storyNodeId,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -1166,6 +3635,10 @@ class $$GameScoresTableTableManager extends RootTableManager<
             required int score,
             Value<int?> level = const Value.absent(),
             Value<DateTime> playedAt = const Value.absent(),
+            Value<int?> maxScore = const Value.absent(),
+            Value<int?> starsEarned = const Value.absent(),
+            Value<int?> durationSeconds = const Value.absent(),
+            Value<String?> storyNodeId = const Value.absent(),
           }) =>
               GameScoresCompanion.insert(
             id: id,
@@ -1174,6 +3647,10 @@ class $$GameScoresTableTableManager extends RootTableManager<
             score: score,
             level: level,
             playedAt: playedAt,
+            maxScore: maxScore,
+            starsEarned: starsEarned,
+            durationSeconds: durationSeconds,
+            storyNodeId: storyNodeId,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (
@@ -1231,6 +3708,1328 @@ typedef $$GameScoresTableProcessedTableManager = ProcessedTableManager<
     (GameScore, $$GameScoresTableReferences),
     GameScore,
     PrefetchHooks Function({bool profileId})>;
+typedef $$StoryNodeProgressTableCreateCompanionBuilder
+    = StoryNodeProgressCompanion Function({
+  Value<int> id,
+  required int profileId,
+  required String adventureId,
+  required String nodeId,
+  Value<String> completion,
+  Value<int> stepsTotal,
+  Value<int> stepsIndependent,
+  Value<int> hintsUsed,
+  Value<int> score,
+  Value<int> durationSeconds,
+  Value<DateTime> updatedAt,
+});
+typedef $$StoryNodeProgressTableUpdateCompanionBuilder
+    = StoryNodeProgressCompanion Function({
+  Value<int> id,
+  Value<int> profileId,
+  Value<String> adventureId,
+  Value<String> nodeId,
+  Value<String> completion,
+  Value<int> stepsTotal,
+  Value<int> stepsIndependent,
+  Value<int> hintsUsed,
+  Value<int> score,
+  Value<int> durationSeconds,
+  Value<DateTime> updatedAt,
+});
+
+final class $$StoryNodeProgressTableReferences extends BaseReferences<
+    _$AppDatabase, $StoryNodeProgressTable, StoryNodeProgressData> {
+  $$StoryNodeProgressTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('story_node_progress__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager($_db, $_db.profiles)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$StoryNodeProgressTableFilterComposer
+    extends Composer<_$AppDatabase, $StoryNodeProgressTable> {
+  $$StoryNodeProgressTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get nodeId => $composableBuilder(
+      column: $table.nodeId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get completion => $composableBuilder(
+      column: $table.completion, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get stepsTotal => $composableBuilder(
+      column: $table.stepsTotal, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get stepsIndependent => $composableBuilder(
+      column: $table.stepsIndependent,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get hintsUsed => $composableBuilder(
+      column: $table.hintsUsed, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnFilters(column));
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableFilterComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryNodeProgressTableOrderingComposer
+    extends Composer<_$AppDatabase, $StoryNodeProgressTable> {
+  $$StoryNodeProgressTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get nodeId => $composableBuilder(
+      column: $table.nodeId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get completion => $composableBuilder(
+      column: $table.completion, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get stepsTotal => $composableBuilder(
+      column: $table.stepsTotal, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get stepsIndependent => $composableBuilder(
+      column: $table.stepsIndependent,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get hintsUsed => $composableBuilder(
+      column: $table.hintsUsed, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get score => $composableBuilder(
+      column: $table.score, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+      column: $table.updatedAt, builder: (column) => ColumnOrderings(column));
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableOrderingComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryNodeProgressTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StoryNodeProgressTable> {
+  $$StoryNodeProgressTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => column);
+
+  GeneratedColumn<String> get nodeId =>
+      $composableBuilder(column: $table.nodeId, builder: (column) => column);
+
+  GeneratedColumn<String> get completion => $composableBuilder(
+      column: $table.completion, builder: (column) => column);
+
+  GeneratedColumn<int> get stepsTotal => $composableBuilder(
+      column: $table.stepsTotal, builder: (column) => column);
+
+  GeneratedColumn<int> get stepsIndependent => $composableBuilder(
+      column: $table.stepsIndependent, builder: (column) => column);
+
+  GeneratedColumn<int> get hintsUsed =>
+      $composableBuilder(column: $table.hintsUsed, builder: (column) => column);
+
+  GeneratedColumn<int> get score =>
+      $composableBuilder(column: $table.score, builder: (column) => column);
+
+  GeneratedColumn<int> get durationSeconds => $composableBuilder(
+      column: $table.durationSeconds, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryNodeProgressTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $StoryNodeProgressTable,
+    StoryNodeProgressData,
+    $$StoryNodeProgressTableFilterComposer,
+    $$StoryNodeProgressTableOrderingComposer,
+    $$StoryNodeProgressTableAnnotationComposer,
+    $$StoryNodeProgressTableCreateCompanionBuilder,
+    $$StoryNodeProgressTableUpdateCompanionBuilder,
+    (StoryNodeProgressData, $$StoryNodeProgressTableReferences),
+    StoryNodeProgressData,
+    PrefetchHooks Function({bool profileId})> {
+  $$StoryNodeProgressTableTableManager(
+      _$AppDatabase db, $StoryNodeProgressTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StoryNodeProgressTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StoryNodeProgressTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StoryNodeProgressTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> profileId = const Value.absent(),
+            Value<String> adventureId = const Value.absent(),
+            Value<String> nodeId = const Value.absent(),
+            Value<String> completion = const Value.absent(),
+            Value<int> stepsTotal = const Value.absent(),
+            Value<int> stepsIndependent = const Value.absent(),
+            Value<int> hintsUsed = const Value.absent(),
+            Value<int> score = const Value.absent(),
+            Value<int> durationSeconds = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+          }) =>
+              StoryNodeProgressCompanion(
+            id: id,
+            profileId: profileId,
+            adventureId: adventureId,
+            nodeId: nodeId,
+            completion: completion,
+            stepsTotal: stepsTotal,
+            stepsIndependent: stepsIndependent,
+            hintsUsed: hintsUsed,
+            score: score,
+            durationSeconds: durationSeconds,
+            updatedAt: updatedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int profileId,
+            required String adventureId,
+            required String nodeId,
+            Value<String> completion = const Value.absent(),
+            Value<int> stepsTotal = const Value.absent(),
+            Value<int> stepsIndependent = const Value.absent(),
+            Value<int> hintsUsed = const Value.absent(),
+            Value<int> score = const Value.absent(),
+            Value<int> durationSeconds = const Value.absent(),
+            Value<DateTime> updatedAt = const Value.absent(),
+          }) =>
+              StoryNodeProgressCompanion.insert(
+            id: id,
+            profileId: profileId,
+            adventureId: adventureId,
+            nodeId: nodeId,
+            completion: completion,
+            stepsTotal: stepsTotal,
+            stepsIndependent: stepsIndependent,
+            hintsUsed: hintsUsed,
+            score: score,
+            durationSeconds: durationSeconds,
+            updatedAt: updatedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$StoryNodeProgressTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (profileId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.profileId,
+                    referencedTable:
+                        $$StoryNodeProgressTableReferences._profileIdTable(db),
+                    referencedColumn: $$StoryNodeProgressTableReferences
+                        ._profileIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$StoryNodeProgressTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $StoryNodeProgressTable,
+    StoryNodeProgressData,
+    $$StoryNodeProgressTableFilterComposer,
+    $$StoryNodeProgressTableOrderingComposer,
+    $$StoryNodeProgressTableAnnotationComposer,
+    $$StoryNodeProgressTableCreateCompanionBuilder,
+    $$StoryNodeProgressTableUpdateCompanionBuilder,
+    (StoryNodeProgressData, $$StoryNodeProgressTableReferences),
+    StoryNodeProgressData,
+    PrefetchHooks Function({bool profileId})>;
+typedef $$StoryChapterProgressTableCreateCompanionBuilder
+    = StoryChapterProgressCompanion Function({
+  Value<int> id,
+  required int profileId,
+  required String adventureId,
+  Value<String?> currentNodeId,
+  Value<bool> isUnlocked,
+  Value<bool> isCompleted,
+  Value<DateTime> startedAt,
+  Value<DateTime?> completedAt,
+  Value<DateTime> lastPlayedAt,
+});
+typedef $$StoryChapterProgressTableUpdateCompanionBuilder
+    = StoryChapterProgressCompanion Function({
+  Value<int> id,
+  Value<int> profileId,
+  Value<String> adventureId,
+  Value<String?> currentNodeId,
+  Value<bool> isUnlocked,
+  Value<bool> isCompleted,
+  Value<DateTime> startedAt,
+  Value<DateTime?> completedAt,
+  Value<DateTime> lastPlayedAt,
+});
+
+final class $$StoryChapterProgressTableReferences extends BaseReferences<
+    _$AppDatabase, $StoryChapterProgressTable, StoryChapterProgressData> {
+  $$StoryChapterProgressTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) => db.profiles
+      .createAlias('story_chapter_progress__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager($_db, $_db.profiles)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$StoryChapterProgressTableFilterComposer
+    extends Composer<_$AppDatabase, $StoryChapterProgressTable> {
+  $$StoryChapterProgressTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get currentNodeId => $composableBuilder(
+      column: $table.currentNodeId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isUnlocked => $composableBuilder(
+      column: $table.isUnlocked, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<bool> get isCompleted => $composableBuilder(
+      column: $table.isCompleted, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get lastPlayedAt => $composableBuilder(
+      column: $table.lastPlayedAt, builder: (column) => ColumnFilters(column));
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableFilterComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryChapterProgressTableOrderingComposer
+    extends Composer<_$AppDatabase, $StoryChapterProgressTable> {
+  $$StoryChapterProgressTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get currentNodeId => $composableBuilder(
+      column: $table.currentNodeId,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isUnlocked => $composableBuilder(
+      column: $table.isUnlocked, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<bool> get isCompleted => $composableBuilder(
+      column: $table.isCompleted, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get startedAt => $composableBuilder(
+      column: $table.startedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get lastPlayedAt => $composableBuilder(
+      column: $table.lastPlayedAt,
+      builder: (column) => ColumnOrderings(column));
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableOrderingComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryChapterProgressTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StoryChapterProgressTable> {
+  $$StoryChapterProgressTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => column);
+
+  GeneratedColumn<String> get currentNodeId => $composableBuilder(
+      column: $table.currentNodeId, builder: (column) => column);
+
+  GeneratedColumn<bool> get isUnlocked => $composableBuilder(
+      column: $table.isUnlocked, builder: (column) => column);
+
+  GeneratedColumn<bool> get isCompleted => $composableBuilder(
+      column: $table.isCompleted, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startedAt =>
+      $composableBuilder(column: $table.startedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get completedAt => $composableBuilder(
+      column: $table.completedAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get lastPlayedAt => $composableBuilder(
+      column: $table.lastPlayedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryChapterProgressTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $StoryChapterProgressTable,
+    StoryChapterProgressData,
+    $$StoryChapterProgressTableFilterComposer,
+    $$StoryChapterProgressTableOrderingComposer,
+    $$StoryChapterProgressTableAnnotationComposer,
+    $$StoryChapterProgressTableCreateCompanionBuilder,
+    $$StoryChapterProgressTableUpdateCompanionBuilder,
+    (StoryChapterProgressData, $$StoryChapterProgressTableReferences),
+    StoryChapterProgressData,
+    PrefetchHooks Function({bool profileId})> {
+  $$StoryChapterProgressTableTableManager(
+      _$AppDatabase db, $StoryChapterProgressTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StoryChapterProgressTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StoryChapterProgressTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StoryChapterProgressTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> profileId = const Value.absent(),
+            Value<String> adventureId = const Value.absent(),
+            Value<String?> currentNodeId = const Value.absent(),
+            Value<bool> isUnlocked = const Value.absent(),
+            Value<bool> isCompleted = const Value.absent(),
+            Value<DateTime> startedAt = const Value.absent(),
+            Value<DateTime?> completedAt = const Value.absent(),
+            Value<DateTime> lastPlayedAt = const Value.absent(),
+          }) =>
+              StoryChapterProgressCompanion(
+            id: id,
+            profileId: profileId,
+            adventureId: adventureId,
+            currentNodeId: currentNodeId,
+            isUnlocked: isUnlocked,
+            isCompleted: isCompleted,
+            startedAt: startedAt,
+            completedAt: completedAt,
+            lastPlayedAt: lastPlayedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int profileId,
+            required String adventureId,
+            Value<String?> currentNodeId = const Value.absent(),
+            Value<bool> isUnlocked = const Value.absent(),
+            Value<bool> isCompleted = const Value.absent(),
+            Value<DateTime> startedAt = const Value.absent(),
+            Value<DateTime?> completedAt = const Value.absent(),
+            Value<DateTime> lastPlayedAt = const Value.absent(),
+          }) =>
+              StoryChapterProgressCompanion.insert(
+            id: id,
+            profileId: profileId,
+            adventureId: adventureId,
+            currentNodeId: currentNodeId,
+            isUnlocked: isUnlocked,
+            isCompleted: isCompleted,
+            startedAt: startedAt,
+            completedAt: completedAt,
+            lastPlayedAt: lastPlayedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$StoryChapterProgressTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (profileId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.profileId,
+                    referencedTable: $$StoryChapterProgressTableReferences
+                        ._profileIdTable(db),
+                    referencedColumn: $$StoryChapterProgressTableReferences
+                        ._profileIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$StoryChapterProgressTableProcessedTableManager
+    = ProcessedTableManager<
+        _$AppDatabase,
+        $StoryChapterProgressTable,
+        StoryChapterProgressData,
+        $$StoryChapterProgressTableFilterComposer,
+        $$StoryChapterProgressTableOrderingComposer,
+        $$StoryChapterProgressTableAnnotationComposer,
+        $$StoryChapterProgressTableCreateCompanionBuilder,
+        $$StoryChapterProgressTableUpdateCompanionBuilder,
+        (StoryChapterProgressData, $$StoryChapterProgressTableReferences),
+        StoryChapterProgressData,
+        PrefetchHooks Function({bool profileId})>;
+typedef $$StoryRewardsTableCreateCompanionBuilder = StoryRewardsCompanion
+    Function({
+  Value<int> id,
+  required int profileId,
+  required String rewardId,
+  required String adventureId,
+  Value<DateTime> earnedAt,
+});
+typedef $$StoryRewardsTableUpdateCompanionBuilder = StoryRewardsCompanion
+    Function({
+  Value<int> id,
+  Value<int> profileId,
+  Value<String> rewardId,
+  Value<String> adventureId,
+  Value<DateTime> earnedAt,
+});
+
+final class $$StoryRewardsTableReferences
+    extends BaseReferences<_$AppDatabase, $StoryRewardsTable, StoryReward> {
+  $$StoryRewardsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) =>
+      db.profiles.createAlias('story_rewards__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager($_db, $_db.profiles)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$StoryRewardsTableFilterComposer
+    extends Composer<_$AppDatabase, $StoryRewardsTable> {
+  $$StoryRewardsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get rewardId => $composableBuilder(
+      column: $table.rewardId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get earnedAt => $composableBuilder(
+      column: $table.earnedAt, builder: (column) => ColumnFilters(column));
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableFilterComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryRewardsTableOrderingComposer
+    extends Composer<_$AppDatabase, $StoryRewardsTable> {
+  $$StoryRewardsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get rewardId => $composableBuilder(
+      column: $table.rewardId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get earnedAt => $composableBuilder(
+      column: $table.earnedAt, builder: (column) => ColumnOrderings(column));
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableOrderingComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryRewardsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $StoryRewardsTable> {
+  $$StoryRewardsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get rewardId =>
+      $composableBuilder(column: $table.rewardId, builder: (column) => column);
+
+  GeneratedColumn<String> get adventureId => $composableBuilder(
+      column: $table.adventureId, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get earnedAt =>
+      $composableBuilder(column: $table.earnedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$StoryRewardsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $StoryRewardsTable,
+    StoryReward,
+    $$StoryRewardsTableFilterComposer,
+    $$StoryRewardsTableOrderingComposer,
+    $$StoryRewardsTableAnnotationComposer,
+    $$StoryRewardsTableCreateCompanionBuilder,
+    $$StoryRewardsTableUpdateCompanionBuilder,
+    (StoryReward, $$StoryRewardsTableReferences),
+    StoryReward,
+    PrefetchHooks Function({bool profileId})> {
+  $$StoryRewardsTableTableManager(_$AppDatabase db, $StoryRewardsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$StoryRewardsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$StoryRewardsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$StoryRewardsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> profileId = const Value.absent(),
+            Value<String> rewardId = const Value.absent(),
+            Value<String> adventureId = const Value.absent(),
+            Value<DateTime> earnedAt = const Value.absent(),
+          }) =>
+              StoryRewardsCompanion(
+            id: id,
+            profileId: profileId,
+            rewardId: rewardId,
+            adventureId: adventureId,
+            earnedAt: earnedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int profileId,
+            required String rewardId,
+            required String adventureId,
+            Value<DateTime> earnedAt = const Value.absent(),
+          }) =>
+              StoryRewardsCompanion.insert(
+            id: id,
+            profileId: profileId,
+            rewardId: rewardId,
+            adventureId: adventureId,
+            earnedAt: earnedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$StoryRewardsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (profileId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.profileId,
+                    referencedTable:
+                        $$StoryRewardsTableReferences._profileIdTable(db),
+                    referencedColumn:
+                        $$StoryRewardsTableReferences._profileIdTable(db).id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$StoryRewardsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $StoryRewardsTable,
+    StoryReward,
+    $$StoryRewardsTableFilterComposer,
+    $$StoryRewardsTableOrderingComposer,
+    $$StoryRewardsTableAnnotationComposer,
+    $$StoryRewardsTableCreateCompanionBuilder,
+    $$StoryRewardsTableUpdateCompanionBuilder,
+    (StoryReward, $$StoryRewardsTableReferences),
+    StoryReward,
+    PrefetchHooks Function({bool profileId})>;
+typedef $$ActivityAttemptLogsTableCreateCompanionBuilder
+    = ActivityAttemptLogsCompanion Function({
+  Value<int> id,
+  required int profileId,
+  required String activityId,
+  Value<String?> storyNodeId,
+  required int stepIndex,
+  required int attemptIndex,
+  required String outcome,
+  required String scaffoldLevel,
+  required int elapsedMilliseconds,
+  Value<DateTime> recordedAt,
+});
+typedef $$ActivityAttemptLogsTableUpdateCompanionBuilder
+    = ActivityAttemptLogsCompanion Function({
+  Value<int> id,
+  Value<int> profileId,
+  Value<String> activityId,
+  Value<String?> storyNodeId,
+  Value<int> stepIndex,
+  Value<int> attemptIndex,
+  Value<String> outcome,
+  Value<String> scaffoldLevel,
+  Value<int> elapsedMilliseconds,
+  Value<DateTime> recordedAt,
+});
+
+final class $$ActivityAttemptLogsTableReferences extends BaseReferences<
+    _$AppDatabase, $ActivityAttemptLogsTable, ActivityAttemptLog> {
+  $$ActivityAttemptLogsTableReferences(
+      super.$_db, super.$_table, super.$_typedResult);
+
+  static $ProfilesTable _profileIdTable(_$AppDatabase db) => db.profiles
+      .createAlias('activity_attempt_logs__profile_id__profiles__id');
+
+  $$ProfilesTableProcessedTableManager get profileId {
+    final $_column = $_itemColumn<int>('profile_id')!;
+
+    final manager = $$ProfilesTableTableManager($_db, $_db.profiles)
+        .filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_profileIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+        manager.$state.copyWith(prefetchedData: [item]));
+  }
+}
+
+class $$ActivityAttemptLogsTableFilterComposer
+    extends Composer<_$AppDatabase, $ActivityAttemptLogsTable> {
+  $$ActivityAttemptLogsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get activityId => $composableBuilder(
+      column: $table.activityId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get storyNodeId => $composableBuilder(
+      column: $table.storyNodeId, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get stepIndex => $composableBuilder(
+      column: $table.stepIndex, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get attemptIndex => $composableBuilder(
+      column: $table.attemptIndex, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get outcome => $composableBuilder(
+      column: $table.outcome, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get scaffoldLevel => $composableBuilder(
+      column: $table.scaffoldLevel, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<int> get elapsedMilliseconds => $composableBuilder(
+      column: $table.elapsedMilliseconds,
+      builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<DateTime> get recordedAt => $composableBuilder(
+      column: $table.recordedAt, builder: (column) => ColumnFilters(column));
+
+  $$ProfilesTableFilterComposer get profileId {
+    final $$ProfilesTableFilterComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableFilterComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ActivityAttemptLogsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ActivityAttemptLogsTable> {
+  $$ActivityAttemptLogsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+      column: $table.id, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get activityId => $composableBuilder(
+      column: $table.activityId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get storyNodeId => $composableBuilder(
+      column: $table.storyNodeId, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get stepIndex => $composableBuilder(
+      column: $table.stepIndex, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get attemptIndex => $composableBuilder(
+      column: $table.attemptIndex,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get outcome => $composableBuilder(
+      column: $table.outcome, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get scaffoldLevel => $composableBuilder(
+      column: $table.scaffoldLevel,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<int> get elapsedMilliseconds => $composableBuilder(
+      column: $table.elapsedMilliseconds,
+      builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<DateTime> get recordedAt => $composableBuilder(
+      column: $table.recordedAt, builder: (column) => ColumnOrderings(column));
+
+  $$ProfilesTableOrderingComposer get profileId {
+    final $$ProfilesTableOrderingComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableOrderingComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ActivityAttemptLogsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ActivityAttemptLogsTable> {
+  $$ActivityAttemptLogsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get activityId => $composableBuilder(
+      column: $table.activityId, builder: (column) => column);
+
+  GeneratedColumn<String> get storyNodeId => $composableBuilder(
+      column: $table.storyNodeId, builder: (column) => column);
+
+  GeneratedColumn<int> get stepIndex =>
+      $composableBuilder(column: $table.stepIndex, builder: (column) => column);
+
+  GeneratedColumn<int> get attemptIndex => $composableBuilder(
+      column: $table.attemptIndex, builder: (column) => column);
+
+  GeneratedColumn<String> get outcome =>
+      $composableBuilder(column: $table.outcome, builder: (column) => column);
+
+  GeneratedColumn<String> get scaffoldLevel => $composableBuilder(
+      column: $table.scaffoldLevel, builder: (column) => column);
+
+  GeneratedColumn<int> get elapsedMilliseconds => $composableBuilder(
+      column: $table.elapsedMilliseconds, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get recordedAt => $composableBuilder(
+      column: $table.recordedAt, builder: (column) => column);
+
+  $$ProfilesTableAnnotationComposer get profileId {
+    final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
+        composer: this,
+        getCurrentColumn: (t) => t.profileId,
+        referencedTable: $db.profiles,
+        getReferencedColumn: (t) => t.id,
+        builder: (joinBuilder,
+                {$addJoinBuilderToRootComposer,
+                $removeJoinBuilderFromRootComposer}) =>
+            $$ProfilesTableAnnotationComposer(
+              $db: $db,
+              $table: $db.profiles,
+              $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+              joinBuilder: joinBuilder,
+              $removeJoinBuilderFromRootComposer:
+                  $removeJoinBuilderFromRootComposer,
+            ));
+    return composer;
+  }
+}
+
+class $$ActivityAttemptLogsTableTableManager extends RootTableManager<
+    _$AppDatabase,
+    $ActivityAttemptLogsTable,
+    ActivityAttemptLog,
+    $$ActivityAttemptLogsTableFilterComposer,
+    $$ActivityAttemptLogsTableOrderingComposer,
+    $$ActivityAttemptLogsTableAnnotationComposer,
+    $$ActivityAttemptLogsTableCreateCompanionBuilder,
+    $$ActivityAttemptLogsTableUpdateCompanionBuilder,
+    (ActivityAttemptLog, $$ActivityAttemptLogsTableReferences),
+    ActivityAttemptLog,
+    PrefetchHooks Function({bool profileId})> {
+  $$ActivityAttemptLogsTableTableManager(
+      _$AppDatabase db, $ActivityAttemptLogsTable table)
+      : super(TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ActivityAttemptLogsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ActivityAttemptLogsTableOrderingComposer(
+                  $db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ActivityAttemptLogsTableAnnotationComposer(
+                  $db: db, $table: table),
+          updateCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            Value<int> profileId = const Value.absent(),
+            Value<String> activityId = const Value.absent(),
+            Value<String?> storyNodeId = const Value.absent(),
+            Value<int> stepIndex = const Value.absent(),
+            Value<int> attemptIndex = const Value.absent(),
+            Value<String> outcome = const Value.absent(),
+            Value<String> scaffoldLevel = const Value.absent(),
+            Value<int> elapsedMilliseconds = const Value.absent(),
+            Value<DateTime> recordedAt = const Value.absent(),
+          }) =>
+              ActivityAttemptLogsCompanion(
+            id: id,
+            profileId: profileId,
+            activityId: activityId,
+            storyNodeId: storyNodeId,
+            stepIndex: stepIndex,
+            attemptIndex: attemptIndex,
+            outcome: outcome,
+            scaffoldLevel: scaffoldLevel,
+            elapsedMilliseconds: elapsedMilliseconds,
+            recordedAt: recordedAt,
+          ),
+          createCompanionCallback: ({
+            Value<int> id = const Value.absent(),
+            required int profileId,
+            required String activityId,
+            Value<String?> storyNodeId = const Value.absent(),
+            required int stepIndex,
+            required int attemptIndex,
+            required String outcome,
+            required String scaffoldLevel,
+            required int elapsedMilliseconds,
+            Value<DateTime> recordedAt = const Value.absent(),
+          }) =>
+              ActivityAttemptLogsCompanion.insert(
+            id: id,
+            profileId: profileId,
+            activityId: activityId,
+            storyNodeId: storyNodeId,
+            stepIndex: stepIndex,
+            attemptIndex: attemptIndex,
+            outcome: outcome,
+            scaffoldLevel: scaffoldLevel,
+            elapsedMilliseconds: elapsedMilliseconds,
+            recordedAt: recordedAt,
+          ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (
+                    e.readTable(table),
+                    $$ActivityAttemptLogsTableReferences(db, table, e)
+                  ))
+              .toList(),
+          prefetchHooksCallback: ({profileId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins: <
+                  T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic>>(state) {
+                if (profileId) {
+                  state = state.withJoin(
+                    currentTable: table,
+                    currentColumn: table.profileId,
+                    referencedTable: $$ActivityAttemptLogsTableReferences
+                        ._profileIdTable(db),
+                    referencedColumn: $$ActivityAttemptLogsTableReferences
+                        ._profileIdTable(db)
+                        .id,
+                  ) as T;
+                }
+
+                return state;
+              },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ));
+}
+
+typedef $$ActivityAttemptLogsTableProcessedTableManager = ProcessedTableManager<
+    _$AppDatabase,
+    $ActivityAttemptLogsTable,
+    ActivityAttemptLog,
+    $$ActivityAttemptLogsTableFilterComposer,
+    $$ActivityAttemptLogsTableOrderingComposer,
+    $$ActivityAttemptLogsTableAnnotationComposer,
+    $$ActivityAttemptLogsTableCreateCompanionBuilder,
+    $$ActivityAttemptLogsTableUpdateCompanionBuilder,
+    (ActivityAttemptLog, $$ActivityAttemptLogsTableReferences),
+    ActivityAttemptLog,
+    PrefetchHooks Function({bool profileId})>;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1239,4 +5038,12 @@ class $AppDatabaseManager {
       $$ProfilesTableTableManager(_db, _db.profiles);
   $$GameScoresTableTableManager get gameScores =>
       $$GameScoresTableTableManager(_db, _db.gameScores);
+  $$StoryNodeProgressTableTableManager get storyNodeProgress =>
+      $$StoryNodeProgressTableTableManager(_db, _db.storyNodeProgress);
+  $$StoryChapterProgressTableTableManager get storyChapterProgress =>
+      $$StoryChapterProgressTableTableManager(_db, _db.storyChapterProgress);
+  $$StoryRewardsTableTableManager get storyRewards =>
+      $$StoryRewardsTableTableManager(_db, _db.storyRewards);
+  $$ActivityAttemptLogsTableTableManager get activityAttemptLogs =>
+      $$ActivityAttemptLogsTableTableManager(_db, _db.activityAttemptLogs);
 }

@@ -3,7 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-import '../../../core/base/protected_game_screen.dart';
+import '../../../core/base/kid_game_screen.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 
@@ -13,14 +13,14 @@ enum GameLevel {
   hard,
 }
 
-class MemoryGameScreen extends ProtectedGameScreen {
+class MemoryGameScreen extends KidGameScreen {
   const MemoryGameScreen({required super.level, super.key});
 
   @override
   State<MemoryGameScreen> createState() => _MemoryGameScreenState();
 }
 
-class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
+class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
     with TickerProviderStateMixin {
   // Define emojis for all levels
   final List<String> _allEmojis = [

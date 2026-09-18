@@ -1,6 +1,24 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <!-- Story reminders ("let's continue the story"). Runtime-requested on
+         Android 13+, and only after the child has actually started a story:
+         see StoryReminderPlanner, which says nothing at all to someone who has
+         never opened an Adventure. -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <!-- Lets a scheduled reminder survive a reboot. Deliberately NOT
+         SCHEDULE_EXACT_ALARM: reminders are inexact by design, because
+         "around six in the evening" is good enough and an exact alarm needs a
+         special-access permission the app should not be asking a parent for. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Kidzo has no photo or video picker. Avatars are four bundled assets in
+         ImageManager.kidAvatars, selected by index and stored as Profiles.avatarIndex
+         (an int), so the app never reads the user's media library and needs no
+         media permission. The three removals below are deliberate regression guards:
+         they are no-ops today because nothing declares these permissions, but if a
+         future plugin re-introduces them through manifest merging the merge strips
+         them again, so the Google Play "use alternative system pickers" policy flag
+         cannot silently come back. Do not delete them as dead code. -->
     <uses-permission
         android:name="android.permission.READ_MEDIA_IMAGES"
         tools:node="remove" />
@@ -37,6 +55,22 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <!-- Re-registers scheduled story reminders after a reboot or an app
+             update; without these a pending reminder is silently dropped. -->
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationBootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <action android:name="com.htc.intent.action.QUICKBOOT_POWERON" />
+            </intent-filter>
+        </receiver>
+        <receiver
+            android:exported="false"
+            android:name="com.dexterous.flutterlocalnotifications.ScheduledNotificationReceiver" />
+
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

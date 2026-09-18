@@ -46,6 +46,7 @@ void main() async {
   final gameAssetManager = GameAssetManager();
 
   runApp(MyApp(
+    database: database,
     profileDao: profileDao,
     gameScoresDao: gameScoresDao,
     flutterTts: flutterTts,
@@ -56,6 +57,7 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({
+    required this.database,
     required this.profileDao,
     required this.gameScoresDao,
     required this.flutterTts,
@@ -63,6 +65,11 @@ class MyApp extends StatelessWidget {
     required this.gameAssetManager,
     super.key,
   });
+  /// Provided to the widget tree so Adventure Mode can build its own DAO.
+  /// Passed down rather than reached for globally, per the injected-services
+  /// rule that this feature's registry and services also follow.
+  final AppDatabase database;
+
   final ProfileDao profileDao;
   final GameScoresDao gameScoresDao;
   final FlutterTts flutterTts;
@@ -73,6 +80,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiRepositoryProvider(
       providers: [
+        RepositoryProvider<AppDatabase>.value(value: database),
         RepositoryProvider.value(value: profileDao),
         RepositoryProvider.value(value: gameScoresDao),
         RepositoryProvider.value(value: flutterTts),

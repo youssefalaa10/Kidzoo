@@ -20,6 +20,24 @@ class AppLocalizations {
     Locale('ar', ''),
   ];
 
+  /// Looks up a key without throwing when it is absent.
+  ///
+  /// Deliberately different from the getters below, which are
+  /// `_localizedValues['key']!` and blow up on a missing key. That is the right
+  /// behaviour for UI strings, where a missing key is a bug the build should
+  /// surface. It is the wrong behaviour for **content** keys, which are data:
+  /// Adventure content ships hundreds of authored strings, and one missing
+  /// translation must degrade to a fallback rather than crash a child's story.
+  ///
+  /// Returns [fallback] when the key is absent, or the key itself when no
+  /// fallback is given, so the missing key is visible without being fatal.
+  String resolve(String key, {String? fallback}) =>
+      _localizedValues[key] ?? fallback ?? key;
+
+  /// Whether [key] has text in the current locale. Lets callers choose a
+  /// different rendering rather than displaying a fallback.
+  bool hasText(String key) => _localizedValues.containsKey(key);
+
   // DrawLab translations
   String get drawLab => _localizedValues['drawLab']!;
   String get navigationNotAllowed => _localizedValues['navigationNotAllowed']!;

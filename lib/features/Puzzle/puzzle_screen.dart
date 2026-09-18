@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:kidzo/core/base/protected_game_screen.dart';
+import 'package:kidzo/core/base/kid_game_screen.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
 import 'package:kidzo/core/shared/widgets/fluid_container.dart';
@@ -8,14 +8,14 @@ import 'package:kidzo/features/Puzzle/bloc/cubit.dart';
 import 'package:kidzo/features/Puzzle/bloc/state.dart';
 import 'package:kidzo/features/Puzzle/data/model/puzzle_model.dart';
 
-class PuzzleScreen extends ProtectedGameScreen {
+class PuzzleScreen extends KidGameScreen {
   const PuzzleScreen({required super.level, super.key});
 
   @override
   State<PuzzleScreen> createState() => _PuzzleScreenState();
 }
 
-class _PuzzleScreenState extends ProtectedGameScreenState<PuzzleScreen> {
+class _PuzzleScreenState extends KidGameScreenState<PuzzleScreen> {
   @override
   void onGameInit() {}
 

@@ -6,7 +6,6 @@ import 'package:kidzo/core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/kid_game_shell.dart';
-import '../../LevelsMap/levelmap_screen.dart';
 import '../data/logic/maze_cubit.dart';
 import '../data/models/maze_models.dart';
 import '../data/models/maze_state.dart';
@@ -216,14 +215,10 @@ class _MazeGameContentState extends State<_MazeGameContent> {
 
     if (won) {
       KidHaptics.success();
-      final parentWidget =
-          context.findAncestorWidgetOfExactType<MazeGameScreen>();
-      if (parentWidget != null) {
-        final stageNumber = _getStageNumberForLevel(parentWidget.level);
-        if (stageNumber != null) {
-          LevelCompletionManager().completeLevel(stageNumber);
-        }
-      }
+      // The old campaign's progress store used to be notified here. It is gone
+      // with the level map: the maze is now reached from the Games grid, where
+      // nothing is locked and so nothing needs unlocking. Story progress is
+      // recorded by the Adventure runner, not by the game itself.
     } else {
       KidHaptics.error();
     }
@@ -249,18 +244,6 @@ class _MazeGameContentState extends State<_MazeGameContent> {
     );
   }
 
-  int? _getStageNumberForLevel(int level) {
-    switch (level) {
-      case 1:
-        return 6;
-      case 2:
-        return 8;
-      case 3:
-        return 10;
-      default:
-        return null;
-    }
-  }
 }
 
 /// Back, difficulty, stars, timer and the two utility buttons, on one line.

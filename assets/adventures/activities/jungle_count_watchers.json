@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "jungle.count_watchers",
+  "engineId": "counting",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "jungle",
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "_comment": "Authored whole per locale. Arabic number-noun agreement is irregular (3-10 take a broken plural, 11+ a singular accusative), so a sentence built by substituting a count into a template produces wrong Arabic. The validator rejects a {count} placeholder in an ar string for exactly this reason.",
+    "prompt": {
+      "en": "How many animals are watching?",
+      "ar": "كَمْ حَيَوَانًا يُرَاقِب؟"
+    },
+    "hint1": {
+      "en": "Touch each one as you count it.",
+      "ar": "اِلْمِسْ كُلَّ وَاحِدٍ وَأَنْتَ تَعُدّ."
+    },
+    "hint2": {
+      "en": "Let's count together, one at a time.",
+      "ar": "لِنَعُدَّ مَعًا، وَاحِدًا تِلْوَ الآخَر."
+    },
+    "model": {
+      "en": "Watch me count them, then you try.",
+      "ar": "شَاهِدْنِي أَعُدُّهَا، ثُمَّ جَرِّبْ أَنْت."
+    },
+    "success": {
+      "en": "That is how many clues you have!",
+      "ar": "هَذَا عَدَدُ الأَدِلَّةِ الَّتِي مَعَك!"
+    }
+  },
+  "payload": {
+    "mode": "countAndPick",
+    "_comment": "tenFrame sits second on the arrangement ladder (dice, tenFrame, linear, scatter, random). It is the right place to start a first Adventure: structured enough to support the one-to-one sweep, not so structured that it gives the answer away.",
+    "layout": "tenFrame",
+    "countRange": [2, 5],
+    "roundCount": 3,
+    "optionSpread": 2,
+    "itemsRef": "packs/animals",
+    "itemIds": ["monkey", "bird", "rabbit"]
+  },
+  "support": {
+    "distractorCount": 2,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 2,
+    "max": 6
+  },
+  "elofGoal": "MATH.counting.cardinality",
+  "prereqSkills": ["MATH.counting.rote_5"],
+  "masteryThreshold": 0.8
+}

@@ -93,6 +93,12 @@ principles and nomenclature.
 
 ## Specific to Flutter
 
+> **Precedence.** `.specify/memory/constitution.md` is the authority for
+> architecture. Where this file and the constitution disagree, the constitution
+> wins and this file is the bug. The rules below were reconciled with it on
+> 2026-09-18; before that they prescribed Riverpod, get_it, freezed and
+> AutoRoute, none of which this codebase uses.
+
 ### Basic Principles
 
 - Use clean architecture
@@ -103,18 +109,24 @@ principles and nomenclature.
   - see entities if you need to organize code into entities
 - Use repository pattern for data persistence
   - see cache if you need to cache data
-- Use controller pattern for business logic with Riverpod
-- Use Riverpod to manage state
-  - see keepAlive if you need to keep the state alive
-- Use freezed to manage UI states
-- Controller always takes methods as input and updates the UI state that effects
-  the UI
-- Use getIt to manage dependencies
-  - Use singleton for services and repositories
-  - Use factory for use cases
-  - Use lazy singleton for controllers
-- Use AutoRoute to manage routes
-  - Use extras to pass data between pages
+- Use BLoC / Cubit (`flutter_bloc`) for business logic and shared state
+  - Local ephemeral state may live in a `StatefulWidget`; business logic may not
+  - A Cubit takes methods as input and emits the state that drives the UI
+- Write state classes as plain immutable Dart classes
+  - This project does not use `freezed`. Do not add code generation for state
+- Never use `static` variables, global state or singleton game state
+  - This is the project's first constitutional principle and it is enforced
+- Inject dependencies through constructors
+  - This project does not use `get_it` or any service locator
+  - Services that wrap hardware or OS features (TTS, audio) are injected
+    instances, not static singletons
+- Use Drift as the sole local persistence layer
+  - Prefer it over `SharedPreferences` for anything that is not a trivial flag
+- Navigate imperatively with `Navigator.push(MaterialPageRoute(...))`
+  - This project does not use `AutoRoute` or named routing. `app_router.dart`
+    and `routes.dart` are intentionally empty; do not populate them without a
+    decision to migrate wholesale, because two parallel navigation systems are
+    worse than one imperative one
 - Use extensions to manage reusable code
 - Use ThemeData to manage themes
 - Use AppLocalizations to manage translations

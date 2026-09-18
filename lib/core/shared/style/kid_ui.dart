@@ -37,8 +37,21 @@ class KidUi {
   static const double radiusCard = 28;
   static const double radiusPill = 999;
 
-  /// Minimum interactive edge for young children (~2cm on a typical phone).
+  /// Minimum interactive edge for chrome: back buttons, pips, replay.
+  ///
+  /// Comfortably above the 48dp adult minimum, but the comment this replaced
+  /// claimed it was the ~2cm young-child target and it is not — 76dp is about
+  /// 1.2cm on a typical phone. Use [minTouchYoung] for anything a child aims at
+  /// to answer.
   static const double minTouch = 76;
+
+  /// Minimum edge for a **primary** target inside an activity board.
+  ///
+  /// NN/g's guidance for young children is 2cm x 2cm, roughly 96-120dp: about
+  /// four times the adult minimum. Children aged 7-10 miss 7mm targets around
+  /// 30% of the time, and a miss recorded as a wrong answer is a measurement
+  /// error, not a learning signal. Engine boards size their cards from this.
+  static const double minTouchYoung = 112;
 
   // --- Motion ---------------------------------------------------------------
   static const Duration fast = Duration(milliseconds: 180);

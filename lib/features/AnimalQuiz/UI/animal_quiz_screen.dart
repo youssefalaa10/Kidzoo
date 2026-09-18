@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:kidzo/core/utils/assets.dart';
 
-import '../../../core/base/protected_game_screen.dart';
+import '../../../core/base/kid_game_screen.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
@@ -9,14 +9,14 @@ import '../../../core/services/background_resolver.dart';
 import '../data/model/animal_quiz_model.dart';
 import '../../../core/helpers/speech.dart';
 
-class AnimalQuizScreen extends ProtectedGameScreen {
+class AnimalQuizScreen extends KidGameScreen {
   const AnimalQuizScreen({required super.level, super.key});
 
   @override
   State<AnimalQuizScreen> createState() => _AnimalQuizScreenState();
 }
 
-class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
+class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
     with TTSMusicMixin {
   List<AnimalQuizModel> animals = [];
   List<AnimalQuizModel> chooseAnimals = [];

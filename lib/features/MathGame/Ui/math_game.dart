@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../core/base/protected_game_screen.dart';
+import '../../../core/base/kid_game_screen.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/shared/style/image_manager.dart';
@@ -12,14 +12,14 @@ import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
 import '../../../core/helpers/speech.dart';
 
-class MathGame extends ProtectedGameScreen {
+class MathGame extends KidGameScreen {
   const MathGame({required super.level, super.key});
 
   @override
   _MathGameState createState() => _MathGameState();
 }
 
-class _MathGameState extends ProtectedGameScreenState<MathGame>
+class _MathGameState extends KidGameScreenState<MathGame>
     with TickerProviderStateMixin {
   late ConfettiController _confettiController;
 

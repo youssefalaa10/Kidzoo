@@ -1,0 +1,129 @@
+{
+  "adventureId": "jungle",
+  "title": {
+    "en": "The Green Page",
+    "ar": "الصَّفْحَةُ الخَضْرَاء"
+  },
+  "backgroundType": "jungle",
+  "accent": "#4AC49A",
+  "rewardId": "green_page",
+  "rewardTitle": {
+    "en": "The Green Page",
+    "ar": "الصَّفْحَةُ الخَضْرَاء"
+  },
+  "_comment": "Every activity node sits inside a beat, and the result of each activity causes the next beat. That is the difference between a story and a themed list of drills: ask the animals and they SPEAK a clue; the count IS how many clues you hold; sorting them is what makes them point the way.",
+  "nodes": [
+    {
+      "nodeId": "jungle.n1",
+      "beat": "openingProblem",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/animal/bird.png",
+      "lines": [
+        {
+          "en": "Noor's book came apart, and the Green Page blew into the jungle.",
+          "ar": "تَمَزَّقَ كِتَابُ نُور، وَطَارَتِ الصَّفْحَةُ الخَضْرَاءُ إِلَى الغَابَة."
+        },
+        {
+          "en": "The jungle is big. But someone here saw where it went.",
+          "ar": "الغَابَةُ كَبِيرَة. لَكِنَّ أَحَدَهُمْ هُنَا رَأَى أَيْنَ ذَهَبَتْ."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n2",
+      "beat": "discovery",
+      "type": "activity",
+      "activityRef": "activities/jungle_ask_animals",
+      "lines": [
+        {
+          "en": "Ask the animals. Each one saw a little piece of it.",
+          "ar": "اِسْأَلِ الحَيَوَانَات. كُلُّ وَاحِدٍ رَأَى جُزْءًا صَغِيرًا."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n3",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/jungle_count_watchers",
+      "lines": [
+        {
+          "en": "More animals were watching than you thought. Count them - that is how many clues you have.",
+          "ar": "كَانَتْ حَيَوَانَاتٌ أَكْثَرُ مِمَّا ظَنَنْتَ تُرَاقِب. عُدَّهَا، فَهَذَا عَدَدُ الأَدِلَّةِ الَّتِي مَعَك."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n4",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/jungle_sort_watchers",
+      "lines": [
+        {
+          "en": "The animals came down to help. Send each one back where it was watching from, so it can point the way.",
+          "ar": "نَزَلَتِ الحَيَوَانَاتُ لِتُسَاعِد. أَعِدْ كُلَّ وَاحِدٍ إِلَى مَكَانِ مُرَاقَبَتِه، لِيَدُلَّكَ عَلَى الطَّرِيق."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n5",
+      "beat": "progress",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/animal/monkey.png",
+      "lines": [
+        {
+          "en": "Every animal is pointing the same way now - down, past the wide leaves.",
+          "ar": "كُلُّ الحَيَوَانَاتِ تُشِيرُ إِلَى الاِتِّجَاهِ نَفْسِهِ الآن: إِلَى الأَسْفَل، خَلْفَ الأَوْرَاقِ العَرِيضَة."
+        },
+        {
+          "en": "Noor says: it must be very close.",
+          "ar": "تَقُولُ نُور: لَا بُدَّ أَنَّهَا قَرِيبَةٌ جِدًّا."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n6",
+      "beat": "climax",
+      "type": "activity",
+      "activityRef": "activities/jungle_find_page",
+      "lines": [
+        {
+          "en": "There are leaves everywhere. Look carefully.",
+          "ar": "الأَوْرَاقُ فِي كُلِّ مَكَان. اُنْظُرْ بِتَمَعُّن."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n7",
+      "beat": "resolution",
+      "type": "storyBeat",
+      "rewardId": "green_page",
+      "speakerArt": "assets/gen/images/animal/monkey.png",
+      "lines": [
+        {
+          "en": "You found it! The Green Page goes back into the book.",
+          "ar": "لَقَدْ وَجَدْتَهَا! تَعُودُ الصَّفْحَةُ الخَضْرَاءُ إِلَى الكِتَاب."
+        },
+        {
+          "en": "The book feels heavier now. That is a good thing.",
+          "ar": "أَصْبَحَ الكِتَابُ أَثْقَلَ الآن. وَهَذَا شَيْءٌ جَمِيل."
+        }
+      ]
+    },
+    {
+      "nodeId": "jungle.n8",
+      "beat": "clueOnward",
+      "type": "storyBeat",
+      "lines": [
+        {
+          "en": "On the mended page there is a drawing: a busy market, full of colour.",
+          "ar": "عَلَى الصَّفْحَةِ المُرَمَّمَةِ رَسْم: سُوقٌ مُزْدَحِم، مَلِيءٌ بِالأَلْوَان."
+        },
+        {
+          "en": "That is where the next page went.",
+          "ar": "إِلَى هُنَاكَ ذَهَبَتِ الصَّفْحَةُ التَّالِيَة."
+        }
+      ]
+    }
+  ]
+}

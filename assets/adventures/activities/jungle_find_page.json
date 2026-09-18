@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "jungle.find_page",
+  "engineId": "hidden_clue",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "jungle",
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "The Green Page is hiding in the leaves. Can you find it?",
+      "ar": "الصَّفْحَةُ الخَضْرَاءُ مُخْتَبِئَةٌ بَيْنَ الأَوْرَاق. هَلْ تَجِدُهَا؟"
+    },
+    "hint1": {
+      "en": "Look near the big leaves.",
+      "ar": "اُنْظُرْ قُرْبَ الأَوْرَاقِ الكَبِيرَة."
+    },
+    "hint2": {
+      "en": "It is lower down, not up in the sky.",
+      "ar": "إِنَّهَا فِي الأَسْفَل، لَيْسَتْ فِي السَّمَاء."
+    },
+    "model": {
+      "en": "There it is. Touch it and it is yours.",
+      "ar": "هَا هِيَ. اِلْمِسْهَا فَتُصْبِحَ لَك."
+    },
+    "success": {
+      "en": "You found the Green Page!",
+      "ar": "لَقَدْ وَجَدْتَ الصَّفْحَةَ الخَضْرَاء!"
+    }
+  },
+  "payload": {
+    "_comment": "Positions are whole percentages of the scene box, so one authored scene works on a phone, a tablet and in landscape. Hidden-object scenes do NOT mirror in Arabic: a painted jungle is a picture, not a line of text.",
+    "clues": [
+      {
+        "id": "green_page",
+        "positionPercent": [68, 61],
+        "image": "assets/gen/images/shapes/square.png",
+        "scale": 0.9,
+        "label": { "en": "the Green Page", "ar": "الصَّفْحَةُ الخَضْرَاء" }
+      }
+    ],
+    "visualNoiseCount": 7,
+    "revealOnIdleSeconds": 15,
+    "hitToleranceFraction": 0.14,
+    "itemsRef": "packs/animals",
+    "noiseItemIds": ["monkey", "bird", "rabbit", "fish"]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "elofGoal": "COG.visual_search.sustained_attention",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

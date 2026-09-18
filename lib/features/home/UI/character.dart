@@ -4,6 +4,7 @@ import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/mixins/background_music_mixin.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/features/Adventure/story/ui/adventure_map_screen.dart';
 import 'package:kidzo/features/AppCategory/education_screen.dart';
 import 'package:kidzo/features/AppCategory/games_screen.dart';
 import 'package:kidzo/features/Profile/kid_profile_screen.dart';
@@ -14,8 +15,6 @@ import '../../../core/localization/language_provider.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../../Alphabets/bloc/alphabet_bloc.dart';
-import '../../LevelsMap/Data/Logic/cubit/levelmap_cubit.dart';
-import '../../LevelsMap/levelmap_screen.dart';
 import '../../Profile/profile_cubit.dart';
 import '../../Profile/profile_state.dart';
 
@@ -59,17 +58,22 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
           child: const EducationScreen(),
         ),
       ),
+      // What used to be "Challenge" is now Adventures. The old level map was
+      // 18 hand-placed nodes with no story, and its only way to grow was more
+      // hardcoded nodes. This entry keeps the same place on the home carousel
+      // so nothing moves under the child, but leads somewhere that can grow by
+      // adding content instead of code.
       CharacterCategory(
-        name: l10n.challenge,
-        characterName: l10n.challenge,
-        characterDesc: l10n.challengeYourself,
-        color: Colors.purple.shade100,
-        buttonLabel: l10n.compete,
-        characterImage: ImageManager.brainstorming,
-        screen: BlocProvider(
-          create: (context) => LevelCubit(),
-          child: const LevelMapScreen(),
+        name: l10n.resolve('adventures', fallback: 'Adventures'),
+        characterName: l10n.resolve('adventures', fallback: 'Adventures'),
+        characterDesc: l10n.resolve(
+          'adventuresSubtitle',
+          fallback: 'Bring the lost pages home',
         ),
+        color: Colors.purple.shade100,
+        buttonLabel: l10n.resolve('adventureStart', fallback: 'Start'),
+        characterImage: ImageManager.brainstorming,
+        screen: const AdventureMapScreen(),
       ),
     ];
   }
