@@ -25,6 +25,18 @@ class KidUi {
   static const Color fruit = Color(0xFFFF8A3D);
   static const Color vegetable = Color(0xFF5FBF5A);
 
+  // --- Scenery --------------------------------------------------------------
+  // Natural colours for drawn scene objects. They live here rather than in the
+  // engine that draws them because an engine that invents its own palette is
+  // how every game drifted apart visually in the first place, and because a
+  // second scene - a market, an ocean - will want the same greys and browns.
+  static const Color foliage = Color(0xFF4E9A5B);
+  static const Color foliageDeep = Color(0xFF357347);
+  static const Color stone = Color(0xFF9AA0A8);
+  static const Color bark = Color(0xFF8A6647);
+  static const Color barkCut = Color(0xFFC9A57E);
+  static const Color blossom = Color(0xFFF7B0C8);
+
   static const List<Color> confettiColors = [
     Color(0xFFFFC53D),
     Color(0xFF4AC49A),

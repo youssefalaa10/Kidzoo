@@ -667,6 +667,42 @@ void main() {
         }
       }
     });
+
+    test('every asset path inside an activity payload exists on disk', () {
+      // Only `rewardArt` used to be checked, so a mistyped path anywhere in a
+      // payload - a clue image, a scene prop, a cover - shipped as a grey box
+      // in a child's game and nothing failed. Walking the payload catches all
+      // of them, including the fields no engine has invented yet.
+      final List<String> missing = <String>[];
+
+      void walk(Object? node, String where) {
+        if (node is String) {
+          if (node.startsWith('assets/') && !File(node).existsSync()) {
+            missing.add('$where -> $node');
+          }
+          return;
+        }
+        if (node is List<dynamic>) {
+          for (int index = 0; index < node.length; index++) {
+            walk(node[index], '$where[$index]');
+          }
+          return;
+        }
+        if (node is Map<String, dynamic>) {
+          node.forEach((String key, Object? value) {
+            // `_comment` fields are prose and may mention a path in passing.
+            if (!key.startsWith('_')) {
+              walk(value, '$where.$key');
+            }
+          });
+        }
+      }
+
+      for (final ActivitySpec spec in bundle.activities.values) {
+        walk(spec.payload, spec.sourcePath);
+      }
+      expect(missing, isEmpty, reason: 'missing art: $missing');
+    });
   });
 
   group('A sorting activity holds constant what it says it holds constant', () {
