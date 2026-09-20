@@ -1,6 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:kidzo/core/database/config.dart';
 import 'package:kidzo/core/database/tables/story_tables.dart';
+import 'package:kidzo/features/Adventure/story/models/story_models.dart';
+import 'package:kidzo/features/Adventure/story/models/story_resume.dart';
 
 part 'story_dao.g.dart';
 
@@ -42,15 +44,59 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
         .watch();
   }
 
+  /// The whole resume cursor for one Adventure, or null if it is untouched.
+  Future<StoryResumePoint?> resumePointFor(
+    int profileId,
+    String adventureId,
+  ) async {
+    final StoryChapterProgressData? row =
+        await chapterFor(profileId, adventureId);
+    if (row == null) {
+      return null;
+    }
+    return StoryResumePoint(
+      profileId: profileId,
+      adventureId: adventureId,
+      nodeId: row.currentNodeId,
+      beat: _beatNamed(row.currentBeat),
+      activity: ActivityCheckpoint.decode(row.activityCheckpoint),
+      isChapterCompleted: row.isCompleted,
+      updatedAt: row.lastPlayedAt,
+    );
+  }
+
+  /// A stored beat name, or null when it is absent or no longer a beat.
+  ///
+  /// Non-throwing on purpose. A beat removed from the enum between releases
+  /// must degrade to "no hint about where they were", never to a crash on the
+  /// way into a story.
+  static StoryBeat? _beatNamed(String? raw) {
+    if (raw == null) {
+      return null;
+    }
+    for (final StoryBeat beat in StoryBeat.values) {
+      if (beat.name == raw) {
+        return beat;
+      }
+    }
+    return null;
+  }
+
   /// Records where the child currently is.
   ///
   /// Written on *entering* each node rather than only on finishing one, because
   /// a force-kill mid-Adventure is the common case at this age, not the edge
   /// case. Costs one small write per beat and makes resume exact.
+  ///
+  /// Moving to a **different** node drops any activity checkpoint, because a
+  /// checkpoint belongs to the activity that wrote it. Re-entering the *same*
+  /// node keeps it — which is exactly the resume path, where the runner has
+  /// already read the checkpoint and is about to hand it to the engine.
   Future<void> saveResumePoint({
     required int profileId,
     required String adventureId,
     required String nodeId,
+    StoryBeat? beat,
   }) async {
     final StoryChapterProgressData? existing =
         await chapterFor(profileId, adventureId);
@@ -62,6 +108,7 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
           profileId: profileId,
           adventureId: adventureId,
           currentNodeId: Value<String?>(nodeId),
+          currentBeat: Value<String?>(beat?.name),
           startedAt: Value<DateTime>(now),
           lastPlayedAt: Value<DateTime>(now),
         ),
@@ -69,11 +116,61 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
       return;
     }
 
+    final bool isSameNode = existing.currentNodeId == nodeId;
     await (update(storyChapterProgress)
           ..where((StoryChapterProgress t) => t.id.equals(existing.id)))
         .write(StoryChapterProgressCompanion(
       currentNodeId: Value<String?>(nodeId),
+      currentBeat: Value<String?>(beat?.name),
       lastPlayedAt: Value<DateTime>(now),
+      activityCheckpoint: isSameNode
+          ? const Value<String?>.absent()
+          : const Value<String?>(null),
+    ));
+  }
+
+  /// Stores where the child is **inside** the activity they are playing.
+  ///
+  /// Called at every step boundary, not on the way out. That is the whole
+  /// point: an exit callback does not run when the OS kills the app, and on a
+  /// tablet handed back to a parent mid-round that is most of how a session
+  /// ends. One small write per step buys exactness for the case that actually
+  /// happens.
+  Future<void> saveActivityCheckpoint({
+    required int profileId,
+    required String adventureId,
+    required ActivityCheckpoint checkpoint,
+  }) async {
+    final StoryChapterProgressData? existing =
+        await chapterFor(profileId, adventureId);
+    if (existing == null) {
+      return;
+    }
+    await (update(storyChapterProgress)
+          ..where((StoryChapterProgress t) => t.id.equals(existing.id)))
+        .write(StoryChapterProgressCompanion(
+      activityCheckpoint: Value<String?>(checkpoint.encode()),
+      lastPlayedAt: Value<DateTime>(DateTime.now()),
+    ));
+  }
+
+  /// Forgets the in-flight activity, leaving the story position alone.
+  ///
+  /// Called when an activity finishes, so a later replay of the same node
+  /// starts it over rather than resuming a run the child already completed.
+  Future<void> clearActivityCheckpoint({
+    required int profileId,
+    required String adventureId,
+  }) async {
+    final StoryChapterProgressData? existing =
+        await chapterFor(profileId, adventureId);
+    if (existing == null || existing.activityCheckpoint == null) {
+      return;
+    }
+    await (update(storyChapterProgress)
+          ..where((StoryChapterProgress t) => t.id.equals(existing.id)))
+        .write(const StoryChapterProgressCompanion(
+      activityCheckpoint: Value<String?>(null),
     ));
   }
 
@@ -91,6 +188,7 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
           profileId: profileId,
           adventureId: adventureId,
           currentNodeId: const Value<String?>(null),
+          currentBeat: const Value<String?>(null),
           isCompleted: const Value<bool>(true),
           startedAt: Value<DateTime>(now),
           completedAt: Value<DateTime?>(now),
@@ -103,7 +201,13 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
     await (update(storyChapterProgress)
           ..where((StoryChapterProgress t) => t.id.equals(existing.id)))
         .write(StoryChapterProgressCompanion(
+      // Cleared together, and that pairing is load-bearing: a null node on a
+      // completed chapter is what distinguishes "finished" from "finished once
+      // and playing it again right now". Collapsing those two was how a replay
+      // threw away every beat the child had just played.
       currentNodeId: const Value<String?>(null),
+      currentBeat: const Value<String?>(null),
+      activityCheckpoint: const Value<String?>(null),
       isCompleted: const Value<bool>(true),
       completedAt: Value<DateTime?>(now),
       lastPlayedAt: Value<DateTime>(now),
@@ -201,7 +305,13 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
   // ------------------------------------------------------------------ rewards
 
   /// Grants a page. Idempotent: replaying an Adventure must not duplicate it.
-  Future<void> grantReward({
+  ///
+  /// Returns whether this call is what earned it. The table was always
+  /// idempotent; the *celebration* was not, so a child who closed the app on
+  /// the resolution beat watched the page fly into the book again every time
+  /// they came back. Telling the caller which of the two happened is what lets
+  /// the story celebrate exactly once.
+  Future<bool> grantReward({
     required int profileId,
     required String rewardId,
     required String adventureId,
@@ -211,7 +321,7 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
               t.profileId.equals(profileId) & t.rewardId.equals(rewardId)))
         .getSingleOrNull();
     if (existing != null) {
-      return;
+      return false;
     }
     await into(storyRewards).insert(
       StoryRewardsCompanion.insert(
@@ -220,6 +330,7 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
         adventureId: adventureId,
       ),
     );
+    return true;
   }
 
   Future<List<StoryReward>> rewardsFor(int profileId) {

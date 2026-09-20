@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.fruit_bowl",
+  "engineId": "counting",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Put that many in the bowl, then hand it to Dalia.",
+      "ar": "ضَعْ هَذَا العَدَدَ فِي الطَّبَق، ثُمَّ نَاوِلْهُ لِدَالْيَا."
+    },
+    "hint1": {
+      "en": "Count them as you put each one in.",
+      "ar": "عُدَّهَا وَأَنْتَ تَضَعُ كُلَّ وَاحِدَة."
+    },
+    "hint2": {
+      "en": "Take one back out if you went too far.",
+      "ar": "أَخْرِجْ وَاحِدَةً إِنْ زِدْت."
+    },
+    "model": {
+      "en": "Watch. That is what that many looks like. Now you make one.",
+      "ar": "شَاهِد. هَكَذَا يَبْدُو هَذَا العَدَد. اِصْنَعْ أَنْتَ وَاحِدًا الآن."
+    },
+    "success": {
+      "en": "The bowl is exactly right. The first customer is happy.",
+      "ar": "الطَّبَقُ صَحِيحٌ تَمَامًا. أَوَّلُ زَبُونَةٍ سَعِيدَة."
+    }
+  },
+  "payload": {
+    "_comment": "giveN, not countAndPick, and that is the whole reason this activity is here rather than being a second counting scene. 'How many are there?' can be answered by reciting over the objects; 'bring me three' cannot. A child who can count to ten out loud and still hands over a fistful has not yet got cardinality, and this is the only task in the chapter that would notice.",
+    "_supplyComment": "The counter always holds more than the answer. A supply of exactly the right size answers the question for the child — take everything, hand it over — which is the classic way a give-N task is defeated by accident.",
+    "mode": "giveN",
+    "layout": "linear",
+    "optionSpread": 2,
+    "itemsRef": "packs/market_goods",
+    "rounds": [
+      {
+        "itemId": "apple",
+        "targetCount": 3,
+        "prompt": {
+          "en": "She asked for three apples. Put three in the bowl.",
+          "ar": "طَلَبَتْ ثَلَاثَ تُفَّاحَات. ضَعْ ثَلَاثًا فِي الطَّبَق."
+        },
+        "revealLine": {
+          "en": "Three apples. Just what she asked for.",
+          "ar": "ثَلَاثُ تُفَّاحَات. تَمَامًا كَمَا طَلَبَتْ."
+        }
+      },
+      {
+        "itemId": "banana",
+        "targetCount": 2,
+        "prompt": {
+          "en": "And two bananas on top.",
+          "ar": "وَمَوْزَتَانِ فَوْقَهَا."
+        },
+        "revealLine": {
+          "en": "Two bananas. The bowl is nearly done.",
+          "ar": "مَوْزَتَان. كَادَ الطَّبَقُ يَكْتَمِل."
+        }
+      },
+      {
+        "itemId": "grapes",
+        "targetCount": 4,
+        "prompt": {
+          "en": "Last of all, four bunches of grapes.",
+          "ar": "وَأَخِيرًا، أَرْبَعَةُ عَنَاقِيدَ مِنَ العِنَب."
+        },
+        "revealLine": {
+          "en": "Four bunches. That is the whole bowl.",
+          "ar": "أَرْبَعَةُ عَنَاقِيد. اِكْتَمَلَ الطَّبَقُ كُلُّه."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 2,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 2,
+    "max": 6
+  },
+  "elofGoal": "MATH.counting.produce_set",
+  "prereqSkills": ["MATH.counting.cardinality"],
+  "masteryThreshold": 0.8
+}
