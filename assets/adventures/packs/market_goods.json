@@ -1,0 +1,73 @@
+{
+  "packId": "market_goods",
+  "_comment": "Goods a stall sells. Arabic labels carry full harakat: diacritics are not optional for ages 3-8, and the benefit of vowelisation is strongest in exactly this band.",
+  "_attributeComment": "`stall` is what the restocking activity sorts on. `weight` is what the balance weighs, and it lives HERE rather than in the activity file so a crate weighs the same in every story it appears in — a thing that is heavy in one chapter and light in the next is not a world, it is a quiz. `size` is held constant by the sorting activity so the child cannot sort by bulk instead of by kind.",
+  "items": [
+    {
+      "id": "apple",
+      "image": "assets/gen/images/fruits/apple.png",
+      "label": { "en": "apple", "ar": "تُفَّاحَة" },
+      "attributes": { "stall": "fruit", "weight": "1", "size": "small", "colour": "red" }
+    },
+    {
+      "id": "orange",
+      "image": "assets/gen/images/fruits/orange.png",
+      "label": { "en": "orange", "ar": "بُرْتُقَالَة" },
+      "attributes": { "stall": "fruit", "weight": "2", "size": "small", "colour": "orange" }
+    },
+    {
+      "id": "banana",
+      "image": "assets/gen/images/fruits/banana.png",
+      "label": { "en": "banana", "ar": "مَوْزَة" },
+      "attributes": { "stall": "fruit", "weight": "1", "size": "small", "colour": "yellow" }
+    },
+    {
+      "id": "grapes",
+      "image": "assets/gen/images/fruits/grapes.png",
+      "label": { "en": "grapes", "ar": "عِنَب" },
+      "attributes": { "stall": "fruit", "weight": "2", "size": "small", "colour": "purple" }
+    },
+    {
+      "id": "watermelon",
+      "image": "assets/gen/images/fruits/watermelon.png",
+      "label": { "en": "watermelon", "ar": "بِطِّيخَة" },
+      "attributes": { "stall": "fruit", "weight": "5", "size": "big", "colour": "green" }
+    },
+    {
+      "id": "carrot",
+      "image": "assets/gen/images/vegetables/carrot.png",
+      "label": { "en": "carrot", "ar": "جَزَرَة" },
+      "attributes": { "stall": "vegetable", "weight": "1", "size": "small", "colour": "orange" }
+    },
+    {
+      "id": "red_pepper",
+      "image": "assets/gen/images/vegetables/red_pepper.png",
+      "label": { "en": "red pepper", "ar": "فُلْفُلٌ أَحْمَر" },
+      "attributes": { "stall": "vegetable", "weight": "2", "size": "small", "colour": "red" }
+    },
+    {
+      "id": "onion",
+      "image": "assets/gen/images/vegetables/onion.png",
+      "label": { "en": "onion", "ar": "بَصَلَة" },
+      "attributes": { "stall": "vegetable", "weight": "1", "size": "small", "colour": "white" }
+    },
+    {
+      "id": "corn",
+      "image": "assets/gen/images/vegetables/corn.png",
+      "label": { "en": "corn", "ar": "ذُرَة" },
+      "attributes": { "stall": "vegetable", "weight": "2", "size": "small", "colour": "yellow" }
+    },
+    {
+      "id": "cabbage",
+      "image": "assets/gen/images/vegetables/cabbage.png",
+      "label": { "en": "cabbage", "ar": "مَلْفُوف" },
+      "attributes": { "stall": "vegetable", "weight": "3", "size": "big", "colour": "green" }
+    },
+    {
+      "id": "potato",
+      "image": "assets/gen/images/vegetables/potato.png",
+      "label": { "en": "potato", "ar": "بَطَاطِس" },
+      "attributes": { "stall": "vegetable", "weight": "2", "size": "small", "colour": "brown" }
+    }
+  ]
+}

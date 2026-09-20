@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_attempt.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
@@ -8,6 +9,7 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_soundboard.dart';
 import 'package:kidzo/features/Adventure/engine/support/number_words.dart';
+import 'package:kidzo/features/Adventure/story/models/story_resume.dart';
 
 /// Everything one run of an activity needs.
 class ActivitySession<TContent extends ActivityContent> {
@@ -15,16 +17,37 @@ class ActivitySession<TContent extends ActivityContent> {
     required this.spec,
     required this.content,
     required this.services,
+    required this.engineId,
+    required this.engineSchemaVersion,
     this.storyNodeId,
+    this.seed = 0,
+    this.resume,
   });
 
   final ActivitySpec spec;
   final TContent content;
   final ActivityServices services;
 
+  /// The engine running this session, carried so a checkpoint can name the
+  /// engine and the content schema it was written against.
+  final String engineId;
+  final int engineSchemaVersion;
+
   /// Set when the activity is running inside a story node, so telemetry can be
   /// joined back to the beat it served.
   final String? storyNodeId;
+
+  /// The seed `services.random` was constructed from.
+  ///
+  /// Held here as well as inside the `Random` because a `Random` cannot be
+  /// asked what seeded it, and resume depends on reproducing the exact board:
+  /// a checkpoint that says "step three" is only meaningful alongside the seed
+  /// that decided what step three *is*.
+  final int seed;
+
+  /// Where a previous, interrupted run of this same activity got to, or null
+  /// for a fresh start. Validated by the cubit before it is honoured.
+  final ActivityCheckpoint? resume;
 }
 
 /// The base every engine cubit extends.
@@ -59,6 +82,17 @@ abstract class ActivityCubit<TContent extends ActivityContent,
   int _stepsIndependent = 0;
   int _hintsUsed = 0;
   bool _hasStarted = false;
+
+  /// Seconds already spent on this activity before it was interrupted, so a
+  /// resumed run reports the time the child actually spent rather than only
+  /// the time since they came back.
+  int _elapsedSecondsBeforeResume = 0;
+
+  /// True when this run picked up a checkpoint rather than starting fresh.
+  /// Read by tests and by the result snapshot; nothing branches on it.
+  bool _didResume = false;
+
+  bool get didResumeFromCheckpoint => _didResume;
 
   /// The last thing said, so the same sentence is never said twice running.
   String? _lastSpokenLine;
@@ -97,9 +131,63 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       stepsTotal: _hasStarted && _steps.isNotEmpty ? _steps.length : 0,
       stepsIndependent: _stepsIndependent,
       hintsUsed: _hintsUsed,
-      durationSeconds: _stopwatch.elapsed.inSeconds,
+      durationSeconds:
+          _elapsedSecondsBeforeResume + _stopwatch.elapsed.inSeconds,
     );
   }
+
+  /// The cursor describing where this run is right now.
+  ActivityCheckpoint _checkpoint() {
+    return ActivityCheckpoint(
+      activityId: spec.instanceId,
+      engineId: session.engineId,
+      engineSchemaVersion: session.engineSchemaVersion,
+      seed: session.seed,
+      stepIndex: _stepIndex,
+      score: _score,
+      stepsIndependent: _stepsIndependent,
+      hintsUsed: _hintsUsed,
+      elapsedSeconds:
+          _elapsedSecondsBeforeResume + _stopwatch.elapsed.inSeconds,
+      enginePayload: captureResumePayload(),
+    );
+  }
+
+  /// Persists the current position.
+  ///
+  /// Called at every step boundary — a point where nothing is half-placed and
+  /// no narration is mid-sentence — and never mid-attempt. Saving inside a
+  /// step would let a child return to a board frozen part-way through a
+  /// gesture they have already forgotten making.
+  Future<void> _saveCheckpoint() async {
+    if (state.status != ActivityStatus.running) {
+      return;
+    }
+    await services.checkpointSink.save(_checkpoint());
+  }
+
+  /// A secondary flush, for the lifecycle callbacks that may or may not run.
+  ///
+  /// Everything it writes has already been written at the last step boundary.
+  /// It exists so that a long step interrupted by a backgrounding keeps the
+  /// score and hint counts accumulated within it, and **not** as the mechanism
+  /// progress depends on: an app killed by the OS never reaches here.
+  Future<void> flushCheckpoint() => _saveCheckpoint();
+
+  /// Engine-specific board state worth restoring, or null.
+  ///
+  /// Overridden by nothing today, which is the intended steady state. An engine
+  /// tempted to override it should first ask whether what it wants to restore
+  /// is really a *step*; it usually is, and a step index is already persisted.
+  /// Whatever is returned must be logical progress, never a position, an offset
+  /// or a frame.
+  @protected
+  Map<String, dynamic>? captureResumePayload() => null;
+
+  /// The counterpart to [captureResumePayload], called before the first emit of
+  /// a resumed run.
+  @protected
+  void restoreResumePayload(Map<String, dynamic> payload) {}
 
   Future<void> start() async {
     if (_hasStarted) {
@@ -122,17 +210,63 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       ));
       return;
     }
+    _applyResumeCheckpoint();
     _stopwatch.start();
     _emitSafely(ActivityState(
       status: ActivityStatus.running,
       engineStep: currentStep,
       languageCode: services.languageCode,
+      stepIndex: _stepIndex,
       stepCount: _steps.length,
       view: describe(currentStep, ScaffoldLevel.initial),
       isBoardLocked: true,
     ));
+    // Written before the first prompt, not after it. A child who opens an
+    // activity and is interrupted three seconds later has still *arrived*, and
+    // the story should reopen on the activity rather than on the beat before.
+    await _saveCheckpoint();
     await _speakPrompt();
     _unlockBoard();
+  }
+
+  /// Restores an interrupted run, or quietly starts over.
+  ///
+  /// The whole no-op path is the requirement, not a fallback: a checkpoint from
+  /// a different activity, a different engine, an engine whose step generation
+  /// has changed, or a step index the current content no longer has, all mean
+  /// the same thing. Restart **this mini-game**, keep the Adventure. The
+  /// alternative — guessing — drops a four-year-old onto a step that may not
+  /// exist, and the failure would look to them like the app being broken.
+  void _applyResumeCheckpoint() {
+    final ActivityCheckpoint? checkpoint = session.resume;
+    if (checkpoint == null) {
+      return;
+    }
+    if (!checkpoint.appliesTo(
+      activityId: spec.instanceId,
+      engineId: session.engineId,
+      engineSchemaVersion: session.engineSchemaVersion,
+      stepCount: _steps.length,
+    )) {
+      return;
+    }
+    // The seed decided what each step *is*. Resuming at step three under a
+    // different seed would restore an index into a board that no longer
+    // exists, which is worse than starting over because it looks like it
+    // worked.
+    if (checkpoint.seed != session.seed) {
+      return;
+    }
+    _didResume = true;
+    _stepIndex = checkpoint.stepIndex;
+    _score = checkpoint.score;
+    _stepsIndependent = checkpoint.stepsIndependent;
+    _hintsUsed = checkpoint.hintsUsed;
+    _elapsedSecondsBeforeResume = checkpoint.elapsedSeconds;
+    final Map<String, dynamic>? payload = checkpoint.enginePayload;
+    if (payload != null) {
+      restoreResumePayload(payload);
+    }
   }
 
   /// The single entry point for everything the child does.
@@ -300,6 +434,10 @@ abstract class ActivityCubit<TContent extends ActivityContent,
     _stepIndex++;
     _wrongOnStep = 0;
     _attemptsOnStep = 0;
+    // The step boundary *is* the safe point, so the write happens here rather
+    // than on the way out. Everything before this line is finished business:
+    // the previous step was judged, scored and spoken to completion.
+    await _saveCheckpoint();
     _emitSafely(state.copyWith(
       stepIndex: _stepIndex,
       engineStep: currentStep,
@@ -318,6 +456,11 @@ abstract class ActivityCubit<TContent extends ActivityContent,
   Future<void> _finish(ActivityCompletion completion) async {
     _stopwatch.stop();
     if (completion == ActivityCompletion.completed) {
+      // The run is over, so its cursor is no longer "where the child is". Left
+      // behind, it would resume a finished run the next time this node was
+      // replayed. An abandoned run keeps its cursor on purpose: that is the
+      // one the child is coming back to.
+      await services.checkpointSink.clear();
       await services.soundboard.play(ActivitySound.celebrate);
       // Spoken once, here, and not after every step. `narration.success` is
       // the activity's closing line — "that is nine clues!" — and saying it
@@ -341,6 +484,10 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       return;
     }
     await services.narrator.cancel();
+    // A last flush before the state turns terminal, so the score and hints
+    // earned inside the step in progress survive alongside the step index the
+    // last boundary already stored.
+    await _saveCheckpoint();
     await _finish(ActivityCompletion.abandoned);
   }
 

@@ -359,9 +359,14 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
             .where((StoryChapterProgressData chapter) => chapter.isCompleted)
             .map((StoryChapterProgressData chapter) => chapter.adventureId)
             .toSet();
+        // A live `currentNodeId` means there is something to continue — whether
+        // or not the story has ever been finished. Excluding completed
+        // chapters here used to hide the one case where the label mattered
+        // most: a child part-way through a *replay*, who was told "Again" and
+        // then restarted from the first line.
         final Set<String> started = chapters
             .where((StoryChapterProgressData chapter) =>
-                !chapter.isCompleted && chapter.currentNodeId != null)
+                chapter.currentNodeId != null)
             .map((StoryChapterProgressData chapter) => chapter.adventureId)
             .toSet();
 
@@ -410,10 +415,18 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
   }
 
   /// What a bead says about itself when a child asks.
+  ///
+  /// Opening a bead with a story in progress *continues* it, with no
+  /// confirmation in between. A four-year-old cannot read "Do you want to
+  /// resume?", and a modal that asks them to choose between two words they
+  /// cannot read is a wall, not a safeguard — so the label is the whole of the
+  /// affordance and the tap does the obvious thing.
   String _statusLabelFor(MapStop stop, bool isInProgress) {
     switch (stop.state) {
       case MapStopState.completed:
-        return widget.l10n.resolve('adventureReplay', fallback: 'Again');
+        return isInProgress
+            ? widget.l10n.resolve('adventureResume', fallback: 'Continue')
+            : widget.l10n.resolve('adventureReplay', fallback: 'Again');
       case MapStopState.open:
         return isInProgress
             ? widget.l10n.resolve('adventureResume', fallback: 'Continue')

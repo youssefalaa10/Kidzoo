@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
@@ -356,7 +355,7 @@ void main() {
           await ui.instantiateImageCodec(data.buffer.asUint8List());
       final ui.FrameInfo frame = await codec.getNextFrame();
       final ByteData? pixels =
-          await frame.image.toByteData(format: ui.ImageByteFormat.rawRgba);
+          await frame.image.toByteData();
       expect(pixels, isNotNull);
 
       int green = 0;
@@ -519,7 +518,7 @@ void main() {
       final AdventureRewardBook book = AdventureRewardBook.fromBundle(
         bundle: bundle,
         arc: bundle.primaryArc,
-        earnedIds: <String>{'green_page'},
+        earnedIds: const <String>{'green_page'},
       );
       expect(book.total, bundle.primaryArc.adventureIds.length);
       expect(book.earnedCount, 1);

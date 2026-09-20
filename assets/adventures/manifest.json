@@ -5,15 +5,24 @@
     "lost_pages"
   ],
   "adventures": [
-    "jungle"
+    "jungle",
+    "market"
   ],
   "activities": [
     "jungle_ask_animals",
     "jungle_count_watchers",
     "jungle_sort_watchers",
-    "jungle_find_page"
+    "jungle_find_page",
+    "market_find_list",
+    "market_restock",
+    "market_weigh_orders",
+    "market_deliver",
+    "market_fruit_bowl",
+    "market_lend_a_hand",
+    "market_mend_sign"
   ],
   "packs": [
-    "animals"
+    "animals",
+    "market_goods"
   ]
 }

@@ -82,6 +82,20 @@ class _CountingBoardState extends State<CountingBoard> {
 
   @override
   Widget build(BuildContext context) {
+    // "How many are there?" and "bring me five" are two different questions,
+    // and only the second one tests cardinality — a child can recite
+    // "one, two, three" over three objects without yet understanding that
+    // *three* is the set. The mode was in the content schema from the start
+    // with no board behind it, which meant an author could ask for the harder
+    // question and silently get the easier one.
+    if (widget.step.mode == CountingMode.giveN) {
+      return _GiveNBoard(
+        step: widget.step,
+        state: widget.state,
+        submit: widget.submit,
+        languageCode: widget.languageCode,
+      );
+    }
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final KidMetrics metrics = KidMetrics.of(constraints);
@@ -646,3 +660,220 @@ class _NumeralButton extends StatelessWidget {
     );
   }
 }
+
+
+/// Producing a set of a stated size, rather than naming the size of one shown.
+///
+/// The child moves things into the bowl one at a time and hands it over when
+/// they think it is right. Taking something back out is as easy as putting it
+/// in, because a count you cannot correct is a count a four-year-old abandons.
+///
+/// Nothing here is judged until the bowl is handed over: filling and emptying
+/// report a tally, which the cubit speaks and does not score.
+class _GiveNBoard extends StatefulWidget {
+  const _GiveNBoard({
+    required this.step,
+    required this.state,
+    required this.submit,
+    required this.languageCode,
+  });
+
+  final CountingStep step;
+  final ActivityState state;
+  final ActivityAttemptCallback submit;
+  final String languageCode;
+
+  @override
+  State<_GiveNBoard> createState() => _GiveNBoardState();
+}
+
+class _GiveNBoardState extends State<_GiveNBoard> {
+  int _inBowl = 0;
+
+  /// How many are on the counter to draw from.
+  ///
+  /// Comfortably more than the answer. A supply that held exactly the right
+  /// number would answer the question for the child — take everything, hand it
+  /// over — which is the classic way a give-N task is accidentally defeated.
+  int get _supply => widget.step.targetCount + 3;
+
+  @override
+  void didUpdateWidget(_GiveNBoard oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.step.stepId != widget.step.stepId) {
+      setState(() => _inBowl = 0);
+    }
+    if (!oldWidget.state.isDemonstrating && widget.state.isDemonstrating) {
+      // Fill it correctly so the child sees what the number looks like, then
+      // empty it so they are the one who makes it.
+      setState(() => _inBowl = widget.step.targetCount);
+    } else if (oldWidget.state.isDemonstrating &&
+        !widget.state.isDemonstrating) {
+      setState(() => _inBowl = 0);
+    }
+  }
+
+  void _take() {
+    if (widget.state.isBoardLocked || _inBowl >= _supply) {
+      return;
+    }
+    KidHaptics.tap();
+    setState(() => _inBowl++);
+    widget.submit(TallyAttempt(_inBowl));
+  }
+
+  void _putBack() {
+    if (widget.state.isBoardLocked || _inBowl == 0) {
+      return;
+    }
+    KidHaptics.tap();
+    setState(() => _inBowl--);
+    if (_inBowl > 0) {
+      widget.submit(TallyAttempt(_inBowl));
+    }
+  }
+
+  void _handOver() {
+    if (widget.state.isBoardLocked || _inBowl == 0) {
+      return;
+    }
+    KidHaptics.tap();
+    widget.submit(QuantityAttempt(_inBowl));
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (BuildContext context, BoxConstraints constraints) {
+        final KidMetrics metrics = KidMetrics.of(constraints);
+        final double itemEdge =
+            metrics.size(KidUi.minTouchYoung, min: 64, max: 132);
+
+        return Column(
+          children: <Widget>[
+            // The counter: everything still to be taken from.
+            Expanded(
+              child: _Tray(
+                count: _supply - _inBowl,
+                itemAsset: widget.step.item.imageAsset,
+                itemEdge: itemEdge * 0.7,
+                label: widget.step.item.label.resolve(widget.languageCode),
+                isEnabled: !widget.state.isBoardLocked,
+                onTapItem: _take,
+                isBowl: false,
+              ),
+            ),
+            SizedBox(height: metrics.gap * 0.4),
+            // The bowl: what will actually be handed over.
+            Expanded(
+              child: _Tray(
+                count: _inBowl,
+                itemAsset: widget.step.item.imageAsset,
+                itemEdge: itemEdge * 0.7,
+                label: widget.step.item.label.resolve(widget.languageCode),
+                isEnabled: !widget.state.isBoardLocked,
+                onTapItem: _putBack,
+                isBowl: true,
+              ),
+            ),
+            SizedBox(height: metrics.gap * 0.4),
+            Semantics(
+              button: true,
+              enabled: !widget.state.isBoardLocked && _inBowl > 0,
+              label: 'Hand it over',
+              child: GestureDetector(
+                key: giveNHandOverKey,
+                onTap: _handOver,
+                child: Container(
+                  height: metrics.size(KidUi.minTouch, min: 56, max: 92),
+                  width: metrics.size(200, min: 150, max: 280),
+                  decoration: BoxDecoration(
+                    color: _inBowl == 0
+                        ? KidUi.primary.withValues(alpha: 0.4)
+                        : KidUi.correct,
+                    borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                    boxShadow: KidUi.shadow(KidUi.correct, strength: 0.7),
+                  ),
+                  child: Icon(
+                    Icons.pan_tool_alt_rounded,
+                    color: Colors.white,
+                    size: metrics.size(30, min: 24, max: 40),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+/// A counter or a bowl: the same thing, drawn twice.
+class _Tray extends StatelessWidget {
+  const _Tray({
+    required this.count,
+    required this.itemAsset,
+    required this.itemEdge,
+    required this.label,
+    required this.isEnabled,
+    required this.onTapItem,
+    required this.isBowl,
+  });
+
+  final int count;
+  final String itemAsset;
+  final double itemEdge;
+  final String label;
+  final bool isEnabled;
+  final VoidCallback onTapItem;
+  final bool isBowl;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(itemEdge * 0.12),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: isBowl ? 0.9 : 0.62),
+        borderRadius: BorderRadius.circular(KidUi.radiusCard),
+        border: isBowl
+            ? Border.all(color: KidUi.correct, width: itemEdge * 0.05)
+            : null,
+      ),
+      child: SingleChildScrollView(
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: itemEdge * 0.16,
+          runSpacing: itemEdge * 0.16,
+          children: <Widget>[
+            for (int index = 0; index < count; index++)
+              Semantics(
+                button: true,
+                enabled: isEnabled,
+                label: label,
+                child: GestureDetector(
+                  key: index == 0
+                      ? (isBowl ? giveNBowlItemKey : giveNSupplyItemKey)
+                      : null,
+                  onTap: isEnabled ? onTapItem : null,
+                  child: Image.asset(
+                    itemAsset,
+                    width: itemEdge,
+                    height: itemEdge,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// Handles for the widget tests, which otherwise would have to find an image
+/// by its asset path and would go green the moment the art changed.
+const Key giveNSupplyItemKey = Key('giveN.supplyItem');
+const Key giveNBowlItemKey = Key('giveN.bowlItem');
+const Key giveNHandOverKey = Key('giveN.handOver');

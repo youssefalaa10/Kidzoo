@@ -411,17 +411,17 @@ void main() {
         <String, dynamic>{
           'instanceId': 'test.generated_counting',
           'engineId': 'counting',
-          'locales': <String>['en'],
-          'narration': <String, dynamic>{
+          'locales': const <String>['en'],
+          'narration': const <String, dynamic>{
             'prompt': <String, String>{'en': 'How many?'},
           },
           'payload': <String, dynamic>{
             'mode': 'countAndPick',
             'layout': 'tenFrame',
-            'countRange': <int>[2, 6],
+            'countRange': const <int>[2, 6],
             'roundCount': roundCount,
             'itemsRef': 'packs/animals',
-            'itemIds': <String>['monkey', 'bird', 'rabbit'],
+            'itemIds': const <String>['monkey', 'bird', 'rabbit'],
           },
         },
         sourcePath: 'test/generated_counting.json',

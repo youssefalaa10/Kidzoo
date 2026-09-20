@@ -216,7 +216,8 @@ void main() {
     const List<Size> testSizes = <Size>[
       Size(360, 640), // small phone, portrait
       Size(780, 390), // phone, landscape
-      Size(800, 1200), // tablet
+      Size(800, 1200), // tablet, portrait
+    Size(1200, 800), // tablet, landscape
     ];
 
     Widget mapUnderTest() {
@@ -281,9 +282,10 @@ void main() {
       final JourneyTrail trail =
           tester.widget<JourneyTrail>(find.byType(JourneyTrail));
 
-      // One playable Adventure plus three places that are not written yet.
+      // Two playable Adventures plus two places that are not written yet.
       // Crucially *not* one bead per activity: the jungle has four activities
-      // and eight nodes, and contributes exactly one stop.
+      // and eight nodes, the market has seven and eleven, and each contributes
+      // exactly one stop.
       expect(trail.stops.length, 4);
       expect(trail.stops.first.id, 'jungle');
       expect(trail.stops.first.state, MapStopState.open);
@@ -291,8 +293,14 @@ void main() {
         trail.stops.skip(1).map((MapStop stop) => stop.id),
         <String>['market', 'ocean', 'stars'],
       );
+      // The market is real content now, so it is **locked** rather than
+      // "coming soon": a stop the child will reach by finishing the one before
+      // it, not a silhouette of something unwritten. The two states look
+      // different and mean different things, and the distinction is what keeps
+      // the map honest about which promises it can already keep.
+      expect(trail.stops[1].state, MapStopState.locked);
       expect(
-        trail.stops.skip(1).every(
+        trail.stops.skip(2).every(
             (MapStop stop) => stop.state == MapStopState.comingSoon),
         isTrue,
       );
@@ -304,6 +312,81 @@ void main() {
       // And the premise paragraph is no longer spending the top of the map.
       expect(find.textContaining('blew away into different worlds'),
           findsNothing);
+    });
+
+    testWidgets('finishing a story opens the next bead, and only then',
+        (WidgetTester tester) async {
+      // The unlock rule, from the map's side. It is derived from what the
+      // child has actually finished rather than from a stored "highest
+      // unlocked" counter, and that difference is the thing this pins: a
+      // counter drifts out of step the moment an Adventure is inserted,
+      // reordered or replayed.
+      await pumpMap(tester);
+      expect(
+        tester
+            .widget<JourneyTrail>(find.byType(JourneyTrail))
+            .stops[1]
+            .state,
+        MapStopState.locked,
+        reason: 'the market is not reachable before the jungle is finished',
+      );
+
+      await dao.markChapterCompleted(
+        profileId: profileId,
+        adventureId: 'jungle',
+      );
+      await pumpMap(tester);
+
+      final List<MapStop> stops =
+          tester.widget<JourneyTrail>(find.byType(JourneyTrail)).stops;
+      expect(stops.first.state, MapStopState.completed);
+      expect(stops[1].state, MapStopState.open,
+          reason: 'recovering the first page is what opens the second stop');
+      expect(stops[2].state, MapStopState.comingSoon,
+          reason: 'and it opens exactly one, not everything after it');
+      expect(find.text('1/4'), findsOneWidget);
+    });
+
+    testWidgets('a story in progress says Continue, not Start',
+        (WidgetTester tester) async {
+      // What the bead promises has to match what opening it does. A bead that
+      // said "Again" and then restarted a replay from its first line was the
+      // shape of the resume bug, visible from the map.
+      await dao.saveResumePoint(
+        profileId: profileId,
+        adventureId: 'jungle',
+        nodeId: 'jungle.n4',
+      );
+      await pumpMap(tester);
+
+      final JourneyTrail trail =
+          tester.widget<JourneyTrail>(find.byType(JourneyTrail));
+      expect(trail.statusLabelFor(trail.stops.first),
+          englishL10n.resolve('adventureResume', fallback: 'Continue'));
+    });
+
+    testWidgets('a finished story being replayed also says Continue',
+        (WidgetTester tester) async {
+      await dao.markChapterCompleted(
+        profileId: profileId,
+        adventureId: 'jungle',
+      );
+      await dao.saveResumePoint(
+        profileId: profileId,
+        adventureId: 'jungle',
+        nodeId: 'jungle.n4',
+      );
+      await pumpMap(tester);
+
+      final JourneyTrail trail =
+          tester.widget<JourneyTrail>(find.byType(JourneyTrail));
+      expect(
+        trail.statusLabelFor(trail.stops.first),
+        englishL10n.resolve('adventureResume', fallback: 'Continue'),
+        reason: 'a replay part-way through is something to continue, and '
+            'saying "Again" there is a promise to start over that the runner '
+            'no longer keeps',
+      );
     });
   });
 }

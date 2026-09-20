@@ -1,0 +1,167 @@
+{
+  "adventureId": "market",
+  "title": {
+    "en": "The Market Morning",
+    "ar": "صَبَاحُ السُّوق"
+  },
+  "backgroundType": "market",
+  "accent": "#F2954A",
+  "rewardId": "amber_page",
+  "rewardTitle": {
+    "en": "The Amber Page",
+    "ar": "الصَّفْحَةُ الكَهْرَمَانِيَّة"
+  },
+  "rewardArt": "assets/gen/images/story/page_amber.png",
+  "_comment": "One problem, seven ways of working on it. The market cannot open, and every activity is a piece of getting it open rather than a lesson wearing market clothes: the list is what tells you what to restock, restocking is what fills the baskets the scale weighs, the weighed baskets are what the cart carries, and the cart arriving is what lets Dalia make the first bowl. Nothing here would still make sense if you took the market away, which is the test.",
+  "_shapeComment": "Seven activities is long for one sitting, and that is deliberate now rather than reckless: durable resume landed in the same change, so a child who stops after the cart comes back to the cart. Before it, a story this length was unfinishable for the age it is written for.",
+  "nodes": [
+    {
+      "nodeId": "market.n1",
+      "beat": "openingProblem",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/story/page_green.png",
+      "lines": [
+        {
+          "en": "The drawing on the green page brought you here. The market, still asleep.",
+          "ar": "الرَّسْمُ عَلَى الصَّفْحَةِ الخَضْرَاءِ أَحْضَرَكَ إِلَى هُنَا. السُّوق، وَمَا زَالَ نَائِمًا."
+        },
+        {
+          "en": "Dalia has to open it when the bell rings. She cannot open it like this.",
+          "ar": "عَلَى دَالْيَا أَنْ تَفْتَحَهُ عِنْدَ قَرْعِ الجَرَس. لَا تَسْتَطِيعُ فَتْحَهُ هَكَذَا."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n2",
+      "beat": "discovery",
+      "type": "activity",
+      "activityRef": "activities/market_find_list",
+      "lines": [
+        {
+          "en": "The wind took Dalia's order list. Find it, and we will know what she needs.",
+          "ar": "أَخَذَتِ الرِّيحُ قَائِمَةَ طَلَبَاتِ دَالْيَا. جِدْهَا، فَنَعْرِفَ مَاذَا تُرِيد."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n3",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/market_restock",
+      "lines": [
+        {
+          "en": "The list says it plainly: fruit on one stall, vegetables on the other.",
+          "ar": "تَقُولُ القَائِمَةُ بِوُضُوح: الفَاكِهَةُ عَلَى كُشْك، وَالخُضَارُ عَلَى الآخَر."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n4",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/market_weigh_orders",
+      "lines": [
+        {
+          "en": "Every order has a weight beside it. Put exactly that much on the scale.",
+          "ar": "لِكُلِّ طَلَبٍ وَزْنٌ مَكْتُوبٌ بِجَانِبِه. ضَعْ عَلَى المِيزَانِ هَذَا القَدْرَ بِالضَّبْط."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n5",
+      "beat": "progress",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/vehicles/truck.png",
+      "lines": [
+        {
+          "en": "The stalls are full. The baskets are weighed. The little cart is loaded.",
+          "ar": "اِمْتَلَأَتِ الأَكْشَاك. وُزِنَتِ السِّلَال. وَامْتَلَأَتِ العَرَبَةُ الصَّغِيرَة."
+        },
+        {
+          "en": "But the lanes are narrow, and the cart only goes where it is told.",
+          "ar": "لَكِنَّ المَمَرَّاتِ ضَيِّقَة، وَالعَرَبَةُ لَا تَذْهَبُ إِلَّا حَيْثُ تَأْمُرُهَا."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n6",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/market_deliver",
+      "lines": [
+        {
+          "en": "Tell the cart the whole way first. It will do exactly what you say, no more.",
+          "ar": "أَخْبِرِ العَرَبَةَ بِالطَّرِيقِ كُلِّهِ أَوَّلًا. سَتَفْعَلُ مَا تَقُولُهُ بِالضَّبْط، لَا أَكْثَر."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n7",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/market_fruit_bowl",
+      "lines": [
+        {
+          "en": "The first customer is already waiting. Dalia is making her a bowl.",
+          "ar": "أَوَّلُ زَبُونَةٍ تَنْتَظِرُ بِالفِعْل. تُحَضِّرُ لَهَا دَالْيَا طَبَقًا."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n8",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/market_lend_a_hand",
+      "lines": [
+        {
+          "en": "Down at the far stall someone needs something, and nobody has noticed.",
+          "ar": "عِنْدَ الكُشْكِ البَعِيدِ أَحَدُهُمْ يَحْتَاجُ شَيْئًا، وَلَمْ يَنْتَبِهْ لَهُ أَحَد."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n9",
+      "beat": "climax",
+      "type": "activity",
+      "activityRef": "activities/market_mend_sign",
+      "lines": [
+        {
+          "en": "Only the sign is left. The wind broke its line, and the bell waits for it.",
+          "ar": "لَمْ تَبْقَ إِلَّا اللَّافِتَة. كَسَرَتِ الرِّيحُ خَطَّهَا، وَالجَرَسُ يَنْتَظِرُهَا."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n10",
+      "beat": "resolution",
+      "type": "storyBeat",
+      "rewardId": "amber_page",
+      "speakerArt": "assets/gen/images/story/page_amber.png",
+      "lines": [
+        {
+          "en": "The sign is whole. The bell rings, and the whole market wakes up at once.",
+          "ar": "عَادَتِ اللَّافِتَةُ سَلِيمَة. يَرِنُّ الجَرَس، وَيَسْتَيْقِظُ السُّوقُ كُلُّهُ دَفْعَةً وَاحِدَة."
+        },
+        {
+          "en": "And folded inside the sign's frame, all this time: the Amber Page.",
+          "ar": "وَمَطْوِيَّةً دَاخِلَ إِطَارِ اللَّافِتَةِ طَوَالَ الوَقْت: الصَّفْحَةُ الكَهْرَمَانِيَّة."
+        }
+      ]
+    },
+    {
+      "nodeId": "market.n11",
+      "beat": "clueOnward",
+      "type": "storyBeat",
+      "lines": [
+        {
+          "en": "On this page there is water. Deep water, and cold, and very blue.",
+          "ar": "عَلَى هَذِهِ الصَّفْحَةِ مَاء. مَاءٌ عَمِيق، وَبَارِد، وَشَدِيدُ الزُّرْقَة."
+        },
+        {
+          "en": "That is where the next page went.",
+          "ar": "إِلَى هُنَاكَ ذَهَبَتِ الصَّفْحَةُ التَّالِيَة."
+        }
+      ]
+    }
+  ]
+}

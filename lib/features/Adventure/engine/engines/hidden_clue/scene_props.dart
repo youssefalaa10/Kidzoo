@@ -19,6 +19,17 @@ enum ScenePropShape {
   log,
   flower,
 
+  // Built furniture. Added for the second Adventure and named for what they
+  // are rather than where they came from: a crate is a crate in a shop, a
+  // workshop, a harbour and a cargo bay. An enum of one Adventure's scenery
+  // would have to be extended again for every Adventure after it, which is the
+  // shape of a mechanic that is not really reusable.
+  crate,
+  basket,
+  awning,
+  barrel,
+  sign,
+
   /// A soft band across the bottom of the scene, so objects have a floor to
   /// sit on instead of hanging in the middle of a photograph.
   ground,
@@ -155,6 +166,16 @@ class ScenePropPainter extends CustomPainter {
         _paintLog(canvas, size);
       case ScenePropShape.flower:
         _paintFlower(canvas, size);
+      case ScenePropShape.crate:
+        _paintCrate(canvas, size);
+      case ScenePropShape.basket:
+        _paintBasket(canvas, size);
+      case ScenePropShape.awning:
+        _paintAwning(canvas, size);
+      case ScenePropShape.barrel:
+        _paintBarrel(canvas, size);
+      case ScenePropShape.sign:
+        _paintSign(canvas, size);
       case ScenePropShape.ground:
         _paintGround(canvas, size);
     }
@@ -362,6 +383,155 @@ class ScenePropPainter extends CustomPainter {
     canvas.drawPath(
       band,
       Paint()..color = _tint(KidUi.foliageDeep, amount: 0.3).withValues(alpha: 0.5),
+    );
+  }
+
+  void _paintCrate(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    final RRect box = RRect.fromRectAndRadius(
+      Rect.fromLTRB(w * 0.1, h * 0.34, w * 0.9, h * 0.88),
+      Radius.circular(w * 0.06),
+    );
+    canvas.drawRRect(box, Paint()..color = _tint(KidUi.barkCut, amount: 0.12));
+
+    // Slats. Three, because two reads as a box and four as a fence.
+    final Paint slat = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.045
+      ..color = _tint(KidUi.bark).withValues(alpha: 0.75);
+    for (final double t in <double>[0.48, 0.62, 0.76]) {
+      canvas.drawLine(Offset(w * 0.12, h * t), Offset(w * 0.88, h * t), slat);
+    }
+    canvas.drawRRect(
+      box,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = w * 0.04
+        ..color = _tint(KidUi.bark),
+    );
+  }
+
+  void _paintBasket(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    final Path bowl = Path()
+      ..moveTo(w * 0.14, h * 0.46)
+      ..lineTo(w * 0.86, h * 0.46)
+      ..quadraticBezierTo(w * 0.78, h * 0.92, w * 0.5, h * 0.92)
+      ..quadraticBezierTo(w * 0.22, h * 0.92, w * 0.14, h * 0.46)
+      ..close();
+    canvas.drawPath(bowl, Paint()..color = _tint(KidUi.barkCut, amount: 0.14));
+
+    // The weave, as two crossing sets rather than a texture: at the size these
+    // are drawn, anything finer turns into noise.
+    final Paint weave = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.03
+      ..color = _tint(KidUi.bark).withValues(alpha: 0.6);
+    for (final double t in <double>[0.58, 0.72]) {
+      canvas.drawLine(Offset(w * 0.18, h * t), Offset(w * 0.82, h * t), weave);
+    }
+    canvas.drawArc(
+      Rect.fromLTRB(w * 0.24, h * 0.16, w * 0.76, h * 0.62),
+      pi,
+      pi,
+      false,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = w * 0.05
+        ..color = _tint(KidUi.bark),
+    );
+  }
+
+  void _paintAwning(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    final Path canopy = Path()
+      ..moveTo(w * 0.04, h * 0.3)
+      ..lineTo(w * 0.96, h * 0.3)
+      ..lineTo(w * 0.9, h * 0.62)
+      ..lineTo(w * 0.1, h * 0.62)
+      ..close();
+    canvas.drawPath(canopy, Paint()..color = accent.withValues(alpha: 0.85));
+
+    // Scalloped hem, in alternating stripes. One stripe colour plus the accent
+    // is enough to say "stall" without inventing a second palette.
+    final Paint stripe = Paint()..color = Colors.white.withValues(alpha: 0.85);
+    const int bands = 5;
+    for (int i = 0; i < bands; i += 2) {
+      final double left = w * (0.1 + 0.8 * i / bands);
+      final double right = w * (0.1 + 0.8 * (i + 1) / bands);
+      canvas.drawPath(
+        Path()
+          ..moveTo(left, h * 0.3)
+          ..lineTo(right, h * 0.3)
+          ..lineTo(right - w * 0.02, h * 0.62)
+          ..lineTo(left + w * 0.02, h * 0.62)
+          ..close(),
+        stripe,
+      );
+    }
+    for (int i = 0; i < bands; i++) {
+      final double centre = w * (0.1 + 0.8 * (i + 0.5) / bands);
+      canvas.drawCircle(
+        Offset(centre, h * 0.62),
+        w * 0.07,
+        Paint()
+          ..color = i.isEven
+              ? Colors.white.withValues(alpha: 0.85)
+              : accent.withValues(alpha: 0.85),
+      );
+    }
+  }
+
+  void _paintBarrel(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    final Path body = Path()
+      ..moveTo(w * 0.24, h * 0.26)
+      ..quadraticBezierTo(w * 0.08, h * 0.56, w * 0.24, h * 0.88)
+      ..lineTo(w * 0.76, h * 0.88)
+      ..quadraticBezierTo(w * 0.92, h * 0.56, w * 0.76, h * 0.26)
+      ..close();
+    canvas.drawPath(body, Paint()..color = _tint(KidUi.bark, amount: 0.12));
+
+    final Paint hoop = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = w * 0.06
+      ..color = _tint(KidUi.stone, amount: 0.1);
+    for (final double t in <double>[0.42, 0.72]) {
+      canvas.drawLine(Offset(w * 0.12, h * t), Offset(w * 0.88, h * t), hoop);
+    }
+    canvas.drawOval(
+      Rect.fromLTRB(w * 0.24, h * 0.16, w * 0.76, h * 0.36),
+      Paint()..color = _tint(KidUi.barkCut, amount: 0.1),
+    );
+  }
+
+  void _paintSign(Canvas canvas, Size size) {
+    final double w = size.width;
+    final double h = size.height;
+    canvas.drawLine(
+      Offset(w * 0.5, h * 0.52),
+      Offset(w * 0.5, h * 0.96),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = w * 0.07
+        ..strokeCap = StrokeCap.round
+        ..color = _tint(KidUi.bark),
+    );
+    final RRect board = RRect.fromRectAndRadius(
+      Rect.fromLTRB(w * 0.1, h * 0.14, w * 0.9, h * 0.56),
+      Radius.circular(w * 0.08),
+    );
+    canvas.drawRRect(board, Paint()..color = _tint(KidUi.barkCut, amount: 0.2));
+    canvas.drawRRect(
+      board,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = w * 0.04
+        ..color = accent,
     );
   }
 

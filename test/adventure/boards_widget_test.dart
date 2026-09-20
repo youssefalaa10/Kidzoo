@@ -36,7 +36,8 @@ void main() {
   const List<Size> testSizes = <Size>[
     Size(360, 640), // small phone, portrait
     Size(780, 390), // phone, landscape
-    Size(800, 1200), // tablet
+    Size(800, 1200), // tablet, portrait
+    Size(1200, 800), // tablet, landscape
   ];
 
   Future<ActivityCubit<ActivityContent, dynamic>> startedCubit(

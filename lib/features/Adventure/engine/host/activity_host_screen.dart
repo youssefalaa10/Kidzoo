@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
@@ -99,6 +101,10 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
     super.didChangeAppLifecycleState(state);
     if (state != AppLifecycleState.resumed) {
       widget.session.services.narrator.cancel();
+      // Secondary safety only: the step the child is on was already persisted
+      // when they reached it. This just carries across the score and hints
+      // earned *inside* a step that a backgrounding interrupts.
+      unawaited(_cubit.flushCheckpoint());
     }
   }
 

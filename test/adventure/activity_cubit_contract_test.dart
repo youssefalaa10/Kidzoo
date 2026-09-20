@@ -2,7 +2,6 @@ import 'dart:math';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_attempt.dart';
-import 'package:kidzo/features/Adventure/engine/contract/activity_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
@@ -47,10 +46,13 @@ void main() {
     const EchoEngine engine = EchoEngine();
     final ActivitySpec spec =
         echoSpec(stepCount: stepCount, optionCount: optionCount);
-    return EchoCubit(ActivitySession<EchoContent>(
+    // Built through the engine rather than by hand, so the session carries the
+    // engine identity and schema version a resume cursor is validated against
+    // — the same way the host builds one.
+    return EchoCubit(engine.createSession(
       spec: spec,
-      content: engine.parseContent(spec, const MapItemPackResolver(<String, ItemPack>{})),
       services: makeServices(languageCode: languageCode),
+      packs: const MapItemPackResolver(<String, ItemPack>{}),
       storyNodeId: 'test.node',
     ));
   }

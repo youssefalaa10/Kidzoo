@@ -1505,6 +1505,18 @@ class $StoryChapterProgressTable extends StoryChapterProgress
       type: DriftSqlType.dateTime,
       requiredDuringInsert: false,
       defaultValue: currentDateAndTime);
+  static const VerificationMeta _currentBeatMeta =
+      const VerificationMeta('currentBeat');
+  @override
+  late final GeneratedColumn<String> currentBeat = GeneratedColumn<String>(
+      'current_beat', aliasedName, true,
+      type: DriftSqlType.string, requiredDuringInsert: false);
+  static const VerificationMeta _activityCheckpointMeta =
+      const VerificationMeta('activityCheckpoint');
+  @override
+  late final GeneratedColumn<String> activityCheckpoint =
+      GeneratedColumn<String>('activity_checkpoint', aliasedName, true,
+          type: DriftSqlType.string, requiredDuringInsert: false);
   @override
   List<GeneratedColumn> get $columns => [
         id,
@@ -1515,7 +1527,9 @@ class $StoryChapterProgressTable extends StoryChapterProgress
         isCompleted,
         startedAt,
         completedAt,
-        lastPlayedAt
+        lastPlayedAt,
+        currentBeat,
+        activityCheckpoint
       ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1579,6 +1593,18 @@ class $StoryChapterProgressTable extends StoryChapterProgress
           lastPlayedAt.isAcceptableOrUnknown(
               data['last_played_at']!, _lastPlayedAtMeta));
     }
+    if (data.containsKey('current_beat')) {
+      context.handle(
+          _currentBeatMeta,
+          currentBeat.isAcceptableOrUnknown(
+              data['current_beat']!, _currentBeatMeta));
+    }
+    if (data.containsKey('activity_checkpoint')) {
+      context.handle(
+          _activityCheckpointMeta,
+          activityCheckpoint.isAcceptableOrUnknown(
+              data['activity_checkpoint']!, _activityCheckpointMeta));
+    }
     return context;
   }
 
@@ -1611,6 +1637,10 @@ class $StoryChapterProgressTable extends StoryChapterProgress
           .read(DriftSqlType.dateTime, data['${effectivePrefix}completed_at']),
       lastPlayedAt: attachedDatabase.typeMapping.read(
           DriftSqlType.dateTime, data['${effectivePrefix}last_played_at'])!,
+      currentBeat: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}current_beat']),
+      activityCheckpoint: attachedDatabase.typeMapping.read(
+          DriftSqlType.string, data['${effectivePrefix}activity_checkpoint']),
     );
   }
 
@@ -1640,6 +1670,31 @@ class StoryChapterProgressData extends DataClass
   /// Drives the "let's continue the story" reminder: a notification is only
   /// worth sending to a child who actually has a story in progress.
   final DateTime lastPlayedAt;
+
+  /// The beat [currentNodeId] belongs to, stored alongside the id rather than
+  /// derived from it.
+  ///
+  /// It is the drift handle. A node id is a content identifier, and content
+  /// gets renamed, reordered and rewritten between releases; when the id a
+  /// child was parked on no longer exists, the beat is enough to put them back
+  /// in the right part of the story instead of at its first line.
+  final String? currentBeat;
+
+  /// The in-flight activity, as versioned JSON, or null when the child is on a
+  /// narration beat or has finished the activity they were on.
+  ///
+  /// One opaque column rather than nine typed ones, and deliberately so. Its
+  /// contents are a *cursor format*, not a schema the database has opinions
+  /// about: it carries a version, and a cursor written by an older or newer
+  /// build simply fails to parse and the current activity restarts. Spreading
+  /// the same fields across nine columns would make every future change to the
+  /// cursor a migration, for data whose entire lifetime is "until this child
+  /// finishes this mini-game".
+  ///
+  /// What it holds is **logical** progress — which step, which seed, what has
+  /// been earned so far. Never animation frames, drag coordinates or playback
+  /// positions: those are how the screen looked, not where the child got to.
+  final String? activityCheckpoint;
   const StoryChapterProgressData(
       {required this.id,
       required this.profileId,
@@ -1649,7 +1704,9 @@ class StoryChapterProgressData extends DataClass
       required this.isCompleted,
       required this.startedAt,
       this.completedAt,
-      required this.lastPlayedAt});
+      required this.lastPlayedAt,
+      this.currentBeat,
+      this.activityCheckpoint});
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
@@ -1666,6 +1723,12 @@ class StoryChapterProgressData extends DataClass
       map['completed_at'] = Variable<DateTime>(completedAt);
     }
     map['last_played_at'] = Variable<DateTime>(lastPlayedAt);
+    if (!nullToAbsent || currentBeat != null) {
+      map['current_beat'] = Variable<String>(currentBeat);
+    }
+    if (!nullToAbsent || activityCheckpoint != null) {
+      map['activity_checkpoint'] = Variable<String>(activityCheckpoint);
+    }
     return map;
   }
 
@@ -1684,6 +1747,12 @@ class StoryChapterProgressData extends DataClass
           ? const Value.absent()
           : Value(completedAt),
       lastPlayedAt: Value(lastPlayedAt),
+      currentBeat: currentBeat == null && nullToAbsent
+          ? const Value.absent()
+          : Value(currentBeat),
+      activityCheckpoint: activityCheckpoint == null && nullToAbsent
+          ? const Value.absent()
+          : Value(activityCheckpoint),
     );
   }
 
@@ -1700,6 +1769,9 @@ class StoryChapterProgressData extends DataClass
       startedAt: serializer.fromJson<DateTime>(json['startedAt']),
       completedAt: serializer.fromJson<DateTime?>(json['completedAt']),
       lastPlayedAt: serializer.fromJson<DateTime>(json['lastPlayedAt']),
+      currentBeat: serializer.fromJson<String?>(json['currentBeat']),
+      activityCheckpoint:
+          serializer.fromJson<String?>(json['activityCheckpoint']),
     );
   }
   @override
@@ -1715,6 +1787,8 @@ class StoryChapterProgressData extends DataClass
       'startedAt': serializer.toJson<DateTime>(startedAt),
       'completedAt': serializer.toJson<DateTime?>(completedAt),
       'lastPlayedAt': serializer.toJson<DateTime>(lastPlayedAt),
+      'currentBeat': serializer.toJson<String?>(currentBeat),
+      'activityCheckpoint': serializer.toJson<String?>(activityCheckpoint),
     };
   }
 
@@ -1727,7 +1801,9 @@ class StoryChapterProgressData extends DataClass
           bool? isCompleted,
           DateTime? startedAt,
           Value<DateTime?> completedAt = const Value.absent(),
-          DateTime? lastPlayedAt}) =>
+          DateTime? lastPlayedAt,
+          Value<String?> currentBeat = const Value.absent(),
+          Value<String?> activityCheckpoint = const Value.absent()}) =>
       StoryChapterProgressData(
         id: id ?? this.id,
         profileId: profileId ?? this.profileId,
@@ -1739,6 +1815,10 @@ class StoryChapterProgressData extends DataClass
         startedAt: startedAt ?? this.startedAt,
         completedAt: completedAt.present ? completedAt.value : this.completedAt,
         lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,
+        currentBeat: currentBeat.present ? currentBeat.value : this.currentBeat,
+        activityCheckpoint: activityCheckpoint.present
+            ? activityCheckpoint.value
+            : this.activityCheckpoint,
       );
   StoryChapterProgressData copyWithCompanion(
       StoryChapterProgressCompanion data) {
@@ -1760,6 +1840,11 @@ class StoryChapterProgressData extends DataClass
       lastPlayedAt: data.lastPlayedAt.present
           ? data.lastPlayedAt.value
           : this.lastPlayedAt,
+      currentBeat:
+          data.currentBeat.present ? data.currentBeat.value : this.currentBeat,
+      activityCheckpoint: data.activityCheckpoint.present
+          ? data.activityCheckpoint.value
+          : this.activityCheckpoint,
     );
   }
 
@@ -1774,14 +1859,26 @@ class StoryChapterProgressData extends DataClass
           ..write('isCompleted: $isCompleted, ')
           ..write('startedAt: $startedAt, ')
           ..write('completedAt: $completedAt, ')
-          ..write('lastPlayedAt: $lastPlayedAt')
+          ..write('lastPlayedAt: $lastPlayedAt, ')
+          ..write('currentBeat: $currentBeat, ')
+          ..write('activityCheckpoint: $activityCheckpoint')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, profileId, adventureId, currentNodeId,
-      isUnlocked, isCompleted, startedAt, completedAt, lastPlayedAt);
+  int get hashCode => Object.hash(
+      id,
+      profileId,
+      adventureId,
+      currentNodeId,
+      isUnlocked,
+      isCompleted,
+      startedAt,
+      completedAt,
+      lastPlayedAt,
+      currentBeat,
+      activityCheckpoint);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -1794,7 +1891,9 @@ class StoryChapterProgressData extends DataClass
           other.isCompleted == this.isCompleted &&
           other.startedAt == this.startedAt &&
           other.completedAt == this.completedAt &&
-          other.lastPlayedAt == this.lastPlayedAt);
+          other.lastPlayedAt == this.lastPlayedAt &&
+          other.currentBeat == this.currentBeat &&
+          other.activityCheckpoint == this.activityCheckpoint);
 }
 
 class StoryChapterProgressCompanion
@@ -1808,6 +1907,8 @@ class StoryChapterProgressCompanion
   final Value<DateTime> startedAt;
   final Value<DateTime?> completedAt;
   final Value<DateTime> lastPlayedAt;
+  final Value<String?> currentBeat;
+  final Value<String?> activityCheckpoint;
   const StoryChapterProgressCompanion({
     this.id = const Value.absent(),
     this.profileId = const Value.absent(),
@@ -1818,6 +1919,8 @@ class StoryChapterProgressCompanion
     this.startedAt = const Value.absent(),
     this.completedAt = const Value.absent(),
     this.lastPlayedAt = const Value.absent(),
+    this.currentBeat = const Value.absent(),
+    this.activityCheckpoint = const Value.absent(),
   });
   StoryChapterProgressCompanion.insert({
     this.id = const Value.absent(),
@@ -1829,6 +1932,8 @@ class StoryChapterProgressCompanion
     this.startedAt = const Value.absent(),
     this.completedAt = const Value.absent(),
     this.lastPlayedAt = const Value.absent(),
+    this.currentBeat = const Value.absent(),
+    this.activityCheckpoint = const Value.absent(),
   })  : profileId = Value(profileId),
         adventureId = Value(adventureId);
   static Insertable<StoryChapterProgressData> custom({
@@ -1841,6 +1946,8 @@ class StoryChapterProgressCompanion
     Expression<DateTime>? startedAt,
     Expression<DateTime>? completedAt,
     Expression<DateTime>? lastPlayedAt,
+    Expression<String>? currentBeat,
+    Expression<String>? activityCheckpoint,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -1852,6 +1959,8 @@ class StoryChapterProgressCompanion
       if (startedAt != null) 'started_at': startedAt,
       if (completedAt != null) 'completed_at': completedAt,
       if (lastPlayedAt != null) 'last_played_at': lastPlayedAt,
+      if (currentBeat != null) 'current_beat': currentBeat,
+      if (activityCheckpoint != null) 'activity_checkpoint': activityCheckpoint,
     });
   }
 
@@ -1864,7 +1973,9 @@ class StoryChapterProgressCompanion
       Value<bool>? isCompleted,
       Value<DateTime>? startedAt,
       Value<DateTime?>? completedAt,
-      Value<DateTime>? lastPlayedAt}) {
+      Value<DateTime>? lastPlayedAt,
+      Value<String?>? currentBeat,
+      Value<String?>? activityCheckpoint}) {
     return StoryChapterProgressCompanion(
       id: id ?? this.id,
       profileId: profileId ?? this.profileId,
@@ -1875,6 +1986,8 @@ class StoryChapterProgressCompanion
       startedAt: startedAt ?? this.startedAt,
       completedAt: completedAt ?? this.completedAt,
       lastPlayedAt: lastPlayedAt ?? this.lastPlayedAt,
+      currentBeat: currentBeat ?? this.currentBeat,
+      activityCheckpoint: activityCheckpoint ?? this.activityCheckpoint,
     );
   }
 
@@ -1908,6 +2021,12 @@ class StoryChapterProgressCompanion
     if (lastPlayedAt.present) {
       map['last_played_at'] = Variable<DateTime>(lastPlayedAt.value);
     }
+    if (currentBeat.present) {
+      map['current_beat'] = Variable<String>(currentBeat.value);
+    }
+    if (activityCheckpoint.present) {
+      map['activity_checkpoint'] = Variable<String>(activityCheckpoint.value);
+    }
     return map;
   }
 
@@ -1922,7 +2041,9 @@ class StoryChapterProgressCompanion
           ..write('isCompleted: $isCompleted, ')
           ..write('startedAt: $startedAt, ')
           ..write('completedAt: $completedAt, ')
-          ..write('lastPlayedAt: $lastPlayedAt')
+          ..write('lastPlayedAt: $lastPlayedAt, ')
+          ..write('currentBeat: $currentBeat, ')
+          ..write('activityCheckpoint: $activityCheckpoint')
           ..write(')'))
         .toString();
   }
@@ -4085,6 +4206,8 @@ typedef $$StoryChapterProgressTableCreateCompanionBuilder
   Value<DateTime> startedAt,
   Value<DateTime?> completedAt,
   Value<DateTime> lastPlayedAt,
+  Value<String?> currentBeat,
+  Value<String?> activityCheckpoint,
 });
 typedef $$StoryChapterProgressTableUpdateCompanionBuilder
     = StoryChapterProgressCompanion Function({
@@ -4097,6 +4220,8 @@ typedef $$StoryChapterProgressTableUpdateCompanionBuilder
   Value<DateTime> startedAt,
   Value<DateTime?> completedAt,
   Value<DateTime> lastPlayedAt,
+  Value<String?> currentBeat,
+  Value<String?> activityCheckpoint,
 });
 
 final class $$StoryChapterProgressTableReferences extends BaseReferences<
@@ -4151,6 +4276,13 @@ class $$StoryChapterProgressTableFilterComposer
 
   ColumnFilters<DateTime> get lastPlayedAt => $composableBuilder(
       column: $table.lastPlayedAt, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get currentBeat => $composableBuilder(
+      column: $table.currentBeat, builder: (column) => ColumnFilters(column));
+
+  ColumnFilters<String> get activityCheckpoint => $composableBuilder(
+      column: $table.activityCheckpoint,
+      builder: (column) => ColumnFilters(column));
 
   $$ProfilesTableFilterComposer get profileId {
     final $$ProfilesTableFilterComposer composer = $composerBuilder(
@@ -4208,6 +4340,13 @@ class $$StoryChapterProgressTableOrderingComposer
       column: $table.lastPlayedAt,
       builder: (column) => ColumnOrderings(column));
 
+  ColumnOrderings<String> get currentBeat => $composableBuilder(
+      column: $table.currentBeat, builder: (column) => ColumnOrderings(column));
+
+  ColumnOrderings<String> get activityCheckpoint => $composableBuilder(
+      column: $table.activityCheckpoint,
+      builder: (column) => ColumnOrderings(column));
+
   $$ProfilesTableOrderingComposer get profileId {
     final $$ProfilesTableOrderingComposer composer = $composerBuilder(
         composer: this,
@@ -4261,6 +4400,12 @@ class $$StoryChapterProgressTableAnnotationComposer
 
   GeneratedColumn<DateTime> get lastPlayedAt => $composableBuilder(
       column: $table.lastPlayedAt, builder: (column) => column);
+
+  GeneratedColumn<String> get currentBeat => $composableBuilder(
+      column: $table.currentBeat, builder: (column) => column);
+
+  GeneratedColumn<String> get activityCheckpoint => $composableBuilder(
+      column: $table.activityCheckpoint, builder: (column) => column);
 
   $$ProfilesTableAnnotationComposer get profileId {
     final $$ProfilesTableAnnotationComposer composer = $composerBuilder(
@@ -4318,6 +4463,8 @@ class $$StoryChapterProgressTableTableManager extends RootTableManager<
             Value<DateTime> startedAt = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
             Value<DateTime> lastPlayedAt = const Value.absent(),
+            Value<String?> currentBeat = const Value.absent(),
+            Value<String?> activityCheckpoint = const Value.absent(),
           }) =>
               StoryChapterProgressCompanion(
             id: id,
@@ -4329,6 +4476,8 @@ class $$StoryChapterProgressTableTableManager extends RootTableManager<
             startedAt: startedAt,
             completedAt: completedAt,
             lastPlayedAt: lastPlayedAt,
+            currentBeat: currentBeat,
+            activityCheckpoint: activityCheckpoint,
           ),
           createCompanionCallback: ({
             Value<int> id = const Value.absent(),
@@ -4340,6 +4489,8 @@ class $$StoryChapterProgressTableTableManager extends RootTableManager<
             Value<DateTime> startedAt = const Value.absent(),
             Value<DateTime?> completedAt = const Value.absent(),
             Value<DateTime> lastPlayedAt = const Value.absent(),
+            Value<String?> currentBeat = const Value.absent(),
+            Value<String?> activityCheckpoint = const Value.absent(),
           }) =>
               StoryChapterProgressCompanion.insert(
             id: id,
@@ -4351,6 +4502,8 @@ class $$StoryChapterProgressTableTableManager extends RootTableManager<
             startedAt: startedAt,
             completedAt: completedAt,
             lastPlayedAt: lastPlayedAt,
+            currentBeat: currentBeat,
+            activityCheckpoint: activityCheckpoint,
           ),
           withReferenceMapper: (p0) => p0
               .map((e) => (

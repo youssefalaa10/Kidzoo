@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -21,6 +22,7 @@ import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_soundboard.dart';
 import 'package:kidzo/features/Adventure/story/adventure_runner_cubit.dart';
 import 'package:kidzo/features/Adventure/story/models/story_models.dart';
+import 'package:kidzo/features/Adventure/story/models/story_resume.dart';
 import 'package:kidzo/features/Adventure/story/rewards/adventure_reward.dart';
 import 'package:kidzo/features/Adventure/story/rewards/adventure_reward_overlay.dart';
 import 'package:kidzo/features/Adventure/story/ui/story_beat_view.dart';
@@ -118,6 +120,11 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
     super.didChangeAppLifecycleState(state);
     if (state != AppLifecycleState.resumed) {
       _narrator.cancel();
+      // Secondary only. The resume point is already written on entering every
+      // node, so nothing here is load-bearing — which is the point: the app
+      // being killed outright is the case that actually happens, and it never
+      // reaches a lifecycle callback.
+      unawaited(_runner.flush());
     }
   }
 
@@ -133,22 +140,40 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
   String get _languageCode =>
       context.read<LanguageCubit>().state.languageCode;
 
-  ActivityServices _servicesFor() {
+  ActivityServices _servicesFor(int seed) {
     return ActivityServices(
       narrator: _narrator,
       soundboard: _soundboard,
-      // Seeded from the clock, not fixed: two runs of the same node should not
-      // produce an identical board, or a child learns the answer's position.
-      random: Random(DateTime.now().millisecondsSinceEpoch),
+      // Seeded from the clock for a fresh run, so two runs of the same node do
+      // not produce an identical board and a child cannot learn the answer's
+      // position — but from the **stored** seed when resuming, because "step
+      // three" only means anything alongside the seed that decided what step
+      // three is.
+      random: Random(seed),
       attemptSink: _StoryAttemptSink(
         storyDao: widget.storyDao,
         profileId: widget.profileId,
+      ),
+      checkpointSink: _StoryCheckpointSink(
+        storyDao: widget.storyDao,
+        profileId: widget.profileId,
+        adventureId: widget.adventureId,
       ),
       languageCode: _languageCode,
     );
   }
 
-  Future<void> _openActivity(StoryNode node) async {
+  /// A fresh seed for a run that is not resuming.
+  ///
+  /// Masked to stay inside the positive 32-bit range `Random` accepts, and
+  /// small enough to round-trip through JSON without surprises.
+  static int _freshSeed() =>
+      DateTime.now().millisecondsSinceEpoch & 0x7fffffff;
+
+  Future<void> _openActivity(
+    StoryNode node, {
+    ActivityCheckpoint? resume,
+  }) async {
     if (_isActivityOpen) {
       return;
     }
@@ -167,11 +192,14 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       final ActivitySpec spec = widget.bundle.requireActivity(node.activityRef!);
       final ActivityEngine<ActivityContent> engine =
           widget.registry.require(spec.engineId);
+      final int seed = resume?.seed ?? _freshSeed();
       final ActivitySession<ActivityContent> session = engine.createSession(
         spec: spec,
-        services: _servicesFor(),
+        services: _servicesFor(seed),
         packs: widget.bundle.packResolver,
         storyNodeId: node.nodeId,
+        seed: seed,
+        resume: resume,
       );
       final AppLocalizations l10n = AppLocalizations.of(context);
 
@@ -202,7 +230,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       // outcome already knows the activity screen has gone.
       _setActivityOpen(false);
       if (result != null) {
-        await _runner.completeActivity(result!);
+        await _runner.completeActivity(result!, fromNodeId: node.nodeId);
       }
     } on ActivityContentException catch (error) {
       if (!mounted) {
@@ -212,7 +240,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('$error')),
       );
-      await _runner.continueStory();
+      await _runner.continueStory(fromNodeId: node.nodeId);
     } finally {
       _setActivityOpen(false);
     }
@@ -279,7 +307,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
             _startCelebration(state);
           }
           if (state.isOnActivity && state.node != null) {
-            _openActivity(state.node!);
+            _openActivity(state.node!, resume: state.activityResume);
           }
         },
         builder: (BuildContext context, AdventureRunnerState state) {
@@ -397,8 +425,12 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
             languageCode: _languageCode,
             accent: _accentOf(state.adventure),
             onSpeak: _narrator.speak,
-            onContinue:
-                isReentry ? () => _openActivity(node) : _runner.continueStory,
+            onContinue: isReentry
+                ? () => _openActivity(node, resume: state.activityResume)
+                // Tagged with the node the beat belongs to, so a narration
+                // future resolving after the story has moved cannot advance a
+                // beat the child never saw.
+                : () => _runner.continueStory(fromNodeId: node.nodeId),
             continueLabel: isReentry
                 ? l10n.resolve('storyBeginActivity', fallback: "Let's play")
                 : l10n.resolve('storyContinue', fallback: 'Next'),
@@ -414,6 +446,41 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
   Color _accentOf(Adventure? adventure) {
     final int? value = adventure?.accentColorValue;
     return value == null ? KidUi.primary : Color(value);
+  }
+}
+
+/// Persists the in-flight activity's position for the signed-in child.
+///
+/// One row on the chapter the activity belongs to, overwritten at every step
+/// boundary, deleted when the run ends. Scoped by profile like everything else
+/// in the story layer, so two children on one tablet never resume into each
+/// other's game.
+class _StoryCheckpointSink implements ActivityCheckpointSink {
+  const _StoryCheckpointSink({
+    required this.storyDao,
+    required this.profileId,
+    required this.adventureId,
+  });
+
+  final StoryDao storyDao;
+  final int profileId;
+  final String adventureId;
+
+  @override
+  Future<void> save(ActivityCheckpoint checkpoint) {
+    return storyDao.saveActivityCheckpoint(
+      profileId: profileId,
+      adventureId: adventureId,
+      checkpoint: checkpoint,
+    );
+  }
+
+  @override
+  Future<void> clear() {
+    return storyDao.clearActivityCheckpoint(
+      profileId: profileId,
+      adventureId: adventureId,
+    );
   }
 }
 

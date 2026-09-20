@@ -190,12 +190,23 @@ class _StoryBeatViewState extends State<StoryBeatView>
     _speakCurrentLine();
   }
 
+  /// True when the box is wide and short enough that stacking the speaker
+  /// above the words would leave no room for either.
+  ///
+  /// A phone on its side is not a small portrait screen; it is a different
+  /// shape, and the story reads better across it than down it. Stacking cost
+  /// the card the few pixels it needed once the progress bar was above it, so
+  /// this is a layout fix and a legibility one at the same time.
+  static bool _prefersSideBySide(BoxConstraints constraints) =>
+      constraints.maxWidth > constraints.maxHeight * 1.25;
+
   @override
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final KidMetrics metrics = KidMetrics.of(constraints);
-        final List<LocalizedText> lines = widget.node.lines;
+        final String? art = widget.node.speakerArt;
+        final bool isSideBySide = art != null && _prefersSideBySide(constraints);
 
         return GestureDetector(
           // The whole beat is tappable, not just a button. A four-year-old
@@ -206,88 +217,122 @@ class _StoryBeatViewState extends State<StoryBeatView>
           onTap: _advance,
           child: Padding(
             padding: EdgeInsets.all(metrics.pagePadding),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                if (widget.node.speakerArt != null)
-                  Expanded(
-                    child: Padding(
-                      padding: EdgeInsets.only(bottom: metrics.gap),
-                      child: Image.asset(
-                        widget.node.speakerArt!,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                Container(
-                  width: double.infinity,
-                  padding: EdgeInsets.all(metrics.size(20, min: 14, max: 30)),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.94),
-                    borderRadius: BorderRadius.circular(KidUi.radiusCard),
-                    boxShadow: KidUi.shadow(widget.accent),
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
+            child: isSideBySide
+                ? Row(
                     children: <Widget>[
-                      for (int index = 0;
-                          index <= _visibleLineIndex && index < lines.length;
-                          index++)
-                        Padding(
-                          padding: EdgeInsets.only(bottom: metrics.gap * 0.4),
-                          child: ActivityGlyphText(
-                            lines[index].resolve(widget.languageCode),
-                            languageCode: widget.languageCode,
-                            fontSize: metrics.size(22, min: 16, max: 28),
-                            color: KidUi.ink,
-                          ),
-                        ),
-                      SizedBox(height: metrics.gap * 0.4),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          _ReplayButton(
-                            metrics: metrics,
-                            accent: widget.accent,
-                            label: widget.replayLabel,
-                            onTap: _speakCurrentLine,
-                          ),
-                          SizedBox(width: metrics.gap * 0.6),
-                          Flexible(
-                            child: AnimatedBuilder(
-                              animation: _nudge,
-                              builder: (BuildContext context, Widget? child) {
-                                // One small up-and-back, so an early tap is
-                                // visibly received rather than swallowed.
-                                final double bump =
-                                    1 - (_nudge.value * 2 - 1).abs();
-                                return Transform.scale(
-                                  scale: 1 + 0.06 * bump,
-                                  child: child,
-                                );
-                              },
-                              child: _ContinueButton(
-                                metrics: metrics,
-                                label: _isOnLastLine
-                                    ? widget.continueLabel
-                                    : widget.nextLabel,
-                                accent: widget.accent,
-                                languageCode: widget.languageCode,
-                                isWaiting: _isNarrating,
-                                onTap: _advance,
+                      Expanded(
+                        flex: 2,
+                        child: Image.asset(art, fit: BoxFit.contain),
+                      ),
+                      SizedBox(width: metrics.gap),
+                      Expanded(
+                        flex: 3,
+                        // Measured against the column it actually occupies,
+                        // not against the whole screen. Sizing text from the
+                        // full width and then rendering it into three fifths
+                        // of that is how a card that fits in portrait
+                        // overflows the moment the phone is turned.
+                        child: LayoutBuilder(
+                          builder: (
+                            BuildContext context,
+                            BoxConstraints cardBox,
+                          ) {
+                            return Center(
+                              child: SingleChildScrollView(
+                                child: _card(KidMetrics.of(cardBox)),
                               ),
-                            ),
-                          ),
-                        ],
+                            );
+                          },
+                        ),
                       ),
                     ],
+                  )
+                : Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      if (art != null)
+                        Expanded(
+                          child: Padding(
+                            padding: EdgeInsets.only(bottom: metrics.gap),
+                            child: Image.asset(art, fit: BoxFit.contain),
+                          ),
+                        ),
+                      _card(metrics),
+                    ],
                   ),
-                ),
-              ],
-            ),
           ),
         );
       },
+    );
+  }
+
+  /// The words, the replay control and the way onward. One widget in both
+  /// layouts, so landscape cannot drift into a second design.
+  Widget _card(KidMetrics metrics) {
+    final List<LocalizedText> lines = widget.node.lines;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(metrics.size(20, min: 14, max: 30)),
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.94),
+        borderRadius: BorderRadius.circular(KidUi.radiusCard),
+        boxShadow: KidUi.shadow(widget.accent),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: <Widget>[
+          for (int index = 0;
+              index <= _visibleLineIndex && index < lines.length;
+              index++)
+            Padding(
+              padding: EdgeInsets.only(bottom: metrics.gap * 0.4),
+              child: ActivityGlyphText(
+                lines[index].resolve(widget.languageCode),
+                languageCode: widget.languageCode,
+                fontSize: metrics.size(22, min: 16, max: 28),
+                color: KidUi.ink,
+              ),
+            ),
+          SizedBox(height: metrics.gap * 0.4),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              _ReplayButton(
+                metrics: metrics,
+                accent: widget.accent,
+                label: widget.replayLabel,
+                onTap: _speakCurrentLine,
+              ),
+              SizedBox(width: metrics.gap * 0.6),
+              Flexible(
+                child: AnimatedBuilder(
+                  animation: _nudge,
+                  builder: (BuildContext context, Widget? child) {
+                    // One small up-and-back, so an early tap is visibly
+                    // received rather than swallowed.
+                    final double bump = 1 - (_nudge.value * 2 - 1).abs();
+                    return Transform.scale(
+                      scale: 1 + 0.06 * bump,
+                      child: child,
+                    );
+                  },
+                  child: _ContinueButton(
+                    metrics: metrics,
+                    label: _isOnLastLine
+                        ? widget.continueLabel
+                        : widget.nextLabel,
+                    accent: widget.accent,
+                    languageCode: widget.languageCode,
+                    isWaiting: _isNarrating,
+                    onTap: _advance,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
