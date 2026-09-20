@@ -184,8 +184,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       _unlockBoard();
       return;
     }
-    await _speakReveal();
-    await _advance();
+    await _settleThenAdvance(await _speakReveal());
   }
 
   Future<void> _handleWrong(
@@ -256,8 +255,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
     await services.soundboard.play(ActivitySound.success);
     // The child still gets the clue. Withholding the story beat from the one
     // child who needed every rung of the ladder would be exactly backwards.
-    await _speakReveal();
-    await _advance();
+    await _settleThenAdvance(await _speakReveal());
   }
 
   Future<void> _handleHelpRequest() async {
@@ -273,6 +271,26 @@ abstract class ActivityCubit<TContent extends ActivityContent,
     await _speakForLevel(level);
     _unlockBoard();
   }
+
+  /// Moves to the next step, never instantaneously.
+  ///
+  /// When the reveal line was spoken, waiting for it is the pause. When it was
+  /// skipped - an empty `revealLine`, or the same sentence as last time, which
+  /// is the ordinary case for an activity whose steps share one line - `_speak`
+  /// returns at once and the board would otherwise swap under the child's
+  /// finger in the same frame they tapped. A beat of daylight between "you got
+  /// it" and the next question is not decoration; without it the child cannot
+  /// tell the two events apart.
+  Future<void> _settleThenAdvance(bool didSpeak) async {
+    if (!didSpeak) {
+      await Future<void>.delayed(_silentStepPause);
+    }
+    await _advance();
+  }
+
+  /// Matches `KidUi.medium`, duplicated rather than imported: the contract
+  /// layer stays free of anything that drags in a widget library.
+  static const Duration _silentStepPause = Duration(milliseconds: 350);
 
   Future<void> _advance() async {
     if (_stepIndex >= _steps.length - 1) {
@@ -339,22 +357,25 @@ abstract class ActivityCubit<TContent extends ActivityContent,
   /// Only *consecutive* duplicates are dropped. A line that comes round again
   /// later, with other speech between, is a reminder rather than a stutter, and
   /// the help button re-speaking on demand is a different path entirely.
-  Future<void> _speak(String line) async {
+  /// Returns whether anything was actually spoken, which callers that gate a
+  /// transition need to know: a line that was skipped provides no pause at all.
+  Future<bool> _speak(String line) async {
     final String trimmed = line.trim();
     if (trimmed.isEmpty || trimmed == _lastSpokenLine) {
-      return;
+      return false;
     }
     _lastSpokenLine = trimmed;
     await services.narrator.speak(trimmed);
+    return true;
   }
 
-  Future<void> _speakPrompt() async {
+  Future<bool> _speakPrompt() async {
     final ActivityStepView? view = state.view;
     final String line = (view?.spokenPrompt ?? view?.prompt)
             ?.resolve(services.languageCode) ??
         '';
     final String fallback = spec.narration.prompt.resolve(services.languageCode);
-    await _speak(line.isNotEmpty ? line : fallback);
+    return _speak(line.isNotEmpty ? line : fallback);
   }
 
   /// Says the running count aloud as the child tags objects.
@@ -376,11 +397,11 @@ abstract class ActivityCubit<TContent extends ActivityContent,
         .speak(NumberWords.spoken(attempt.runningCount, services.languageCode));
   }
 
-  Future<void> _speakReveal() async {
-    await _speak(state.view?.revealLine?.resolve(services.languageCode) ?? '');
+  Future<bool> _speakReveal() async {
+    return _speak(state.view?.revealLine?.resolve(services.languageCode) ?? '');
   }
 
-  Future<void> _speakForLevel(ScaffoldLevel level) async {
+  Future<bool> _speakForLevel(ScaffoldLevel level) async {
     final String line;
     switch (level) {
       case ScaffoldLevel.gentleRetry:
@@ -396,7 +417,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
         line = '';
         break;
     }
-    await _speak(line);
+    return _speak(line);
   }
 
   Future<void> _recordAttempt(AttemptOutcome outcome) async {

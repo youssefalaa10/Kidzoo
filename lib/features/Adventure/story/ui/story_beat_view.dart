@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
 import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text.dart';
@@ -26,8 +28,12 @@ class StoryBeatView extends StatefulWidget {
   final StoryNode node;
   final String languageCode;
 
-  /// Speaks a line. Injected rather than called directly so this widget stays
-  /// testable without a TTS engine.
+  /// Speaks a line, resolving when the audio has stopped.
+  ///
+  /// Injected rather than called directly so this widget stays testable
+  /// without a TTS engine — and the beat now *waits* on the returned future, so
+  /// an injected narrator that resolves early will make the beat advance early.
+  /// That is the contract `ActivityNarrator.speak` promises.
   final Future<void> Function(String line) onSpeak;
 
   final VoidCallback onContinue;
@@ -55,8 +61,35 @@ class StoryBeatView extends StatefulWidget {
   State<StoryBeatView> createState() => _StoryBeatViewState();
 }
 
-class _StoryBeatViewState extends State<StoryBeatView> {
+class _StoryBeatViewState extends State<StoryBeatView>
+    with SingleTickerProviderStateMixin {
+  /// Acknowledges a tap that arrived while the narrator was still talking.
+  late final AnimationController _nudge = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 220),
+  );
+
   int _visibleLineIndex = 0;
+
+  /// True from the moment a line starts being spoken until the audio stops.
+  ///
+  /// Nothing advances while this is set. The story used to hand off on a tap
+  /// regardless of what was playing, so the next activity's prompt started on
+  /// top of the sentence that was introducing it — the child heard two voices
+  /// at the exact moment they most needed to hear one.
+  bool _isNarrating = false;
+
+  /// Identifies the line currently being spoken, so a late-resolving future
+  /// belonging to a line the child has already moved past cannot unlock the
+  /// button for a line that is still talking.
+  int _speechGeneration = 0;
+
+  /// Liveness backstop. `Speech` already guarantees its future resolves, so
+  /// this only covers an injected narrator that never does; without it such a
+  /// narrator would lock a child out of the story with no way forward.
+  Timer? _narrationFailsafe;
+
+  static const Duration _failsafe = Duration(seconds: 20);
 
   /// Set the instant the last line is tapped through.
   ///
@@ -84,23 +117,67 @@ class _StoryBeatViewState extends State<StoryBeatView> {
     }
   }
 
-  void _speakCurrentLine() {
+  @override
+  void dispose() {
+    _narrationFailsafe?.cancel();
+    _nudge.dispose();
+    super.dispose();
+  }
+
+  Future<void> _speakCurrentLine() async {
     if (!mounted || _visibleLineIndex >= widget.node.lines.length) {
       return;
     }
     final String line =
         widget.node.lines[_visibleLineIndex].resolve(widget.languageCode);
-    if (line.isNotEmpty) {
-      // Not awaited: the beat must stay tappable while it is talking. The
-      // narrator's latest-wins rule is what keeps that from overlapping.
-      widget.onSpeak(line);
+    if (line.isEmpty) {
+      // A missing string must never be able to lock a child out of the story.
+      _setNarrating(false);
+      return;
     }
+
+    final int generation = ++_speechGeneration;
+    _setNarrating(true);
+    _narrationFailsafe?.cancel();
+    _narrationFailsafe = Timer(_failsafe, () {
+      if (generation == _speechGeneration) {
+        _setNarrating(false);
+      }
+    });
+
+    await widget.onSpeak(line);
+
+    // A stale line resolving late says nothing about the line now playing.
+    if (!mounted || generation != _speechGeneration) {
+      return;
+    }
+    _narrationFailsafe?.cancel();
+    _setNarrating(false);
+  }
+
+  void _setNarrating(bool value) {
+    if (_isNarrating == value) {
+      return;
+    }
+    if (!mounted) {
+      _isNarrating = value;
+      return;
+    }
+    setState(() => _isNarrating = value);
   }
 
   bool get _isOnLastLine => _visibleLineIndex >= widget.node.lines.length - 1;
 
   void _advance() {
     if (_hasHandedOff) {
+      return;
+    }
+    if (_isNarrating) {
+      // Absorbed, not queued. The tap still gets a haptic and the button still
+      // bounces, because a control that does nothing at all reads as broken to
+      // a four-year-old — but nothing moves until the voice has finished.
+      KidHaptics.tap();
+      _nudge.forward(from: 0);
       return;
     }
     KidHaptics.tap();
@@ -177,14 +254,28 @@ class _StoryBeatViewState extends State<StoryBeatView> {
                           ),
                           SizedBox(width: metrics.gap * 0.6),
                           Flexible(
-                            child: _ContinueButton(
-                              metrics: metrics,
-                              label: _isOnLastLine
-                                  ? widget.continueLabel
-                                  : widget.nextLabel,
-                              accent: widget.accent,
-                              languageCode: widget.languageCode,
-                              onTap: _advance,
+                            child: AnimatedBuilder(
+                              animation: _nudge,
+                              builder: (BuildContext context, Widget? child) {
+                                // One small up-and-back, so an early tap is
+                                // visibly received rather than swallowed.
+                                final double bump =
+                                    1 - (_nudge.value * 2 - 1).abs();
+                                return Transform.scale(
+                                  scale: 1 + 0.06 * bump,
+                                  child: child,
+                                );
+                              },
+                              child: _ContinueButton(
+                                metrics: metrics,
+                                label: _isOnLastLine
+                                    ? widget.continueLabel
+                                    : widget.nextLabel,
+                                accent: widget.accent,
+                                languageCode: widget.languageCode,
+                                isWaiting: _isNarrating,
+                                onTap: _advance,
+                              ),
                             ),
                           ),
                         ],
@@ -256,6 +347,7 @@ class _ContinueButton extends StatelessWidget {
     required this.label,
     required this.accent,
     required this.languageCode,
+    required this.isWaiting,
     required this.onTap,
   });
 
@@ -263,17 +355,32 @@ class _ContinueButton extends StatelessWidget {
   final String label;
   final Color accent;
   final String languageCode;
+
+  /// True while the line is still being spoken.
+  ///
+  /// The button keeps its **word** either way - a pre-reader learns the shape
+  /// of "Next", and swapping it for a spinner would take that away at the one
+  /// moment they are looking straight at it. What changes is the colour and
+  /// the trailing glyph: dimmed with three breathing dots means "listen", full
+  /// accent with an arrow means "go".
+  final bool isWaiting;
+
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     final bool isRtl = ActivityGlyphText.isRightToLeft(languageCode);
+    final double glyphSize = metrics.size(22, min: 18, max: 28);
+
     return Semantics(
       button: true,
+      enabled: !isWaiting,
       label: label,
       child: GestureDetector(
         onTap: onTap,
-        child: Container(
+        child: AnimatedContainer(
+          duration: KidUi.medium,
+          curve: Curves.easeOut,
           constraints: BoxConstraints(
             minHeight: metrics.size(KidUi.minTouch, min: 56, max: 88),
           ),
@@ -282,9 +389,9 @@ class _ContinueButton extends StatelessWidget {
             vertical: metrics.size(12, min: 8, max: 16),
           ),
           decoration: BoxDecoration(
-            color: accent,
+            color: isWaiting ? accent.withValues(alpha: 0.45) : accent,
             borderRadius: BorderRadius.circular(KidUi.radiusPill),
-            boxShadow: KidUi.shadow(accent, strength: 0.8),
+            boxShadow: KidUi.shadow(accent, strength: isWaiting ? 0.25 : 0.8),
           ),
           child: Row(
             mainAxisSize: MainAxisSize.min,
@@ -299,19 +406,87 @@ class _ContinueButton extends StatelessWidget {
                 ),
               ),
               SizedBox(width: metrics.gap * 0.3),
-              // The arrow follows the reading direction, so "onward" points
-              // the way the child's eye already travels.
-              Icon(
-                isRtl
-                    ? Icons.arrow_back_rounded
-                    : Icons.arrow_forward_rounded,
-                color: Colors.white,
-                size: metrics.size(22, min: 18, max: 28),
-              ),
+              if (isWaiting)
+                _SpeakingDots(size: glyphSize)
+              else
+                // The arrow follows the reading direction, so "onward" points
+                // the way the child's eye already travels.
+                Icon(
+                  isRtl
+                      ? Icons.arrow_back_rounded
+                      : Icons.arrow_forward_rounded,
+                  color: Colors.white,
+                  size: glyphSize,
+                ),
             ],
           ),
         ),
       ),
+    );
+  }
+}
+
+/// Three dots that breathe in turn while a line is being spoken.
+///
+/// The one moving thing on the beat, and it sits on the control the child is
+/// waiting for - so "wait" and "this is what you will touch next" are the same
+/// object rather than two things competing for attention.
+class _SpeakingDots extends StatefulWidget {
+  const _SpeakingDots({required this.size});
+
+  final double size;
+
+  @override
+  State<_SpeakingDots> createState() => _SpeakingDotsState();
+}
+
+class _SpeakingDotsState extends State<_SpeakingDots>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1100),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  /// Phase-shifted triangle wave, so the three dots peak in sequence.
+  double _opacityFor(int index) {
+    final double phase = (_controller.value + index / 3) % 1.0;
+    final double wave = 1 - (phase * 2 - 1).abs();
+    return 0.35 + 0.65 * wave.clamp(0.0, 1.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double dot = widget.size * 0.24;
+    return AnimatedBuilder(
+      animation: _controller,
+      builder: (BuildContext context, Widget? child) {
+        return Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            for (int index = 0; index < 3; index++)
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: dot * 0.22),
+                child: Opacity(
+                  opacity: _opacityFor(index),
+                  child: Container(
+                    width: dot,
+                    height: dot,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
