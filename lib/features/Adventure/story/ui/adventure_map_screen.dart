@@ -15,7 +15,7 @@ import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text
 import 'package:kidzo/features/Adventure/engine/support/localized_text.dart';
 import 'package:kidzo/features/Adventure/story/models/story_models.dart';
 import 'package:kidzo/features/Adventure/story/ui/adventure_runner_screen.dart';
-import 'package:kidzo/features/Adventure/story/ui/map_stop_tile.dart';
+import 'package:kidzo/features/Adventure/story/ui/journey_trail.dart';
 import 'package:kidzo/features/Adventure/story/ui/story_book_view.dart';
 import 'package:kidzo/features/Profile/profile_cubit.dart';
 import 'package:kidzo/features/Profile/profile_state.dart';
@@ -33,6 +33,12 @@ import 'package:kidzo/features/Profile/profile_state.dart';
 /// next one. The locked stops carry a name and nothing more until the Adventure
 /// before them is finished — enough to promise a journey, not enough to spend
 /// the surprise.
+///
+/// One bead is one **story**. Opening it plays that Adventure from its first
+/// line to its last — narration, activities, resolution — without ever coming
+/// back here in between, and only finishing the whole thing marks it done and
+/// opens the next. The activities inside a story are not map nodes, because
+/// they are not places the child can go to.
 class AdventureMapScreen extends StatefulWidget {
   const AdventureMapScreen({
     super.key,
@@ -206,6 +212,22 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
   /// Bumped after returning from an Adventure so the stops and the book refresh.
   int _refreshToken = 0;
 
+  final ScrollController _scroll = ScrollController();
+
+  /// The trail is scrolled to the current bead rather than to the top.
+  ///
+  /// With the first story finished, the top of the map is a stop the child has
+  /// already played; landing there asks them to work out where they are before
+  /// they can do anything. Jump the first time, glide afterwards, so coming
+  /// back from a story *shows* the map changing.
+  bool _hasCentredOnCurrent = false;
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
   /// Which Adventure ids were already finished when this screen last rendered.
   ///
   /// Kept so the screen can tell "finished a while ago" from "finished just
@@ -232,6 +254,8 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
     if (!mounted) {
       return;
     }
+    // Something on the map may have just opened, so let the next build find it.
+    _hasCentredOnCurrent = false;
     setState(() => _refreshToken++);
     // They have just played, so there is now something real to remind them
     // about. Scheduling here also means the permission prompt lands after the
@@ -282,6 +306,10 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
       stops.add(MapStop(
         id: destination.id,
         title: destination.title,
+        // The motif the content authored. Nothing read this before, so every
+        // unwritten place wore the same padlock; a shopfront, a wave and a
+        // spark say "somewhere is coming" without saying what happens there.
+        icon: destination.icon,
         // Only the very next place gets its line, and only once the road to it
         // is clear. Two teasers at once reads as a menu of things the child
         // cannot have.
@@ -341,60 +369,296 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
           _noteUnlocks(completed);
         }
         final List<MapStop> stops = _stopsFor(completed);
+        final double headerInset = metrics.size(96, min: 78, max: 126);
 
-        return ListView(
-          padding: EdgeInsets.all(metrics.pagePadding),
+        _scheduleCentreOnCurrent(stops, metrics, headerInset);
+
+        return Stack(
           children: <Widget>[
-            ActivityGlyphText(
-              arc.title.resolve(widget.languageCode),
-              languageCode: widget.languageCode,
-              fontSize: metrics.size(30, min: 22, max: 40),
-              color: Colors.white,
-            ),
-            SizedBox(height: metrics.gap * 0.4),
-            ActivityGlyphText(
-              arc.premise.resolve(widget.languageCode),
-              languageCode: widget.languageCode,
-              fontSize: metrics.size(16, min: 13, max: 20),
-              fontWeight: FontWeight.w600,
-              color: Colors.white,
-            ),
-            SizedBox(height: metrics.gap),
-            StoryBookView(
-              key: ValueKey<int>(_refreshToken),
-              bundle: widget.bundle,
-              storyDao: widget.storyDao,
-              profileId: widget.profileId,
-              languageCode: widget.languageCode,
-              metrics: metrics,
-              l10n: widget.l10n,
-            ),
-            SizedBox(height: metrics.gap * 1.2),
-            ActivityGlyphText(
-              widget.l10n.resolve('adventureJourney', fallback: 'Your journey'),
-              languageCode: widget.languageCode,
-              fontSize: metrics.size(20, min: 16, max: 26),
-              color: Colors.white,
-              textAlign: TextAlign.start,
-            ),
-            SizedBox(height: metrics.gap * 0.6),
-            for (int index = 0; index < stops.length; index++)
-              MapStopTile(
-                stop: stops[index],
-                isLast: index == stops.length - 1,
-                isJustUnlocked: stops[index].id == _justUnlockedStopId,
-                isInProgress: started.contains(stops[index].id),
+            Positioned.fill(
+              child: JourneyTrail(
+                stops: stops,
                 languageCode: widget.languageCode,
                 metrics: metrics,
-                l10n: widget.l10n,
-                onOpen: stops[index].state == MapStopState.comingSoon ||
-                        stops[index].state == MapStopState.locked
-                    ? null
-                    : () => _openAdventure(stops[index].id),
+                controller: _scroll,
+                topInset: headerInset + metrics.gap,
+                justUnlockedStopId: _justUnlockedStopId,
+                statusLabelFor: (MapStop stop) =>
+                    _statusLabelFor(stop, started.contains(stop.id)),
+                onOpen: (MapStop stop) => _openAdventure(stop.id),
               ),
+            ),
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: _JourneyHeader(
+                title: arc.title.resolve(widget.languageCode),
+                languageCode: widget.languageCode,
+                metrics: metrics,
+                pagesFound: completed.length,
+                pagesTotal: stops.length,
+                bookLabel: widget.l10n.resolve('storyBook', fallback: 'Book'),
+                onBack: () => Navigator.of(context).maybePop(),
+                onOpenBook: () => _showBook(arc),
+              ),
+            ),
           ],
         );
       },
+    );
+  }
+
+  /// What a bead says about itself when a child asks.
+  String _statusLabelFor(MapStop stop, bool isInProgress) {
+    switch (stop.state) {
+      case MapStopState.completed:
+        return widget.l10n.resolve('adventureReplay', fallback: 'Again');
+      case MapStopState.open:
+        return isInProgress
+            ? widget.l10n.resolve('adventureResume', fallback: 'Continue')
+            : widget.l10n.resolve('adventureStart', fallback: 'Start');
+      case MapStopState.locked:
+        return widget.l10n.resolve('adventureLocked', fallback: 'Not yet');
+      case MapStopState.comingSoon:
+        return widget.l10n.resolve('adventureComingSoon',
+            fallback: 'Coming soon');
+    }
+  }
+
+  /// Puts the bead the child should play next on screen, once per arrival.
+  void _scheduleCentreOnCurrent(
+    List<MapStop> stops,
+    KidMetrics metrics,
+    double headerInset,
+  ) {
+    if (_hasCentredOnCurrent) {
+      return;
+    }
+    final int index = stops.indexWhere(
+      (MapStop stop) => stop.state == MapStopState.open,
+    );
+    if (index < 0) {
+      _hasCentredOnCurrent = true;
+      return;
+    }
+    _hasCentredOnCurrent = true;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted || !_scroll.hasClients) {
+        return;
+      }
+      final double target = JourneyTrail.offsetFor(
+        index: index,
+        metrics: metrics,
+        viewportHeight: _scroll.position.viewportDimension,
+        topInset: headerInset + metrics.gap,
+      ).clamp(0.0, _scroll.position.maxScrollExtent);
+      _scroll.animateTo(
+        target,
+        duration: const Duration(milliseconds: 650),
+        curve: Curves.easeOutCubic,
+      );
+    });
+  }
+
+  /// The book, and the premise, on demand.
+  ///
+  /// Both used to sit above the trail and cost most of a phone screen before
+  /// the child could see where they were. They are still one tap away — and the
+  /// book badge in the header keeps the count visible the whole time, which is
+  /// the part that actually needed to be permanent.
+  void _showBook(StoryArc arc) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (BuildContext sheetContext) {
+        return SafeArea(
+          child: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) {
+              final KidMetrics sheetMetrics = KidMetrics.of(constraints);
+              return Container(
+                margin: EdgeInsets.all(sheetMetrics.pagePadding),
+                padding: EdgeInsets.all(sheetMetrics.pagePadding),
+                decoration: BoxDecoration(
+                  color: KidUi.cream,
+                  borderRadius: BorderRadius.circular(KidUi.radiusCard),
+                  boxShadow: KidUi.shadow(KidUi.primary),
+                ),
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: <Widget>[
+                      ActivityGlyphText(
+                        arc.premise.resolve(widget.languageCode),
+                        languageCode: widget.languageCode,
+                        fontSize: sheetMetrics.size(16, min: 13, max: 20),
+                        fontWeight: FontWeight.w600,
+                        color: KidUi.ink,
+                      ),
+                      SizedBox(height: sheetMetrics.gap),
+                      StoryBookView(
+                        bundle: widget.bundle,
+                        storyDao: widget.storyDao,
+                        profileId: widget.profileId,
+                        languageCode: widget.languageCode,
+                        metrics: sheetMetrics,
+                        l10n: widget.l10n,
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// The one permanent piece of chrome on the map.
+///
+/// Back, where the child is, and how much of the book is home. Everything else
+/// the old header carried — the premise paragraph, the book itself — moved
+/// behind the badge, because the map is the thing worth the screen.
+class _JourneyHeader extends StatelessWidget {
+  const _JourneyHeader({
+    required this.title,
+    required this.languageCode,
+    required this.metrics,
+    required this.pagesFound,
+    required this.pagesTotal,
+    required this.bookLabel,
+    required this.onBack,
+    required this.onOpenBook,
+  });
+
+  final String title;
+  final String languageCode;
+  final KidMetrics metrics;
+  final int pagesFound;
+  final int pagesTotal;
+  final String bookLabel;
+  final VoidCallback onBack;
+  final VoidCallback onOpenBook;
+
+  @override
+  Widget build(BuildContext context) {
+    final double button = metrics.size(54, min: 46, max: 68);
+
+    return SafeArea(
+      bottom: false,
+      child: Padding(
+        padding: EdgeInsets.symmetric(
+          horizontal: metrics.pagePadding,
+          vertical: metrics.gap * 0.5,
+        ),
+        child: Container(
+          padding: EdgeInsets.all(metrics.size(8, min: 6, max: 12)),
+          decoration: BoxDecoration(
+            color: KidUi.ink.withValues(alpha: 0.42),
+            borderRadius: BorderRadius.circular(KidUi.radiusPill),
+          ),
+          child: Row(
+            children: <Widget>[
+              _HeaderButton(
+                size: button,
+                icon: Icons.arrow_back_rounded,
+                label: 'Back',
+                onTap: onBack,
+              ),
+              SizedBox(width: metrics.gap * 0.5),
+              Expanded(
+                child: ActivityGlyphText(
+                  title,
+                  languageCode: languageCode,
+                  fontSize: metrics.size(19, min: 15, max: 25),
+                  color: Colors.white,
+                  maxLines: 1,
+                  textAlign: TextAlign.start,
+                ),
+              ),
+              SizedBox(width: metrics.gap * 0.5),
+              Semantics(
+                button: true,
+                label: '$bookLabel $pagesFound / $pagesTotal',
+                child: GestureDetector(
+                  onTap: () {
+                    KidHaptics.tap();
+                    onOpenBook();
+                  },
+                  child: Container(
+                    height: button,
+                    padding: EdgeInsets.symmetric(
+                      horizontal: metrics.size(12, min: 9, max: 16),
+                    ),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withValues(alpha: 0.94),
+                      borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: <Widget>[
+                        Icon(
+                          Icons.auto_stories_rounded,
+                          size: button * 0.46,
+                          color: KidUi.primary,
+                        ),
+                        SizedBox(width: metrics.gap * 0.25),
+                        ActivityGlyphText(
+                          '$pagesFound/$pagesTotal',
+                          languageCode: languageCode,
+                          fontSize: metrics.size(15, min: 12, max: 19),
+                          color: KidUi.ink,
+                          maxLines: 1,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _HeaderButton extends StatelessWidget {
+  const _HeaderButton({
+    required this.size,
+    required this.icon,
+    required this.label,
+    required this.onTap,
+  });
+
+  final double size;
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      label: label,
+      child: GestureDetector(
+        onTap: () {
+          KidHaptics.tap();
+          onTap();
+        },
+        child: Container(
+          width: size,
+          height: size,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.94),
+            shape: BoxShape.circle,
+          ),
+          child: Icon(icon, size: size * 0.5, color: KidUi.ink),
+        ),
+      ),
     );
   }
 }
