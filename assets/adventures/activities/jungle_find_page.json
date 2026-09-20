@@ -31,17 +31,47 @@
   },
   "payload": {
     "_comment": "Positions are whole percentages of the scene box, so one authored scene works on a phone, a tablet and in landscape. Hidden-object scenes do NOT mirror in Arabic: a painted jungle is a picture, not a line of text. The clue art is `page_green.png` and not a coloured shape - the story calls this the GREEN page in both locales, and the previous art was `shapes/square.png`, which is orange. A child who is told to find something green and then hands back an orange square has been lied to, and hint2 ('it is green, and flat like paper') only works because the asset now actually is. A content test asserts the thing searched for and the thing awarded are one picture.",
+    "_sceneComment": "The page used to sit alone on a backdrop with seven animals scattered at random, which made it the only flat green rectangle on screen - seen instantly, never found. It now lies on a jungle floor with a frond and a leaf resting across it. Two rules hold this together and neither is negotiable: the covers are authored to leave a corner of the page showing, so tapping that corner wins WITHOUT moving anything and the level stays very easy; and moving a cover is not an attempt, so a child who sweeps three leaves aside has made no mistakes. `props` and `covers` carry `shape` names today and are drawn in code. They are placeholders for real illustration: swapping a `shape` for an `image` path is a content edit with no code change, and the positions, scales and turns below carry over untouched.",
     "clues": [
       {
         "id": "green_page",
-        "positionPercent": [68, 61],
+        "positionPercent": [66, 62],
         "image": "assets/gen/images/story/page_green.png",
         "scale": 1.0,
         "label": { "en": "the Green Page", "ar": "الصَّفْحَةُ الخَضْرَاء" }
       }
     ],
-    "visualNoiseCount": 7,
-    "revealOnIdleSeconds": 15,
+    "ground": "ground",
+    "props": [
+      { "shape": "bush", "positionPercent": [14, 70], "scale": 1.15, "turn": -4 },
+      { "shape": "bush", "positionPercent": [88, 74], "scale": 0.95, "turn": 5, "flip": true },
+      { "shape": "rock", "positionPercent": [30, 84], "scale": 0.8 },
+      { "shape": "log", "positionPercent": [74, 87], "scale": 1.05, "turn": -3 },
+      { "shape": "grass", "positionPercent": [48, 80], "scale": 0.9 },
+      { "shape": "flower", "positionPercent": [20, 88], "scale": 0.6 },
+      { "shape": "leaf", "positionPercent": [40, 30], "scale": 0.7, "turn": 24 }
+    ],
+    "_coverComment": "Covers are placed against the CLUE, in percentages of the page's own size, not against the scene. Scene percentages are per-axis while every object is sized from the box's short side, so on a landscape board two things a few percent apart drift far apart in pixels and a frond authored to lie across the page sits well clear of it. Anchoring here makes the overlap the author drew the overlap every child sees.",
+    "covers": [
+      {
+        "id": "frond_over_page",
+        "shape": "frond",
+        "offsetFromCluePercent": [-55, -45],
+        "scale": 1.05,
+        "turn": 28,
+        "move": "slideLeft"
+      },
+      {
+        "id": "leaf_over_page",
+        "shape": "leaf",
+        "offsetFromCluePercent": [58, 48],
+        "scale": 0.7,
+        "turn": -18,
+        "move": "slideRight"
+      }
+    ],
+    "visualNoiseCount": 4,
+    "revealOnIdleSeconds": 8,
     "hitToleranceFraction": 0.14,
     "itemsRef": "packs/animals",
     "noiseItemIds": ["monkey", "bird", "rabbit", "fish"]
