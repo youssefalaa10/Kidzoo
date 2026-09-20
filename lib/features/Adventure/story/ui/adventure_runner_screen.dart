@@ -153,10 +153,12 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       return;
     }
     _setActivityOpen(true);
-    // The beat that introduced this activity may still be talking. The activity
-    // opens by speaking its own prompt, so without this the child hears the
-    // instruction and the set-up on top of each other — which is exactly the
-    // moment they most need to hear one thing clearly.
+    // A no-op on the ordinary path now: `StoryBeatView` will not hand off until
+    // the line it is on has finished, so there is nothing left in the air to
+    // cut. It stays for the paths that do not come through a finished beat —
+    // re-entry after backing out, and a resume that lands straight on an
+    // activity node — where the activity is about to speak its own prompt and
+    // must not do so over anything else.
     await _narrator.cancel();
     if (!mounted) {
       return;

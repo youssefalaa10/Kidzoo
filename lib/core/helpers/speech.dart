@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
@@ -6,6 +8,26 @@ import 'azure_tts.dart';
 import 'tts_service.dart';
 import 'tts_setup_report.dart';
 import 'tts_voice_selection.dart';
+
+/// How an utterance ended.
+///
+/// The difference between these is the whole point of [Speech.speakAndWait]:
+/// a caller that gates a scene transition needs to know the audio has actually
+/// stopped, and needs to know it from the engine rather than from a guess.
+enum SpeechOutcome {
+  /// The engine reported the utterance finished on its own.
+  completed,
+
+  /// Superseded, stopped, or the app went away. Audio is silent.
+  cancelled,
+
+  /// Nothing was spoken, and nothing was going to be. Returns at once.
+  skipped,
+
+  /// Dispatch failed, or no completion event ever arrived and the watchdog
+  /// stepped in. Audio has been stopped either way.
+  failed,
+}
 
 /// Where a given utterance is being spoken from.
 enum SpeechRoute {
@@ -41,6 +63,18 @@ class Speech {
   static AudioPlayer? _player;
   static AzureTtsClient? _azure;
 
+  /// The utterance [speakAndWait] is currently waiting on, if any.
+  static Completer<SpeechOutcome>? _utterance;
+
+  /// Liveness guard for the current utterance. Never the transition signal.
+  static Timer? _watchdog;
+
+  /// Bumped whenever an utterance is superseded or stopped, so a late platform
+  /// callback belonging to an abandoned utterance cannot resolve a newer one.
+  static int _utteranceGeneration = 0;
+
+  static StreamSubscription<void>? _playerCompletion;
+
   static String _languageCode = 'en';
   static SpeechRoute _route = SpeechRoute.device;
 
@@ -63,10 +97,44 @@ class Speech {
     _tts = tts;
     _player = player;
     if (AzureSpeechConfig.isConfigured) _azure ??= AzureTtsClient();
+    _wireCompletion(tts, player);
+  }
+
+  /// Attaches the completion callbacks that make [speakAndWait] real.
+  ///
+  /// These go on **this** facade's engine and player. There is a second
+  /// `FlutterTts` inside `TtsService`, and a handler registered through
+  /// `TtsService.setCompletionHandler` fires for that other instance - so it
+  /// would never see an utterance spoken through here, and the wait would hang
+  /// until the watchdog rescued it every single time.
+  ///
+  /// Deliberately **not** `awaitSpeakCompletion(true)`. That would make
+  /// `tts.speak` itself block until the utterance ends, and about twenty legacy
+  /// call sites do `await Speech.speak(...)` and then apply their own timing on
+  /// top. Turning those awaits from "dispatched" into "finished" would re-time
+  /// every one of them. The handlers below give the real completion event
+  /// without changing what `speak` means to anyone already calling it.
+  static void _wireCompletion(FlutterTts tts, AudioPlayer player) {
+    tts.setCompletionHandler(() => _settle(SpeechOutcome.completed));
+    tts.setCancelHandler(() => _settle(SpeechOutcome.cancelled));
+    tts.setErrorHandler((dynamic message) {
+      debugPrint('Speech: engine error: $message');
+      _settle(SpeechOutcome.failed);
+    });
+    _playerCompletion?.cancel();
+    // The cloud route plays a file, so its completion comes from the player.
+    _playerCompletion =
+        player.onPlayerComplete.listen((_) => _settle(SpeechOutcome.completed));
   }
 
   @visibleForTesting
   static void reset() {
+    _watchdog?.cancel();
+    _watchdog = null;
+    _playerCompletion?.cancel();
+    _playerCompletion = null;
+    _utterance = null;
+    _utteranceGeneration = 0;
     _tts = null;
     _player = null;
     _azure = null;
@@ -140,14 +208,10 @@ class Speech {
       return false;
     }
 
-    if (_route == SpeechRoute.azure) {
-      if (await _speakWithAzure(text)) return true;
-      // Network down, quota spent, or a bad key. Better a plainer voice than
-      // silence in a child's game.
-      debugPrint('Speech: Azure unavailable, using device voice');
-    }
-
-    return _speakWithDevice(text);
+    // Network down, quota spent, or a bad key falls through to the device
+    // voice inside `_dispatch`. Better a plainer voice than silence in a
+    // child's game.
+    return _dispatch(text);
   }
 
   static Future<bool> _speakWithAzure(String text) async {
@@ -179,8 +243,136 @@ class Speech {
     }
   }
 
-  /// Stops whichever route is currently talking.
+  /// Speaks [text] and resolves only once the audio has actually stopped.
+  ///
+  /// This is the call anything sequencing a scene must use. [speak] returns on
+  /// **dispatch**, which is why the story used to move while the narrator was
+  /// still mid-sentence; this one resolves from the engine's own completion
+  /// callback, and the character-count estimate survives only as the watchdog
+  /// below.
+  ///
+  /// The guarantee callers rely on: **when this future resolves, nothing is
+  /// playing.** Every path honours it, including the failure paths.
+  static Future<SpeechOutcome> speakAndWait(String text) async {
+    final trimmed = text.trim();
+    if (trimmed.isEmpty) return SpeechOutcome.skipped;
+
+    if (_route == SpeechRoute.needsVoiceData) {
+      // Returns immediately rather than waiting out an utterance that was
+      // never going to happen. This used to sit silent for the full estimate -
+      // up to eight seconds of dead air on a device with no Arabic voice, with
+      // the child looking at a button that would not light up.
+      debugPrint('Speech: skipped - no Arabic voice installed');
+      onVoiceDataMissing?.call();
+      return SpeechOutcome.skipped;
+    }
+
+    // Anything still in flight is silenced and settled before a new utterance
+    // starts, so two lines can never overlap and no stale waiter survives.
+    await stop();
+
+    final completer = Completer<SpeechOutcome>();
+    _utterance = completer;
+    final generation = _utteranceGeneration;
+
+    final dispatched = await _dispatch(trimmed)
+        .timeout(dispatchTimeout, onTimeout: () => false);
+
+    if (generation != _utteranceGeneration) {
+      // Superseded while dispatching. `stop()` already settled this completer.
+      return completer.future;
+    }
+    if (!dispatched) {
+      await _stopEngines();
+      _settle(SpeechOutcome.failed);
+      return completer.future;
+    }
+    if (!completer.isCompleted) {
+      _watchdog = Timer(watchdogFor(trimmed), () => _onWatchdogFired(generation));
+    }
+    return completer.future;
+  }
+
+  /// Sends [text] to whichever route is active, cloud first with a device
+  /// fallback. Returns whether audio was actually started.
+  static Future<bool> _dispatch(String text) async {
+    if (_route == SpeechRoute.azure) {
+      if (await _speakWithAzure(text)) return true;
+      debugPrint('Speech: Azure unavailable, using device voice');
+    }
+    return _speakWithDevice(text);
+  }
+
+  /// Longest a dispatch may take before it is treated as failed.
+  ///
+  /// Generous because the cloud route synthesises to a file first, and that is
+  /// a network round trip before a single sound is made.
+  static const Duration dispatchTimeout = Duration(seconds: 15);
+
+  /// How long to wait for a completion event before assuming it is never
+  /// coming. Twice the estimate plus a margin: comfortably longer than any
+  /// real utterance, so a healthy engine never reaches it.
+  static Duration watchdogFor(String text) =>
+      estimateFor(text) * 2 + const Duration(seconds: 2);
+
+  /// Roughly how long [text] takes to say. **Only** used to size the watchdog.
+  ///
+  /// It was previously the completion signal itself, which is what let the
+  /// story run ahead of the voice: it is a guess, it is capped, and a capped
+  /// guess on a long line expires while the engine is still talking.
+  static Duration estimateFor(String text) {
+    final estimated = text.length * millisecondsPerCharacter;
+    if (estimated < minimumUtterance.inMilliseconds) return minimumUtterance;
+    if (estimated > maximumUtterance.inMilliseconds) return maximumUtterance;
+    return Duration(milliseconds: estimated);
+  }
+
+  static const Duration minimumUtterance = Duration(milliseconds: 700);
+  static const Duration maximumUtterance = Duration(seconds: 8);
+  static const int millisecondsPerCharacter = 55;
+
+  /// No completion event arrived. Stop the audio, **then** resolve.
+  ///
+  /// The order is the whole point. Resolving first would release the caller to
+  /// start the next scene while the engine may still be speaking - precisely
+  /// the overlap this mechanism exists to prevent - so a lost callback would
+  /// quietly reintroduce the original bug on exactly the lines most likely to
+  /// trigger it.
+  static Future<void> _onWatchdogFired(int generation) async {
+    if (generation != _utteranceGeneration) return;
+    final completer = _utterance;
+    if (completer == null || completer.isCompleted) return;
+    debugPrint('Speech: no completion event; stopping audio and giving up');
+    await _stopEngines();
+    _settle(SpeechOutcome.failed);
+  }
+
+  /// Resolves the pending utterance, if there is one. Idempotent, because the
+  /// platform can deliver a completion and a cancel for the same utterance.
+  static void _settle(SpeechOutcome outcome) {
+    _watchdog?.cancel();
+    _watchdog = null;
+    final completer = _utterance;
+    _utterance = null;
+    if (completer != null && !completer.isCompleted) {
+      completer.complete(outcome);
+    }
+  }
+
+  /// True while an utterance started by [speakAndWait] is still in flight.
+  static bool get isSpeaking => _utterance != null;
+
+  /// Stops whichever route is currently talking, and settles any waiter.
+  ///
+  /// Audio is stopped **before** the waiter is released, for the same reason
+  /// the watchdog does it in that order.
   static Future<void> stop() async {
+    _utteranceGeneration++;
+    await _stopEngines();
+    _settle(SpeechOutcome.cancelled);
+  }
+
+  static Future<void> _stopEngines() async {
     try {
       await _tts?.stop();
     } catch (_) {}
