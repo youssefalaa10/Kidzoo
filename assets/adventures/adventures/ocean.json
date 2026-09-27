@@ -12,9 +12,9 @@
     "ar": "الصَّفْحَةُ الزَّرْقَاء"
   },
   "rewardArt": "assets/gen/images/story/page_blue.png",
-  "_comment": "One problem, six pieces of solving it. The page went over the reef edge into the trench, and you cannot follow it without a lift, a light and a way through. The floats you sort BECOME the lift; the lift is the basket you load; the light you gather is strung on Sadaf's shell; her light is what lets you see the wall to draw on; the line you draw is what shows you the gate; the beat you read is what opens it. Take any one away and the chapter stops.",
+  "_comment": "One problem, six pieces of solving it, and every piece is the input to the next. The lamp you sweep finds the trench mouth; the floats you sort BECOME the lift; the currents you turn carry the lift down; the lights you gather are strung on Sadaf's shell; her glow is what lets you see the wall to draw on; the line you draw is what shows you the gate; the beat you hear is what opens it. Take any one away and the chapter stops.",
   "_shapeComment": "Six activities, not the Market's seven. The Market's own report flagged its length as an untested bet, and attention at four to five runs eight to twelve minutes. Six lands inside that with the story beats included.",
-  "_agencyComment": "Sadaf carries, but she cannot read the current and says so. The climax is the child's: they complete the pattern, the gate opens, and she goes through on the beat they opened. The Market let an adult resolve its ending; this one does not.",
+  "_agencyComment": "Sadaf carries, but she cannot hear the beat and says so. The climax is the child's: they give the rhythm back from memory, the gate opens, and she goes through on the beat they played. The Market let an adult resolve its ending; this one does not.",
   "nodes": [
     {
       "nodeId": "ocean.n1",
@@ -39,8 +39,8 @@
       "activityRef": "activities/ocean_find_marker",
       "lines": [
         {
-          "en": "The storm stirred up the sand. Somewhere under it is the marker for the way down.",
-          "ar": "أَثَارَتِ العَاصِفَةُ الرَّمْل. وَتَحْتَهُ فِي مَكَانٍ مَا عَلَامَةُ طَرِيقِ النُّزُول."
+          "en": "Under the reef edge there is no daylight left. Take the lamp and look.",
+          "ar": "تَحْتَ حَافَّةِ الشِّعَابِ لَا يَبْقَى ضَوْءُ النَّهَار. خُذِ المِصْبَاحَ وَانْظُر."
         }
       ]
     },
@@ -58,13 +58,13 @@
     },
     {
       "nodeId": "ocean.n4",
-      "beat": "obstacle",
+      "beat": "progress",
       "type": "activity",
-      "activityRef": "activities/ocean_load_the_basket",
+      "activityRef": "activities/ocean_ride_the_current",
       "lines": [
         {
-          "en": "Load it too heavy and it goes down and stays down. Load it right and it comes back.",
-          "ar": "إِنْ حَمَّلْتَهَا فَوْقَ طَاقَتِهَا نَزَلَتْ وَلَمْ تَعُد. وَإِنْ ضَبَطْتَهَا عَادَتْ إِلَيْك."
+          "en": "The floats hold. Nobody swims down a trench: you ride the water that is already going there.",
+          "ar": "صَمَدَتِ العَوَّامَات. وَلَا أَحَدَ يَسْبَحُ إِلَى الأُخْدُود؛ بَلْ تَرْكَبُ المَاءَ النَّازِل."
         }
       ]
     },
@@ -75,12 +75,12 @@
       "speakerArt": "assets/gen/images/sea/lift_basket.png",
       "lines": [
         {
-          "en": "The lift floats. The basket hangs level. Sadaf has it on her back.",
-          "ar": "الرَّافِعَةُ تَطْفُو. وَالسَّلَّةُ مُتَدَلِّيَةٌ مُسْتَوِيَة. وَصَدَفُ تَحْمِلُهَا عَلَى ظَهْرِهَا."
+          "en": "The basket is down. Sadaf is beside it, waiting on the trench floor.",
+          "ar": "وَصَلَتِ السَّلَّةُ. وَصَدَفُ بِجِوَارِهَا تَنْتَظِرُ عَلَى قَاعِ الأُخْدُود."
         },
         {
-          "en": "But below the reef there is no light at all. None.",
-          "ar": "لَكِنْ تَحْتَ الشِّعَابِ لَا ضَوْءَ عَلَى الإِطْلَاق. وَلَا ذَرَّة."
+          "en": "Down here there is no light at all. None.",
+          "ar": "وَهُنَا فِي الأَسْفَلِ لَا ضَوْءَ عَلَى الإِطْلَاق. وَلَا ذَرَّة."
         }
       ]
     },
@@ -115,8 +115,8 @@
       "activityRef": "activities/ocean_read_the_current",
       "lines": [
         {
-          "en": "A gate of reef, opening and shutting with the swell. Sadaf cannot read it. You can.",
-          "ar": "بَوَّابَةٌ مِنَ الشِّعَابِ تَنْفَتِحُ وَتَنْغَلِقُ مَعَ المَوْج. صَدَفُ لَا تَقْرَؤُهَا. أَنْتَ تَقْدِر."
+          "en": "A gate of reef, and the sea is tapping at it. Sadaf cannot hear the beat. You can.",
+          "ar": "بَوَّابَةٌ مِنَ الشِّعَاب، وَالبَحْرُ يَطْرُقُهَا. صَدَفُ لَا تَسْمَعُ الإِيقَاع. أَنْتَ تَسْمَعُه."
         }
       ]
     },

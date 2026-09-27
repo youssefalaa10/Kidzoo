@@ -5,6 +5,7 @@ import 'package:kidzo/features/Adventure/data/adventure_content_loader.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_attempt.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_engine.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_engine_descriptor.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_engine_registry.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
@@ -461,19 +462,27 @@ void main() {
             cubitFor(activityId);
         await cubit.start();
 
+        bool everReachedModelled = false;
+        bool everNamedTheAnswer = false;
+
         int guard = 0;
         while (cubit.state.status == ActivityStatus.running && guard < 200) {
           guard++;
           // A deliberately invalid attempt: wrong for every engine.
           await cubit.submit(const ChoiceAttempt('__definitely_wrong__'));
           if (cubit.state.scaffoldLevel == ScaffoldLevel.modelled) {
-            // The board now offers only the correct option. Feed the engine
-            // the id it highlighted, which is how a real child would finish.
+            everReachedModelled = true;
+            // Where an engine's answer *is* one option, the board now offers
+            // only that one, so feeding back the id it highlighted is how a
+            // real child finishes. Where the answer is a configuration or a
+            // remembered order there is no such id, and the run still has to
+            // end — the base cubit credits the step after modelling, which is
+            // what the `finished` assertion below actually proves.
             final String? correct = cubit.state.view?.highlightOptionId;
-            expect(correct, isNotNull,
-                reason: '$activityId reached modelled without naming the '
-                    'correct option, so the child cannot finish');
-            await cubit.submit(ChoiceAttempt(correct!));
+            if (correct != null) {
+              everNamedTheAnswer = true;
+              await cubit.submit(ChoiceAttempt(correct));
+            }
           }
         }
 
@@ -482,6 +491,24 @@ void main() {
         expect(cubit.state.result.completion, ActivityCompletion.completed);
         expect(cubit.state.result.score, greaterThan(0),
             reason: 'never-zero is the house rule');
+
+        // An engine whose answer is a single option must still name it, or the
+        // modelled rung has nothing to demonstrate and the child is carried
+        // through by the credit path instead of being taught anything.
+        const Set<InteractionMode> picksOneThing = <InteractionMode>{
+          InteractionMode.chooseOne,
+          InteractionMode.dragToTarget,
+          InteractionMode.tapInScene,
+        };
+        final ActivityEngineDescriptor descriptor = registry
+            .require(bundle.requireActivity(activityId).engineId)
+            .descriptor;
+        if (everReachedModelled &&
+            descriptor.interactionModes.any(picksOneThing.contains)) {
+          expect(everNamedTheAnswer, isTrue,
+              reason: '$activityId reached modelled without naming the '
+                  'correct option, so the child is never shown what to do');
+        }
         await cubit.close();
       }
     });
