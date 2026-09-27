@@ -15,8 +15,10 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_engine.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_engine_registry.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
 import 'package:kidzo/features/Adventure/engine/default_engines.dart';
-import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/current_rider/current_rider_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/flashlight/flashlight_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/sound_sequence/sound_sequence_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/host/background_resolver.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
 
@@ -75,8 +77,14 @@ void main() {
             tokenId: step.item.id,
             targetId: step.correctBinId,
           ));
-        } else if (step is PatternStep) {
-          await cubit.submit(ChoiceAttempt(step.correctItemId));
+        } else if (step is FlashlightStep) {
+          await cubit.submit(ChoiceAttempt(step.target.id));
+        } else if (step is SoundSequenceStep) {
+          await cubit.submit(SequenceAttempt(step.round.sequence));
+        } else if (step is CurrentRiderStep) {
+          await cubit.submit(SequenceAttempt(
+            CurrentRiderStep.tokensFor(step.round, step.round.solutions.first),
+          ));
         } else {
           break;
         }
@@ -151,19 +159,45 @@ void main() {
     await cubit.close();
   }
 
-  testWidgets('the current, on a phone', (WidgetTester tester) async {
+  testWidgets('the gate rhythm, on a phone', (WidgetTester tester) async {
     await shoot(tester, 'ocean_read_the_current',
-        name: 'patterns_phone', size: const Size(360, 640));
+        name: 'sound_sequence_phone', size: const Size(360, 640));
   });
 
-  testWidgets('the current, on a tablet', (WidgetTester tester) async {
+  testWidgets('the gate rhythm, on a tablet', (WidgetTester tester) async {
     await shoot(tester, 'ocean_read_the_current',
-        name: 'patterns_tablet', size: const Size(800, 1200));
+        name: 'sound_sequence_tablet', size: const Size(800, 1200));
   });
 
-  testWidgets('the current, phone landscape', (WidgetTester tester) async {
+  testWidgets('the gate rhythm, phone landscape', (WidgetTester tester) async {
     await shoot(tester, 'ocean_read_the_current',
-        name: 'patterns_landscape', size: const Size(780, 390));
+        name: 'sound_sequence_landscape', size: const Size(780, 390));
+  });
+
+  testWidgets('the gate part way open', (WidgetTester tester) async {
+    // The whole point of the gate: two rhythms in, and it is visibly further
+    // open than it was. A shot of the first round cannot show that.
+    await shoot(tester, 'ocean_read_the_current',
+        name: 'sound_sequence_midway', size: const Size(360, 640), advance: 2);
+  });
+
+  testWidgets('riding the current, on a phone', (WidgetTester tester) async {
+    await shoot(tester, 'ocean_ride_the_current',
+        name: 'current_rider_phone', size: const Size(360, 640));
+  });
+
+  testWidgets('riding the current, phone landscape',
+      (WidgetTester tester) async {
+    await shoot(tester, 'ocean_ride_the_current',
+        name: 'current_rider_landscape', size: const Size(780, 390));
+  });
+
+  testWidgets('riding the current, deeper down', (WidgetTester tester) async {
+    // The second board draws the water darker, which is how the descent is
+    // shown. Worth a shot of its own, because it is the only place that
+    // progress appears.
+    await shoot(tester, 'ocean_ride_the_current',
+        name: 'current_rider_deep', size: const Size(360, 640), advance: 1);
   });
 
   testWidgets('float or sink', (WidgetTester tester) async {
@@ -176,9 +210,22 @@ void main() {
         name: 'sorting_phone_midway', size: const Size(360, 640), advance: 5);
   });
 
-  testWidgets('the silt', (WidgetTester tester) async {
+  testWidgets('the dark, before anything is found',
+      (WidgetTester tester) async {
     await shoot(tester, 'ocean_find_marker',
-        name: 'hidden_clue_phone', size: const Size(360, 640));
+        name: 'flashlight_phone', size: const Size(360, 640));
+  });
+
+  testWidgets('the dark, phone landscape', (WidgetTester tester) async {
+    await shoot(tester, 'ocean_find_marker',
+        name: 'flashlight_landscape', size: const Size(780, 390));
+  });
+
+  testWidgets('the dark, two finds in', (WidgetTester tester) async {
+    // Found things stay lit, so this shot is the one that shows the scene
+    // getting more legible as the child works — the progress display.
+    await shoot(tester, 'ocean_find_marker',
+        name: 'flashlight_midway', size: const Size(360, 640), advance: 2);
   });
 
   testWidgets('the trench wall', (WidgetTester tester) async {

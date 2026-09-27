@@ -13,8 +13,8 @@
   },
   "narration": {
     "prompt": {
-      "en": "To light the way down, put that many on Sadaf's shell.",
-      "ar": "لِتُضِيءَ طَرِيقَ النُّزُول، ضَعْ هَذَا العَدَدَ عَلَى صَدَفَةِ صَدَف."
+      "en": "To see anything down here, put that many on Sadaf's shell.",
+      "ar": "لِتَرَى شَيْئًا هُنَا فِي الأَسْفَل، ضَعْ هَذَا العَدَدَ عَلَى صَدَفَةِ صَدَف."
     },
     "hint1": {
       "en": "Count them as you put each one on.",
@@ -46,12 +46,12 @@
         "itemId": "glow_weed",
         "targetCount": 4,
         "prompt": {
-          "en": "The trench is four fathoms deep. Put four strands on her shell.",
-          "ar": "عُمْقُ الأُخْدُودِ أَرْبَعُ قَامَات. ضَعْ أَرْبَعَةَ خُيُوطٍ عَلَى صَدَفَتِهَا."
+          "en": "The trench wall is four fathoms high. Put four strands on her shell.",
+          "ar": "جِدَارُ الأُخْدُودِ أَرْبَعُ قَامَات. ضَعْ أَرْبَعَةَ خُيُوطٍ عَلَى صَدَفَتِهَا."
         },
         "revealLine": {
-          "en": "Four strands. That reaches the bottom.",
-          "ar": "أَرْبَعَةُ خُيُوط. هَذَا يَصِلُ إِلَى القَاع."
+          "en": "Four strands. The light reaches the wall.",
+          "ar": "أَرْبَعَةُ خُيُوط. بَلَغَ الضَّوْءُ الجِدَار."
         }
       },
       {
@@ -74,8 +74,8 @@
           "ar": "تَحْتَ الحَافَةِ يَزْدَادُ الظَّلَام. خَيْطَانِ آخَرَان."
         },
         "revealLine": {
-          "en": "Two more. Sadaf is bright enough for the whole way down.",
-          "ar": "خَيْطَانِ آخَرَان. صَارَتْ صَدَفُ مُضِيئَةً بِمَا يَكْفِي لِلطَّرِيقِ كُلِّه."
+          "en": "Two more. Sadaf is bright enough for the whole wall.",
+          "ar": "خَيْطَانِ آخَرَان. صَارَتْ صَدَفُ مُضِيئَةً بِمَا يَكْفِي لِلجِدَارِ كُلِّه."
         }
       }
     ]

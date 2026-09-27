@@ -6,6 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/database/daos/story_dao.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/localization/language_provider.dart';
+import 'package:kidzo/core/services/cubit/music_cubit.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
 import 'package:kidzo/core/shared/widgets/kid_game_shell.dart';
 import 'package:kidzo/features/Adventure/data/adventure_content_loader.dart';
@@ -98,7 +99,14 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
     super.initState();
     WidgetsBinding.instance.addObserver(this);
     _narrator = widget.narrator ?? SpeechActivityNarrator();
-    _soundboard = widget.soundboard ?? AudioActivitySoundboard();
+    // Honours the app's own sound switch. Without this the Adventure was the
+    // one place in the app that ignored it — which went unnoticed while the
+    // only sounds were short reactions, and stopped being ignorable once an
+    // activity's question was itself a sequence of tones.
+    _soundboard = widget.soundboard ??
+        AudioActivitySoundboard(
+          isEnabled: () => context.read<MusicCubit>().state.isSoundEnabled,
+        );
     _runner = AdventureRunnerCubit(
       bundle: widget.bundle,
       adventureId: widget.adventureId,

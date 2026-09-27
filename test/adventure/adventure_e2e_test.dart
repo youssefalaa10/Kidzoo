@@ -16,10 +16,13 @@ import 'package:kidzo/features/Adventure/engine/engines/balance_experiment/balan
 import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_content.dart';
 import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/counting/counting_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/current_rider/current_rider_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/flashlight/flashlight_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/sound_sequence/sound_sequence_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/trace_path/trace_engine.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_narrator.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
@@ -102,6 +105,20 @@ void main() {
       // for a finger travelling across the figure, and a child who taps the
       // points in order gets there the same way.
       return ChoiceAttempt(step.figure.lastAnchor.id);
+    }
+    if (step is FlashlightStep) {
+      return ChoiceAttempt(step.target.id);
+    }
+    if (step is CurrentRiderStep) {
+      // Any setting that gets there. Content guarantees at least one exists —
+      // the parser refuses a board where none does — so `first` is safe rather
+      // than lucky.
+      return SequenceAttempt(
+        CurrentRiderStep.tokensFor(step.round, step.round.solutions.first),
+      );
+    }
+    if (step is SoundSequenceStep) {
+      return SequenceAttempt(step.round.sequence);
     }
     throw StateError('no correct attempt known for ${step.runtimeType}');
   }
@@ -429,12 +446,21 @@ void main() {
         final List<String> spoken =
             await playAdventure(languageCode: locale, adventureId: 'ocean');
 
-        for (final String activityId in <String>[
-          'ocean_load_the_basket',
-          'ocean_light_her_shell',
-          'ocean_light_the_wall',
-          'ocean_read_the_current',
-        ]) {
+        // Read off the chapter rather than hand-listed, so swapping an
+        // activity cannot quietly shrink what this test covers. The previous
+        // version named four files; when one of them was replaced the test
+        // went on passing against the three that were left.
+        final List<String> activityIds = <String>[
+          for (final StoryNode node
+              in bundle.adventures['ocean']!.nodes.where((StoryNode n) => n.isActivity))
+            node.activityRef!.split('/').last,
+        ];
+        expect(activityIds.length, 6,
+            reason: 'the chapter is six activities; it now has '
+                '${activityIds.length}');
+
+        int authoringReveals = 0;
+        for (final String activityId in activityIds) {
           final ActivitySpec spec = bundle.requireActivity(activityId);
           final List<String> reveals = <String>[];
           void collect(Object? node) {
@@ -450,15 +476,23 @@ void main() {
           }
 
           collect(spec.payload);
-          expect(reveals, isNotEmpty,
-              reason: '$activityId authored no reveal lines, so finishing it '
-                  'tells the child nothing');
+          if (reveals.isNotEmpty) {
+            authoringReveals++;
+          }
           for (final String reveal in reveals) {
             expect(spoken, contains(reveal),
                 reason: '$activityId never said "$reveal", so the thing the '
                     'child just did changed nothing the story mentions');
           }
         }
+
+        // Sorting is the one activity that legitimately has none: what it
+        // produces is the pile of floats, and the beat after it is the lift
+        // being built out of them. Everything else in the chain has to say
+        // what it just changed, or the chain is only in the author's head.
+        expect(authoringReveals, greaterThanOrEqualTo(5),
+            reason: 'only $authoringReveals of ${activityIds.length} '
+                'activities say what they changed');
       });
 
       test('a child who gets everything wrong still reaches the page',

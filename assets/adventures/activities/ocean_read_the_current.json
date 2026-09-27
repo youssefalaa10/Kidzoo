@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "instanceId": "ocean.read_the_current",
-  "engineId": "patterns",
+  "engineId": "sound_sequence",
   "locales": ["en", "ar"],
   "presentation": {
     "backgroundType": "ocean",
@@ -9,20 +9,20 @@
   },
   "narration": {
     "prompt": {
-      "en": "The reef repeats itself. To open the gate, put back what the storm tore out.",
-      "ar": "الشِّعَابُ تُكَرِّرُ نَفْسَهَا. لِتَفْتَحَ البَوَّابَة، أَعِدْ مَا اقْتَلَعَتْهُ العَاصِفَة."
+      "en": "The gate answers to a beat. Listen to the reef, then play it back.",
+      "ar": "البَوَّابَةُ لَا تُجِيبُ إِلَّا لِإِيقَاع. اِسْمَعِ الشِّعَابَ ثُمَّ أَعِدْهُ."
     },
     "hint1": {
-      "en": "Say the ledge out loud from the start. What comes after that?",
-      "ar": "اُنْطُقِ الحَافَةَ بِصَوْتٍ عَالٍ مِنَ البِدَايَة. مَاذَا يَأْتِي بَعْدَ ذَلِك؟"
+      "en": "Listen once more. Watch which one lights up first.",
+      "ar": "اِسْمَعْ مَرَّةً أُخْرَى. وَانْظُرْ أَيُّهَا يُضِيءُ أَوَّلًا."
     },
     "hint2": {
-      "en": "Look at the same place one repeat earlier.",
-      "ar": "اُنْظُرْ إِلَى المَكَانِ نَفْسِهِ فِي التَّكْرَارِ السَّابِق."
+      "en": "Say it out loud as it plays, then touch them in that order.",
+      "ar": "قُلْهُ بِصَوْتٍ عَالٍ وَهُوَ يُعْزَف، ثُمَّ الْمِسْهَا بِهَذَا التَّرْتِيب."
     },
     "model": {
-      "en": "This one belongs here. Look why, then put it back yourself.",
-      "ar": "هَذِهِ مَكَانُهَا هُنَا. اُنْظُرْ لِمَاذَا، ثُمَّ أَعِدْهَا بِنَفْسِك."
+      "en": "It starts with this one. Hear it again, then you play it.",
+      "ar": "يَبْدَأُ بِهَذَا. اِسْمَعْهُ مَرَّةً أُخْرَى، ثُمَّ اعْزِفْهُ أَنْت."
     },
     "success": {
       "en": "You read the whole current. The gate is open and Sadaf is through.",
@@ -30,59 +30,79 @@
     }
   },
   "payload": {
-    "_comment": "The climax, and the only thing in the chapter that asks the child to work out a RULE and then use it somewhere they cannot see the answer. Sadaf cannot do this — she says so — which is what makes the child, not the turtle, the one who opens the way. Three rounds, and the unit gets harder each time: AB, then AAB, then ABC. Difficulty comes from the pattern, never from a tier.",
-    "_notSortingComment": "Sorting asks which box a thing belongs in, and its verdict for an item is the same wherever it lands. This asks what is missing from a run, and the same shell is right in one hole and wrong in the next. The board says so before anyone speaks: one connected ledge with holes punched in it, not a row of boxes.",
-    "_trayComment": "trayExtraCount is 1 so the last hole of a round can never be filled by elimination. With only the answer left in the tray, a child who puts it in has practised counting the tray rather than reading the reef.",
-    "_revealedComment": "Two whole repeats are always laid out before the first hole, and the engine checks that against the gaps rather than taking the number on trust. One repeat is a guess; two is a pattern a child can actually see.",
+    "_comment": "The climax, and the only thing in the chapter a child answers from memory rather than from what is in front of them. The rhythm has stopped by the time they touch anything: nothing on screen says what came first. Sadaf cannot do this — she says so two beats earlier — so the gate opens because the child opened it, not because the grown-up in the story did.",
+    "_notPatternsComment": "A pattern strip stays on screen the whole time and asks which tile belongs in a hole; it is a rule to read, and reading it is the skill. This asks what came FIRST, and the second round has a repeated beat, so there is no rule at all — only an order. Serial recall and patterning are different enough that neither engine can be authored into the other.",
+    "_muteComment": "Every beat is flashed as well as sounded, and the round is winnable with the volume at zero. That is a requirement rather than a courtesy: the app has a mute switch, it is played in cars and waiting rooms, and an activity that quietly stops being answerable on a silent phone is broken for a large share of the times it is opened. The tones are the five piano notes the app already ships; no new audio was added, and a device with no audio at all loses nothing but the sound.",
+    "_difficultyComment": "Three, three-with-a-repeat, then four. The step that matters is the second, not the third: a repeated beat defeats the strategy of remembering 'one of each' and forces the child to hold a position rather than a set. Difficulty comes from the rhythm, never from a tier.",
     "itemsRef": "packs/tide_pool",
-    "itemIds": ["coral", "spiral_shell", "tropical_fish", "kelp", "crab"],
-    "revealedRepeats": 2,
-    "trayExtraCount": 1,
-    "mode": "extend",
+    "beatMilliseconds": 620,
+    "voices": [
+      {
+        "id": "fish_flick",
+        "itemId": "tropical_fish",
+        "audio": "audio/piano-c.wav",
+        "label": { "en": "the little fish", "ar": "السَّمَكَةُ الصَّغِيرَة" }
+      },
+      {
+        "id": "shell_chime",
+        "itemId": "spiral_shell",
+        "audio": "audio/piano-e.wav",
+        "label": { "en": "the shell", "ar": "الصَّدَفَة" }
+      },
+      {
+        "id": "crab_click",
+        "itemId": "crab",
+        "audio": "audio/piano-a.wav",
+        "label": { "en": "the crab", "ar": "السَّرَطَان" }
+      },
+      {
+        "id": "weed_sway",
+        "itemId": "kelp",
+        "audio": "audio/piano-d.wav",
+        "label": { "en": "the kelp", "ar": "العُشْبُ البَحْرِيّ" }
+      },
+      {
+        "id": "coral_knock",
+        "itemId": "coral",
+        "audio": "audio/piano-f.wav",
+        "label": { "en": "the coral", "ar": "المَرْجَان" }
+      }
+    ],
     "rounds": [
       {
         "id": "the_swell",
-        "unit": ["coral", "spiral_shell"],
-        "repeats": 4,
-        "gaps": [6, 7],
-        "mode": "extend",
+        "sequence": ["fish_flick", "shell_chime", "crab_click"],
         "prompt": {
-          "en": "Coral, shell, coral, shell. Say it to the end.",
-          "ar": "مَرْجَان، صَدَفَة، مَرْجَان، صَدَفَة. أَكْمِلْهَا إِلَى النِّهَايَة."
+          "en": "Three sounds, and the gate moves. Play them back in order.",
+          "ar": "ثَلَاثَةُ أَصْوَاتٍ فَتَتَحَرَّكُ البَوَّابَة. أَعِدْهَا بِالتَّرْتِيب."
         },
         "revealLine": {
-          "en": "The water moved. That is the reef breathing in and out.",
-          "ar": "تَحَرَّكَ المَاء. هَذَا هُوَ الشِّعَابُ يَتَنَفَّسُ دُخُولًا وَخُرُوجًا."
+          "en": "The gate shifted. That is the reef breathing in and out.",
+          "ar": "تَحَرَّكَتِ البَوَّابَة. هَذَا هُوَ الشِّعَابُ يَتَنَفَّسُ دُخُولًا وَخُرُوجًا."
         }
       },
       {
         "id": "the_backwash",
-        "unit": ["coral", "coral", "spiral_shell"],
-        "repeats": 3,
-        "gaps": [6, 7],
-        "mode": "fillGap",
+        "sequence": ["shell_chime", "shell_chime", "weed_sway"],
         "prompt": {
-          "en": "This one goes two, then one. Two holes in the middle.",
-          "ar": "هَذِهِ اثْنَتَانِ ثُمَّ وَاحِدَة. وَفَتْحَتَانِ فِي المُنْتَصَف."
+          "en": "This one says the same thing twice before it changes.",
+          "ar": "هَذَا يَقُولُ الشَّيْءَ نَفْسَهُ مَرَّتَيْنِ قَبْلَ أَنْ يَتَغَيَّر."
         },
         "revealLine": {
-          "en": "Longer this time. The swell pulls twice before it pushes.",
-          "ar": "أَطْوَلُ هَذِهِ المَرَّة. يَسْحَبُ المَوْجُ مَرَّتَيْنِ قَبْلَ أَنْ يَدْفَع."
+          "en": "Twice, then once. The swell pulls before it pushes.",
+          "ar": "مَرَّتَانِ ثُمَّ مَرَّة. يَسْحَبُ المَوْجُ قَبْلَ أَنْ يَدْفَع."
         }
       },
       {
         "id": "the_gate_beat",
-        "unit": ["coral", "spiral_shell", "tropical_fish"],
-        "repeats": 3,
-        "gaps": [6, 8],
-        "mode": "extend",
+        "sequence": ["crab_click", "coral_knock", "fish_flick", "shell_chime"],
         "prompt": {
-          "en": "Three things now, over and over. This is the beat the gate opens on.",
-          "ar": "ثَلَاثَةُ أَشْيَاءَ الآن، مَرَّةً بَعْدَ مَرَّة. عَلَى هَذَا الإِيقَاعِ تَنْفَتِحُ البَوَّابَة."
+          "en": "Four now. This is the beat the gate opens on.",
+          "ar": "أَرْبَعَةٌ الآن. عَلَى هَذَا الإِيقَاعِ تَنْفَتِحُ البَوَّابَة."
         },
         "revealLine": {
-          "en": "The whole ledge ran, beat by beat. The gate swung open.",
-          "ar": "جَرَتِ الحَافَةُ كُلُّهَا، نَبْضَةً بَعْدَ نَبْضَة. وَانْفَتَحَتِ البَوَّابَة."
+          "en": "The whole reef ran, beat by beat. The gate swung wide open.",
+          "ar": "جَرَتِ الشِّعَابُ كُلُّهَا، نَبْضَةً بَعْدَ نَبْضَة. وَانْفَتَحَتِ البَوَّابَةُ عَلَى مِصْرَاعَيْهَا."
         }
       }
     ]
@@ -92,10 +112,10 @@
     "scaffolding": "errorless"
   },
   "adaptation": {
-    "min": 1,
-    "max": 4
+    "min": 450,
+    "max": 900
   },
-  "elofGoal": "MATH.patterning.extend_repeating_unit",
+  "elofGoal": "COG.memory.serial_recall",
   "prereqSkills": [],
   "masteryThreshold": 0.7
 }

@@ -21,8 +21,8 @@
       "ar": "لَيْسَ تَمَامًا. اُنْظُرْ مَاذَا فَعَلَتْ حِينَ تَرَكْتَهَا."
     },
     "hint2": {
-      "en": "Big does not mean heavy. A whole log rides up; one little key does not.",
-      "ar": "الكَبِيرُ لَيْسَ ثَقِيلًا بِالضَّرُورَة. جِذْعٌ كَامِلٌ يَطْفُو، وَمِفْتَاحٌ صَغِيرٌ لَا يَطْفُو."
+      "en": "Size is not the answer. A whole log rides up, and so does a thread of kelp.",
+      "ar": "الحَجْمُ لَيْسَ هُوَ الجَوَاب. جِذْعٌ كَامِلٌ يَطْفُو، وَخَيْطُ عُشْبٍ يَطْفُو كَذَلِك."
     },
     "model": {
       "en": "This is where it ends up. Now you send one.",
@@ -35,7 +35,7 @@
   },
   "payload": {
     "_comment": "An experiment, not a quiz about one. The child has to predict — buoyancy is the one property here that cannot be seen, only reasoned about — and then the object answers. A float dropped on the sand drifts back up, in front of them, which is a better correction than any sound: it tells them WHAT THE THING IS, which is something they can use on the next piece.",
-    "_castComment": "Cross-balanced against size in both directions. Driftwood, a coconut and a crate are big and float; a key and a coin are tiny and sink. 'Big things sink' fails on the second piece and 'small things float' fails on the third, so neither rule is ever confirmed long enough to stick.",
+    "_castComment": "Cross-balanced against size in BOTH directions, and the second direction is the one that is easy to forget. Driftwood, a coconut and a crate are big and float, so 'big things sink' fails immediately. But a cast whose floaters are all big still lets a child run 'small things sink' undefeated for the whole round and score full marks on a rule that is false — so kelp is in here as a small thing that rides up, and a stone and a chain are big things that do not. Neither naive rule survives a single round.",
     "_heldConstantComment": "heldConstant is deliberately EMPTY. Sorting activities normally hold the other attributes still so the target one is the only thing varying — but here size has to vary, and vary against the answer, or the round teaches a rule that is not true. Claiming size as held constant would be a lie the validator catches, correctly.",
     "activeAttribute": "buoyancy",
     "heldConstant": [],
@@ -47,6 +47,7 @@
       "coconut",
       "ring_buoy",
       "wooden_crate",
+      "kelp",
       "reef_stone",
       "chains",
       "anchor",

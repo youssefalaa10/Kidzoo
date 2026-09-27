@@ -17,7 +17,15 @@ import 'package:kidzo/features/Adventure/story/models/story_resume.dart';
 
 import 'support/disk_content_source.dart';
 
-/// `patterns`, the engine Adventure 3 added.
+/// `patterns`, the engine Adventure 3 added and then stopped shipping.
+
+/// Adventure 3's climax moved to `sound_sequence` — a rhythm you hold in your
+/// head rather than a strip you read off the board — so no activity file uses
+/// `patterns` today. The engine stays registered and stays tested, and its
+/// fixture moved from the Ocean file on disk to [patternsFixture] below. That
+/// is the whole of the change: an engine with no current content is still an
+/// engine, and deleting a tested, reusable mechanic because this chapter went
+/// another way would be paying for it twice.
 ///
 /// It claims `patterning | dragToTarget`, a domain the contract has declared
 /// since Phase 1 with nothing behind it. What is worth checking here is the one
@@ -39,13 +47,93 @@ void main() {
         await const AdventureContentLoader(DiskAdventureContentSource()).load();
   });
 
+  /// The board this file exercises, held here rather than read from disk.
+  ///
+  /// It is the reef ledge Adventure 3 used to end on, kept verbatim because it
+  /// is a good hard case: three rounds whose unit grows AB, AAB, ABC, gaps
+  /// that never fall on the same position twice, and a spare tile in the tray
+  /// so the last hole of a round cannot be filled by elimination.
+  ActivitySpec patternsFixture() => ActivitySpec.fromJson(
+        const <String, dynamic>{
+          'instanceId': 'ocean.read_the_current.patterns_fixture',
+          'engineId': 'patterns',
+          'locales': <String>['en', 'ar'],
+          'presentation': <String, dynamic>{'accent': '#4A9FD8'},
+          'narration': <String, dynamic>{
+            'prompt': <String, String>{'en': 'put back what the storm tore out', 'ar': 'x'},
+            'success': <String, String>{'en': 'the gate is open', 'ar': 'x'},
+          },
+          'payload': <String, dynamic>{
+            'itemsRef': 'packs/tide_pool',
+            'itemIds': <String>[
+              'coral',
+              'spiral_shell',
+              'tropical_fish',
+              'kelp',
+              'crab',
+            ],
+            'revealedRepeats': 2,
+            'trayExtraCount': 1,
+            'mode': 'extend',
+            'rounds': <Map<String, dynamic>>[
+              <String, dynamic>{
+                'id': 'the_swell',
+                'unit': <String>['coral', 'spiral_shell'],
+                'repeats': 4,
+                'gaps': <int>[6, 7],
+                'mode': 'extend',
+                'prompt': <String, String>{
+                  'en': 'Coral, shell, coral, shell. Say it to the end.',
+                  'ar': 'x',
+                },
+                'revealLine': <String, String>{
+                  'en': 'The water moved.',
+                  'ar': 'x',
+                },
+              },
+              <String, dynamic>{
+                'id': 'the_backwash',
+                'unit': <String>['coral', 'coral', 'spiral_shell'],
+                'repeats': 3,
+                'gaps': <int>[6, 7],
+                'mode': 'fillGap',
+                'prompt': <String, String>{
+                  'en': 'This one goes two, then one.',
+                  'ar': 'x',
+                },
+                'revealLine': <String, String>{
+                  'en': 'Longer this time.',
+                  'ar': 'x',
+                },
+              },
+              <String, dynamic>{
+                'id': 'the_gate_beat',
+                'unit': <String>['coral', 'spiral_shell', 'tropical_fish'],
+                'repeats': 3,
+                'gaps': <int>[6, 8],
+                'mode': 'extend',
+                'prompt': <String, String>{
+                  'en': 'Three things now, over and over.',
+                  'ar': 'x',
+                },
+                'revealLine': <String, String>{
+                  'en': 'The whole ledge ran.',
+                  'ar': 'x',
+                },
+              },
+            ],
+          },
+        },
+        sourcePath: 'test fixture > patterns',
+      );
+
   PatternsCubit cubitFor({
     int seed = 11,
     String languageCode = 'en',
     ActivityCheckpointSink? checkpointSink,
     ActivityCheckpoint? resume,
   }) {
-    final ActivitySpec spec = bundle.requireActivity('ocean_read_the_current');
+    final ActivitySpec spec = patternsFixture();
     final ActivityEngine<ActivityContent> engine =
         registry.require(spec.engineId);
     return engine.createCubit(engine.createSession(
@@ -64,7 +152,7 @@ void main() {
 
   PatternsContent authored() =>
       registry.require('patterns').parseContent(
-            bundle.requireActivity('ocean_read_the_current'),
+            patternsFixture(),
             bundle.packResolver,
           ) as PatternsContent;
 
