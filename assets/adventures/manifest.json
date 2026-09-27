@@ -6,7 +6,8 @@
   ],
   "adventures": [
     "jungle",
-    "market"
+    "market",
+    "ocean"
   ],
   "activities": [
     "jungle_ask_animals",
@@ -19,10 +20,17 @@
     "market_deliver",
     "market_fruit_bowl",
     "market_lend_a_hand",
-    "market_mend_sign"
+    "market_mend_sign",
+    "ocean_find_marker",
+    "ocean_float_or_sink",
+    "ocean_load_the_basket",
+    "ocean_light_her_shell",
+    "ocean_light_the_wall",
+    "ocean_read_the_current"
   ],
   "packs": [
     "animals",
-    "market_goods"
+    "market_goods",
+    "tide_pool"
   ]
 }

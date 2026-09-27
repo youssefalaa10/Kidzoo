@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.find_marker",
+  "engineId": "hidden_clue",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8"
+  },
+  "narration": {
+    "prompt": {
+      "en": "The storm buried the reef mouth. To find the way down, move the weed aside.",
+      "ar": "دَفَنَتِ العَاصِفَةُ فَمَ الشِّعَاب. لِتَجِدَ طَرِيقَ النُّزُول، أَزِحِ العُشْبَ جَانِبًا."
+    },
+    "hint1": {
+      "en": "Things can hide under other things. Try moving one.",
+      "ar": "قَدْ تَخْتَبِئُ الأَشْيَاءُ تَحْتَ أَشْيَاءَ أُخْرَى. جَرِّبْ أَنْ تُزِيحَ وَاحِدًا."
+    },
+    "hint2": {
+      "en": "Sadaf keeps looking at the same place. Look where she is looking.",
+      "ar": "تَنْظُرُ صَدَفُ إِلَى المَكَانِ نَفْسِهِ دَائِمًا. اُنْظُرْ حَيْثُ تَنْظُر."
+    },
+    "model": {
+      "en": "There. That round thing with the needle. Now you touch it.",
+      "ar": "هُنَاك. ذَلِكَ الشَّيْءُ المُسْتَدِيرُ ذُو الإِبْرَة. اِلْمِسْهُ أَنْتَ الآن."
+    },
+    "success": {
+      "en": "The old compass. The divers left it right at the reef mouth.",
+      "ar": "البُوصَلَةُ القَدِيمَة. تَرَكَهَا الغَوَّاصُونَ عِنْدَ فَمِ الشِّعَابِ تَمَامًا."
+    }
+  },
+  "payload": {
+    "_comment": "The chapter opens with looking, not with answering. Moving a cover is free and is not an attempt, so the first thing a child does here cannot be wrong — which matters more at the start of a chapter than anywhere else in it. The scene also gets steadily more legible as they work, so the progress IS the picture and needs no counter.",
+    "_clueComment": "The marker is a compass, NOT the page. The page is a discovery at the end, found where nobody was searching; a chapter that opens by hunting the thing it closes by finding has spent its ending in the first minute.",
+    "_propComment": "Every prop is a shape the engine already paints. Rock reads as reef rubble, bush as a coral head, frond and grass as weed, log as a sunken spar, barrel and crate as what the storm rolled down here. Naming them for what they are rather than where they came from is exactly what the shared prop set was for.",
+    "visualNoiseCount": 7,
+    "revealOnIdleSeconds": 9,
+    "hitToleranceFraction": 0.14,
+    "ground": "ground",
+    "itemsRef": "packs/tide_pool",
+    "noiseItemIds": ["crab", "coral", "spiral_shell", "tropical_fish", "coin", "old_key", "kelp"],
+    "clues": [
+      {
+        "id": "marker_compass",
+        "positionPercent": [63, 58],
+        "image": "assets/gen/images/sea/compass.png",
+        "scale": 1.1,
+        "label": { "en": "the old compass", "ar": "البُوصَلَةُ القَدِيمَة" }
+      }
+    ],
+    "_coverComment": "Offsets are in CLUE-sizes, and these are solved rather than eyeballed: the engine asserts at least a quarter of the clue stays uncovered at every board size, and each cover still sits inside one clue-size of it so it counts as lying over the page when the hint nudges it. Three covers that each take a bite out of a different side leave a compass that has to be looked for without ever being invisible.",
+    "covers": [
+      {
+        "id": "weed_across_it",
+        "shape": "frond",
+        "offsetFromCluePercent": [-57, 33],
+        "scale": 0.9,
+        "turn": 24,
+        "move": "slideLeft"
+      },
+      {
+        "id": "weed_over_it",
+        "shape": "grass",
+        "offsetFromCluePercent": [57, 33],
+        "scale": 0.85,
+        "flip": true,
+        "move": "slideRight"
+      },
+      {
+        "id": "spar_on_top",
+        "shape": "log",
+        "offsetFromCluePercent": [0, -66],
+        "scale": 0.8,
+        "turn": 8,
+        "move": "slideUp"
+      }
+    ],
+    "props": [
+      { "shape": "rock", "positionPercent": [16, 74], "scale": 1.4 },
+      { "shape": "rock", "positionPercent": [84, 70], "scale": 1.1, "flip": true },
+      { "shape": "bush", "positionPercent": [30, 64], "scale": 1.2 },
+      { "shape": "bush", "positionPercent": [72, 78], "scale": 0.9 },
+      { "shape": "grass", "positionPercent": [46, 80], "scale": 1.3 },
+      { "shape": "frond", "positionPercent": [10, 44], "scale": 1.1, "turn": 340 },
+      { "shape": "frond", "positionPercent": [90, 40], "scale": 1.0, "turn": 20, "flip": true },
+      { "shape": "barrel", "positionPercent": [24, 40], "scale": 0.95, "turn": 14 },
+      { "shape": "crate", "positionPercent": [78, 52], "scale": 0.9, "turn": 350 },
+      { "shape": "leaf", "positionPercent": [56, 22], "scale": 0.8, "turn": 40 },
+      { "shape": "log", "positionPercent": [40, 88], "scale": 1.2, "turn": 6 }
+    ]
+  },
+  "support": {
+    "distractorCount": 2,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 3,
+    "max": 12
+  },
+  "elofGoal": "COG.attention.visual_search",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

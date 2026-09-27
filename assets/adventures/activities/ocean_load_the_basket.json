@@ -1,0 +1,84 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.load_the_basket",
+  "engineId": "balance_experiment",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8",
+    "stage": {
+      "art": "assets/gen/images/sea/lift_basket.png",
+      "mode": "both"
+    }
+  },
+  "narration": {
+    "prompt": {
+      "en": "The float lifts only so much. To send the basket down, load it to exactly that.",
+      "ar": "العَوَّامَةُ تَرْفَعُ قَدْرًا مُعَيَّنًا فَقَط. لِتُنْزِلَ السَّلَّة، حَمِّلْهَا بِهَذَا القَدْرِ بِالضَّبْط."
+    },
+    "hint1": {
+      "en": "Watch which way it leans. Heavy goes down.",
+      "ar": "اُنْظُرْ إِلَى أَيِّ جِهَةٍ يَمِيل. الثَّقِيلُ يَنْزِل."
+    },
+    "hint2": {
+      "en": "You can take something out again. Nothing here is stuck.",
+      "ar": "يُمْكِنُكَ إِخْرَاجُ شَيْءٍ مَرَّةً أُخْرَى. لَا شَيْءَ هُنَا ثَابِت."
+    },
+    "model": {
+      "en": "Like this. See it come level? Now you make one.",
+      "ar": "هَكَذَا. أَرَأَيْتَهُ يَسْتَوِي؟ اِصْنَعْ أَنْتَ وَاحِدَةً الآن."
+    },
+    "success": {
+      "en": "Both loads are exact. Sadaf can carry the basket down now.",
+      "ar": "الحُمُولَتَانِ مَضْبُوطَتَان. تَسْتَطِيعُ صَدَفُ أَنْ تَحْمِلَ السَّلَّةَ إِلَى الأَسْفَلَ الآن."
+    }
+  },
+  "payload": {
+    "_comment": "The only place in the chapter the child can act before answering. Adding and taking back are free and unjudged, so they can try something, see what the beam does and undo it as often as they like. Only handing the basket over is an answer — and that control works whatever the beam says, because a child who hands over the wrong load should be answered by the sea, not by a button that quietly refused to be pressed.",
+    "_targetComment": "Both targets have more than one right load. Four is a stone and a key, or four keys. Six is two stones, or an anchor and a key. A task with exactly one answer is a puzzle; a task with several is a thing to think inside.",
+    "itemsRef": "packs/tide_pool",
+    "weightAttribute": "weight",
+    "tolerance": 0,
+    "unitLabel": { "en": "weights", "ar": "أَوْزَان" },
+    "targetImage": "assets/gen/images/sea/ring_buoy.png",
+    "rounds": [
+      {
+        "id": "first_load",
+        "target": 4,
+        "itemIds": ["reef_stone", "old_key", "coin"],
+        "prompt": {
+          "en": "This float holds four. Fill the basket to four.",
+          "ar": "هَذِهِ العَوَّامَةُ تَحْمِلُ أَرْبَعَة. اِمْلَأِ السَّلَّةَ حَتَّى أَرْبَعَة."
+        },
+        "revealLine": {
+          "en": "Four exactly. It hangs level and it will go down straight.",
+          "ar": "أَرْبَعَةٌ بِالضَّبْط. تَتَدَلَّى مُسْتَوِيَةً وَسَتَنْزِلُ مُسْتَقِيمَة."
+        }
+      },
+      {
+        "id": "second_load",
+        "target": 6,
+        "itemIds": ["reef_stone", "chains", "anchor", "old_key"],
+        "prompt": {
+          "en": "The big float holds six. There is more than one way to make six.",
+          "ar": "العَوَّامَةُ الكَبِيرَةُ تَحْمِلُ سِتَّة. وَهُنَاكَ أَكْثَرُ مِنْ طَرِيقَةٍ لِصُنْعِ سِتَّة."
+        },
+        "revealLine": {
+          "en": "Six. The lift is loaded and the basket is ready for the trench.",
+          "ar": "سِتَّة. اِمْتَلَأَتِ الرَّافِعَة، وَالسَّلَّةُ جَاهِزَةٌ لِلْأُخْدُود."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 0,
+    "max": 2
+  },
+  "elofGoal": "MATH.measurement.compare_quantity",
+  "prereqSkills": ["MATH.counting.cardinality"],
+  "masteryThreshold": 0.7
+}

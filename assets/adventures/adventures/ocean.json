@@ -1,0 +1,156 @@
+{
+  "adventureId": "ocean",
+  "title": {
+    "en": "The Deep Blue",
+    "ar": "الأَزْرَقُ العَمِيق"
+  },
+  "backgroundType": "ocean",
+  "accent": "#4A9FD8",
+  "rewardId": "blue_page",
+  "rewardTitle": {
+    "en": "The Blue Page",
+    "ar": "الصَّفْحَةُ الزَّرْقَاء"
+  },
+  "rewardArt": "assets/gen/images/story/page_blue.png",
+  "_comment": "One problem, six pieces of solving it. The page went over the reef edge into the trench, and you cannot follow it without a lift, a light and a way through. The floats you sort BECOME the lift; the lift is the basket you load; the light you gather is strung on Sadaf's shell; her light is what lets you see the wall to draw on; the line you draw is what shows you the gate; the beat you read is what opens it. Take any one away and the chapter stops.",
+  "_shapeComment": "Six activities, not the Market's seven. The Market's own report flagged its length as an untested bet, and attention at four to five runs eight to twelve minutes. Six lands inside that with the story beats included.",
+  "_agencyComment": "Sadaf carries, but she cannot read the current and says so. The climax is the child's: they complete the pattern, the gate opens, and she goes through on the beat they opened. The Market let an adult resolve its ending; this one does not.",
+  "nodes": [
+    {
+      "nodeId": "ocean.n1",
+      "beat": "openingProblem",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/sea/turtle.png",
+      "lines": [
+        {
+          "en": "The page did not land on the sand. It went over the reef edge, into the dark.",
+          "ar": "لَمْ تَسْقُطِ الصَّفْحَةُ عَلَى الرَّمْل. عَبَرَتْ حَافَّةَ الشِّعَابِ إِلَى الظَّلَام."
+        },
+        {
+          "en": "A young turtle saw it go. Her name is Sadaf, and she has never been down there.",
+          "ar": "رَأَتْهَا سُلَحْفَاةٌ صَغِيرَةٌ وَهِيَ تَهْوِي. اِسْمُهَا صَدَف، وَلَمْ تَنْزِلْ هُنَاكَ قَطّ."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n2",
+      "beat": "discovery",
+      "type": "activity",
+      "activityRef": "activities/ocean_find_marker",
+      "lines": [
+        {
+          "en": "The storm stirred up the sand. Somewhere under it is the marker for the way down.",
+          "ar": "أَثَارَتِ العَاصِفَةُ الرَّمْل. وَتَحْتَهُ فِي مَكَانٍ مَا عَلَامَةُ طَرِيقِ النُّزُول."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n3",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/ocean_float_or_sink",
+      "lines": [
+        {
+          "en": "Nothing reaches the trench by hand. The storm left enough here to build a lift.",
+          "ar": "لَا شَيْءَ يَصِلُ إِلَى الأُخْدُودِ بِاليَد. وَتَرَكَتِ العَاصِفَةُ هُنَا مَا يَكْفِي لِبِنَاءِ رَافِعَة."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n4",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/ocean_load_the_basket",
+      "lines": [
+        {
+          "en": "Load it too heavy and it goes down and stays down. Load it right and it comes back.",
+          "ar": "إِنْ حَمَّلْتَهَا فَوْقَ طَاقَتِهَا نَزَلَتْ وَلَمْ تَعُد. وَإِنْ ضَبَطْتَهَا عَادَتْ إِلَيْك."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n5",
+      "beat": "progress",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/sea/lift_basket.png",
+      "lines": [
+        {
+          "en": "The lift floats. The basket hangs level. Sadaf has it on her back.",
+          "ar": "الرَّافِعَةُ تَطْفُو. وَالسَّلَّةُ مُتَدَلِّيَةٌ مُسْتَوِيَة. وَصَدَفُ تَحْمِلُهَا عَلَى ظَهْرِهَا."
+        },
+        {
+          "en": "But below the reef there is no light at all. None.",
+          "ar": "لَكِنْ تَحْتَ الشِّعَابِ لَا ضَوْءَ عَلَى الإِطْلَاق. وَلَا ذَرَّة."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n6",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/ocean_light_her_shell",
+      "lines": [
+        {
+          "en": "Glow-weed grows along this ledge. Sadaf will carry whatever you give her.",
+          "ar": "يَنْمُو العُشْبُ المُضِيءُ عَلَى هَذِهِ الحَافَّة. وَصَدَفُ سَتَحْمِلُ كُلَّ مَا تُعْطِيهَا."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n7",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/ocean_light_the_wall",
+      "lines": [
+        {
+          "en": "Her glow reaches the trench wall. Drag the light along it and it stays.",
+          "ar": "يَبْلُغُ تَوَهُّجُهَا جِدَارَ الأُخْدُود. اِسْحَبِ الضَّوْءَ عَلَيْهِ فَيَثْبُت."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n8",
+      "beat": "climax",
+      "type": "activity",
+      "activityRef": "activities/ocean_read_the_current",
+      "lines": [
+        {
+          "en": "A gate of reef, opening and shutting with the swell. Sadaf cannot read it. You can.",
+          "ar": "بَوَّابَةٌ مِنَ الشِّعَابِ تَنْفَتِحُ وَتَنْغَلِقُ مَعَ المَوْج. صَدَفُ لَا تَقْرَؤُهَا. أَنْتَ تَقْدِر."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n9",
+      "beat": "resolution",
+      "type": "storyBeat",
+      "rewardId": "blue_page",
+      "speakerArt": "assets/gen/images/story/page_blue.png",
+      "lines": [
+        {
+          "en": "Past the gate, caught on the wall you lit, right where nobody was searching.",
+          "ar": "خَلْفَ البَوَّابَة، عَالِقَةً عَلَى الجِدَارِ الَّذِي أَضَأْتَه، حَيْثُ لَمْ يَبْحَثْ أَحَد."
+        },
+        {
+          "en": "The basket brings it up, and Sadaf follows the shells home: the Blue Page.",
+          "ar": "تَرْفَعُهَا السَّلَّة، وَتَتْبَعُ صَدَفُ الصَّدَفَاتِ عَائِدَة: الصَّفْحَةُ الزَّرْقَاء."
+        }
+      ]
+    },
+    {
+      "nodeId": "ocean.n10",
+      "beat": "clueOnward",
+      "type": "storyBeat",
+      "lines": [
+        {
+          "en": "On this page it is night, and the sky is full of small cold lights.",
+          "ar": "عَلَى هَذِهِ الصَّفْحَةِ لَيْل، وَالسَّمَاءُ مَلِيئَةٌ بِأَضْوَاءٍ صَغِيرَةٍ بَارِدَة."
+        },
+        {
+          "en": "Something is moving between them.",
+          "ar": "وَشَيْءٌ مَا يَتَحَرَّكُ بَيْنَهَا."
+        }
+      ]
+    }
+  ]
+}

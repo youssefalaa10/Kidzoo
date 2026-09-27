@@ -17,11 +17,19 @@ class TraceStep extends ActivityStep {
     required this.figure,
     required this.tolerance,
     required this.accentColorValue,
+    this.alreadyDrawn = const <TraceFigure>[],
   }) : super(stepId);
 
   final TraceFigure figure;
   final double tolerance;
   final int? accentColorValue;
+
+  /// Figures finished earlier in this activity, still lit.
+  ///
+  /// Carried on the step rather than kept in the board, so it is a pure
+  /// function of the state and a child who comes back mid-activity finds the
+  /// part of the route they had already drawn still glowing.
+  final List<TraceFigure> alreadyDrawn;
 }
 
 class TraceCubit extends ActivityCubit<TraceContent, TraceStep> {
@@ -36,6 +44,9 @@ class TraceCubit extends ActivityCubit<TraceContent, TraceStep> {
           figure: content.figures[index],
           tolerance: content.tolerance,
           accentColorValue: content.accentColorValue,
+          alreadyDrawn: content.keepCompleted
+              ? List<TraceFigure>.unmodifiable(content.figures.sublist(0, index))
+              : const <TraceFigure>[],
         ),
     ];
   }
@@ -134,6 +145,10 @@ class TracePathEngine extends ActivityEngine<TraceContent> {
               description: 'each with id, an ordered points list as whole '
                   'percentages of the box, a label, and the flags closed / '
                   'showNumbers / showGuide'),
+          ContentParameter.flag('keepCompleted',
+              description: 'keep each finished figure lit while the next is '
+                  'drawn, for when the figures are one thing rather than a set '
+                  'of unrelated shapes'),
           ContentParameter.integer('tolerancePercent',
               minValue: 1,
               maxValue: 40,

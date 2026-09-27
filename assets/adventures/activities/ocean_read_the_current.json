@@ -1,0 +1,101 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.read_the_current",
+  "engineId": "patterns",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8"
+  },
+  "narration": {
+    "prompt": {
+      "en": "The reef repeats itself. To open the gate, put back what the storm tore out.",
+      "ar": "الشِّعَابُ تُكَرِّرُ نَفْسَهَا. لِتَفْتَحَ البَوَّابَة، أَعِدْ مَا اقْتَلَعَتْهُ العَاصِفَة."
+    },
+    "hint1": {
+      "en": "Say the ledge out loud from the start. What comes after that?",
+      "ar": "اُنْطُقِ الحَافَةَ بِصَوْتٍ عَالٍ مِنَ البِدَايَة. مَاذَا يَأْتِي بَعْدَ ذَلِك؟"
+    },
+    "hint2": {
+      "en": "Look at the same place one repeat earlier.",
+      "ar": "اُنْظُرْ إِلَى المَكَانِ نَفْسِهِ فِي التَّكْرَارِ السَّابِق."
+    },
+    "model": {
+      "en": "This one belongs here. Look why, then put it back yourself.",
+      "ar": "هَذِهِ مَكَانُهَا هُنَا. اُنْظُرْ لِمَاذَا، ثُمَّ أَعِدْهَا بِنَفْسِك."
+    },
+    "success": {
+      "en": "You read the whole current. The gate is open and Sadaf is through.",
+      "ar": "قَرَأْتَ التَّيَّارَ كُلَّه. اِنْفَتَحَتِ البَوَّابَةُ وَعَبَرَتْ صَدَف."
+    }
+  },
+  "payload": {
+    "_comment": "The climax, and the only thing in the chapter that asks the child to work out a RULE and then use it somewhere they cannot see the answer. Sadaf cannot do this — she says so — which is what makes the child, not the turtle, the one who opens the way. Three rounds, and the unit gets harder each time: AB, then AAB, then ABC. Difficulty comes from the pattern, never from a tier.",
+    "_notSortingComment": "Sorting asks which box a thing belongs in, and its verdict for an item is the same wherever it lands. This asks what is missing from a run, and the same shell is right in one hole and wrong in the next. The board says so before anyone speaks: one connected ledge with holes punched in it, not a row of boxes.",
+    "_trayComment": "trayExtraCount is 1 so the last hole of a round can never be filled by elimination. With only the answer left in the tray, a child who puts it in has practised counting the tray rather than reading the reef.",
+    "_revealedComment": "Two whole repeats are always laid out before the first hole, and the engine checks that against the gaps rather than taking the number on trust. One repeat is a guess; two is a pattern a child can actually see.",
+    "itemsRef": "packs/tide_pool",
+    "itemIds": ["coral", "spiral_shell", "tropical_fish", "kelp", "crab"],
+    "revealedRepeats": 2,
+    "trayExtraCount": 1,
+    "mode": "extend",
+    "rounds": [
+      {
+        "id": "the_swell",
+        "unit": ["coral", "spiral_shell"],
+        "repeats": 4,
+        "gaps": [6, 7],
+        "mode": "extend",
+        "prompt": {
+          "en": "Coral, shell, coral, shell. Say it to the end.",
+          "ar": "مَرْجَان، صَدَفَة، مَرْجَان، صَدَفَة. أَكْمِلْهَا إِلَى النِّهَايَة."
+        },
+        "revealLine": {
+          "en": "The water moved. That is the reef breathing in and out.",
+          "ar": "تَحَرَّكَ المَاء. هَذَا هُوَ الشِّعَابُ يَتَنَفَّسُ دُخُولًا وَخُرُوجًا."
+        }
+      },
+      {
+        "id": "the_backwash",
+        "unit": ["coral", "coral", "spiral_shell"],
+        "repeats": 3,
+        "gaps": [6, 7],
+        "mode": "fillGap",
+        "prompt": {
+          "en": "This one goes two, then one. Two holes in the middle.",
+          "ar": "هَذِهِ اثْنَتَانِ ثُمَّ وَاحِدَة. وَفَتْحَتَانِ فِي المُنْتَصَف."
+        },
+        "revealLine": {
+          "en": "Longer this time. The swell pulls twice before it pushes.",
+          "ar": "أَطْوَلُ هَذِهِ المَرَّة. يَسْحَبُ المَوْجُ مَرَّتَيْنِ قَبْلَ أَنْ يَدْفَع."
+        }
+      },
+      {
+        "id": "the_gate_beat",
+        "unit": ["coral", "spiral_shell", "tropical_fish"],
+        "repeats": 3,
+        "gaps": [6, 8],
+        "mode": "extend",
+        "prompt": {
+          "en": "Three things now, over and over. This is the beat the gate opens on.",
+          "ar": "ثَلَاثَةُ أَشْيَاءَ الآن، مَرَّةً بَعْدَ مَرَّة. عَلَى هَذَا الإِيقَاعِ تَنْفَتِحُ البَوَّابَة."
+        },
+        "revealLine": {
+          "en": "The whole ledge ran, beat by beat. The gate swung open.",
+          "ar": "جَرَتِ الحَافَةُ كُلُّهَا، نَبْضَةً بَعْدَ نَبْضَة. وَانْفَتَحَتِ البَوَّابَة."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 1,
+    "max": 4
+  },
+  "elofGoal": "MATH.patterning.extend_repeating_unit",
+  "prereqSkills": [],
+  "masteryThreshold": 0.7
+}

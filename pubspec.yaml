@@ -69,6 +69,10 @@ flutter:
     - assets/gen/images/fruits/
     - assets/gen/images/vegetables/
     - assets/gen/images/vehicles/
+    # Sea life and salvage for the Ocean chapter. Its own directory rather than
+    # scattered through animal/ and vehicles/, because the whole set is one
+    # visual family and has to stay swappable as a set.
+    - assets/gen/images/sea/
     - assets/gen/images/puzzle/
     - assets/gen/images/puzzle/gazelle block/
     - assets/gen/images/puzzle/ghost block/
