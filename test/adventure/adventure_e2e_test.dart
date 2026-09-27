@@ -18,6 +18,7 @@ import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_engi
 import 'package:kidzo/features/Adventure/engine/engines/counting/counting_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/trace_path/trace_engine.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_narrator.dart';
@@ -92,6 +93,9 @@ void main() {
     }
     if (step is BalanceStep) {
       return QuantityAttempt(step.round.target);
+    }
+    if (step is PatternStep) {
+      return ChoiceAttempt(step.correctItemId);
     }
     if (step is TraceStep) {
       // The tap route, not the drag: a whole stroke is what the board sends
@@ -376,17 +380,130 @@ void main() {
     });
   }
 
+  for (final String locale in <String>['en', 'ar']) {
+    group('Adventure 3 in $locale', () {
+      // The ocean, and the first chapter whose climax is an engine that did not
+      // exist when the chapter before it shipped. Same battery as the market,
+      // because the point of the battery is that a new chapter should need no
+      // new kind of assurance.
+      test('plays from the first beat to the page, answering well', () async {
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'ocean');
+
+        expect(spoken, isNotEmpty);
+        final List<StoryReward> rewards = await dao.rewardsFor(profileId);
+        expect(
+            rewards.map((StoryReward r) => r.rewardId), contains('blue_page'));
+      });
+
+      test('never mixes the two languages in one run', () async {
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'ocean');
+
+        for (final String line in spoken) {
+          if (locale == 'ar') {
+            expect(arabic.hasMatch(line), isTrue,
+                reason: 'an Arabic run said "$line", which has no Arabic in it');
+          } else {
+            expect(arabic.hasMatch(line), isFalse,
+                reason: 'an English run said "$line"');
+          }
+        }
+      });
+
+      test('never says the same thing twice in a row', () async {
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'ocean');
+
+        for (int index = 1; index < spoken.length; index++) {
+          expect(spoken[index], isNot(spoken[index - 1]),
+              reason: 'said "${spoken[index]}" twice running');
+        }
+      });
+
+      test('every activity result changes the sea, out loud', () async {
+        // The chain the chapter is built on, checked out loud: the floats
+        // become the lift, the lift carries the light, the light shows the
+        // wall, the wall shows the gate. An activity whose outcome nothing
+        // refers to is decoration, however good it looks.
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'ocean');
+
+        for (final String activityId in <String>[
+          'ocean_load_the_basket',
+          'ocean_light_her_shell',
+          'ocean_light_the_wall',
+          'ocean_read_the_current',
+        ]) {
+          final ActivitySpec spec = bundle.requireActivity(activityId);
+          final List<String> reveals = <String>[];
+          void collect(Object? node) {
+            if (node is Map) {
+              final Object? reveal = node['revealLine'];
+              if (reveal is Map && reveal[locale] is String) {
+                reveals.add(reveal[locale] as String);
+              }
+              node.values.forEach(collect);
+            } else if (node is List) {
+              node.forEach(collect);
+            }
+          }
+
+          collect(spec.payload);
+          expect(reveals, isNotEmpty,
+              reason: '$activityId authored no reveal lines, so finishing it '
+                  'tells the child nothing');
+          for (final String reveal in reveals) {
+            expect(spoken, contains(reveal),
+                reason: '$activityId never said "$reveal", so the thing the '
+                    'child just did changed nothing the story mentions');
+          }
+        }
+      });
+
+      test('a child who gets everything wrong still reaches the page',
+          () async {
+        await playAdventure(
+          languageCode: locale,
+          adventureId: 'ocean',
+          answerEverythingWrong: true,
+        );
+
+        final List<StoryReward> rewards = await dao.rewardsFor(profileId);
+        expect(
+            rewards.map((StoryReward r) => r.rewardId), contains('blue_page'));
+      });
+
+      test('fast repeated taps do not skip a beat or double a page', () async {
+        await playAdventure(
+          languageCode: locale,
+          adventureId: 'ocean',
+          tapFast: true,
+        );
+
+        final List<StoryReward> rewards = await dao.rewardsFor(profileId);
+        expect(
+          rewards.where((StoryReward r) => r.rewardId == 'blue_page').length,
+          1,
+        );
+      });
+    });
+  }
+
   group('The arc plays as one journey', () {
-    test('both chapters run back to back and both pages come home', () async {
-      // Finishing the jungle is what opens the market, so the two have to work
-      // in sequence against one profile rather than only in isolation.
+    test('all three chapters run back to back and every page comes home',
+        () async {
+      // Finishing the jungle is what opens the market, and the market is what
+      // opens the ocean, so all three have to work in sequence against one
+      // profile rather than only in isolation.
       await playAdventure(languageCode: 'en');
       await playAdventure(languageCode: 'en', adventureId: 'market');
+      await playAdventure(languageCode: 'en', adventureId: 'ocean');
 
       final List<StoryReward> rewards = await dao.rewardsFor(profileId);
       expect(
         rewards.map((StoryReward r) => r.rewardId).toSet(),
-        <String>{'green_page', 'amber_page'},
+        <String>{'green_page', 'amber_page', 'blue_page'},
       );
     });
 
@@ -404,12 +521,41 @@ void main() {
           if (node.isActivity)
             bundle.requireActivity(node.activityRef!).engineId,
       };
+      final Set<String> oceanEngines = <String>{
+        for (final StoryNode node in bundle.requireAdventure('ocean').nodes)
+          if (node.isActivity)
+            bundle.requireActivity(node.activityRef!).engineId,
+      };
 
       expect(marketEngines.difference(jungleEngines), isNotEmpty,
           reason: 'the market is the jungle repainted');
       expect(marketEngines.intersection(jungleEngines), isNotEmpty,
           reason: 'nothing was reused, which means the engines are not '
               'actually reusable');
+      expect(
+          oceanEngines.difference(marketEngines.union(jungleEngines)),
+          isNotEmpty,
+          reason: 'the ocean brings nothing the child has not already met');
+      expect(oceanEngines.intersection(marketEngines), isNotEmpty,
+          reason: 'the ocean reused nothing, which would mean every chapter '
+              'costs a new engine');
+    });
+
+    test('no chapter repeats an interaction inside itself', () async {
+      // Variety within one sitting, not only between chapters. Six activities
+      // that are six rounds of the same interaction is the failure this
+      // catches, and it is invisible to every per-activity test.
+      for (final String adventureId in <String>['jungle', 'market', 'ocean']) {
+        final List<String> engines = <String>[
+          for (final StoryNode node
+              in bundle.requireAdventure(adventureId).nodes)
+            if (node.isActivity)
+              bundle.requireActivity(node.activityRef!).engineId,
+        ];
+        expect(engines.toSet().length, engines.length,
+            reason: '$adventureId asks for the same interaction twice: '
+                '$engines');
+      }
     });
   });
 

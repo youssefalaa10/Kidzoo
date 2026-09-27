@@ -222,6 +222,7 @@ class _TraceBoardState extends State<TraceBoard>
                         return CustomPaint(
                           painter: _FigurePainter(
                             walk: _walk,
+                            alreadyDrawn: widget.step.alreadyDrawn,
                             reached: _reached,
                             stroke: _stroke,
                             accent: accent,
@@ -301,6 +302,7 @@ class _AnchorNumber extends StatelessWidget {
 class _FigurePainter extends CustomPainter {
   const _FigurePainter({
     required this.walk,
+    required this.alreadyDrawn,
     required this.reached,
     required this.stroke,
     required this.accent,
@@ -310,6 +312,10 @@ class _FigurePainter extends CustomPainter {
   });
 
   final List<TraceAnchor> walk;
+
+  /// Figures finished earlier, drawn underneath and still lit.
+  final List<TraceFigure> alreadyDrawn;
+
   final int reached;
   final List<Offset> stroke;
   final Color accent;
@@ -326,6 +332,7 @@ class _FigurePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final double unit = size.shortestSide;
 
+    _paintAlreadyDrawn(canvas, size, unit);
     if (showGuide) {
       _paintGuide(canvas, size, unit);
     }
@@ -335,6 +342,56 @@ class _FigurePainter extends CustomPainter {
     }
     _paintFreeStroke(canvas, size, unit);
     _paintAnchors(canvas, size, unit);
+  }
+
+  /// Everything drawn before this figure, left lit.
+  ///
+  /// Dimmer than the live line and with the same soft halo, so the finished
+  /// part of the route reads as *already done* rather than competing with the
+  /// stroke the child is making now.
+  void _paintAlreadyDrawn(Canvas canvas, Size size, double unit) {
+    if (alreadyDrawn.isEmpty) {
+      return;
+    }
+    for (final TraceFigure figure in alreadyDrawn) {
+      final List<TraceAnchor> done = figure.walk;
+      if (done.length < 2) {
+        continue;
+      }
+      final Path path = Path()
+        ..moveTo(_at(done.first, size).dx, _at(done.first, size).dy);
+      for (int index = 1; index < done.length; index++) {
+        final Offset point = _at(done[index], size);
+        path.lineTo(point.dx, point.dy);
+      }
+      _glow(canvas, path, unit, alpha: 0.18);
+      canvas.drawPath(
+        path,
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = unit * 0.04
+          ..strokeCap = StrokeCap.round
+          ..strokeJoin = StrokeJoin.round
+          ..color = accent.withValues(alpha: 0.55),
+      );
+    }
+  }
+
+  /// A soft halo under a line, so a drawn route looks lit rather than inked.
+  ///
+  /// A blurred stroke is one extra paint of the same path — no shader, no
+  /// layer, nothing that costs a frame on a low-end device.
+  void _glow(Canvas canvas, Path path, double unit, {required double alpha}) {
+    canvas.drawPath(
+      path,
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = unit * 0.105
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..color = accent.withValues(alpha: alpha)
+        ..maskFilter = MaskFilter.blur(BlurStyle.normal, unit * 0.03),
+    );
   }
 
   /// The dotted road between the points.
@@ -376,6 +433,7 @@ class _FigurePainter extends CustomPainter {
       final Offset point = _at(walk[index], size);
       path.lineTo(point.dx, point.dy);
     }
+    _glow(canvas, path, unit, alpha: 0.32);
     canvas.drawPath(
       path,
       Paint()
@@ -472,5 +530,6 @@ class _FigurePainter extends CustomPainter {
       old.stroke.length != stroke.length ||
       old.ghostProgress != ghostProgress ||
       old.isHintingNext != isHintingNext ||
-      old.walk != walk;
+      old.walk != walk ||
+      old.alreadyDrawn != alreadyDrawn;
 }

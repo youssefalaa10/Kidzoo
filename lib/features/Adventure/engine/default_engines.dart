@@ -6,6 +6,7 @@ import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_engi
 import 'package:kidzo/features/Adventure/engine/engines/counting/counting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/trace_path/trace_engine.dart';
 
@@ -31,5 +32,11 @@ ActivityEngineRegistry buildDefaultEngineRegistry() {
     const CodePathEngine(),
     const BalanceExperimentEngine(),
     const TracePathEngine(),
+    // Adventure 3 added one, for the domain the contract has declared since
+    // Phase 1 with nothing behind it: `patterning`. Its key is unique because
+    // the domain is, even though it shares `sorting`'s interaction — which is
+    // the registry working as intended rather than a loophole. Sorting asks
+    // which box a thing belongs in; this asks what is missing from a run.
+    const PatternsEngine(),
   ]);
 }

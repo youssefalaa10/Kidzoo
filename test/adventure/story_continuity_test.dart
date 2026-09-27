@@ -282,10 +282,10 @@ void main() {
       final JourneyTrail trail =
           tester.widget<JourneyTrail>(find.byType(JourneyTrail));
 
-      // Two playable Adventures plus two places that are not written yet.
+      // Three playable Adventures plus one place that is not written yet.
       // Crucially *not* one bead per activity: the jungle has four activities
-      // and eight nodes, the market has seven and eleven, and each contributes
-      // exactly one stop.
+      // and eight nodes, the market has seven and eleven, the ocean six and
+      // ten, and each contributes exactly one stop.
       expect(trail.stops.length, 4);
       expect(trail.stops.first.id, 'jungle');
       expect(trail.stops.first.state, MapStopState.open);
@@ -293,17 +293,15 @@ void main() {
         trail.stops.skip(1).map((MapStop stop) => stop.id),
         <String>['market', 'ocean', 'stars'],
       );
-      // The market is real content now, so it is **locked** rather than
-      // "coming soon": a stop the child will reach by finishing the one before
-      // it, not a silhouette of something unwritten. The two states look
-      // different and mean different things, and the distinction is what keeps
-      // the map honest about which promises it can already keep.
+      // The market and the ocean are real content now, so they are **locked**
+      // rather than "coming soon": stops the child will reach by finishing the
+      // one before them, not silhouettes of something unwritten. The two
+      // states look different and mean different things, and the distinction
+      // is what keeps the map honest about which promises it can already keep.
+      // Only the stars are still a silhouette.
       expect(trail.stops[1].state, MapStopState.locked);
-      expect(
-        trail.stops.skip(2).every(
-            (MapStop stop) => stop.state == MapStopState.comingSoon),
-        isTrue,
-      );
+      expect(trail.stops[2].state, MapStopState.locked);
+      expect(trail.stops[3].state, MapStopState.comingSoon);
 
       // The header keeps the one number worth keeping permanently on screen.
       expect(find.text('0/4'), findsOneWidget);
@@ -342,7 +340,7 @@ void main() {
       expect(stops.first.state, MapStopState.completed);
       expect(stops[1].state, MapStopState.open,
           reason: 'recovering the first page is what opens the second stop');
-      expect(stops[2].state, MapStopState.comingSoon,
+      expect(stops[2].state, MapStopState.locked,
           reason: 'and it opens exactly one, not everything after it');
       expect(find.text('1/4'), findsOneWidget);
     });

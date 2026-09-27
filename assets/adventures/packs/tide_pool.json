@@ -1,0 +1,116 @@
+{
+  "packId": "tide_pool",
+  "_comment": "What the storm left on the reef, and what lives there. Arabic labels carry full harakat: diacritics are not optional for ages 3-8, and the benefit of vowelisation is strongest in exactly this band.",
+  "_buoyancyComment": "`buoyancy` is the attribute the float/sink round sorts on, and the cast is cross-balanced against `size` in BOTH directions on purpose. Driftwood, a coconut and a crate are big and float; a key and a coin are tiny and sink. A child whose rule is 'big things sink' is wrong on the second piece, and a child whose rule is 'small things float' is wrong on the third. Neither hypothesis survives long enough to feel confirmed, which is the whole point of the round.",
+  "_weightComment": "`weight` lives HERE rather than in the activity so a stone weighs three in every story it turns up in. A thing that is heavy in one chapter and light in the next is not a world, it is a quiz.",
+  "items": [
+    {
+      "id": "driftwood",
+      "image": "assets/gen/images/sea/driftwood.png",
+      "label": { "en": "driftwood", "ar": "خَشَبَة" },
+      "attributes": { "buoyancy": "float", "size": "big", "kind": "salvage" }
+    },
+    {
+      "id": "coconut",
+      "image": "assets/gen/images/sea/coconut.png",
+      "label": { "en": "coconut", "ar": "جَوْزُ الهِنْد" },
+      "attributes": { "buoyancy": "float", "size": "big", "kind": "salvage" }
+    },
+    {
+      "id": "ring_buoy",
+      "image": "assets/gen/images/sea/ring_buoy.png",
+      "label": { "en": "life ring", "ar": "عَوَّامَة" },
+      "attributes": { "buoyancy": "float", "size": "big", "kind": "salvage" }
+    },
+    {
+      "id": "wooden_crate",
+      "image": "assets/gen/images/sea/wooden_crate.png",
+      "label": { "en": "crate", "ar": "صُنْدُوق" },
+      "attributes": { "buoyancy": "float", "size": "big", "kind": "salvage" }
+    },
+    {
+      "id": "kelp",
+      "image": "assets/gen/images/sea/kelp.png",
+      "label": { "en": "kelp", "ar": "عُشْبٌ بَحْرِيّ" },
+      "attributes": { "buoyancy": "float", "size": "small", "kind": "reef" }
+    },
+    {
+      "id": "reef_stone",
+      "image": "assets/gen/images/sea/reef_stone.png",
+      "label": { "en": "stone", "ar": "حَجَر" },
+      "attributes": { "buoyancy": "sink", "size": "big", "weight": "3", "kind": "salvage" }
+    },
+    {
+      "id": "chains",
+      "image": "assets/gen/images/sea/chains.png",
+      "label": { "en": "chain", "ar": "سِلْسِلَة" },
+      "attributes": { "buoyancy": "sink", "size": "big", "weight": "3", "kind": "salvage" }
+    },
+    {
+      "id": "anchor",
+      "image": "assets/gen/images/sea/anchor.png",
+      "label": { "en": "anchor", "ar": "مِرْسَاة" },
+      "attributes": { "buoyancy": "sink", "size": "big", "weight": "5", "kind": "salvage" }
+    },
+    {
+      "id": "old_key",
+      "image": "assets/gen/images/sea/old_key.png",
+      "label": { "en": "old key", "ar": "مِفْتَاحٌ قَدِيم" },
+      "attributes": { "buoyancy": "sink", "size": "small", "weight": "1", "kind": "salvage" }
+    },
+    {
+      "id": "coin",
+      "image": "assets/gen/images/sea/coin.png",
+      "label": { "en": "coin", "ar": "عُمْلَة" },
+      "attributes": { "buoyancy": "sink", "size": "small", "weight": "1", "kind": "salvage" }
+    },
+    {
+      "id": "spiral_shell",
+      "image": "assets/gen/images/sea/spiral_shell.png",
+      "label": { "en": "shell", "ar": "صَدَفَة" },
+      "attributes": { "size": "small", "kind": "reef" }
+    },
+    {
+      "id": "coral",
+      "image": "assets/gen/images/sea/coral.png",
+      "label": { "en": "coral", "ar": "مَرْجَان" },
+      "attributes": { "size": "small", "kind": "reef" }
+    },
+    {
+      "id": "tropical_fish",
+      "image": "assets/gen/images/sea/tropical_fish.png",
+      "label": { "en": "little fish", "ar": "سَمَكَةٌ صَغِيرَة" },
+      "attributes": { "size": "small", "kind": "reef" }
+    },
+    {
+      "id": "crab",
+      "image": "assets/gen/images/sea/crab.png",
+      "label": { "en": "crab", "ar": "سَرَطَان" },
+      "attributes": { "size": "small", "kind": "reef" }
+    },
+    {
+      "id": "glow_weed",
+      "image": "assets/gen/images/sea/glow_weed.png",
+      "label": { "en": "glow-weed", "ar": "خَيْطٌ مُضِيء" },
+      "attributes": { "size": "small", "kind": "reef" }
+    },
+    {
+      "id": "compass",
+      "image": "assets/gen/images/sea/compass.png",
+      "label": { "en": "old compass", "ar": "بُوصَلَةٌ قَدِيمَة" },
+      "attributes": { "size": "small", "kind": "marker" }
+    },
+    {
+      "id": "turtle",
+      "image": "assets/gen/images/sea/turtle.png",
+      "label": { "en": "Sadaf", "ar": "صَدَف" },
+      "attributes": { "size": "big", "kind": "friend" }
+    },
+    {
+      "id": "lift_basket",
+      "image": "assets/gen/images/sea/lift_basket.png",
+      "label": { "en": "the lift-basket", "ar": "سَلَّةُ الرَّفْع" },
+      "attributes": { "size": "big", "kind": "gear" }
+    }
+  ]
+}

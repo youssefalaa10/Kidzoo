@@ -82,6 +82,7 @@ class TraceContent extends ActivityContent {
   const TraceContent({
     required this.figures,
     required this.tolerance,
+    this.keepCompleted = false,
     this.accentColorValue,
   });
 
@@ -94,6 +95,15 @@ class TraceContent extends ActivityContent {
   /// millimetres has not misunderstood the shape; scoring that as wrong
   /// measures their finger, not their thinking.
   final double tolerance;
+
+  /// Whether a finished figure stays on screen while the next one is drawn.
+  ///
+  /// Off by default, because a set of unrelated shapes drawn in the same box
+  /// would just pile up. On when the figures are *one thing* — a route down and
+  /// the route back, a constellation joined star by star — where the point is
+  /// that the child ends up looking at the whole of what they made rather than
+  /// at the last stroke of it.
+  final bool keepCompleted;
 
   final int? accentColorValue;
 
@@ -212,6 +222,7 @@ TraceContent parseTraceContent(ActivitySpec spec) {
   return TraceContent(
     figures: figures,
     tolerance: tolerance,
+    keepCompleted: reader.optionalBool('keepCompleted') ?? false,
     accentColorValue: _accentValue(spec.presentation.accent),
   );
 }

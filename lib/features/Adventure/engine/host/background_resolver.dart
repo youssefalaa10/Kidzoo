@@ -17,8 +17,7 @@ class BackgroundResolver {
     'jungle': _BackgroundPlates('$_dir/jungle_mob.png', '$_dir/jungle-tab.jpg'),
     'market': _BackgroundPlates(
         '$_dir/colorful_bg_mob.png', '$_dir/colorful_bg_tab.jpg'),
-    'ocean':
-        _BackgroundPlates('$_dir/cloudy_bg_mob.png', '$_dir/cloudy_bg_tab.png'),
+    'ocean': _BackgroundPlates('$_dir/ocean_mob.png', '$_dir/ocean_tab.png'),
     'star': _BackgroundPlates('$_dir/tech_bg_mob.jpeg', '$_dir/tech_bg_desk.jpg'),
     'learning':
         _BackgroundPlates('$_dir/learn_bg_mob.png', '$_dir/learn_bg_desk.jpg'),

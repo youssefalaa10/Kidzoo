@@ -30,7 +30,8 @@ This is the **single** progress ledger for Spec 006 — there is no second statu
 | 5P — Adventure 1 UX / story / content polish pass | complete | 2026-09-18 | 2026-09-18 |
 | 6R — Durable resume *(new requirement)* | complete | 2026-09-20 | 2026-09-20 |
 | 6 — Adventure 2 (The Market Morning) | complete — 3 new engines, see notes | 2026-09-20 | 2026-09-20 |
-| 6b — Adventures 3–4 | not started (content only) | — | — |
+| 6b — Adventure 3 (The Deep Blue) | complete — 1 new engine + 3 adaptations, see notes | 2026-09-23 | 2026-09-23 |
+| 6c — Adventure 4 | not started | — | — |
 
 ---
 
@@ -424,9 +425,99 @@ same line.
 
 ---
 
+## Phase 6b: Adventure 3 — The Deep Blue
+
+*Content, plus one engine and three adaptations. Full write-up:
+[adventure-3-report.md](./adventure-3-report.md).*
+
+- [x] T610 Capability audit of the six proposed mechanics against the registry key → four are
+      content, one needs a new engine, one needs a shared piece of chrome
+- [x] T611 `patterns` — `patterning | dragToTarget`, the domain the contract has declared since
+      Phase 1 with nothing behind it
+- [x] T612 `ActivityStage` — the thing being built, shown changing, authored as `presentation.stage`
+- [x] T613 `sorting` rung 2: `bins[].settleMotion` and visible accumulation
+- [x] T614 `trace_path` rung 2: `keepCompleted`
+- [x] T615 `ActivityFeedbackScope`, so a board that owns an animation's clock can own its sound too
+- [x] T616 `background_resolver.dart` — `ocean` pointed at real underwater plates instead of a sky
+- [x] T617 `packs/tide_pool.json` (18 items, Fluent Emoji, MIT) + 6 activity files +
+      `adventures/ocean.json` + the three generated art files
+- [x] T618 Arc rewiring: the ocean moves from `upcoming` into `adventures`
+- [x] T619 `patterns_engine_test.dart` (32) + `ocean_screenshot_test.dart` (6) + Adventure 3 through
+      the existing e2e battery in both locales
+
+---
+
 ## Notes and decisions
 
 *Append dated entries as work proceeds. Newest first.*
+
+- **2026-09-23** — **Four of the six ocean activities are zero Dart, and the two
+  that are not are not the two you would guess.** The climax needed a new engine,
+  which was expected. What was not: "every activity visibly changes the world"
+  turned out to be the expensive requirement, because no amount of JSON makes a
+  board that shows one object, two boxes and a step counter show anything else.
+  That became `ActivityStage` — one piece of shared chrome, authored per
+  activity, rendered *inside the prompt banner's row* so it costs no vertical
+  space and therefore survives 780x390 rather than being the first thing removed
+  on the layouts that need it most.
+
+- **2026-09-23** — **`patterning` had been a declared `LearningDomain` with no
+  engine since Phase 1, and nothing noticed.** The registry test catches two
+  engines claiming one key; nothing catches a key nobody claims. Worth a test of
+  its own eventually: an enum value the shipped set never uses is either a gap
+  or a lie, and both are worth knowing about before a chapter is planned around
+  one.
+
+- **2026-09-23** — **Most of the new engine is about the ways round reading the
+  pattern.** Gaps that all land on the same position in the unit can be answered
+  by copying a fixed distance back; a tray with no spare tile can be answered by
+  elimination; a "revealedRepeats" that the gaps contradict is scaffolding that
+  silently is not there. Each is now a parse-time rejection, and each test pins
+  the *message* rather than just the exception — the first draft of the
+  end-of-strip test was passing because it tripped a different rule two lines
+  above the one it named.
+
+- **2026-09-23** — **The float/sink round is the Market's colour-balance trick
+  on a new dimension, and it forced `heldConstant` to be empty.** Driftwood and
+  a coconut are big and float; a key and a coin are tiny and sink, so "big
+  things sink" fails on the second piece and "small things float" on the third.
+  That means size has to vary *against* the answer — and claiming it as held
+  constant would have been exactly the kind of comment-that-outlived-its-content
+  the Adventure 1 polish pass turned into an assertion. The validator would have
+  caught it.
+
+- **2026-09-23** — **Two bugs, both caught by tests that already existed, both
+  the same shape as bugs a previous chapter had.** The hidden-clue covers buried
+  the compass completely (the engine's own "the page must always be partly
+  visible" assertion), and the pattern ribbon overflowed 360dp by 45px — which
+  is the `code_path` tray failure at exactly the same width, for exactly the
+  same reason. A row is not its tiles: it also spends width on the band's
+  padding, its border, the gaps between tiles and, here, the gate. The cover
+  offsets are now solved numerically across board widths rather than eyeballed.
+
+- **2026-09-23** — **A board can own a sound now, and only for this reason.**
+  Sound belongs in the cubit, where the answer happens and the tests can see it.
+  The wave's per-tile tick is the other kind: a rhythm whose timing *is* the
+  point and whose clock lives in the widget. Driving it from the cubit would
+  have made every test sit through a wave it cannot see, and animating on two
+  clocks would have drifted. `ActivityFeedbackScope` hands the board the
+  soundboard the host already owns — nothing localized passes through it, so the
+  rule that keeps engines free of `AppLocalizations` still holds.
+
+- **2026-09-23** — **The map's "coming soon" state is load-bearing and needs
+  updating by hand.** Promoting the ocean from `upcoming` to `adventures` turned
+  it from `comingSoon` into `locked`, and two assertions in
+  `story_continuity_test` had pinned the old shape. That is the test doing its
+  job — the two states look different and mean different things — but it is also
+  a step that will recur for every chapter, and it is not in the quickstart
+  checklist.
+
+- **2026-09-23** — **Six activities, not seven.** The Market's own report flagged
+  its length as an untested bet on resume, and attention at four to five runs
+  eight to twelve minutes. Six is the correction, and it is now checked from the
+  other side too: a new e2e test asserts **no chapter repeats an interaction
+  inside itself**, which is the failure that makes a long chapter feel long.
+
 
 - **2026-09-20** — **The Adventure restarted itself three ways, and only one of
   them was the reported one.** Reproduced before anything was changed:

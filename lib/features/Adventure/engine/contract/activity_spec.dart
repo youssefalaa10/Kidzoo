@@ -64,6 +64,48 @@ class ActivitySpec {
       JsonReader(payload, '$sourcePath > payload');
 }
 
+/// How the thing an activity is *making* shows that it is being made.
+///
+/// Every activity in a story is a piece of work on some object — a basket being
+/// filled, a lamp being lit, a raft being built — and the child has no way to
+/// see that unless the object is on screen changing. A step counter is not that:
+/// symbolic progress trackers are understood by far fewer children of this age
+/// than a direct depiction of the thing itself, and embellishing the symbol
+/// makes it worse rather than better.
+///
+/// Deliberately **optional**. Three of Adventure 3's six activities omit it,
+/// because their boards already *are* the world changing — a scene being
+/// uncovered, a line being drawn, a gate being opened. A stage on top of those
+/// would be a second progress display saying the same thing twice.
+@immutable
+class ActivityStageSpec {
+  const ActivityStageSpec({required this.art, required this.mode});
+
+  factory ActivityStageSpec.fromJson(Map<String, dynamic> json) {
+    final JsonReader reader = JsonReader(json, 'presentation.stage');
+    final String mode = reader.optionalString('mode') ?? 'both';
+    if (!modes.contains(mode)) {
+      throw ActivityContentException(
+        'presentation.stage.mode',
+        '"$mode" is not a stage mode; expected one of ${modes.toList()}',
+      );
+    }
+    return ActivityStageSpec(art: reader.requireString('art'), mode: mode);
+  }
+
+  static const Set<String> modes = <String>{'fill', 'brighten', 'both'};
+
+  /// The object being worked on, as an asset path.
+  final String art;
+
+  /// `fill` clips it in from the bottom, `brighten` fades and saturates it up
+  /// from a dim ghost, `both` does the two together.
+  final String mode;
+
+  bool get fills => mode == 'fill' || mode == 'both';
+  bool get brightens => mode == 'brighten' || mode == 'both';
+}
+
 /// Backdrop and accent. Deliberately tiny: anything richer is art, not config.
 @immutable
 class ActivityPresentation {
@@ -73,6 +115,7 @@ class ActivityPresentation {
     this.sceneImage,
     this.accent,
     this.celebration,
+    this.stage,
   });
 
   factory ActivityPresentation.fromJson(Map<String, dynamic>? json) {
@@ -80,12 +123,14 @@ class ActivityPresentation {
       return const ActivityPresentation();
     }
     final JsonReader reader = JsonReader(json, 'presentation');
+    final Map<String, dynamic>? stage = reader.optionalMap('stage');
     return ActivityPresentation(
       backgroundType: reader.optionalString('backgroundType'),
       backgroundAsset: reader.optionalString('backgroundAsset'),
       sceneImage: reader.optionalString('sceneImage'),
       accent: reader.optionalString('accent'),
       celebration: reader.optionalString('celebration'),
+      stage: stage == null ? null : ActivityStageSpec.fromJson(stage),
     );
   }
 
@@ -94,6 +139,7 @@ class ActivityPresentation {
   final String? sceneImage;
   final String? accent;
   final String? celebration;
+  final ActivityStageSpec? stage;
 }
 
 /// The four spoken lines every activity provides.
