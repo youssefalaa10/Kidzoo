@@ -258,10 +258,11 @@ void main() {
       expect(row.activityCheckpoint, isNull);
     });
 
-    test('the database reports schema v4', () {
-      // v4 adds the two nullable columns durable resume needs, on the chapter
-      // row the resume point already lived on. Pure-add, like v3.
-      expect(database.schemaVersion, 4);
+    test('the database reports schema v5', () {
+      // v4 added the two nullable columns durable resume needs, on the chapter
+      // row the resume point already lived on. v5 adds the EarnedBadges table.
+      // Both are pure-add, like v3.
+      expect(database.schemaVersion, 5);
     });
 
     test('GameScores accepts the new nullable story columns', () async {

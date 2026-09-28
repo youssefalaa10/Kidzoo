@@ -3,9 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-import '../../../core/database/daos/game_scores_dao.dart';
-import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/kid_game_shell.dart';
@@ -25,15 +24,12 @@ class FeedAnimalScreen extends StatelessWidget {
     // inside the create callback throws, because that callback runs once and
     // can never be rebuilt to see an update.
     final l10n = AppLocalizations.of(context);
-    final gameScoresDao = context.read<GameScoresDao>();
-    final profileDao = context.read<ProfileDao>();
     final flutterTts = context.read<FlutterTts>();
     final audioPlayer = context.read<AudioPlayer>();
 
     return BlocProvider(
       create: (_) => FeedAnimalCubit(
-        gameScoresDao: gameScoresDao,
-        profileDao: profileDao,
+        scoreRecorder: context.read<GameScoreRecorder>(),
         flutterTts: flutterTts,
         audioPlayer: audioPlayer,
         l10n: l10n,

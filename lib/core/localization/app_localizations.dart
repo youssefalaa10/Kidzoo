@@ -40,9 +40,6 @@ class AppLocalizations {
 
   // DrawLab translations
   String get drawLab => _localizedValues['drawLab']!;
-  String get navigationNotAllowed => _localizedValues['navigationNotAllowed']!;
-  String get gamesOnlyThroughLevelMap =>
-      _localizedValues['gamesOnlyThroughLevelMap']!;
   String get goBack => _localizedValues['goBack']!;
   String get toolSettings => _localizedValues['toolSettings']!;
   String get failedToShare => _localizedValues['failedToShare']!;
@@ -372,12 +369,8 @@ class AppLocalizations {
   String get flappyBird => _localizedValues['flappyBird']!;
   String get game2048 => _localizedValues['game2048']!;
 
-  String currentLevelLabel(int level) => _localizedValues['currentLevelLabel']!
-      .replaceAll('{level}', level.toString());
   String levelLabel(int level) =>
       _localizedValues['levelLabel']!.replaceAll('{level}', level.toString());
-  String difficultyLevel(int level) => _localizedValues['difficultyLevel']!
-      .replaceAll('{level}', level.toString());
   String get gameTypesLabel => _localizedValues['gameTypesLabel']!;
   String get memoryGameCongrats => _localizedValues['memoryGameCongrats']!;
   String get memoryGameTimeResult => _localizedValues['memoryGameTimeResult']!;
@@ -386,9 +379,6 @@ class AppLocalizations {
   String pairsLabel(int current, int total) => _localizedValues['pairsLabel']!
       .replaceAll('{current}', current.toString())
       .replaceAll('{total}', total.toString());
-  String lockedLevelMessage(int level) =>
-      _localizedValues['lockedLevelMessage']!
-          .replaceAll('{level}', level.toString());
 
   // Learning Activities translations
   String get numbers => _localizedValues['numbers']!;
@@ -888,6 +878,50 @@ class AppLocalizations {
         return [_localizedValues['vocab_where_is_the']!];
     }
   }
+
+  // Difficulty tiers. The per-game tier descriptions are resolved by key from
+  // the picker rather than given getters, because they are catalog data; see
+  // test/difficulty/tier_description_keys_test.dart for the guard that
+  // replaces the getter cross-check.
+  String get chooseDifficulty => _localizedValues['chooseDifficulty']!;
+  String get nextLevel => _localizedValues['nextLevel']!;
+  String get tierLocked => _localizedValues['tierLocked']!;
+  String get notPlayedYet => _localizedValues['notPlayedYet']!;
+  String get freePlayCard => _localizedValues['freePlayCard']!;
+  String finishPreviousTier(String tier) =>
+      _localizedValues['finishPreviousTier']!.replaceAll('{tier}', tier);
+  String tierBestScore(int score) => _localizedValues['tierBestScore']!
+      .replaceAll('{score}', score.toString());
+
+  // Badges and the Profile's progress tab. The per-badge title and
+  // description keys are catalog data and are read with resolve(), guarded by
+  // test/badges/badge_localization_keys_test.dart.
+  String get badgeEarnedCaption => _localizedValues['badgeEarnedCaption']!;
+  String get badgeWallTitle => _localizedValues['badgeWallTitle']!;
+  String get badgeLockedLabel => _localizedValues['badgeLockedLabel']!;
+  String badgeEarnedOnLabel(String date) =>
+      _localizedValues['badgeEarnedOnLabel']!.replaceAll('{date}', date);
+  String badgeWallCount(int earned, int total) =>
+      _localizedValues['badgeWallCount']!
+          .replaceAll('{earned}', earned.toString())
+          .replaceAll('{total}', total.toString());
+  String get profileTabMe => _localizedValues['profileTabMe']!;
+  String get profileTabProgress => _localizedValues['profileTabProgress']!;
+  String get recentActivityTitle => _localizedValues['recentActivityTitle']!;
+  String get recentActivityEmpty => _localizedValues['recentActivityEmpty']!;
+  String get storyProgressTitle => _localizedValues['storyProgressTitle']!;
+  String get storyPagesFoundLabel =>
+      _localizedValues['storyPagesFoundLabel']!;
+  String get storyBeatsLabel => _localizedValues['storyBeatsLabel']!;
+  String get adventuresCompletedLabel =>
+      _localizedValues['adventuresCompletedLabel']!;
+  String get justNow => _localizedValues['justNow']!;
+  String hoursAgoShort(int hours) => _localizedValues['hoursAgoShort']!
+      .replaceAll('{hours}', hours.toString());
+  String daysAgoShort(int days) =>
+      _localizedValues['daysAgoShort']!.replaceAll('{days}', days.toString());
+  String pointsShortLabel(int points) => _localizedValues['pointsShortLabel']!
+      .replaceAll('{points}', points.toString());
 }
 
 class _AppLocalizationsDelegate

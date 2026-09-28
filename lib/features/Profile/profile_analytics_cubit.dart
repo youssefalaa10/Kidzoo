@@ -1,91 +1,212 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/badges/badge_catalog.dart';
+import 'package:kidzo/core/badges/badge_definition.dart';
+import 'package:kidzo/core/badges/badge_service.dart';
+import 'package:kidzo/core/badges/badge_stats_reader.dart';
+import 'package:kidzo/core/badges/badge_stats_snapshot.dart';
+import 'package:kidzo/core/catalog/game_catalog.dart';
+import 'package:kidzo/core/catalog/game_descriptor.dart';
 import 'package:kidzo/core/database/config.dart';
+import 'package:kidzo/core/database/daos/badge_dao.dart';
 import 'package:kidzo/core/database/daos/game_scores_dao.dart';
+import 'package:kidzo/core/database/daos/story_dao.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 
-import 'models/achievement.dart';
+import 'models/badge_view.dart';
 import 'models/game_category_progress.dart';
+import 'models/recent_activity_entry.dart';
+import 'models/recent_activity_kind.dart';
 import 'profile_analytics_state.dart';
 import 'utils/game_category_mapper.dart';
 
+/// Everything the Profile screen shows.
+///
+/// The headline numbers now come from [BadgeStatsReader] rather than being
+/// recomputed here. That is not tidiness: the badge rules and this screen were
+/// each going to define "total score", "stars" and "streak" separately, and
+/// the star counts in particular disagreed — this screen counted rows scoring
+/// 80 or more, while the badges would have read the real `starsEarned`. One
+/// reader means the number on the pill is the number the badge was judged by.
 class ProfileAnalyticsCubit extends Cubit<ProfileAnalyticsState> {
-  ProfileAnalyticsCubit(this.gameScoresDao) : super(ProfileAnalyticsInitial());
+  ProfileAnalyticsCubit({
+    required this.gameScoresDao,
+    required this.storyDao,
+    required this.badgeDao,
+    required this.badgeCatalog,
+    required this.badgeStatsReader,
+    required this.gameCatalog,
+    this.badgeService,
+  }) : super(ProfileAnalyticsInitial());
 
   final GameScoresDao gameScoresDao;
+  final StoryDao storyDao;
+  final BadgeDao badgeDao;
+  final BadgeCatalog badgeCatalog;
+  final BadgeStatsReader badgeStatsReader;
 
-  static const int _starThreshold = 80;
+  /// Used to resolve a `gameKey` to the activity's display name, rather than
+  /// duplicating that map here where it would rot.
+  final GameCatalog gameCatalog;
+
+  /// Optional: opening the Profile is a second chance to catch a badge that a
+  /// crashed session missed.
+  final BadgeService? badgeService;
+
+  /// Points that count as one full category bar.
   static const int _levelUpScore = 200;
+
+  /// How many rows the activity feed shows.
+  static const int _activityLimit = 8;
 
   Future<void> load(int profileId, AppLocalizations l10n) async {
     emit(ProfileAnalyticsLoading());
     try {
-      final scores = await gameScoresDao.getScoresForProfile(profileId);
+      await badgeService?.evaluateForProfile(profileId);
+      final BadgeStatsSnapshot stats =
+          await badgeStatsReader.readSnapshot(profileId);
+      final List<GameScore> scores =
+          await gameScoresDao.getScoresForProfile(profileId);
+      final List<EarnedBadge> earned = await badgeDao.badgesFor(profileId);
 
-      final totalScore = scores.fold<int>(0, (sum, s) => sum + s.score);
-      final gamesPlayed = scores.length;
-      final bestScore = scores.isEmpty
-          ? 0
-          : scores.map((s) => s.score).reduce((a, b) => a > b ? a : b);
-      final stars = scores.where((s) => s.score >= _starThreshold).length;
-      final currentStreak =
-          _computeStreak(scores.map((s) => s.playedAt).toList());
-
-      final categories = _buildCategories(scores, l10n);
-      final achievements = _buildAchievements(
-        gamesPlayed: gamesPlayed,
-        totalScore: totalScore,
-        currentStreak: currentStreak,
-        categories: categories,
-        l10n: l10n,
-      );
+      final List<GameCategoryProgress> categories =
+          _buildCategories(scores, l10n);
 
       emit(ProfileAnalyticsLoaded(
-        totalScore: totalScore,
-        stars: stars,
-        gamesPlayed: gamesPlayed,
-        currentStreak: currentStreak,
-        bestScore: bestScore,
+        totalScore: stats.totalScore,
+        stars: stats.totalStars,
+        gamesPlayed: stats.totalPlays,
+        currentStreak: stats.currentStreak,
+        bestScore: stats.bestScore,
         categories: categories,
-        achievements: achievements,
+        badges: _buildBadgeViews(earned, l10n),
+        recentActivity: await _buildRecentActivity(profileId, earned, l10n),
+        storyNodesCompleted: stats.storyNodesCompleted,
+        storyPagesFound: stats.storyPagesFound,
+        adventuresCompleted: stats.adventuresCompleted,
+        adventuresStarted: stats.adventuresStarted,
       ));
     } catch (e) {
       emit(ProfileAnalyticsError(e.toString()));
     }
   }
 
-  int _computeStreak(List<DateTime> playedAt) {
-    if (playedAt.isEmpty) return 0;
-    final days = playedAt.map((d) => DateTime(d.year, d.month, d.day)).toSet();
+  /// Merges the catalog with what this child has actually earned.
+  List<BadgeView> _buildBadgeViews(
+    List<EarnedBadge> earned,
+    AppLocalizations l10n,
+  ) {
+    final Map<String, DateTime> earnedAt = <String, DateTime>{
+      for (final EarnedBadge row in earned) row.badgeId: row.earnedAt,
+    };
+    return badgeCatalog.all
+        .map((BadgeDefinition definition) => BadgeView(
+              badgeId: definition.badgeId,
+              title: l10n.resolve(definition.titleLocalizationKey),
+              description: l10n.resolve(definition.descriptionLocalizationKey),
+              icon: definition.icon,
+              color: definition.color,
+              pillar: definition.pillar,
+              earnedAt: earnedAt[definition.badgeId],
+            ))
+        .toList(growable: false);
+  }
 
-    final today = DateTime.now();
-    var cursor = DateTime(today.year, today.month, today.day);
-    if (!days.contains(cursor)) {
-      cursor = cursor.subtract(const Duration(days: 1));
-      if (!days.contains(cursor)) return 0;
+  /// The three histories, flattened and sorted by when they happened.
+  Future<List<RecentActivityEntry>> _buildRecentActivity(
+    int profileId,
+    List<EarnedBadge> earned,
+    AppLocalizations l10n,
+  ) async {
+    final List<RecentActivityEntry> entries = <RecentActivityEntry>[];
+
+    final List<GameScore> recentScores =
+        await gameScoresDao.getRecentScoresForProfile(profileId);
+    for (final GameScore row in recentScores) {
+      final GameDescriptor? descriptor =
+          gameCatalog.findByActivityId(row.gameKey);
+      final CategoryDefinition category = _categoryFor(row.gameKey);
+      entries.add(RecentActivityEntry(
+        kind: RecentActivityKind.game,
+        title: descriptor == null
+            ? categoryTitleFor(l10n, category.id)
+            : l10n.resolve(descriptor.titleLocalizationKey),
+        subtitle: _scoreSubtitle(row, l10n),
+        icon: category.icon,
+        color: category.color,
+        occurredAt: row.playedAt,
+      ));
     }
 
-    var streak = 0;
-    while (days.contains(cursor)) {
-      streak++;
-      cursor = cursor.subtract(const Duration(days: 1));
+    final List<StoryNodeProgressData> nodes =
+        await storyDao.allNodesFor(profileId);
+    for (final StoryNodeProgressData node in nodes
+        .where((StoryNodeProgressData n) => n.completion == 'completed')) {
+      entries.add(RecentActivityEntry(
+        kind: RecentActivityKind.storyNode,
+        title: l10n.storyBeatsLabel,
+        icon: Icons.auto_stories_rounded,
+        color: const Color(0xFF8D6E63),
+        occurredAt: node.updatedAt,
+      ));
     }
-    return streak;
+
+    for (final EarnedBadge row in earned) {
+      final BadgeDefinition? definition = badgeCatalog.findById(row.badgeId);
+      if (definition == null) {
+        // A badge that was retired from the catalog. The row stays in the
+        // database — badges are never taken back — but there is nothing left
+        // to render it with.
+        continue;
+      }
+      entries.add(RecentActivityEntry(
+        kind: RecentActivityKind.badge,
+        title: l10n.resolve(definition.titleLocalizationKey),
+        subtitle: l10n.badgeEarnedCaption,
+        icon: definition.icon,
+        color: definition.color,
+        occurredAt: row.earnedAt,
+      ));
+    }
+
+    entries.sort((RecentActivityEntry a, RecentActivityEntry b) =>
+        b.occurredAt.compareTo(a.occurredAt));
+    return entries.take(_activityLimit).toList(growable: false);
+  }
+
+  String _scoreSubtitle(GameScore row, AppLocalizations l10n) {
+    final String points = l10n.pointsShortLabel(row.score);
+    final int? stars = row.starsEarned;
+    if (stars == null || stars <= 0) {
+      return points;
+    }
+    return '$points  ${'★' * stars}';
+  }
+
+  CategoryDefinition _categoryFor(String gameKey) {
+    final String id = categoryIdForGameKey(gameKey);
+    return kGameCategories.firstWhere(
+      (CategoryDefinition def) => def.id == id,
+      orElse: () => kGameCategories.last,
+    );
   }
 
   List<GameCategoryProgress> _buildCategories(
       List<GameScore> scores, AppLocalizations l10n) {
-    return kGameCategories.map((def) {
-      final categoryScores = scores
-          .where((s) => categoryIdForGameKey(s.gameKey) == def.id)
+    return kGameCategories.map((CategoryDefinition def) {
+      final List<GameScore> categoryScores = scores
+          .where((GameScore s) => categoryIdForGameKey(s.gameKey) == def.id)
           .toList();
 
-      final score = categoryScores.fold<int>(0, (sum, s) => sum + s.score);
-      final gamesPlayed = categoryScores.length;
-      final bestScore = categoryScores.isEmpty
+      final int score =
+          categoryScores.fold<int>(0, (int sum, GameScore s) => sum + s.score);
+      final int gamesPlayed = categoryScores.length;
+      final int bestScore = categoryScores.isEmpty
           ? 0
-          : categoryScores.map((s) => s.score).reduce((a, b) => a > b ? a : b);
-      final progress = (score / _levelUpScore).clamp(0.0, 1.0);
+          : categoryScores
+              .map((GameScore s) => s.score)
+              .reduce((int a, int b) => a > b ? a : b);
+      final double progress = (score / _levelUpScore).clamp(0.0, 1.0);
 
       return GameCategoryProgress(
         id: def.id,
@@ -120,67 +241,5 @@ class ProfileAnalyticsCubit extends Cubit<ProfileAnalyticsState> {
     }
     if (progress >= 0.5) return l10n.encouragementImproving;
     return l10n.encouragementKeepPracticing;
-  }
-
-  List<Achievement> _buildAchievements({
-    required int gamesPlayed,
-    required int totalScore,
-    required int currentStreak,
-    required List<GameCategoryProgress> categories,
-    required AppLocalizations l10n,
-  }) {
-    GameCategoryProgress categoryOf(String id) =>
-        categories.firstWhere((c) => c.id == id);
-
-    return [
-      Achievement(
-        id: 'first_win',
-        title: l10n.achievementFirstWinTitle,
-        description: l10n.achievementFirstWinDesc,
-        icon: Icons.emoji_events_rounded,
-        color: const Color(0xFFFFC107),
-        isUnlocked: gamesPlayed >= 1,
-      ),
-      Achievement(
-        id: 'memory_master',
-        title: l10n.achievementMemoryMasterTitle,
-        description: l10n.achievementMemoryMasterDesc,
-        icon: Icons.psychology_rounded,
-        color: const Color(0xFF7C4DFF),
-        isUnlocked: categoryOf('memory').gamesPlayed >= 5,
-      ),
-      Achievement(
-        id: 'math_star',
-        title: l10n.achievementMathStarTitle,
-        description: l10n.achievementMathStarDesc,
-        icon: Icons.calculate_rounded,
-        color: const Color(0xFFFF9F43),
-        isUnlocked: categoryOf('math').bestScore >= _starThreshold,
-      ),
-      Achievement(
-        id: 'five_day_streak',
-        title: l10n.achievementFiveDayStreakTitle,
-        description: l10n.achievementFiveDayStreakDesc,
-        icon: Icons.local_fire_department_rounded,
-        color: const Color(0xFFFF5252),
-        isUnlocked: currentStreak >= 5,
-      ),
-      Achievement(
-        id: 'puzzle_hero',
-        title: l10n.achievementPuzzleHeroTitle,
-        description: l10n.achievementPuzzleHeroDesc,
-        icon: Icons.extension_rounded,
-        color: const Color(0xFF26C6DA),
-        isUnlocked: categoryOf('puzzle').gamesPlayed >= 5,
-      ),
-      Achievement(
-        id: 'super_learner',
-        title: l10n.achievementSuperLearnerTitle,
-        description: l10n.achievementSuperLearnerDesc,
-        icon: Icons.school_rounded,
-        color: const Color(0xFF66BB6A),
-        isUnlocked: totalScore >= 500,
-      ),
-    ];
   }
 }

@@ -6,6 +6,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/kid_game_shell.dart';
@@ -33,6 +34,7 @@ class SorterGameScreen extends StatelessWidget {
     final audioPlayer = context.read<AudioPlayer>();
     final gameScoresDao = context.read<GameScoresDao>();
     final profileDao = context.read<ProfileDao>();
+    final scoreRecorder = context.read<GameScoreRecorder>();
 
     return BlocProvider<SorterGameCubit>(
       create: (_) => SorterGameCubit(
@@ -41,6 +43,7 @@ class SorterGameScreen extends StatelessWidget {
         l10n: l10n,
         gameScoresDao: gameScoresDao,
         profileDao: profileDao,
+        scoreRecorder: scoreRecorder,
       ),
       child: const _SorterGameView(),
     );

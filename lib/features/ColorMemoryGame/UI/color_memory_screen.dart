@@ -1,13 +1,19 @@
+import 'dart:async';
+
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/base/kid_game_screen.dart';
+import '../../../core/difficulty/difficulty_run_scope.dart';
+import '../../../core/difficulty/kid_difficulty.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../bloc/color_memory_bloc.dart';
 import '../bloc/color_memory_event.dart';
+import '../data/color_memory_star_rule.dart';
 import '../data/models/color_memory_constants.dart';
 import '../data/models/game_state_model.dart';
 import 'widgets/color_grid_widget.dart';
@@ -68,8 +74,12 @@ class _ColorMemoryScreenState extends KidGameScreenState<ColorMemoryScreen> {
     } catch (_) {}
   }
 
+  /// When this level started, for the time-based star rating.
+  DateTime? _startedAt;
+
   @override
   void onGameInit() {
+    _startedAt = DateTime.now();
     _sfxPlayer = AudioPlayer();
     _sfxPlayer.setPlayerMode(PlayerMode.lowLatency);
     _bloc = ColorMemoryBloc();
@@ -87,6 +97,32 @@ class _ColorMemoryScreenState extends KidGameScreenState<ColorMemoryScreen> {
     super.dispose();
   }
 
+
+  /// Writes the finished level, which is what unlocks the next tier.
+  void _recordWin(ColorMemoryGameState state) {
+    final int elapsed =
+        DateTime.now().difference(_startedAt ?? DateTime.now()).inSeconds;
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'color_memory_game',
+          difficulty: KidDifficulty.fromLevel(widget.level),
+          score: state.score.currentScore,
+          stars: ColorMemoryStarRule.rate(
+            level: widget.level,
+            elapsedSeconds: elapsed,
+          ),
+          durationSeconds: elapsed,
+        ));
+  }
+
+  /// Moves up a tier if there is one, otherwise back to the picker.
+  void _goToNextTierOrExit() {
+    final DifficultyRunScope? scope = DifficultyRunScope.maybeOf(context);
+    if (scope != null && scope.hasNextDifficulty) {
+      scope.playNext(context);
+      return;
+    }
+    Navigator.of(context).maybePop();
+  }
   void _onColorTap(int colorIndex, ColorMemoryGameState state) {
     if (state.phase == GamePhase.playerTurn) {
       // Haptic feedback
@@ -122,13 +158,13 @@ class _ColorMemoryScreenState extends KidGameScreenState<ColorMemoryScreen> {
 
           switch (state.phase) {
             case GamePhase.levelComplete:
+              _recordWin(state);
               _showGameDialog((dialogContext) => LevelCompleteDialog(
                     level: state.level,
                     score: state.score.currentScore,
                     onContinue: () {
                       Navigator.of(dialogContext).pop();
-                      // Only a finished level reports success to the map.
-                      Navigator.of(context).pop(true);
+                      _goToNextTierOrExit();
                     },
                   ));
               break;
@@ -161,7 +197,9 @@ class _ColorMemoryScreenState extends KidGameScreenState<ColorMemoryScreen> {
                       Navigator.of(dialogContext).pop();
                       // Losing must not unlock the next level. This used to
                       // pop `true`, which the level map reads as a win.
-                      Navigator.of(context).pop(false);
+                      // Nothing reads the result any more; the tier is
+                      // unlocked by a score row, which a loss never writes.
+                      Navigator.of(context).maybePop();
                     },
                   ));
               break;

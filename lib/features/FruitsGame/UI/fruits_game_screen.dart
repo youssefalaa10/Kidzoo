@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/database/config.dart';
-import '../../../core/database/daos/game_scores_dao.dart';
-import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../data/fruits_game_engine.dart';
 import 'widgets/conveyor_belt.dart';
 
@@ -84,23 +82,15 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
     });
 
     final audioPlayer = context.read<AudioPlayer>();
-    final profileDao = context.read<ProfileDao>();
-    final gameScoresDao = context.read<GameScoresDao>();
+    final scoreRecorder = context.read<GameScoreRecorder>();
 
     try {
       await audioPlayer.play(AssetSource('audio/success.mp3'));
     } catch (_) {}
 
-    try {
-      final profiles = await profileDao.getAllProfiles();
-      if (profiles.isNotEmpty) {
-        await gameScoresDao.insertScore(GameScoresCompanion.insert(
-          profileId: profiles.first.id,
-          gameKey: 'fruits',
-          score: _score,
-        ));
-      }
-    } catch (_) {}
+    // The recorder resolves the profile, writes the row and evaluates
+    // badges, and swallows its own failures.
+    await scoreRecorder.recordPlay(gameKey: 'fruits', score: _score);
   }
 
   void _handleCorrect(FruitItem data) {

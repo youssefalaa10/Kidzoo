@@ -4,11 +4,9 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-import '../../../core/database/config.dart';
-import '../../../core/database/daos/game_scores_dao.dart';
-import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../data/feed_animal_data.dart';
 import '../data/feed_animal_models.dart';
 import 'feed_animal_state.dart';
@@ -19,8 +17,7 @@ const String kFeedGameKey = 'feed_animal_game';
 
 class FeedAnimalCubit extends Cubit<FeedAnimalState> {
   FeedAnimalCubit({
-    required this.gameScoresDao,
-    required this.profileDao,
+    required this.scoreRecorder,
     required this.flutterTts,
     required this.audioPlayer,
     required this.l10n,
@@ -29,8 +26,7 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
     _startGame();
   }
 
-  final GameScoresDao gameScoresDao;
-  final ProfileDao profileDao;
+  final GameScoreRecorder scoreRecorder;
   final FlutterTts flutterTts;
   final AudioPlayer audioPlayer;
   final AppLocalizations l10n;
@@ -250,15 +246,6 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
     emit(state.copyWith(phase: FeedPhase.complete, score: finalScore));
   }
 
-  Future<void> _saveScore(int finalScore) async {
-    try {
-      final profiles = await profileDao.getAllProfiles();
-      if (profiles.isEmpty) return;
-      await gameScoresDao.insertScore(GameScoresCompanion.insert(
-        profileId: profiles.first.id,
-        gameKey: kFeedGameKey,
-        score: finalScore,
-      ));
-    } catch (_) {}
-  }
+  Future<void> _saveScore(int finalScore) =>
+      scoreRecorder.recordPlay(gameKey: kFeedGameKey, score: finalScore);
 }

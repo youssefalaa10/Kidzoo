@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/localization/app_localizations.dart';
+import '../../../../core/shared/style/kid_ui.dart';
 import '../../data/models/maze_models.dart';
 
 /// Show instructions dialog before starting the game
@@ -90,7 +91,7 @@ void showMazeInstructionsDialog(
                   ),
                 ),
                 child: Text(
-                  difficulty.displayName,
+                  l10n.resolve(difficulty.nameKey),
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     color: difficulty.color,
@@ -264,6 +265,7 @@ void showMazeResultDialog(
   required bool touchedWall,
   required VoidCallback onPlayAgain,
   required VoidCallback onExit,
+  VoidCallback? onNextLevel,
 }) {
   final l10n = AppLocalizations.of(context);
   final primaryColor = won ? Colors.green : Colors.red;
@@ -446,7 +448,7 @@ void showMazeResultDialog(
                                     const SizedBox(width: 8),
                                     Flexible(
                                       child: Text(
-                                        '${l10n.difficulty}: ${difficulty.displayName}',
+                                        '${l10n.difficulty}: ${l10n.resolve(difficulty.nameKey)}',
                                         style: TextStyle(
                                           fontSize: fontSize,
                                           fontWeight: FontWeight.bold,
@@ -712,6 +714,13 @@ void showMazeResultDialog(
                                         ),
                                       ),
                                     ),
+                                    if (onNextLevel != null) ...[
+                                      const SizedBox(height: 12),
+                                      _MazeNextLevelButton(
+                                        label: l10n.nextLevel,
+                                        onTap: onNextLevel,
+                                      ),
+                                    ],
                                   ],
                                 ],
                               )
@@ -839,6 +848,13 @@ void showMazeResultDialog(
                                         ),
                                       ),
                                     ),
+                                    if (onNextLevel != null) ...[
+                                      const SizedBox(height: 12),
+                                      _MazeNextLevelButton(
+                                        label: l10n.nextLevel,
+                                        onTap: onNextLevel,
+                                      ),
+                                    ],
                                   ],
                                 ],
                               );
@@ -859,4 +875,68 @@ String _formatTime(int seconds) {
   final minutes = seconds ~/ 60;
   final secs = seconds % 60;
   return '$minutes:${secs.toString().padLeft(2, '0')}';
+}
+
+/// The "next maze" action on the win dialog.
+///
+/// Only built when the runner says there is a harder maze to go to, so a child
+/// who has just cleared the biggest one is not offered a fourth that does not
+/// exist.
+class _MazeNextLevelButton extends StatelessWidget {
+  const _MazeNextLevelButton({required this.label, required this.onTap});
+
+  final String label;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: double.infinity,
+      height: 55,
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: const LinearGradient(
+            colors: <Color>[KidUi.primary, Color(0xFF5C33CC)],
+          ),
+          borderRadius: BorderRadius.circular(20),
+          boxShadow: <BoxShadow>[
+            BoxShadow(
+              color: KidUi.primary.withValues(alpha: 0.5),
+              blurRadius: 10,
+              offset: const Offset(0, 5),
+            ),
+          ],
+        ),
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: onTap,
+            borderRadius: BorderRadius.circular(20),
+            child: Center(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  const Icon(Icons.arrow_forward_rounded,
+                      color: Colors.white, size: 22),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 }

@@ -4,11 +4,11 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-import '../../../core/database/config.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
 import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../data/sorter_data.dart';
 import '../data/sorter_models.dart';
 import 'sorter_state.dart';
@@ -26,6 +26,7 @@ class SorterGameCubit extends Cubit<SorterGameState> {
     required this.l10n,
     this.gameScoresDao,
     this.profileDao,
+    this.scoreRecorder,
     this.totalRounds = 10,
   }) : super(const SorterGameState.loading()) {
     _startGame();
@@ -38,6 +39,9 @@ class SorterGameCubit extends Cubit<SorterGameState> {
   /// Optional so the cubit stays testable without a database.
   final GameScoresDao? gameScoresDao;
   final ProfileDao? profileDao;
+
+  /// The shared recorder. Optional for the same reason as the DAOs above.
+  final GameScoreRecorder? scoreRecorder;
   final int totalRounds;
 
   final Random _random = Random();
@@ -221,18 +225,15 @@ class SorterGameCubit extends Cubit<SorterGameState> {
 
   /// The sorter was the only one of the three games that never persisted a
   /// score, so it was invisible in the child's profile.
+  ///
+  /// It still was: the DAO above is optional and the screen never passed one,
+  /// so this method returned early every single time. Routing through the
+  /// shared recorder fixes that, and picks up badge evaluation with it.
   Future<void> _saveScore(int finalScore) async {
-    final scoresDao = gameScoresDao;
-    final profiles = profileDao;
-    if (scoresDao == null || profiles == null) return;
-    try {
-      final all = await profiles.getAllProfiles();
-      if (all.isEmpty) return;
-      await scoresDao.insertScore(GameScoresCompanion.insert(
-        profileId: all.first.id,
-        gameKey: kSorterGameKey,
-        score: finalScore,
-      ));
-    } catch (_) {}
+    await scoreRecorder?.recordPlay(
+      gameKey: kSorterGameKey,
+      score: finalScore,
+      maxScore: maxScore,
+    );
   }
 }

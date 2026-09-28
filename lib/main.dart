@@ -5,14 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-
+import 'core/badges/badge_celebration_cubit.dart';
+import 'core/badges/badge_service.dart';
+import 'core/badges/badge_stats_reader.dart';
+import 'core/badges/default_badge_catalog.dart';
+import 'core/badges/ui/badge_celebration_host.dart';
 import 'core/database/config.dart';
+import 'core/database/daos/badge_dao.dart';
 import 'core/database/daos/game_scores_dao.dart';
 import 'core/database/daos/profile_dao.dart';
+import 'core/database/daos/story_dao.dart';
 import 'core/helpers/speech.dart';
 import 'core/localization/app_localizations.dart';
 import 'core/localization/language_provider.dart';
 import 'core/managers/game_asset_manager.dart';
+import 'core/scoring/game_score_recorder.dart';
 import 'core/services/cubit/music_cubit.dart';
 import 'features/Alphabets/bloc/alphabet_bloc.dart';
 import 'features/Profile/profile_cubit.dart';
@@ -27,6 +34,22 @@ void main() async {
   final database = AppDatabase();
   final profileDao = ProfileDao(database);
   final gameScoresDao = GameScoresDao(database);
+  final storyDao = StoryDao(database);
+  final badgeDao = BadgeDao(database);
+  final badgeService = BadgeService(
+    badgeCatalog: buildDefaultBadgeCatalog(),
+    badgeDao: badgeDao,
+    badgeStatsReader: BadgeStatsReader(
+      gameScoresDao: gameScoresDao,
+      storyDao: storyDao,
+    ),
+    profileDao: profileDao,
+  );
+  final gameScoreRecorder = GameScoreRecorder(
+    gameScoresDao: gameScoresDao,
+    profileDao: profileDao,
+    badgeService: badgeService,
+  );
   final flutterTts = FlutterTts();
   final audioPlayer = AudioPlayer();
   // Speech goes through one facade so the device-or-cloud decision is made
@@ -49,6 +72,10 @@ void main() async {
     database: database,
     profileDao: profileDao,
     gameScoresDao: gameScoresDao,
+    gameScoreRecorder: gameScoreRecorder,
+    storyDao: storyDao,
+    badgeDao: badgeDao,
+    badgeService: badgeService,
     flutterTts: flutterTts,
     audioPlayer: audioPlayer,
     gameAssetManager: gameAssetManager,
@@ -60,6 +87,10 @@ class MyApp extends StatelessWidget {
     required this.database,
     required this.profileDao,
     required this.gameScoresDao,
+    required this.gameScoreRecorder,
+    required this.storyDao,
+    required this.badgeDao,
+    required this.badgeService,
     required this.flutterTts,
     required this.audioPlayer,
     required this.gameAssetManager,
@@ -73,6 +104,10 @@ class MyApp extends StatelessWidget {
 
   final ProfileDao profileDao;
   final GameScoresDao gameScoresDao;
+  final GameScoreRecorder gameScoreRecorder;
+  final StoryDao storyDao;
+  final BadgeDao badgeDao;
+  final BadgeService badgeService;
   final FlutterTts flutterTts;
   final AudioPlayer audioPlayer;
   final GameAssetManager gameAssetManager;
@@ -84,6 +119,10 @@ class MyApp extends StatelessWidget {
         RepositoryProvider<AppDatabase>.value(value: database),
         RepositoryProvider.value(value: profileDao),
         RepositoryProvider.value(value: gameScoresDao),
+        RepositoryProvider.value(value: gameScoreRecorder),
+        RepositoryProvider.value(value: storyDao),
+        RepositoryProvider.value(value: badgeDao),
+        RepositoryProvider.value(value: badgeService),
         RepositoryProvider.value(value: flutterTts),
         RepositoryProvider.value(value: audioPlayer),
         RepositoryProvider.value(value: gameAssetManager),
@@ -92,10 +131,16 @@ class MyApp extends StatelessWidget {
         providers: [
           BlocProvider(create: (context) => LanguageCubit()),
           BlocProvider(create: (context) => SettingsCubit()),
+          BlocProvider<BadgeCelebrationCubit>(
+            create: (context) =>
+                BadgeCelebrationCubit(badgeService: badgeService),
+          ),
           BlocProvider(create: (context) => MusicCubit()),
           BlocProvider(
               create: (context) =>
-                  ProfileCubit(context.read<ProfileDao>())..checkProfile()),
+                  ProfileCubit(context.read<ProfileDao>(),
+                      badgeService: badgeService)
+                    ..checkProfile()),
         ],
         // The shared FlutterTts instance is configured centrally whenever the
         // app language changes. Individual games used to be responsible for
@@ -118,6 +163,10 @@ class MyApp extends StatelessWidget {
                   useMaterial3: true,
                 ),
                 debugShowCheckedModeBanner: false,
+                // Wraps the Navigator, so a badge earned on a game screen is
+                // still celebrated after that screen pops itself.
+                builder: (BuildContext context, Widget? child) =>
+                    BadgeCelebrationHost(child: child ?? const SizedBox()),
                 locale: locale,
                 localizationsDelegates: const [
                   AppLocalizations.delegate,

@@ -1,12 +1,19 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/base/kid_game_screen.dart';
+import 'package:kidzo/core/difficulty/difficulty_run_scope.dart';
+import 'package:kidzo/core/difficulty/kid_difficulty.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/scoring/game_score_recorder.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/shared/style/kid_ui.dart';
 import 'package:kidzo/core/shared/widgets/fluid_container.dart';
 import 'package:kidzo/features/Puzzle/bloc/cubit.dart';
 import 'package:kidzo/features/Puzzle/bloc/state.dart';
 import 'package:kidzo/features/Puzzle/data/model/puzzle_model.dart';
+import 'package:kidzo/features/Puzzle/data/puzzle_star_rule.dart';
 
 class PuzzleScreen extends KidGameScreen {
   const PuzzleScreen({required super.level, super.key});
@@ -33,13 +40,13 @@ class _PuzzleScreenState extends KidGameScreenState<PuzzleScreen> {
       create: (context) => PuzzleCubit(),
       child: widget.level == 1
           // Level 1: auto-select default image (index 0) and go straight to the puzzle
-          ? const PuzzleFrame(index: 0)
+          ? PuzzleFrame(index: 0, level: widget.level)
           : widget.level == 2
               // Level 2: auto-select ghost image (index 1)
-              ? const PuzzleFrame(index: 1)
+              ? PuzzleFrame(index: 1, level: widget.level)
               : widget.level == 3
                   // Level 3: auto-select party image (index 2)
-                  ? const PuzzleFrame(index: 2)
+                  ? PuzzleFrame(index: 2, level: widget.level)
                   // Other levels: let the user choose the image
                   : ImageSelectionPage(gridSize: gridSize, level: widget.level),
     );
@@ -76,24 +83,19 @@ class ImageSelectionPage extends StatelessWidget {
             itemCount: sampleImages.length,
             itemBuilder: (context, index) {
               return InkWell(
-                onTap: () async {
-                  // In a real app, pass the actual image data
-                  // For this example, we'll just use the URL
-                  final result = await Navigator.push<bool>(
+                onTap: () {
+                  // Free play: no level, so the solve is celebrated but not
+                  // recorded. The result used to be bubbled up to
+                  // LevelMapScreen, which no longer exists.
+                  Navigator.push<void>(
                     context,
-                    MaterialPageRoute(builder: (context) {
-                      return BlocProvider(
-                        create: (context) => PuzzleCubit(),
+                    MaterialPageRoute<void>(builder: (BuildContext _) {
+                      return BlocProvider<PuzzleCubit>(
+                        create: (BuildContext _) => PuzzleCubit(),
                         child: PuzzleFrame(index: index),
                       );
                     }),
                   );
-                  if (result == true) {
-                    // Bubble the completion up to LevelMapScreen
-                    if (context.mounted) {
-                      Navigator.of(context).pop(true);
-                    }
-                  }
                 },
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(8),
@@ -112,8 +114,16 @@ class ImageSelectionPage extends StatelessWidget {
 }
 
 class PuzzleFrame extends StatefulWidget {
-  const PuzzleFrame({required this.index, super.key});
+  const PuzzleFrame({required this.index, super.key, this.level});
+
   final int index;
+
+  /// The tier this puzzle is being played at, or null for free play.
+  ///
+  /// Free play deliberately records nothing: it lets a child pick any
+  /// picture, so treating it as tier evidence would unlock the harder
+  /// puzzles without them ever being solved.
+  final int? level;
 
   @override
   State<PuzzleFrame> createState() => _PuzzleFrameState();
@@ -121,6 +131,7 @@ class PuzzleFrame extends StatefulWidget {
 
 class _PuzzleFrameState extends State<PuzzleFrame> {
   bool _completionReturned = false;
+  final Stopwatch _solveTime = Stopwatch();
   @override
   void initState() {
     super.initState();
@@ -131,8 +142,86 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
         context.read<PuzzleCubit>().initGame();
       }
     });
+    _solveTime.start();
   }
 
+
+  /// Records the solve and shows the result.
+  ///
+  /// This used to `pop(true)` so the level map would open the next stage. The
+  /// level map is gone and the value was being discarded, so the child now
+  /// gets a proper ending with somewhere to go next.
+  void _handleCompletion(PuzzleCubit cubit) {
+    _solveTime.stop();
+    final int pieceCount = cubit.puzzle.length;
+    final int elapsed = _solveTime.elapsed.inSeconds;
+    final int? level = widget.level;
+    if (level != null) {
+      unawaited(context.read<GameScoreRecorder>().recordWin(
+            gameKey: 'puzzle',
+            difficulty: KidDifficulty.fromLevel(level),
+            score: cubit.score,
+            stars: PuzzleStarRule.rate(
+              pieceCount: pieceCount,
+              elapsedSeconds: elapsed,
+            ),
+            maxScore: PuzzleStarRule.maxScoreFor(pieceCount),
+            durationSeconds: elapsed,
+          ));
+    }
+    _showResultDialog(elapsed: elapsed, pieceCount: pieceCount);
+  }
+
+  void _showResultDialog({required int elapsed, required int pieceCount}) {
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final DifficultyRunScope? scope = DifficultyRunScope.maybeOf(context);
+    final int stars = PuzzleStarRule.rate(
+      pieceCount: pieceCount,
+      elapsedSeconds: elapsed,
+    );
+    showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(KidUi.radiusCard),
+        ),
+        title: Text(l10n.levelComplete, textAlign: TextAlign.center),
+        content: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            for (int index = 0; index < 3; index++)
+              Icon(
+                index < stars
+                    ? Icons.star_rounded
+                    : Icons.star_border_rounded,
+                color: KidUi.hint,
+                size: 40,
+              ),
+          ],
+        ),
+        actionsAlignment: MainAxisAlignment.center,
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(dialogContext).pop();
+              Navigator.of(context).maybePop();
+            },
+            child: Text(l10n.exit),
+          ),
+          if (scope != null && scope.hasNextDifficulty)
+            FilledButton(
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+                scope.playNext(context);
+              },
+              child: Text(l10n.nextLevel),
+            ),
+        ],
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
@@ -145,7 +234,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
       cubitPre.gameOver = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (mounted) {
-          Navigator.of(context).pop(true);
+          _handleCompletion(cubitPre);
         }
       });
     }
@@ -158,7 +247,7 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
             cubit.puzzle.isNotEmpty) {
           _completionReturned = true;
           cubit.gameOver = true;
-          Navigator.of(context).pop(true);
+          _handleCompletion(cubit);
         }
       },
       child: Scaffold(

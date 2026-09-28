@@ -2,6 +2,7 @@ import 'dart:math' as math;
 
 import 'package:flutter/material.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
+import 'package:kidzo/core/shared/widgets/reward_burst_painter.dart';
 import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text.dart';
 import 'package:kidzo/features/Adventure/story/rewards/adventure_reward.dart';
 
@@ -193,7 +194,7 @@ class _AdventureRewardOverlayState extends State<AdventureRewardOverlay>
                                 angle: _controller.value * math.pi,
                                 child: CustomPaint(
                                   size: Size.square(pageSize * 1.35),
-                                  painter: _BurstPainter(accent),
+                                  painter: RewardBurstPainter(accent),
                                 ),
                               ),
                             ),
@@ -241,34 +242,3 @@ class _AdventureRewardOverlayState extends State<AdventureRewardOverlay>
 
 /// Soft rays behind the reward. Painted rather than an asset so it takes the
 /// Adventure's own accent.
-class _BurstPainter extends CustomPainter {
-  const _BurstPainter(this.color);
-
-  final Color color;
-
-  @override
-  void paint(Canvas canvas, Size size) {
-    final Offset centre = Offset(size.width / 2, size.height / 2);
-    final double radius = size.shortestSide / 2;
-    final Paint paint = Paint()..color = color.withValues(alpha: 0.5);
-    const int rays = 12;
-    for (int index = 0; index < rays; index++) {
-      final double angle = index * (2 * math.pi / rays);
-      final Path path = Path()
-        ..moveTo(centre.dx, centre.dy)
-        ..lineTo(
-          centre.dx + radius * math.cos(angle - 0.09),
-          centre.dy + radius * math.sin(angle - 0.09),
-        )
-        ..lineTo(
-          centre.dx + radius * math.cos(angle + 0.09),
-          centre.dy + radius * math.sin(angle + 0.09),
-        )
-        ..close();
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(_BurstPainter oldDelegate) => oldDelegate.color != color;
-}

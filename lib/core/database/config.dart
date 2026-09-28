@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart';
+import 'package:kidzo/core/database/tables/badge_tables.dart';
 import 'package:kidzo/core/database/tables/game_scores_table.dart';
 import 'package:kidzo/core/database/tables/profile_table.dart';
 import 'package:kidzo/core/database/tables/story_tables.dart';
@@ -14,6 +15,7 @@ part 'config.g.dart';
   StoryChapterProgress,
   StoryRewards,
   ActivityAttemptLogs,
+  EarnedBadges,
 ])
 class AppDatabase extends _$AppDatabase {
   // After generating code, this class needs to define a `schemaVersion` getter
@@ -22,7 +24,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -54,6 +56,12 @@ class AppDatabase extends _$AppDatabase {
                 storyChapterProgress, storyChapterProgress.currentBeat);
             await m.addColumn(storyChapterProgress,
                 storyChapterProgress.activityCheckpoint);
+          }
+          if (from < 5) {
+            // Badges. Pure-add, the safest shape a migration has: one new
+            // table, no column changes, so an install that rolls back to v4
+            // keeps working and only loses the badge wall.
+            await m.createTable(earnedBadges);
           }
         },
       );

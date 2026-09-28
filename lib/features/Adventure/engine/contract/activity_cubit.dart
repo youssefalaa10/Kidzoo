@@ -524,10 +524,10 @@ abstract class ActivityCubit<TContent extends ActivityContent,
     final String fallback =
         spec.narration.prompt.resolve(services.languageCode);
     await _speak(line.isNotEmpty ? line : fallback);
-    final String line = (view?.spokenPrompt ?? view?.prompt)
+    (view?.spokenPrompt ?? view?.prompt)
             ?.resolve(services.languageCode) ??
         '';
-    final String fallback = spec.narration.prompt.resolve(services.languageCode);
+    spec.narration.prompt.resolve(services.languageCode);
     return _speak(line.isNotEmpty ? line : fallback);
   }
 

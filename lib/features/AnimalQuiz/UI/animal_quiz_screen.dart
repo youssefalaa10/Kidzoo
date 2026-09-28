@@ -1,12 +1,20 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/utils/assets.dart';
 
 import '../../../core/base/kid_game_screen.dart';
+import '../../../core/difficulty/difficulty_run_scope.dart';
+import '../../../core/difficulty/kid_difficulty.dart';
 import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/style/kid_ui.dart';
+import '../data/animal_quiz_star_rule.dart';
 import '../data/model/animal_quiz_model.dart';
 
 class AnimalQuizScreen extends KidGameScreen {
@@ -27,6 +35,12 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
   int pointsPerCorrectMatch = 10;
   int penaltyPerWrongMatch = 5;
   int targetScoreForLevel = 100;
+
+  /// How many animals this tier started with.
+  ///
+  /// Captured at setup because [animals] is emptied as the child plays, so by
+  /// the time the round is scored it is always zero.
+  int _animalsThisRound = 0;
 
   final TtsService _ttsService = TtsService();
 
@@ -198,6 +212,7 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
         break;
     }
 
+    _animalsThisRound = animals.length;
     chooseAnimals = List<AnimalQuizModel>.from(animals);
     animals.shuffle();
     chooseAnimals.shuffle();
@@ -208,17 +223,33 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
       final l10n = AppLocalizations.of(context);
       // Show a brief congratulations message
       speak(l10n.levelComplete);
-
-      // Add a small delay to allow the speech to be heard
+      _recordWin();
+      // Let the congratulation be heard, then show the result panel.
+      //
+      // This used to pop(true) to the level map so it would open the next
+      // stage. The level map is gone, so the panel below — which was dead
+      // code, because the pop always fired first — is what a child sees now.
       Future.delayed(const Duration(milliseconds: 1500), () {
-        // Always return to map screen with completion status
-        // This will signal the level map to automatically open the next stage
         if (mounted) {
-          Navigator.of(context)
-              .pop(true); // Return true to indicate level completion
+          setState(() => gameOver = true);
         }
       });
     }
+  }
+
+  /// Writes the finished run, which is what unlocks the next tier.
+  void _recordWin() {
+    final int maxScore = AnimalQuizStarRule.maxScoreFor(
+      pointsPerCorrectMatch: pointsPerCorrectMatch,
+      animalCount: _animalsThisRound,
+    );
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'animal_quiz',
+          difficulty: KidDifficulty.fromLevel(level),
+          score: score,
+          stars: AnimalQuizStarRule.rate(score: score, maxScore: maxScore),
+          maxScore: maxScore,
+        ));
   }
 
   void speak(String text) async {
@@ -516,8 +547,12 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
                             ),
                             child: TextButton(
                               onPressed: () {
+                                // Replays the tier the child chose. This used
+                                // to reset to level 1, so finishing Hard and
+                                // tapping Play Again silently dropped them to
+                                // Easy.
                                 setState(() {
-                                  level = 1;
+                                  level = widget.level;
                                   initGame();
                                 });
                               },
@@ -533,6 +568,42 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
                               ),
                             ),
                           ),
+                          if (DifficultyRunScope.maybeOf(context)
+                                  ?.hasNextDifficulty ==
+                              true) ...<Widget>[
+                            const SizedBox(height: 16),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2,
+                              height: MediaQuery.of(context).size.width / 10,
+                              decoration: BoxDecoration(
+                                color: KidUi.primary,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color:
+                                        KidUi.primary.withValues(alpha: 0.4),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: TextButton(
+                                onPressed: () => DifficultyRunScope.maybeOf(
+                                        context)!
+                                    .playNext(context),
+                                child: Text(
+                                  l10n.nextLevel,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ),

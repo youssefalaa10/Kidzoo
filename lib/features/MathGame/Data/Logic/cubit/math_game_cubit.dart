@@ -111,7 +111,11 @@ class MathGameCubit extends Cubit<MathGameState> {
     if (selectedAnswer == correctAnswer) {
       emit(state.copyWith(starsEarned: state.starsEarned + 1));
       _proceedToNextQuestion();
+      return;
     }
+    // Counted, but the question is not failed: the child stays on it and can
+    // try again, exactly as before. Only the rating at the end changes.
+    emit(state.copyWith(wrongAttempts: state.wrongAttempts + 1));
   }
 
   void _proceedToNextQuestion() {
