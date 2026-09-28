@@ -3,6 +3,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/badges/badge_service.dart';
 import 'package:kidzo/core/database/daos/story_dao.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/localization/language_provider.dart';
@@ -44,6 +45,7 @@ class AdventureRunnerScreen extends StatefulWidget {
     super.key,
     this.narrator,
     this.soundboard,
+    this.badgeService,
   });
 
   final AdventureContentBundle bundle;
@@ -54,6 +56,10 @@ class AdventureRunnerScreen extends StatefulWidget {
 
   /// Injected in tests so nothing tries to speak.
   final ActivityNarrator? narrator;
+
+  /// Optional so the many Adventure tests that build this screen keep
+  /// working without a badge stack behind them.
+  final BadgeService? badgeService;
   final ActivitySoundboard? soundboard;
 
   @override
@@ -112,6 +118,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       adventureId: widget.adventureId,
       profileId: widget.profileId,
       storyDao: widget.storyDao,
+      badgeService: widget.badgeService,
     );
     WidgetsBinding.instance.addPostFrameCallback((_) => _runner.start());
   }

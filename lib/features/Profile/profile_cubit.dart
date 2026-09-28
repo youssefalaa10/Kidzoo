@@ -1,13 +1,22 @@
+import 'dart:async';
+
 import 'package:drift/drift.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/badges/badge_service.dart';
 import 'package:kidzo/core/database/config.dart';
 import 'package:kidzo/core/database/daos/profile_dao.dart';
 
 import 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
-  ProfileCubit(this.profileDao) : super(ProfileInitial());
+  ProfileCubit(this.profileDao, {this.badgeService})
+      : super(ProfileInitial());
+
   final ProfileDao profileDao;
+
+  /// Used once at startup to backfill badges an existing child has already
+  /// earned. Optional so the many tests that build this cubit keep working.
+  final BadgeService? badgeService;
 
   /// Mirrors the Profiles table constraint
   /// (name: text().withLength(min: 3, max: 16)).
@@ -29,6 +38,12 @@ class ProfileCubit extends Cubit<ProfileState> {
     try {
       final profiles = await profileDao.getAllProfiles();
       if (profiles.isNotEmpty) {
+        // An install that already has play history would otherwise earn every
+        // badge it qualifies for at once and celebrate all of them, one after
+        // another, over whatever screen the child happened to open. This
+        // records them silently so the wall is simply already populated.
+        unawaited(badgeService?.backfillSilently(profiles.first.id) ??
+            Future<void>.value());
         emit(ProfileLoaded(profiles.first));
       } else {
         emit(const ProfileLoaded(null));

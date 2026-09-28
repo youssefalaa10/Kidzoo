@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../localization/app_localizations.dart';
+import '../../scoring/star_rating.dart';
 import '../style/kid_ui.dart';
 
 /// Shared end-of-game celebration.
@@ -22,6 +23,7 @@ class KidResultView extends StatefulWidget {
     super.key,
     this.onExit,
     this.title,
+    this.onNextLevel,
   });
 
   final KidMetrics metrics;
@@ -29,17 +31,22 @@ class KidResultView extends StatefulWidget {
   final int maxScore;
   final VoidCallback onPlayAgain;
   final VoidCallback? onExit;
+
+  /// Offered only when there is a harder tier to go to.
+  ///
+  /// Null everywhere else, including every Adventure activity: a story beat
+  /// has no notion of a next difficulty, so the button cannot appear there
+  /// even by accident.
+  final VoidCallback? onNextLevel;
   final String? title;
 
   /// One to three stars, so finishing always feels like an achievement while
   /// still leaving something to beat next time.
-  static int starsFor(int score, int maxScore) {
-    if (maxScore <= 0) return 1;
-    final ratio = score / maxScore;
-    if (ratio >= 0.9) return 3;
-    if (ratio >= 0.6) return 2;
-    return 1;
-  }
+  ///
+  /// The thresholds moved to [StarRating] so the six tiered games rate their
+  /// runs by the same rule this celebration has always used.
+  static int starsFor(int score, int maxScore) =>
+      StarRating.fromScore(score: score, maxScore: maxScore);
 
   @override
   State<KidResultView> createState() => _KidResultViewState();
@@ -142,6 +149,17 @@ class _KidResultViewState extends State<KidResultView> {
                   spacing: m.gap,
                   runSpacing: m.gap,
                   children: [
+                    if (widget.onNextLevel != null)
+                      _BigButton(
+                        metrics: m,
+                        label: l10n.nextLevel,
+                        icon: Icons.arrow_forward_rounded,
+                        background: KidUi.primary,
+                        onTap: () {
+                          KidHaptics.success();
+                          widget.onNextLevel!();
+                        },
+                      ).animate(delay: 400.ms).fadeIn().slideY(begin: 0.4),
                     _BigButton(
                       metrics: m,
                       label: l10n.playAgain,

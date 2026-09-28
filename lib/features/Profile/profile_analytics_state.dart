@@ -1,7 +1,8 @@
 import 'package:equatable/equatable.dart';
 
-import 'models/achievement.dart';
+import 'models/badge_view.dart';
 import 'models/game_category_progress.dart';
+import 'models/recent_activity_entry.dart';
 
 abstract class ProfileAnalyticsState extends Equatable {
   const ProfileAnalyticsState();
@@ -22,7 +23,12 @@ class ProfileAnalyticsLoaded extends ProfileAnalyticsState {
     required this.currentStreak,
     required this.bestScore,
     required this.categories,
-    required this.achievements,
+    required this.badges,
+    required this.recentActivity,
+    required this.storyNodesCompleted,
+    required this.storyPagesFound,
+    required this.adventuresCompleted,
+    required this.adventuresStarted,
   });
 
   final int totalScore;
@@ -31,7 +37,20 @@ class ProfileAnalyticsLoaded extends ProfileAnalyticsState {
   final int currentStreak;
   final int bestScore;
   final List<GameCategoryProgress> categories;
-  final List<Achievement> achievements;
+
+  /// Every badge in the catalog, earned or not.
+  final List<BadgeView> badges;
+
+  /// Games, story beats and badges, newest first.
+  final List<RecentActivityEntry> recentActivity;
+
+  final int storyNodesCompleted;
+  final int storyPagesFound;
+  final int adventuresCompleted;
+  final int adventuresStarted;
+
+  int get badgesEarned =>
+      badges.where((BadgeView badge) => badge.isEarned).length;
 
   @override
   List<Object?> get props => [
@@ -41,7 +60,12 @@ class ProfileAnalyticsLoaded extends ProfileAnalyticsState {
         currentStreak,
         bestScore,
         categories,
-        achievements
+        badges,
+        recentActivity,
+        storyNodesCompleted,
+        storyPagesFound,
+        adventuresCompleted,
+        adventuresStarted,
       ];
 }
 

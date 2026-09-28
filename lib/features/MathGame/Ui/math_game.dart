@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,12 +7,16 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/base/kid_game_screen.dart';
+import '../../../core/difficulty/difficulty_run_scope.dart';
+import '../../../core/difficulty/kid_difficulty.dart';
 import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/shared/style/image_manager.dart';
 import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
+import '../Data/math_star_rule.dart';
 
 class MathGame extends KidGameScreen {
   const MathGame({required super.level, super.key});
@@ -27,6 +33,49 @@ class _MathGameState extends KidGameScreenState<MathGame>
   /// the app talk over itself.
   int? _spokenQuestionIndex;
   bool _ttsConfigured = false;
+
+  /// Records the finished round, which is what unlocks the next tier.
+  void _recordWin(MathGameState state) {
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'math_game',
+          difficulty: KidDifficulty.fromLevel(widget.level),
+          score: MathStarRule.scoreFor(wrongAttempts: state.wrongAttempts),
+          stars: MathStarRule.rate(wrongAttempts: state.wrongAttempts),
+          maxScore: MathStarRule.questionsPerRound,
+        ));
+  }
+
+  /// Replays this tier.
+  ///
+  /// Routed through the run scope rather than pushing a bare [MathGame], so
+  /// the replacement keeps the scope and the Next-level button survives a
+  /// second round.
+  void _playAgain() {
+    final DifficultyRunScope? scope = DifficultyRunScope.maybeOf(context);
+    if (scope != null) {
+      scope.playAgain(context);
+      return;
+    }
+    Navigator.pushReplacement<void, void>(
+      context,
+      MaterialPageRoute<void>(
+        builder: (BuildContext _) => MathGame(level: widget.level),
+      ),
+    );
+  }
+
+  /// Moves up a tier if there is one, otherwise leaves.
+  ///
+  /// This button used to pop `true` to the level map, which has not existed
+  /// for some time; the value was silently discarded.
+  void _goToNextTierOrExit() {
+    final DifficultyRunScope? scope = DifficultyRunScope.maybeOf(context);
+    if (scope != null && scope.hasNextDifficulty) {
+      scope.playNext(context);
+      return;
+    }
+    Navigator.of(context).maybePop();
+  }
 
   @override
   void onGameInit() {
@@ -113,6 +162,7 @@ class _MathGameState extends KidGameScreenState<MathGame>
           }
           if (state.isCompleted) {
             _confettiController.play();
+            _recordWin(state);
             final l10n = AppLocalizations.of(context);
             showDialog<void>(
               context: context,
@@ -260,7 +310,7 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                         child: ElevatedButton.icon(
                                           onPressed: () {
                                             Navigator.pop(dialogContext);
-                                            Navigator.of(context).pop(true);
+                                            _goToNextTierOrExit();
                                           },
                                           icon: const Icon(Icons.arrow_forward),
                                           label: Text(l10n.continueToNextLevel),
@@ -282,14 +332,7 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                         child: OutlinedButton.icon(
                                           onPressed: () {
                                             Navigator.pop(dialogContext);
-                                            Navigator.pushReplacement<void,
-                                                void>(
-                                              context,
-                                              MaterialPageRoute<void>(
-                                                builder: (context) => MathGame(
-                                                    level: widget.level),
-                                              ),
-                                            );
+                                            _playAgain();
                                           },
                                           icon: const Icon(Icons.refresh),
                                           label: Text(l10n.playAgain),
@@ -315,14 +358,7 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                         child: OutlinedButton.icon(
                                           onPressed: () {
                                             Navigator.pop(dialogContext);
-                                            Navigator.pushReplacement<void,
-                                                void>(
-                                              context,
-                                              MaterialPageRoute<void>(
-                                                builder: (context) => MathGame(
-                                                    level: widget.level),
-                                              ),
-                                            );
+                                            _playAgain();
                                           },
                                           icon: const Icon(Icons.refresh),
                                           label: Text(l10n.playAgain),
@@ -346,7 +382,7 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                         child: ElevatedButton.icon(
                                           onPressed: () {
                                             Navigator.pop(dialogContext);
-                                            Navigator.of(context).pop(true);
+                                            _goToNextTierOrExit();
                                           },
                                           icon: const Icon(Icons.arrow_forward),
                                           label: Text(l10n.continueToNextLevel),

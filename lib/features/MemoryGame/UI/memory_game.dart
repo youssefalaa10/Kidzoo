@@ -2,10 +2,15 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../../../core/base/kid_game_screen.dart';
+import '../../../core/difficulty/difficulty_run_scope.dart';
+import '../../../core/difficulty/kid_difficulty.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
+import '../data/memory_star_rule.dart';
 
 enum GameLevel {
   easy,
@@ -210,6 +215,20 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
     }
   }
 
+  /// Writes the finished run, which is what unlocks the next tier.
+  void _recordCompletion() {
+    final int stars =
+        MemoryStarRule.rate(totalPairs: _totalPairs, moves: _moves);
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'memory_game',
+          difficulty: KidDifficulty.fromLevel(widget.level),
+          score: MemoryStarRule.scoreFor(
+              totalPairs: _totalPairs, moves: _moves),
+          stars: stars,
+          maxScore: 100,
+          durationSeconds: _stopwatch.elapsed.inSeconds,
+        ));
+  }
   void _checkForMatch() {
     if (_firstFlippedIndex != null && _secondFlippedIndex != null) {
       if (_cards[_firstFlippedIndex!].content ==
@@ -226,6 +245,7 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
             _stopwatch.stop();
             _timer?.cancel();
             _gameCompletedController.forward();
+            _recordCompletion();
           }
         });
       } else {
@@ -473,8 +493,18 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
                           Flexible(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Return to level map with completion status
-                                Navigator.of(context).pop(true);
+                                // Next tier if there is one, otherwise back to
+                                // the picker. The old pop(true) reported
+                                // completion to a LevelMapScreen that no
+                                // longer exists.
+                                final DifficultyRunScope? scope =
+                                    DifficultyRunScope.maybeOf(context);
+                                if (scope != null &&
+                                    scope.hasNextDifficulty) {
+                                  scope.playNext(context);
+                                  return;
+                                }
+                                Navigator.of(context).maybePop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green[400],
@@ -486,7 +516,11 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
                                 ),
                               ),
                               child: Text(
-                                l10n.continueText,
+                                DifficultyRunScope.maybeOf(context)
+                                            ?.hasNextDifficulty ==
+                                        true
+                                    ? l10n.nextLevel
+                                    : l10n.continueText,
                                 style: const TextStyle(fontSize: 14),
                               ),
                             ),

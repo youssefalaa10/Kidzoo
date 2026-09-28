@@ -1,32 +1,43 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import 'package:kidzo/core/base/kid_game_screen.dart';
+import 'package:kidzo/core/difficulty/difficulty_run_scope.dart';
+import 'package:kidzo/core/difficulty/kid_difficulty.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
+import 'package:kidzo/core/scoring/game_score_recorder.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/kid_game_shell.dart';
 import '../data/logic/maze_cubit.dart';
+import '../data/maze_star_rule.dart';
 import '../data/models/maze_models.dart';
 import '../data/models/maze_state.dart';
 import 'widgets/game_dialogs.dart';
 import 'widgets/interactive_maze.dart';
 
-class MazeGameScreen extends StatelessWidget {
-  const MazeGameScreen({super.key, this.level = 1});
-
-  final int level;
+/// The maze, at one of three sizes.
+///
+/// Now a [KidGameScreen] like the other five tiered games, rather than the
+/// lone `StatelessWidget` that defaulted its own level: the picker is the only
+/// thing that chooses a tier, so the default is gone and [level] is required.
+class MazeGameScreen extends KidGameScreen {
+  const MazeGameScreen({required super.level, super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final difficulty = level == 1
-        ? MazeDifficulty.easy
-        : level == 2
-            ? MazeDifficulty.medium
-            : MazeDifficulty.hard;
+  State<MazeGameScreen> createState() => _MazeGameScreenState();
+}
 
-    return BlocProvider(
-      create: (context) => MazeCubit(difficulty: difficulty),
+class _MazeGameScreenState extends KidGameScreenState<MazeGameScreen> {
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider<MazeCubit>(
+      create: (BuildContext _) => MazeCubit(
+        difficulty: MazeDifficulty.fromLevel(widget.level),
+      ),
       child: const _MazeGameContent(),
     );
   }
@@ -209,16 +220,33 @@ class _MazeGameContentState extends State<_MazeGameContent> {
     );
   }
 
+  /// Records the escape. The presence of this row unlocks the next maze size.
+  ///
+  /// The old campaign's progress store used to be notified here; it went with
+  /// the level map. This replaces it with the one score row the picker reads.
+  void _recordWin(MazeState state) {
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'maze_game',
+          difficulty: KidDifficulty.fromLevel(state.difficulty.level),
+          score: MazeStarRule.scoreFor(
+            timeElapsedSeconds: state.timeElapsed,
+            starsCollected: state.starsCollected,
+          ),
+          stars: MazeStarRule.rate(
+            collectedAllStars: state.hasCollectedAllStars,
+            touchedWall: state.touchedWall,
+          ),
+          durationSeconds: state.timeElapsed,
+        ));
+  }
+
   Future<void> _showResultDialog(MazeState state, bool won) async {
     if (_resultDialogOpen) return;
     _resultDialogOpen = true;
 
     if (won) {
       KidHaptics.success();
-      // The old campaign's progress store used to be notified here. It is gone
-      // with the level map: the maze is now reached from the Games grid, where
-      // nothing is locked and so nothing needs unlocking. Story progress is
-      // recorded by the Adventure runner, not by the game itself.
+      _recordWin(state);
     } else {
       KidHaptics.error();
     }
@@ -236,10 +264,19 @@ class _MazeGameContentState extends State<_MazeGameContent> {
         _resultDialogOpen = false;
         context.read<MazeCubit>().resetGame();
       },
+      onNextLevel: DifficultyRunScope.maybeOf(context)?.hasNextDifficulty ==
+              true
+          ? () {
+              Navigator.pop(context);
+              _resultDialogOpen = false;
+              DifficultyRunScope.maybeOf(context)!.playNext(context);
+            }
+          : null,
       onExit: () {
         Navigator.pop(context);
         _resultDialogOpen = false;
-        Navigator.pop(context, won);
+        // The result value went with the level map; nothing reads it now.
+        Navigator.pop(context);
       },
     );
   }
@@ -288,7 +325,7 @@ class _MazeHud extends StatelessWidget {
             children: [
               _Pill(
                 metrics: metrics,
-                label: state.difficulty.displayName,
+                label: l10n.resolve(state.difficulty.nameKey),
                 color: state.difficulty.color,
               ),
               if (state.requiredStars > 0)

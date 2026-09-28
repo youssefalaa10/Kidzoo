@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/database/config.dart';
+import 'package:kidzo/core/badges/badge_service.dart';
 import 'package:kidzo/core/database/daos/story_dao.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/localization/language_provider.dart';
@@ -240,6 +241,10 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
   String? _justUnlockedStopId;
 
   Future<void> _openAdventure(String adventureId) async {
+    // Read before the await: the badge stack is provided app-wide, and
+    // reaching for it after an async gap risks a context that has moved on.
+    final BadgeService? badgeService =
+        context.read<BadgeService?>();
     await Navigator.of(context).push<void>(
       MaterialPageRoute<void>(
         builder: (BuildContext _) => AdventureRunnerScreen(
@@ -248,6 +253,7 @@ class _AdventureJourneyState extends State<_AdventureJourney> {
           adventureId: adventureId,
           profileId: widget.profileId,
           storyDao: widget.storyDao,
+          badgeService: badgeService,
         ),
       ),
     );

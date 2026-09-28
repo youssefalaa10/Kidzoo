@@ -6,6 +6,7 @@ import 'package:kidzo/core/catalog/default_game_catalog.dart';
 import 'package:kidzo/core/catalog/game_catalog.dart';
 import 'package:kidzo/core/catalog/game_descriptor.dart';
 import 'package:kidzo/core/catalog/game_surface.dart';
+import 'package:kidzo/core/difficulty/kid_difficulty.dart';
 
 /// Locks the Games and Education grids to an explicit, reviewed list.
 ///
@@ -148,6 +149,65 @@ void main() {
       expect(() => buildDefaultGameCatalog(), returnsNormally);
       for (final GameDescriptor descriptor in catalog.all) {
         expect(descriptor.screenBuilder, isA<Function>());
+      }
+    });
+  });
+
+  group('Difficulty tiers', () {
+    /// The exact set of games whose card opens the picker instead of the game.
+    ///
+    /// Adding a game here is a product decision: it means a child can no
+    /// longer reach it in one tap. Dropping one silently strands whatever
+    /// Medium and Hard content that game already implements, which is the bug
+    /// this whole feature exists to undo.
+    const Set<String> expectedTieredIds = <String>{
+      'animal_quiz',
+      'color_memory_game',
+      'math_game',
+      'maze_game',
+      'memory_game',
+      'puzzle',
+    };
+
+    test('exactly the six free-play games offer tiers', () {
+      final Set<String> actual = catalog.all
+          .where((GameDescriptor d) => d.hasDifficultyTiers)
+          .map((GameDescriptor d) => d.activityId)
+          .toSet();
+      expect(actual, expectedTieredIds);
+    });
+
+    test('every tier description key resolves in both locales', () {
+      // These keys are read through AppLocalizations.resolve rather than a
+      // getter, so locale_parity_test cannot see them. Without this guard a
+      // missing key degrades silently to a blank line on the card.
+Map<String, dynamic> loadLocale(String code) =>          json.decode(File('assets/lang/$code.json').readAsStringSync())              as Map<String, dynamic>;      final Map<String, dynamic> english = loadLocale('en');      final Map<String, dynamic> arabic = loadLocale('ar');
+      const List<String> prefixes = <String>[
+        'animalQuiz',
+        'colorMemory',
+        'math',
+        'maze',
+        'memory',
+        'puzzle',
+      ];
+      for (final String prefix in prefixes) {
+        for (final String tier in <String>['Easy', 'Medium', 'Hard']) {
+          final String key = '$prefix${tier}Description';
+          expect(english.containsKey(key), isTrue,
+              reason: 'no en.json entry for "$key"');
+          expect(arabic.containsKey(key), isTrue,
+              reason: 'no ar.json entry for "$key"');
+        }
+      }
+    });
+
+    test('the tiered builders cover all three tiers', () {
+      for (final GameDescriptor descriptor in catalog.all
+          .where((GameDescriptor d) => d.hasDifficultyTiers)) {
+        for (final KidDifficulty tier in KidDifficulty.values) {
+          expect(() => descriptor.tieredScreenBuilder!(tier), returnsNormally,
+              reason: " cannot build ");
+        }
       }
     });
   });

@@ -3,7 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/catalog/game_catalog.dart';
 import 'package:kidzo/core/catalog/game_descriptor.dart';
 import 'package:kidzo/core/catalog/game_surface.dart';
+import 'package:kidzo/core/catalog/tiered_game_descriptor.dart';
+import 'package:kidzo/core/difficulty/kid_difficulty.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
+import 'package:kidzo/core/shared/style/kid_ui.dart';
 import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
@@ -27,6 +30,7 @@ import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
 import 'package:kidzo/features/Numbers/number_screen.dart';
 import 'package:kidzo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
 import 'package:kidzo/features/Puzzle/puzzle_screen.dart';
+import 'package:kidzo/features/Puzzle/ui/puzzle_free_play_card.dart';
 import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzo/features/Shapes/shape_screen.dart';
 import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
@@ -116,43 +120,55 @@ GameCatalog buildDefaultGameCatalog() {
     //
     // Putting them in the grids is also what the design actually calls for:
     // free play is never gated by story progress, and gating a memory game
-    // behind a campaign was the mistake the level map embodied. They default to
-    // level 1, which is the gentlest configuration each one offers.
-    GameDescriptor(
+    // behind a campaign was the mistake the level map embodied.
+    //
+    // Each opens the shared difficulty picker rather than a fixed level: Easy
+    // is always open and clearing a tier opens the next, so the Medium and
+    // Hard configurations these games have always implemented are reachable
+    // again.
+    buildTieredDescriptor(
       activityId: 'memory_game',
       titleLocalizationKey: 'memoryGame',
+      descriptionKeyPrefix: 'memory',
       iconAsset: ImageManager.brain,
       flipImageAsset: ImageManager.brainstorming,
       surface: GameSurface.games,
       backIcon: Icons.grid_view_rounded,
-      screenBuilder: () => const MemoryGameScreen(level: 1),
+      gameBuilder: (KidDifficulty d) => MemoryGameScreen(level: d.level),
     ),
-    GameDescriptor(
+    buildTieredDescriptor(
       activityId: 'color_memory_game',
       titleLocalizationKey: 'colorMemory',
+      descriptionKeyPrefix: 'colorMemory',
       iconAsset: 'assets/gen/images/shapes/circle.png',
       flipImageAsset: ImageManager.colorLearn,
       surface: GameSurface.games,
       backIcon: Icons.palette_rounded,
-      screenBuilder: () => const ColorMemoryScreen(level: 1),
+      gameBuilder: (KidDifficulty d) => ColorMemoryScreen(level: d.level),
     ),
-    GameDescriptor(
+    buildTieredDescriptor(
       activityId: 'puzzle',
       titleLocalizationKey: 'puzzleGame',
+      descriptionKeyPrefix: 'puzzle',
       iconAsset: ImageManager.puzzle,
       flipImageAsset: ImageManager.brain,
       surface: GameSurface.games,
       backIcon: Icons.extension_rounded,
-      screenBuilder: () => const PuzzleScreen(level: 1),
+      gameBuilder: (KidDifficulty d) => PuzzleScreen(level: d.level),
+      // Puzzle alone keeps the image chooser the level map used to reach by
+      // asking for "level 4". It is an always-open bonus, not a fourth tier.
+      bonusCardBuilder: (BuildContext context, KidMetrics metrics) =>
+          PuzzleFreePlayCard(metrics: metrics),
     ),
-    GameDescriptor(
+    buildTieredDescriptor(
       activityId: 'maze_game',
       titleLocalizationKey: 'mazeGame',
+      descriptionKeyPrefix: 'maze',
       iconAsset: ImageManager.brainstorming,
       flipImageAsset: ImageManager.brain,
       surface: GameSurface.games,
       backIcon: Icons.route_rounded,
-      screenBuilder: () => const MazeGameScreen(),
+      gameBuilder: (KidDifficulty d) => MazeGameScreen(level: d.level),
     ),
 
     // ---- Education ----
@@ -260,22 +276,24 @@ GameCatalog buildDefaultGameCatalog() {
 
     // Also previously locked behind the level map; appended so the eleven
     // entries above keep the exact order they have always had.
-    GameDescriptor(
+    buildTieredDescriptor(
       activityId: 'animal_quiz',
       titleLocalizationKey: 'animalQuiz',
+      descriptionKeyPrefix: 'animalQuiz',
       iconAsset: 'assets/gen/images/animal/lion.png',
       flipImageAsset: 'assets/gen/images/animal/giraffe.png',
       surface: GameSurface.education,
-      screenBuilder: () => const AnimalQuizScreen(level: 1),
+      gameBuilder: (KidDifficulty d) => AnimalQuizScreen(level: d.level),
     ),
-    GameDescriptor(
+    buildTieredDescriptor(
       activityId: 'math_game',
       titleLocalizationKey: 'mathGameTitle',
+      descriptionKeyPrefix: 'math',
       iconAsset: ImageManager.numbers,
       flipImageAsset: ImageManager.flipNumbers,
       surface: GameSurface.education,
       backIcon: Icons.calculate_rounded,
-      screenBuilder: () => const MathGame(level: 1),
+      gameBuilder: (KidDifficulty d) => MathGame(level: d.level),
     ),
   ]);
 }

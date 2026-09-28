@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/badges/badge_service.dart';
 import 'package:kidzo/core/database/daos/story_dao.dart';
 import 'package:kidzo/features/Adventure/data/adventure_content_loader.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
@@ -69,6 +70,7 @@ class AdventureRunnerCubit extends Cubit<AdventureRunnerState> {
     required this.adventureId,
     required this.profileId,
     required this.storyDao,
+    this.badgeService,
   }) : super(const AdventureRunnerState(
           status: AdventureRunnerStatus.loading,
         ));
@@ -77,6 +79,15 @@ class AdventureRunnerCubit extends Cubit<AdventureRunnerState> {
   final String adventureId;
   final int profileId;
   final StoryDao storyDao;
+
+  /// Checks for newly earned badges after each story write.
+  ///
+  /// Nullable so the many existing tests that build this cubit keep working
+  /// unchanged, and because a missing badge is never worth failing a story
+  /// for. Hooked here rather than in `ActivityCubit`: the engine contract
+  /// deliberately has no DAO, no profileId and no context, and its result
+  /// already flows out through this cubit.
+  final BadgeService? badgeService;
 
   static const StoryResumeResolver _resumeResolver = StoryResumeResolver();
 
@@ -166,6 +177,8 @@ class AdventureRunnerCubit extends Cubit<AdventureRunnerState> {
         earnedReward = node.rewardId;
       }
     }
+
+    await badgeService?.evaluateForProfile(profileId);
 
     if (isClosed) {
       return;
@@ -287,6 +300,7 @@ class AdventureRunnerCubit extends Cubit<AdventureRunnerState> {
       profileId: profileId,
       adventureId: adventureId,
     );
+    await badgeService?.evaluateForProfile(profileId);
     if (isClosed) {
       return;
     }

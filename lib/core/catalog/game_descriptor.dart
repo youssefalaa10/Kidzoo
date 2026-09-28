@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:kidzo/core/catalog/game_surface.dart';
+import 'package:kidzo/core/difficulty/kid_difficulty.dart';
 
 /// One entry in the activity catalog.
 ///
@@ -24,6 +25,7 @@ class GameDescriptor {
     required this.screenBuilder,
     this.backIcon,
     this.frontIcon,
+    this.tieredScreenBuilder,
   });
 
   /// Stable identity for this activity.
@@ -47,4 +49,15 @@ class GameDescriptor {
 
   final IconData? backIcon;
   final IconData? frontIcon;
+
+  /// Builds the game itself at a chosen tier, for the activities that offer
+  /// Easy/Medium/Hard.
+  ///
+  /// When this is set, [screenBuilder] returns the shared difficulty picker
+  /// rather than the game, so the grid needs no knowledge of tiers at all.
+  /// Adventure never reads it: story beats configure real gameplay
+  /// parameters, never a tier.
+  final Widget Function(KidDifficulty difficulty)? tieredScreenBuilder;
+
+  bool get hasDifficultyTiers => tieredScreenBuilder != null;
 }

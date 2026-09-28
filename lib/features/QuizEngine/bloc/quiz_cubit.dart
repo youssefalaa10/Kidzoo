@@ -1,9 +1,7 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:kidzo/core/database/config.dart';
-import 'package:kidzo/core/database/daos/game_scores_dao.dart';
-import 'package:kidzo/core/database/daos/profile_dao.dart';
+import 'package:kidzo/core/scoring/game_score_recorder.dart';
 
 import '../../../core/helpers/speech.dart';
 import '../data/quiz_models.dart';
@@ -11,8 +9,7 @@ import 'quiz_state.dart';
 
 class QuizCubit extends Cubit<QuizState> {
   QuizCubit({
-    required this.gameScoresDao,
-    required this.profileDao,
+    required this.scoreRecorder,
     required this.flutterTts,
     required this.audioPlayer,
     required List<QuizQuestion> questions,
@@ -31,8 +28,7 @@ class QuizCubit extends Cubit<QuizState> {
   final String? tryAgainText;
   final Duration transitionDuration;
   final Duration wrongFeedbackDuration;
-  final GameScoresDao gameScoresDao;
-  final ProfileDao profileDao;
+  final GameScoreRecorder scoreRecorder;
   final FlutterTts flutterTts;
   final AudioPlayer audioPlayer;
 
@@ -105,15 +101,11 @@ class QuizCubit extends Cubit<QuizState> {
   }
 
   Future<void> _finishQuiz() async {
-    final profiles = await profileDao.getAllProfiles();
-    if (profiles.isNotEmpty) {
-      final profileId = profiles.first.id;
-      await gameScoresDao.insertScore(GameScoresCompanion.insert(
-        profileId: profileId,
-        gameKey: _gameKey,
-        score: _score,
-      ));
-    }
+    await scoreRecorder.recordPlay(
+      gameKey: _gameKey,
+      score: _score,
+      maxScore: _questions.length,
+    );
     emit(QuizCompleted(_score));
   }
 }

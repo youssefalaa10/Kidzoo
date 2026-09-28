@@ -297,6 +297,17 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
         .get();
   }
 
+  /// Every node this profile has touched, across all adventures.
+  ///
+  /// [nodesFor] is scoped to one adventure because the runner only ever cares
+  /// about the story in front of it. The badge snapshot and the Profile's
+  /// activity feed want the whole history, which is a different question.
+  Future<List<StoryNodeProgressData>> allNodesFor(int profileId) {
+    return (select(storyNodeProgress)
+          ..where((StoryNodeProgress t) => t.profileId.equals(profileId)))
+        .get();
+  }
+
   Future<Set<String>> completedNodeIds(
       int profileId, String adventureId) async {
     final List<StoryNodeProgressData> rows =
