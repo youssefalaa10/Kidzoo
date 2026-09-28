@@ -34,8 +34,15 @@ class ProfileAnalyticsLoaded extends ProfileAnalyticsState {
   final List<Achievement> achievements;
 
   @override
-  List<Object?> get props =>
-      [totalScore, stars, gamesPlayed, currentStreak, bestScore, categories, achievements];
+  List<Object?> get props => [
+        totalScore,
+        stars,
+        gamesPlayed,
+        currentStreak,
+        bestScore,
+        categories,
+        achievements
+      ];
 }
 
 class ProfileAnalyticsError extends ProfileAnalyticsState {

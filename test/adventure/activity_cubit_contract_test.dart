@@ -49,7 +49,8 @@ void main() {
         echoSpec(stepCount: stepCount, optionCount: optionCount);
     return EchoCubit(ActivitySession<EchoContent>(
       spec: spec,
-      content: engine.parseContent(spec, const MapItemPackResolver(<String, ItemPack>{})),
+      content: engine.parseContent(
+          spec, const MapItemPackResolver(<String, ItemPack>{})),
       services: makeServices(languageCode: languageCode),
       storyNodeId: 'test.node',
     ));
@@ -151,8 +152,8 @@ void main() {
       await cubit.submit(ChoiceAttempt(wrongOptionFor(cubit)));
       await cubit.submit(ChoiceAttempt(wrongOptionFor(cubit)));
 
-      final ActivityStepView view = cubit.state.view!;
-      expect(view.liveOptionIds, contains(correct));
+      final ActivityStepView? view = cubit.state.view;
+      expect(view!.liveOptionIds, contains(correct));
       expect(view.liveOptionIds.length, 2);
       expect(view.dimmedOptionIds.length, 2,
           reason: 'dimmed options keep their slot so the tray cannot reflow');
@@ -265,7 +266,8 @@ void main() {
       expect(attempts.recorded.length, 2);
       expect(attempts.recorded.first.outcome, AttemptOutcome.wrongItem);
       expect(attempts.recorded.last.outcome, AttemptOutcome.correct);
-      expect(attempts.recorded.every((r) => r.storyNodeId == 'test.node'), isTrue);
+      expect(
+          attempts.recorded.every((r) => r.storyNodeId == 'test.node'), isTrue);
       expect(attempts.recorded.first.activityId, 'test.echo');
       await cubit.close();
     });
@@ -291,8 +293,10 @@ void main() {
       final EchoCubit cubit = makeCubit(languageCode: 'ar', stepCount: 1);
       await cubit.start();
       await cubit.submit(ChoiceAttempt(wrongOptionFor(cubit)));
-      expect(narrator.spoken.any((String line) => line.contains('حاول')), isTrue,
-          reason: 'the Arabic hint should have been spoken, not the English one');
+      expect(
+          narrator.spoken.any((String line) => line.contains('حاول')), isTrue,
+          reason:
+              'the Arabic hint should have been spoken, not the English one');
       await cubit.close();
     });
   });

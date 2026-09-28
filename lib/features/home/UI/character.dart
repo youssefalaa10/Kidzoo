@@ -90,106 +90,137 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.tech).resolveBackground()!),
+            image: AssetImage(BackgroundResolver(context, BackgroundType.tech)
+                .resolveBackground()!),
             fit: BoxFit.cover,
           ),
         ),
         child: FluidContainer(
           child: Column(
-              children: [
-                // Header section
-                _buildHeader(mq, isLandscape),
-                SizedBox(height: isLandscape ? mq.height(1) : mq.height(2.5)),
-                // Title
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: isLandscape ? size.width * 0.2 : mq.width(8)),
-                  child: Container(
-                    width: double.infinity,
-                    padding: EdgeInsets.symmetric(
-                      horizontal: mq.width(3),
-                      vertical: mq.height(1),
-                    ),
-                    decoration: BoxDecoration(
-                      color: Colors.blue.shade200,
-                      borderRadius: BorderRadius.circular(50),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.2),
+            children: [
+              // Header section
+              _buildHeader(mq, isLandscape),
+              SizedBox(height: isLandscape ? mq.height(1) : mq.height(2.5)),
+              // Title
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: isLandscape ? size.width * 0.2 : mq.width(8)),
+                child: Container(
+                  width: double.infinity,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: mq.width(3),
+                    vertical: mq.height(1),
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade200,
+                    borderRadius: BorderRadius.circular(50),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Text(
+                    AppLocalizations.of(context).improveYourSkills,
+                    style: TextStyle(
+                      fontSize: isLandscape ? size.height * 0.06 : mq.width(7),
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      shadows: const [
+                        Shadow(
+                          color: Colors.black54,
                           blurRadius: 8,
-                          offset: const Offset(0, 2),
+                          offset: Offset(0, 2),
                         ),
                       ],
                     ),
-                    child: Text(
-                      AppLocalizations.of(context).improveYourSkills,
-                      style: TextStyle(
-                        fontSize: isLandscape ? size.height * 0.06 : mq.width(7),
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                        shadows: const [
-                          Shadow(
-                            color: Colors.black54,
-                            blurRadius: 8,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-                SizedBox(height: isLandscape ? mq.height(1.5) : mq.height(3.5)),
-                // Carousel section
-                Expanded(
-                  child: OverlappedCarousel(
-                    items: _getCategories(context),
-                    selectedIndex: _selectedIndex,
-                    mq: mq,
-                    onItemChanged: (index) {
-                      setState(() {
-                        _selectedIndex = index;
-                      });
-                    },
-                  ),
+              ),
+              SizedBox(height: isLandscape ? mq.height(1.5) : mq.height(3.5)),
+              // Carousel section
+              Expanded(
+                child: OverlappedCarousel(
+                  items: _getCategories(context),
+                  selectedIndex: _selectedIndex,
+                  mq: mq,
+                  onItemChanged: (index) {
+                    setState(() {
+                      _selectedIndex = index;
+                    });
+                  },
                 ),
-              ],
-            ),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
 
   Widget _buildHeader(CustomMQ mq, bool isLandscape) {
-    return BlocBuilder<ProfileCubit, ProfileState>(
-      builder: (context, state) {
-        String avatarPath = ImageManager.kidAvatars.first;
-        if (state is ProfileLoaded && state.currentProfile != null) {
-            final idx = state.currentProfile!.avatarIndex;
-            if (idx >= 0 && idx < ImageManager.kidAvatars.length) {
-               avatarPath = ImageManager.kidAvatars[idx];
-            }
+    return BlocBuilder<ProfileCubit, ProfileState>(builder: (context, state) {
+      String avatarPath = ImageManager.kidAvatars.first;
+      if (state is ProfileLoaded && state.currentProfile != null) {
+        final idx = state.currentProfile!.avatarIndex;
+        if (idx >= 0 && idx < ImageManager.kidAvatars.length) {
+          avatarPath = ImageManager.kidAvatars[idx];
         }
+      }
 
-        return Padding(
-          padding: EdgeInsets.symmetric(
-              horizontal: mq.width(5), vertical: mq.height(1.5)),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              // Avatar on one side — tap to open the Kid Profile screen
-              Semantics(
-                label: 'Open my profile',
-                button: true,
-                child: GestureDetector(
-                  onTap: () => Navigator.push<void>(
-                    context,
-                    MaterialPageRoute<void>(
-                      builder: (context) => const KidProfileScreen(),
-                    ),
+      return Padding(
+        padding: EdgeInsets.symmetric(
+            horizontal: mq.width(5), vertical: mq.height(1.5)),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Avatar on one side — tap to open the Kid Profile screen
+            Semantics(
+              label: 'Open my profile',
+              button: true,
+              child: GestureDetector(
+                onTap: () => Navigator.push<void>(
+                  context,
+                  MaterialPageRoute<void>(
+                    builder: (context) => const KidProfileScreen(),
                   ),
+                ),
+                child: Container(
+                  width: isLandscape ? mq.height(15) : mq.width(12),
+                  height: isLandscape ? mq.height(15) : mq.width(12),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.white.withValues(alpha: 0.9),
+                    border: Border.all(color: Colors.white, width: 2),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.2),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: Image.asset(avatarPath, fit: BoxFit.cover),
+                  ),
+                ),
+              ),
+            ),
+
+            // Settings and Lang on the other side
+            Row(
+              children: [
+                // Language Toggle
+                GestureDetector(
+                  onTap: () {
+                    context.read<LanguageCubit>().toggleLanguage();
+                  },
                   child: Container(
-                    width: isLandscape ? mq.height(15) : mq.width(12),
-                    height: isLandscape ? mq.height(15) : mq.width(12),
+                    width: isLandscape ? mq.height(12) : mq.width(10),
+                    height: isLandscape ? mq.height(12) : mq.width(10),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.white.withValues(alpha: 0.9),
@@ -202,86 +233,55 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
                         ),
                       ],
                     ),
-                    child: ClipOval(
-                      child: Image.asset(avatarPath, fit: BoxFit.cover),
-                    ),
-                  ),
-                ),
-              ),
-
-              // Settings and Lang on the other side
-              Row(
-                children: [
-                  // Language Toggle
-                  GestureDetector(
-                    onTap: () {
-                      context.read<LanguageCubit>().toggleLanguage();
-                    },
-                    child: Container(
-                      width: isLandscape ? mq.height(12) : mq.width(10),
-                      height: isLandscape ? mq.height(12) : mq.width(10),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Text(
-                          context.read<LanguageCubit>().isArabic ? 'EN' : 'ع',
-                          style: TextStyle(
-                            color: Colors.blue[800],
-                            fontWeight: FontWeight.bold,
-                            fontSize: mq.width(4),
-                          ),
+                    child: Center(
+                      child: Text(
+                        context.read<LanguageCubit>().isArabic ? 'EN' : 'ع',
+                        style: TextStyle(
+                          color: Colors.blue[800],
+                          fontWeight: FontWeight.bold,
+                          fontSize: mq.width(4),
                         ),
                       ),
                     ),
                   ),
-                  SizedBox(width: mq.width(3)),
-                  // Settings Icon
-                  GestureDetector(
-                    onTap: () => Navigator.push<void>(
-                      context,
-                      MaterialPageRoute<void>(
-                        builder: (context) => const SettingsScreen(),
-                      ),
-                    ),
-                    child: Container(
-                      width: isLandscape ? mq.height(12) : mq.width(10),
-                      height: isLandscape ? mq.height(12) : mq.width(10),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white.withValues(alpha: 0.9),
-                        border: Border.all(color: Colors.white, width: 2),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.2),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Icon(
-                        Icons.settings_outlined,
-                        color: Colors.blue[800],
-                        size: mq.width(5),
-                      ),
+                ),
+                SizedBox(width: mq.width(3)),
+                // Settings Icon
+                GestureDetector(
+                  onTap: () => Navigator.push<void>(
+                    context,
+                    MaterialPageRoute<void>(
+                      builder: (context) => const SettingsScreen(),
                     ),
                   ),
-                ],
-              ),
-            ],
-          ),
-        );
-      }
-    );
+                  child: Container(
+                    width: isLandscape ? mq.height(12) : mq.width(10),
+                    height: isLandscape ? mq.height(12) : mq.width(10),
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.white.withValues(alpha: 0.9),
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.2),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.settings_outlined,
+                      color: Colors.blue[800],
+                      size: mq.width(5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    });
   }
 }
 
@@ -412,7 +412,8 @@ class CharacterCard extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(
-          horizontal: mq.width(2.5), vertical: isLandscape ? mq.height(1) : mq.height(2.5)),
+          horizontal: mq.width(2.5),
+          vertical: isLandscape ? mq.height(1) : mq.height(2.5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -488,8 +489,9 @@ class CharacterCard extends StatelessWidget {
               fit: BoxFit.scaleDown,
               child: Container(
                 padding: EdgeInsets.symmetric(
-                    horizontal: isLandscape ? size.width * 0.04 : mq.width(6), 
-                    vertical: isLandscape ? size.height * 0.015 : mq.height(1.5)),
+                    horizontal: isLandscape ? size.width * 0.04 : mq.width(6),
+                    vertical:
+                        isLandscape ? size.height * 0.015 : mq.height(1.5)),
                 decoration: BoxDecoration(
                   color: Colors.blue,
                   borderRadius: BorderRadius.circular(25),
@@ -502,7 +504,8 @@ class CharacterCard extends StatelessWidget {
                       style: TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,
-                        fontSize: isLandscape ? size.height * 0.04 : mq.width(4),
+                        fontSize:
+                            isLandscape ? size.height * 0.04 : mq.width(4),
                       ),
                     ),
                   ],

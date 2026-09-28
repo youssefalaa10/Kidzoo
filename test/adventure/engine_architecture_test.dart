@@ -39,7 +39,8 @@ void main() {
 
   setUpAll(() {
     expect(engineSources(), isNotEmpty,
-        reason: 'found no engine sources to check — the path is probably wrong, '
+        reason:
+            'found no engine sources to check — the path is probably wrong, '
             'and these tests would pass vacuously');
   });
 
@@ -59,29 +60,29 @@ void main() {
     forbid(
       'Scaffold(',
       'The host owns the Scaffold. An engine that builds its own is building a '
-      'screen, which is how the previous quiz engine ended up unusable.',
+          'screen, which is how the previous quiz engine ended up unusable.',
     );
     forbid(
       'AppBar(',
       'The host owns the top bar. An AppBar here also means hardcoded titles, '
-      'which is how English literals got into a bilingual app.',
+          'which is how English literals got into a bilingual app.',
     );
     forbid(
       'MediaQuery.of',
       'Boards size themselves from the LayoutBuilder constraints they are given '
-      '(KidMetrics), not from the window. Reading the window is what broke '
-      'layout inside the tablet split view.',
+          '(KidMetrics), not from the window. Reading the window is what broke '
+          'layout inside the tablet split view.',
     );
     forbid(
       'AppLocalizations',
       'Engines never touch the app localization file. Content carries its own '
-      'per-locale text, which is what lets hundreds of story strings ship '
-      'without editing a 700-getter class.',
+          'per-locale text, which is what lets hundreds of story strings ship '
+          'without editing a 700-getter class.',
     );
     forbid(
       'Navigator.of',
       'An engine does not decide what happens next. The host reports a result '
-      'and the story layer navigates.',
+          'and the story layer navigates.',
     );
     forbid(
       'showDialog',

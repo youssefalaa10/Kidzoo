@@ -162,8 +162,8 @@ class MapStopTile extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.all(metrics.size(16, min: 12, max: 24)),
               decoration: BoxDecoration(
-                color: Colors.white
-                    .withValues(alpha: _isReachable ? 0.94 : 0.62),
+                color:
+                    Colors.white.withValues(alpha: _isReachable ? 0.94 : 0.62),
                 borderRadius: BorderRadius.circular(KidUi.radiusCard),
                 boxShadow: KidUi.shadow(
                   _accent,
@@ -358,9 +358,7 @@ class _Road extends StatelessWidget {
               width: width,
               height: width,
               decoration: BoxDecoration(
-                color: isWalked
-                    ? accent
-                    : Colors.white.withValues(alpha: 0.7),
+                color: isWalked ? accent : Colors.white.withValues(alpha: 0.7),
                 shape: BoxShape.circle,
               ),
             ),
@@ -405,8 +403,8 @@ class _UnlockRevealState extends State<_UnlockReveal>
         // A glow that blooms and fades, over a stop that grows into place. It
         // is over in under a second: the point is to draw the eye to something
         // that changed, not to make the child wait.
-        final double glow = (1 - (_controller.value - 0.35).abs() * 2.6)
-            .clamp(0.0, 1.0);
+        final double glow =
+            (1 - (_controller.value - 0.35).abs() * 2.6).clamp(0.0, 1.0);
         return Transform.scale(
           scale: 0.9 + 0.1 * t,
           child: DecoratedBox(

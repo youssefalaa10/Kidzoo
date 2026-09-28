@@ -81,7 +81,8 @@ class ActivityJudgement {
     this.isStepComplete = false,
   });
 
-  const ActivityJudgement.correct() : this(outcome: AttemptOutcome.correct, isStepComplete: true);
+  const ActivityJudgement.correct()
+      : this(outcome: AttemptOutcome.correct, isStepComplete: true);
 
   const ActivityJudgement.wrongItem() : this(outcome: AttemptOutcome.wrongItem);
 

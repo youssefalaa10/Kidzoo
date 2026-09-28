@@ -60,8 +60,7 @@ class ActivitySpec {
   final ActivityAdaptation adaptation;
   final String sourcePath;
 
-  JsonReader get payloadReader =>
-      JsonReader(payload, '$sourcePath > payload');
+  JsonReader get payloadReader => JsonReader(payload, '$sourcePath > payload');
 }
 
 /// Backdrop and accent. Deliberately tiny: anything richer is art, not config.
@@ -113,12 +112,13 @@ class ActivityNarration {
   factory ActivityNarration.fromJson(Map<String, dynamic>? json) {
     final Map<String, dynamic> map = json ?? const <String, dynamic>{};
     return ActivityNarration(
-      prompt: LocalizedText.fromJson(map['prompt'], debugPath: 'narration.prompt'),
+      prompt:
+          LocalizedText.fromJson(map['prompt'], debugPath: 'narration.prompt'),
       hint1: LocalizedText.fromJson(map['hint1'], debugPath: 'narration.hint1'),
       hint2: LocalizedText.fromJson(map['hint2'], debugPath: 'narration.hint2'),
       model: LocalizedText.fromJson(map['model'], debugPath: 'narration.model'),
-      success:
-          LocalizedText.fromJson(map['success'], debugPath: 'narration.success'),
+      success: LocalizedText.fromJson(map['success'],
+          debugPath: 'narration.success'),
     );
   }
 
@@ -322,7 +322,8 @@ class JsonReader {
   Map<String, dynamic>? optionalMap(String key) {
     final Object? value = _map[key];
     if (value is Map) {
-      return value.map((Object? k, Object? v) => MapEntry<String, dynamic>('$k', v));
+      return value
+          .map((Object? k, Object? v) => MapEntry<String, dynamic>('$k', v));
     }
     return null;
   }
@@ -332,8 +333,8 @@ class JsonReader {
     if (value is List) {
       return value
           .whereType<Map<Object?, Object?>>()
-          .map((Map<Object?, Object?> item) =>
-              item.map((Object? k, Object? v) => MapEntry<String, dynamic>('$k', v)))
+          .map((Map<Object?, Object?> item) => item.map(
+              (Object? k, Object? v) => MapEntry<String, dynamic>('$k', v)))
           .toList(growable: false);
     }
     return const <Map<String, dynamic>>[];

@@ -11,7 +11,8 @@ class AchievementBadge extends StatefulWidget {
   State<AchievementBadge> createState() => _AchievementBadgeState();
 }
 
-class _AchievementBadgeState extends State<AchievementBadge> with SingleTickerProviderStateMixin {
+class _AchievementBadgeState extends State<AchievementBadge>
+    with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _scale;
 
@@ -44,7 +45,8 @@ class _AchievementBadgeState extends State<AchievementBadge> with SingleTickerPr
     final isUnlocked = achievement.isUnlocked;
 
     return Semantics(
-      label: '${achievement.title}: ${achievement.description}${isUnlocked ? '' : ', locked'}',
+      label:
+          '${achievement.title}: ${achievement.description}${isUnlocked ? '' : ', locked'}',
       child: Opacity(
         opacity: isUnlocked ? 1.0 : 0.5,
         child: ScaleTransition(
@@ -84,7 +86,10 @@ class _AchievementBadgeState extends State<AchievementBadge> with SingleTickerPr
                         ? LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [achievement.color, achievement.color.withValues(alpha: 0.65)],
+                            colors: [
+                              achievement.color,
+                              achievement.color.withValues(alpha: 0.65)
+                            ],
                           )
                         : null,
                     color: isUnlocked ? null : const Color(0xFFEDEDED),
@@ -104,7 +109,8 @@ class _AchievementBadgeState extends State<AchievementBadge> with SingleTickerPr
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
+                    style: const TextStyle(
+                        fontSize: 12, fontWeight: FontWeight.bold),
                   ),
                 ),
                 const SizedBox(height: 2),
@@ -116,7 +122,8 @@ class _AchievementBadgeState extends State<AchievementBadge> with SingleTickerPr
                       textAlign: TextAlign.center,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 10, height: 1.2, color: Color(0xFF9E9E9E)),
+                      style: const TextStyle(
+                          fontSize: 10, height: 1.2, color: Color(0xFF9E9E9E)),
                     ),
                   ),
                 ),
@@ -124,7 +131,9 @@ class _AchievementBadgeState extends State<AchievementBadge> with SingleTickerPr
                   width: double.infinity,
                   height: 6,
                   decoration: BoxDecoration(
-                    color: isUnlocked ? achievement.color : const Color(0xFFEDEDED),
+                    color: isUnlocked
+                        ? achievement.color
+                        : const Color(0xFFEDEDED),
                     borderRadius: const BorderRadius.only(
                       bottomLeft: Radius.circular(22),
                       bottomRight: Radius.circular(22),

@@ -667,7 +667,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
           ),
         ],
       ),
-      child: isLandscape 
+      child: isLandscape
           ? SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(
@@ -762,9 +762,7 @@ class _DrawLabScreenState extends State<DrawLabScreen>
       child: Tooltip(
         message: label,
         child: Material(
-          color: isSelected
-              ? const Color(0xFF6366F1)
-              : const Color(0xFFF1F5F9),
+          color: isSelected ? const Color(0xFF6366F1) : const Color(0xFFF1F5F9),
           borderRadius: BorderRadius.circular(16),
           child: InkWell(
             borderRadius: BorderRadius.circular(16),

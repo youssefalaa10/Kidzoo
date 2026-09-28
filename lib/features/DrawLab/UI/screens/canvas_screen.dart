@@ -102,13 +102,6 @@ class _CanvasScreenState extends State<CanvasScreen>
     }
   }
 
-  void _onDrawingChanged(DrawingData newData) {
-    setState(() {
-      _drawingData = newData;
-    });
-    _addToHistory(newData);
-  }
-
   void _undo() {
     if (_historyIndex > 0) {
       setState(() {

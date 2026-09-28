@@ -20,7 +20,8 @@ class HomeScreen extends StatelessWidget {
             height: MediaQuery.of(context).size.height,
             width: MediaQuery.of(context).size.width,
             fit: BoxFit.cover,
-            BackgroundResolver(context, BackgroundType.tech).resolveBackground()!,
+            BackgroundResolver(context, BackgroundType.tech)
+                .resolveBackground()!,
           ),
           SafeArea(
             child: Padding(

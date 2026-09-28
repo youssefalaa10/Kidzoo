@@ -7,11 +7,11 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../../core/database/config.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../data/feed_animal_data.dart';
 import '../data/feed_animal_models.dart';
 import 'feed_animal_state.dart';
-import '../../../core/helpers/speech.dart';
 
 const int kFeedMaxRoundScore = 10;
 const int kFeedMinRoundScore = 4;
@@ -96,10 +96,10 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
     ]..shuffle(_random);
 
     // Alternate the phrasing so the same sentence is not repeated ten times.
-    final promptCandidates = PromptType.values
-        .where((p) => p != _lastPromptType)
-        .toList();
-    final promptType = promptCandidates[_random.nextInt(promptCandidates.length)];
+    final promptCandidates =
+        PromptType.values.where((p) => p != _lastPromptType).toList();
+    final promptType =
+        promptCandidates[_random.nextInt(promptCandidates.length)];
     _lastPromptType = promptType;
 
     _wrongAttempts = 0;
@@ -178,9 +178,9 @@ class FeedAnimalCubit extends Cubit<FeedAnimalState> {
 
   Future<void> onFoodDropped(FeedItem food) async {
     if (!state.isInteractive) return;
-    final data = state.roundData!;
+    final data = state.roundData;
 
-    if (food.id == data.targetFood.id) {
+    if (food.id == data!.targetFood.id) {
       await _handleCorrect(food);
     } else {
       await _handleWrong(food);

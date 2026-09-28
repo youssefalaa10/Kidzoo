@@ -54,7 +54,8 @@ class Word {
 
   final String word; // e.g., "CAT" (already uppercased)
   final List<int> missingIndices; // e.g., [1] or [0, 2] for multiple gaps
-  final List<String> options; // shuffled letter choices, e.g. ["C", "A", "G", "Y"]
+  final List<String>
+      options; // shuffled letter choices, e.g. ["C", "A", "G", "Y"]
   final List<String> correctLetters; // correct letters, in missingIndices order
   final String imagePath;
 }

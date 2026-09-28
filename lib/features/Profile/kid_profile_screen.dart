@@ -76,10 +76,13 @@ class _KidProfileViewState extends State<_KidProfileView> {
     if (_initialized) return;
     _initialized = true;
     _nameController.text = profile.name;
-    _selectedAvatarIndex = profile.avatarIndex.clamp(0, ImageManager.kidAvatars.length - 1);
+    _selectedAvatarIndex =
+        profile.avatarIndex.clamp(0, ImageManager.kidAvatars.length - 1);
     _age = profile.age;
     _currentQuote = _pickQuote(context);
-    context.read<ProfileAnalyticsCubit>().load(profile.id, AppLocalizations.of(context));
+    context
+        .read<ProfileAnalyticsCubit>()
+        .load(profile.id, AppLocalizations.of(context));
     _loadedProfileId = profile.id;
   }
 
@@ -100,7 +103,8 @@ class _KidProfileViewState extends State<_KidProfileView> {
   void _scrollToName() {
     final ctx = _nameFieldKey.currentContext;
     if (ctx != null) {
-      Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 400));
+      Scrollable.ensureVisible(ctx,
+          duration: const Duration(milliseconds: 400));
     }
     FocusScope.of(context).requestFocus(FocusNode());
   }
@@ -160,10 +164,12 @@ class _KidProfileViewState extends State<_KidProfileView> {
                       SnackBar(
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: const Color(0xFF4CAF50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                         content: Row(
                           children: [
-                            const Icon(Icons.celebration_rounded, color: Colors.white),
+                            const Icon(Icons.celebration_rounded,
+                                color: Colors.white),
                             const SizedBox(width: 10),
                             Expanded(child: Text(l10n.profileSavedMessage)),
                           ],
@@ -171,9 +177,11 @@ class _KidProfileViewState extends State<_KidProfileView> {
                       ),
                     );
                   }
-                  final profile = state.currentProfile!;
-                  if (_loadedProfileId != profile.id) {
-                    context.read<ProfileAnalyticsCubit>().load(profile.id, l10n);
+                  final profile = state.currentProfile;
+                  if (_loadedProfileId != profile!.id) {
+                    context
+                        .read<ProfileAnalyticsCubit>()
+                        .load(profile.id, l10n);
                     _loadedProfileId = profile.id;
                   }
                 } else if (state is ProfileError) {
@@ -191,8 +199,8 @@ class _KidProfileViewState extends State<_KidProfileView> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final profile = state.currentProfile!;
-              _initFromProfile(profile);
+              final profile = state.currentProfile;
+              _initFromProfile(profile!);
 
               return Stack(
                 children: [
@@ -207,7 +215,9 @@ class _KidProfileViewState extends State<_KidProfileView> {
                         opacity: _showEntrance ? 1 : 0,
                         duration: const Duration(milliseconds: 450),
                         child: AnimatedSlide(
-                          offset: _showEntrance ? Offset.zero : const Offset(0, 0.05),
+                          offset: _showEntrance
+                              ? Offset.zero
+                              : const Offset(0, 0.05),
                           duration: const Duration(milliseconds: 450),
                           curve: Curves.easeOutCubic,
                           child: SingleChildScrollView(
@@ -217,7 +227,8 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                 Row(
                                   children: [
                                     IconButton(
-                                      onPressed: () => Navigator.of(context).maybePop(),
+                                      onPressed: () =>
+                                          Navigator.of(context).maybePop(),
                                       icon: const Icon(
                                         Icons.arrow_back_ios_new_rounded,
                                         color: Color(0xFF2D3142),
@@ -235,7 +246,8 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                 ),
                                 const SizedBox(height: 8),
                                 ProfileHeader(
-                                  avatarAsset: ImageManager.kidAvatars[_selectedAvatarIndex],
+                                  avatarAsset: ImageManager
+                                      .kidAvatars[_selectedAvatarIndex],
                                   name: _nameController.text.isEmpty
                                       ? profile.name
                                       : _nameController.text,
@@ -246,17 +258,20 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                 ),
                                 const SizedBox(height: 18),
                                 MotivationalQuoteCard(
-                                  quote: _currentQuote ?? l10n.youAreDoingAmazing,
+                                  quote:
+                                      _currentQuote ?? l10n.youAreDoingAmazing,
                                   onRefresh: _refreshQuote,
                                 ),
                                 const SizedBox(height: 24),
-                                _SectionTitle(title: l10n.chooseYourHero, subtitle: l10n.pickAvatarSubtitle),
+                                _SectionTitle(
+                                    title: l10n.chooseYourHero,
+                                    subtitle: l10n.pickAvatarSubtitle),
                                 const SizedBox(height: 12),
                                 AvatarSelector(
                                   avatarAssets: ImageManager.kidAvatars,
                                   selectedIndex: _selectedAvatarIndex,
-                                  onSelected: (index) =>
-                                      setState(() => _selectedAvatarIndex = index),
+                                  onSelected: (index) => setState(
+                                      () => _selectedAvatarIndex = index),
                                 ),
                                 const SizedBox(height: 24),
                                 _SectionTitle(title: l10n.whatsYourName),
@@ -267,7 +282,9 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                   errorText: _nameError,
                                   hintText: l10n.namePlaceholder,
                                   onChanged: (_) {
-                                    if (_nameError != null) setState(() => _nameError = null);
+                                    if (_nameError != null) {
+                                      setState(() => _nameError = null);
+                                    }
                                     setState(() {});
                                   },
                                 ),
@@ -276,26 +293,33 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                 const SizedBox(height: 12),
                                 AgeSelector(
                                   age: _age,
-                                  onChanged: (value) => setState(() => _age = value),
+                                  onChanged: (value) =>
+                                      setState(() => _age = value),
                                 ),
                                 const SizedBox(height: 24),
-                                BlocBuilder<ProfileAnalyticsCubit, ProfileAnalyticsState>(
+                                BlocBuilder<ProfileAnalyticsCubit,
+                                    ProfileAnalyticsState>(
                                   builder: (context, analyticsState) {
-                                    if (analyticsState is! ProfileAnalyticsLoaded) {
+                                    if (analyticsState
+                                        is! ProfileAnalyticsLoaded) {
                                       return const Padding(
-                                        padding: EdgeInsets.symmetric(vertical: 24),
-                                        child: Center(child: CircularProgressIndicator()),
+                                        padding:
+                                            EdgeInsets.symmetric(vertical: 24),
+                                        child: Center(
+                                            child: CircularProgressIndicator()),
                                       );
                                     }
                                     return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.stretch,
                                       children: [
                                         ScoreSummary(
                                           metrics: [
                                             ScoreMetric(
                                               icon: Icons.stars_rounded,
                                               label: l10n.totalScoreLabel,
-                                              value: '${analyticsState.totalScore}',
+                                              value:
+                                                  '${analyticsState.totalScore}',
                                               color: const Color(0xFF7C4DFF),
                                             ),
                                             ScoreMetric(
@@ -305,13 +329,16 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                               color: const Color(0xFFFFC107),
                                             ),
                                             ScoreMetric(
-                                              icon: Icons.videogame_asset_rounded,
+                                              icon:
+                                                  Icons.videogame_asset_rounded,
                                               label: l10n.gamesPlayedLabel,
-                                              value: '${analyticsState.gamesPlayed}',
+                                              value:
+                                                  '${analyticsState.gamesPlayed}',
                                               color: const Color(0xFF26C6DA),
                                             ),
                                             ScoreMetric(
-                                              icon: Icons.local_fire_department_rounded,
+                                              icon: Icons
+                                                  .local_fire_department_rounded,
                                               label: l10n.currentStreakLabel,
                                               value:
                                                   '${analyticsState.currentStreak} ${l10n.daysSuffix}',
@@ -320,25 +347,30 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                             ScoreMetric(
                                               icon: Icons.emoji_events_rounded,
                                               label: l10n.bestScoreLabel,
-                                              value: '${analyticsState.bestScore}',
+                                              value:
+                                                  '${analyticsState.bestScore}',
                                               color: const Color(0xFF66BB6A),
                                             ),
                                           ],
                                         ),
                                         const SizedBox(height: 24),
-                                        _SectionTitle(title: l10n.gameProgressTitle),
+                                        _SectionTitle(
+                                            title: l10n.gameProgressTitle),
                                         const SizedBox(height: 12),
-                                        ...analyticsState.categories
-                                            .map((c) => GameAnalyticsCard(category: c)),
+                                        ...analyticsState.categories.map((c) =>
+                                            GameAnalyticsCard(category: c)),
                                         const SizedBox(height: 12),
-                                        _SectionTitle(title: l10n.achievementsTitle),
+                                        _SectionTitle(
+                                            title: l10n.achievementsTitle),
                                         const SizedBox(height: 12),
                                         SizedBox(
                                           height: 168,
                                           child: ListView(
                                             scrollDirection: Axis.horizontal,
-                                            children: analyticsState.achievements
-                                                .map((a) => AchievementBadge(achievement: a))
+                                            children: analyticsState
+                                                .achievements
+                                                .map((a) => AchievementBadge(
+                                                    achievement: a))
                                                 .toList(),
                                           ),
                                         ),
@@ -377,7 +409,8 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                 color: Color(0xFF4CAF50),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check_rounded, color: Colors.white, size: 60),
+                              child: const Icon(Icons.check_rounded,
+                                  color: Colors.white, size: 60),
                             ),
                           ),
                         ),
@@ -469,7 +502,8 @@ class _NameField extends StatelessWidget {
         prefixIcon: const Icon(Icons.face_rounded, color: Color(0xFF1AA6A0)),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,
@@ -503,7 +537,8 @@ class _SaveButton extends StatelessWidget {
           backgroundColor: const Color(0xFF4CAF50),
           foregroundColor: Colors.white,
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         ),
         icon: const Icon(Icons.favorite_rounded),
         label: Text(
@@ -526,10 +561,22 @@ class _BackgroundBlobs extends StatelessWidget {
       child: IgnorePointer(
         child: Stack(
           children: [
-            Positioned(top: -70, right: -50, child: _Blob(size: 190, color: Color(0x33FF8A65))),
-            Positioned(top: 190, left: -60, child: _Blob(size: 150, color: Color(0x331AA6A0))),
-            Positioned(bottom: -80, right: -60, child: _Blob(size: 230, color: Color(0x33FFD166))),
-            Positioned(bottom: 260, left: -40, child: _Blob(size: 110, color: Color(0x33FF6B81))),
+            Positioned(
+                top: -70,
+                right: -50,
+                child: _Blob(size: 190, color: Color(0x33FF8A65))),
+            Positioned(
+                top: 190,
+                left: -60,
+                child: _Blob(size: 150, color: Color(0x331AA6A0))),
+            Positioned(
+                bottom: -80,
+                right: -60,
+                child: _Blob(size: 230, color: Color(0x33FFD166))),
+            Positioned(
+                bottom: 260,
+                left: -40,
+                child: _Blob(size: 110, color: Color(0x33FF6B81))),
           ],
         ),
       ),

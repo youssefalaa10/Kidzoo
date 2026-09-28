@@ -124,8 +124,7 @@ class StoryBookView extends StatelessWidget {
                       isEarned: false,
                       languageCode: languageCode,
                       size: slot,
-                      semanticLabel:
-                          destination.title.resolve(languageCode),
+                      semanticLabel: destination.title.resolve(languageCode),
                     ),
                 ],
               ),
@@ -170,9 +169,8 @@ class _PageSlot extends StatelessWidget {
     final int? accentValue = reward?.accentValue;
     final Color accent =
         accentValue == null ? KidUi.primary : Color(accentValue);
-    final String label = semanticLabel ??
-        reward?.title.resolve(languageCode) ??
-        '';
+    final String label =
+        semanticLabel ?? reward?.title.resolve(languageCode) ?? '';
 
     return Semantics(
       label: label,

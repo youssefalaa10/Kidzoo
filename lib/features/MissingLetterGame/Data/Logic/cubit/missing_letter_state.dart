@@ -88,8 +88,10 @@ class MissingLetterState {
       wrongAttempts: wrongAttempts ?? this.wrongAttempts,
       isTransitioning: isTransitioning ?? this.isTransitioning,
       hintRevealed: hintRevealed ?? this.hintRevealed,
-      positiveFeedbackIndex: positiveFeedbackIndex ?? this.positiveFeedbackIndex,
-      negativeFeedbackIndex: negativeFeedbackIndex ?? this.negativeFeedbackIndex,
+      positiveFeedbackIndex:
+          positiveFeedbackIndex ?? this.positiveFeedbackIndex,
+      negativeFeedbackIndex:
+          negativeFeedbackIndex ?? this.negativeFeedbackIndex,
     );
   }
 }

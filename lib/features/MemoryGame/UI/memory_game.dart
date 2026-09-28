@@ -276,7 +276,9 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
       body: SafeArea(
         child: FluidContainer(
           padding: EdgeInsets.zero,
-          child: isLandscape ? _buildLandscapeLayout(l10n) : _buildPortraitLayout(l10n),
+          child: isLandscape
+              ? _buildLandscapeLayout(l10n)
+              : _buildPortraitLayout(l10n),
         ),
       ),
     );
@@ -286,8 +288,7 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 16.0, vertical: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -387,8 +388,7 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
             itemBuilder: (context, index) {
               return _cards[index].isEmpty
                   ? Container() // Empty space for easy level
-                  : _buildCard(
-                      _cards[index], () => _flipCard(index));
+                  : _buildCard(_cards[index], () => _flipCard(index));
             },
           ),
         ),
@@ -460,8 +460,7 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: Text(
@@ -483,8 +482,7 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: Text(
@@ -554,7 +552,7 @@ class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.blue[300]!, Colors.blue[500]!],
+              colors: [Colors.blue.shade300, Colors.blue.shade500],
             ),
             boxShadow: [
               BoxShadow(

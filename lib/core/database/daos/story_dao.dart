@@ -26,7 +26,8 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
   ) {
     return (select(storyChapterProgress)
           ..where((StoryChapterProgress t) =>
-              t.profileId.equals(profileId) & t.adventureId.equals(adventureId)))
+              t.profileId.equals(profileId) &
+              t.adventureId.equals(adventureId)))
         .getSingleOrNull();
   }
 
@@ -120,11 +121,13 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
   }) async {
     await (delete(storyNodeProgress)
           ..where((StoryNodeProgress t) =>
-              t.profileId.equals(profileId) & t.adventureId.equals(adventureId)))
+              t.profileId.equals(profileId) &
+              t.adventureId.equals(adventureId)))
         .go();
     await (delete(storyChapterProgress)
           ..where((StoryChapterProgress t) =>
-              t.profileId.equals(profileId) & t.adventureId.equals(adventureId)))
+              t.profileId.equals(profileId) &
+              t.adventureId.equals(adventureId)))
         .go();
   }
 
@@ -185,11 +188,13 @@ class StoryDao extends DatabaseAccessor<AppDatabase> with _$StoryDaoMixin {
   ) {
     return (select(storyNodeProgress)
           ..where((StoryNodeProgress t) =>
-              t.profileId.equals(profileId) & t.adventureId.equals(adventureId)))
+              t.profileId.equals(profileId) &
+              t.adventureId.equals(adventureId)))
         .get();
   }
 
-  Future<Set<String>> completedNodeIds(int profileId, String adventureId) async {
+  Future<Set<String>> completedNodeIds(
+      int profileId, String adventureId) async {
     final List<StoryNodeProgressData> rows =
         await nodesFor(profileId, adventureId);
     return rows

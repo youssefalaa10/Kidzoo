@@ -5,12 +5,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/base/kid_game_screen.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/shared/style/image_manager.dart';
 import '../Data/Logic/cubit/math_game_cubit.dart';
 import '../Data/Logic/cubit/math_game_state.dart';
-import '../../../core/helpers/speech.dart';
 
 class MathGame extends KidGameScreen {
   const MathGame({required super.level, super.key});
@@ -39,8 +39,7 @@ class _MathGameState extends KidGameScreenState<MathGame>
   /// Reading the raw label aloud gives a child "seven multiplication sign
   /// three equals question mark"; the operator is spelled out in their own
   /// language instead.
-  String _spokenQuestion(
-      Map<String, dynamic> question, AppLocalizations l10n) {
+  String _spokenQuestion(Map<String, dynamic> question, AppLocalizations l10n) {
     final left = '${question['left'] ?? ''}';
     final right = '${question['right'] ?? ''}';
     if (left.isEmpty || right.isEmpty) return question['question'] as String;
@@ -466,7 +465,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                   child: SingleChildScrollView(
                                     physics: const BouncingScrollPhysics(),
                                     child: Column(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Row(
                                           mainAxisAlignment:
@@ -488,8 +488,9 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                             const SizedBox(width: 12),
                                             Semantics(
                                               button: true,
-                                              label: AppLocalizations.of(context)
-                                                  .listenToQuestion,
+                                              label:
+                                                  AppLocalizations.of(context)
+                                                      .listenToQuestion,
                                               child: Material(
                                                 color: Colors.purple.shade50,
                                                 shape: const CircleBorder(),
@@ -498,7 +499,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                                       const CircleBorder(),
                                                   onTap: () => _speakQuestion(
                                                     currentQuestion,
-                                                    AppLocalizations.of(context),
+                                                    AppLocalizations.of(
+                                                        context),
                                                   ),
                                                   child: const Padding(
                                                     padding: EdgeInsets.all(12),
@@ -518,7 +520,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                         GridView.count(
                                           crossAxisCount: 2,
                                           shrinkWrap: true,
-                                          physics: const NeverScrollableScrollPhysics(),
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
                                           childAspectRatio: 1.2,
                                           mainAxisSpacing: 15,
                                           crossAxisSpacing: 15,
@@ -526,7 +529,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                               .asMap()
                                               .entries
                                               .map<Widget>(
-                                                  (MapEntry<int, dynamic> entry) {
+                                                  (MapEntry<int, dynamic>
+                                                      entry) {
                                             final option = entry.value;
                                             final index = entry.key;
                                             return _FunnyOptionButton(
@@ -558,8 +562,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                                       shape:
                                                           RoundedRectangleBorder(
                                                         borderRadius:
-                                                            BorderRadius.circular(
-                                                                20),
+                                                            BorderRadius
+                                                                .circular(20),
                                                       ),
                                                     ),
                                                   );

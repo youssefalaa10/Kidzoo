@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 
 class Country {
-
   factory Country.fromJson(Map<String, dynamic> json) {
     return Country(
       code: json['code'] ?? '',

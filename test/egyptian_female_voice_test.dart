@@ -53,11 +53,13 @@ void main() {
       // Android's Voice API exposes no gender at all; the variant subtag is
       // the only signal available.
       expect(
-        TtsVoiceCandidate.fromMap(android('ar-xa-x-arz-local', 'ar-XA')).isFemale,
+        TtsVoiceCandidate.fromMap(android('ar-xa-x-arz-local', 'ar-XA'))
+            .isFemale,
         isTrue,
       );
       expect(
-        TtsVoiceCandidate.fromMap(android('ar-xa-x-arc-local', 'ar-XA')).isFemale,
+        TtsVoiceCandidate.fromMap(android('ar-xa-x-arc-local', 'ar-XA'))
+            .isFemale,
         isTrue,
       );
       expect(
@@ -217,7 +219,7 @@ void main() {
       );
       expect(
         route(
-          deviceOutcome: TtsLanguageOutcome(
+          deviceOutcome: const TtsLanguageOutcome(
             locale: 'en-US',
             isArabic: false,
             isEgyptian: false,

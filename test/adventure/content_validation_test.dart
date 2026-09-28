@@ -33,8 +33,8 @@ void main() {
 
   setUpAll(() async {
     registry = buildDefaultEngineRegistry();
-    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
-        .load();
+    bundle =
+        await const AdventureContentLoader(DiskAdventureContentSource()).load();
     manifest = json.decode(
       File('$contentRoot/manifest.json').readAsStringSync(),
     ) as Map<String, dynamic>;
@@ -58,7 +58,8 @@ void main() {
           .listSync()
           .whereType<File>()
           .where((File file) => file.path.endsWith('.json'))
-          .map((File file) => file.uri.pathSegments.last.replaceAll('.json', ''))
+          .map(
+              (File file) => file.uri.pathSegments.last.replaceAll('.json', ''))
           .toSet();
 
       final Set<String> inManifest =
@@ -92,7 +93,8 @@ void main() {
             .whereType<Directory>()
             .toList();
         expect(nested, isEmpty,
-            reason: '$directory/ has subdirectories ${nested.map((d) => d.path)} '
+            reason:
+                '$directory/ has subdirectories ${nested.map((d) => d.path)} '
                 'which pubspec will not bundle');
       }
     });
@@ -122,7 +124,8 @@ void main() {
       }
     });
 
-    test("each engine's own parseContent runs over every file that uses it", () {
+    test("each engine's own parseContent runs over every file that uses it",
+        () {
       // This is what makes the untyped payload safe: not a schema check, but
       // the real parser the runtime will use.
       for (final ActivitySpec spec in bundle.activities.values) {
@@ -185,7 +188,8 @@ void main() {
       'hard',
     ];
 
-    void expectNoForbiddenKeys(Object? node, String path, List<String> failures) {
+    void expectNoForbiddenKeys(
+        Object? node, String path, List<String> failures) {
       if (node is Map) {
         node.forEach((Object? key, Object? value) {
           final String keyName = '$key';
@@ -207,11 +211,11 @@ void main() {
           .listSync()
           .whereType<File>()) {
         final Object? decoded = json.decode(file.readAsStringSync());
-        expectNoForbiddenKeys(
-            decoded, file.uri.pathSegments.last, failures);
+        expectNoForbiddenKeys(decoded, file.uri.pathSegments.last, failures);
       }
       expect(failures, isEmpty,
-          reason: 'difficulty tiers found in content: $failures — configure the '
+          reason:
+              'difficulty tiers found in content: $failures — configure the '
               'real gameplay parameter instead');
     });
   });
@@ -386,7 +390,8 @@ void main() {
             return;
           }
           expect(placeholder.hasMatch(arabic), isFalse,
-              reason: '${spec.sourcePath}: narration.$name Arabic text contains '
+              reason:
+                  '${spec.sourcePath}: narration.$name Arabic text contains '
                   'a placeholder ("$arabic"). Author the sentence whole.');
         });
       }
@@ -427,15 +432,16 @@ void main() {
       }
     });
 
-    test('every activity node sits inside a beat and names a real activity', () {
+    test('every activity node sits inside a beat and names a real activity',
+        () {
       for (final Adventure adventure in bundle.adventures.values) {
         for (final StoryNode node in adventure.nodes) {
           if (!node.isActivity) {
             continue;
           }
           expect(node.activityRef, isNotNull);
-          expect(() => bundle.requireActivity(node.activityRef!),
-              returnsNormally,
+          expect(
+              () => bundle.requireActivity(node.activityRef!), returnsNormally,
               reason: '${adventure.adventureId}.${node.nodeId} points at '
                   'missing activity "${node.activityRef}"');
         }
@@ -534,9 +540,8 @@ void main() {
     });
 
     test('every adventure belongs to an arc', () {
-      final Set<String> claimed = bundle.arcs.values
-          .expand((StoryArc arc) => arc.adventureIds)
-          .toSet();
+      final Set<String> claimed =
+          bundle.arcs.values.expand((StoryArc arc) => arc.adventureIds).toSet();
       for (final String adventureId in bundle.adventures.keys) {
         expect(claimed, contains(adventureId),
             reason: 'adventure "$adventureId" is unreachable: no arc lists it');
@@ -636,8 +641,7 @@ void main() {
           if (!node.isActivity) {
             continue;
           }
-          final ActivitySpec spec =
-              bundle.requireActivity(node.activityRef!);
+          final ActivitySpec spec = bundle.requireActivity(node.activityRef!);
           if (spec.engineId != 'hidden_clue') {
             continue;
           }
@@ -670,7 +674,8 @@ void main() {
   });
 
   group('A sorting activity holds constant what it says it holds constant', () {
-    test('every heldConstant attribute really is constant across its items', () {
+    test('every heldConstant attribute really is constant across its items',
+        () {
       // `heldConstant` is a pedagogical claim: young children attend to the
       // most salient attribute even when it is irrelevant, so an activity
       // teaching "sort by habitat" while the sizes also vary risks teaching
@@ -699,9 +704,8 @@ void main() {
         );
 
         for (final String attribute in held) {
-          final Set<String?> values = items
-              .map((PackItem item) => item.attribute(attribute))
-              .toSet();
+          final Set<String?> values =
+              items.map((PackItem item) => item.attribute(attribute)).toSet();
           expect(values.length, 1,
               reason: '${spec.sourcePath} claims "$attribute" is held '
                   'constant, but its items span $values. Either the claim is '
@@ -809,8 +813,8 @@ void main() {
       for (final StoryArc arc in bundle.arcs.values) {
         for (final UpcomingDestination destination in arc.upcoming) {
           for (final String locale in declaredLocales()) {
-            expect(destination.peek.resolve(locale).length,
-                lessThanOrEqualTo(90),
+            expect(
+                destination.peek.resolve(locale).length, lessThanOrEqualTo(90),
                 reason: '"${destination.id}" gives away too much of a chapter '
                     'the child has not reached');
           }

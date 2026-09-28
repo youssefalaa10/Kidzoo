@@ -64,10 +64,10 @@ class MazeCubit extends Cubit<MazeState> {
     if (state.status != MazeGameStatus.playing) return;
     if (state.currentPosition == null) return;
 
-    final current = state.currentPosition!;
+    final current = state.currentPosition;
 
     // Check if position is adjacent to current
-    if (!_isAdjacent(current, position)) return;
+    if (!_isAdjacent(current!, position)) return;
 
     // Check if there's a wall between current and next position
     if (_hasWallBetween(current, position)) {

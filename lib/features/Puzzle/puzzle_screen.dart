@@ -67,45 +67,45 @@ class ImageSelectionPage extends StatelessWidget {
         child: FluidContainer(
           padding: EdgeInsets.zero,
           child: GridView.builder(
-        padding: const EdgeInsets.all(16),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 2,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-        ),
-        itemCount: sampleImages.length,
-        itemBuilder: (context, index) {
-          return InkWell(
-            onTap: () async {
-              // In a real app, pass the actual image data
-              // For this example, we'll just use the URL
-              final result = await Navigator.push<bool>(
-                context,
-                MaterialPageRoute(builder: (context) {
-                  return BlocProvider(
-                    create: (context) => PuzzleCubit(),
-                    child: PuzzleFrame(index: index),
-                  );
-                }),
-              );
-              if (result == true) {
-                // Bubble the completion up to LevelMapScreen
-                if (context.mounted) {
-                  Navigator.of(context).pop(true);
-                }
-              }
-            },
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                sampleImages[index],
-                fit: BoxFit.cover,
-              ),
+            padding: const EdgeInsets.all(16),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
             ),
-          );
-        },
-      ),
-      ),
+            itemCount: sampleImages.length,
+            itemBuilder: (context, index) {
+              return InkWell(
+                onTap: () async {
+                  // In a real app, pass the actual image data
+                  // For this example, we'll just use the URL
+                  final result = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(builder: (context) {
+                      return BlocProvider(
+                        create: (context) => PuzzleCubit(),
+                        child: PuzzleFrame(index: index),
+                      );
+                    }),
+                  );
+                  if (result == true) {
+                    // Bubble the completion up to LevelMapScreen
+                    if (context.mounted) {
+                      Navigator.of(context).pop(true);
+                    }
+                  }
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.asset(
+                    sampleImages[index],
+                    fit: BoxFit.cover,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -171,93 +171,94 @@ class _PuzzleFrameState extends State<PuzzleFrame> {
           child: FluidContainer(
             padding: EdgeInsets.zero,
             child: BlocBuilder<PuzzleCubit, PuzzleState>(
-          builder: (context, state) {
-            final cubit = context.read<PuzzleCubit>();
-            // Check if puzzle data is ready
-            if (cubit.puzzle.isEmpty) {
-              return const Center(
-                child: CircularProgressIndicator(),
-              );
-            }
+              builder: (context, state) {
+                final cubit = context.read<PuzzleCubit>();
+                // Check if puzzle data is ready
+                if (cubit.puzzle.isEmpty) {
+                  return const Center(
+                    child: CircularProgressIndicator(),
+                  );
+                }
 
-            return Center(
-                child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Column(children: [
-                      Container(
-                        height: widget.index == 2 ? 300 : 200,
-                        width: widget.index == 2 ? 300 : 200,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            opacity: .5,
-                            image: AssetImage(sampleImages[widget.index]),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Directionality(
-                          textDirection: TextDirection.ltr,
-                          child: GridView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate:
-                                SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: widget.index == 2 ? 3 : 2,
+                return Center(
+                    child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Column(children: [
+                          Container(
+                            height: widget.index == 2 ? 300 : 200,
+                            width: widget.index == 2 ? 300 : 200,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                opacity: .5,
+                                image: AssetImage(sampleImages[widget.index]),
+                                fit: BoxFit.cover,
+                              ),
                             ),
-                            itemCount: cubit.puzzle.length,
-                            itemBuilder: (context, i) {
-                              return DraggableItem(
-                                  puzzle: cubit.puzzle,
-                                  choosePiece: cubit.choosePiece,
-                                  index: i,
-                                  score: cubit.score);
-                            },
+                            child: Directionality(
+                              textDirection: TextDirection.ltr,
+                              child: GridView.builder(
+                                physics: const NeverScrollableScrollPhysics(),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: widget.index == 2 ? 3 : 2,
+                                ),
+                                itemCount: cubit.puzzle.length,
+                                itemBuilder: (context, i) {
+                                  return DraggableItem(
+                                      puzzle: cubit.puzzle,
+                                      choosePiece: cubit.choosePiece,
+                                      index: i,
+                                      score: cubit.score);
+                                },
+                              ),
+                            ),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        child: SizedBox(
-                          width: MediaQuery.of(context).size.width,
-                          child: SingleChildScrollView(
-                            child: Wrap(
-                              alignment: WrapAlignment.center,
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: cubit.choosePiece.map((puzzleItem) {
-                                return Draggable<PuzzleModel>(
-                                  data: puzzleItem,
-                                  childWhenDragging: Container(
-                                    height: widget.index == 2 ? 60 : 80,
-                                    width: widget.index == 2 ? 60 : 80,
-                                    decoration: BoxDecoration(
-                                      image: DecorationImage(
-                                        opacity: .5,
-                                        image: AssetImage(puzzleItem.image),
-                                        fit: BoxFit.cover,
-                                      ),
-                                    ),
-                                  ),
-                                  feedback: SizedBox(
-                                      height: widget.index == 2 ? 80 : 100,
-                                      width: widget.index == 2 ? 80 : 100,
-                                      child: Image.asset(puzzleItem.image)),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(4.0),
-                                    child: SizedBox(
+                          Expanded(
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width,
+                              child: SingleChildScrollView(
+                                child: Wrap(
+                                  alignment: WrapAlignment.center,
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: cubit.choosePiece.map((puzzleItem) {
+                                    return Draggable<PuzzleModel>(
+                                      data: puzzleItem,
+                                      childWhenDragging: Container(
                                         height: widget.index == 2 ? 60 : 80,
                                         width: widget.index == 2 ? 60 : 80,
-                                        child: Image.asset(puzzleItem.image)),
-                                  ),
-                                );
-                              }).toList(),
+                                        decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                            opacity: .5,
+                                            image: AssetImage(puzzleItem.image),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      feedback: SizedBox(
+                                          height: widget.index == 2 ? 80 : 100,
+                                          width: widget.index == 2 ? 80 : 100,
+                                          child: Image.asset(puzzleItem.image)),
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(4.0),
+                                        child: SizedBox(
+                                            height: widget.index == 2 ? 60 : 80,
+                                            width: widget.index == 2 ? 60 : 80,
+                                            child:
+                                                Image.asset(puzzleItem.image)),
+                                      ),
+                                    );
+                                  }).toList(),
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ),
-                      Text('${l10n.yourScore} ${cubit.score}',
-                          style: const TextStyle(fontSize: 20)),
-                    ])));
-          },
-        ),
-        ),
+                          Text('${l10n.yourScore} ${cubit.score}',
+                              style: const TextStyle(fontSize: 20)),
+                        ])));
+              },
+            ),
+          ),
         ),
       ),
     );

@@ -93,8 +93,9 @@ class TtsVoiceCandidate {
             rawNetwork?.toString() == '1';
 
     final rawQuality = map['quality'];
-    final quality =
-        rawQuality is int ? rawQuality : int.tryParse(rawQuality?.toString() ?? '');
+    final quality = rawQuality is int
+        ? rawQuality
+        : int.tryParse(rawQuality?.toString() ?? '');
 
     return TtsVoiceCandidate(
       name: read('name'),
@@ -187,8 +188,7 @@ class TtsVoiceCandidate {
   }
 
   @override
-  String toString() =>
-      'TtsVoiceCandidate($name, $locale, quality: $quality, '
+  String toString() => 'TtsVoiceCandidate($name, $locale, quality: $quality, '
       'network: $networkRequired)';
 }
 

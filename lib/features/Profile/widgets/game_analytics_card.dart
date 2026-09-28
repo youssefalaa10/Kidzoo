@@ -12,8 +12,8 @@ class GameAnalyticsCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     return Semantics(
-      label: l10n.gameAnalyticsSemanticLabel(
-          category.title, category.score, category.gamesPlayed, category.bestScore),
+      label: l10n.gameAnalyticsSemanticLabel(category.title, category.score,
+          category.gamesPlayed, category.bestScore),
       child: Container(
         padding: const EdgeInsets.all(16),
         margin: const EdgeInsets.only(bottom: 14),
@@ -48,11 +48,15 @@ class GameAnalyticsCard extends StatelessWidget {
                     children: [
                       Text(
                         category.title,
-                        style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16),
                       ),
                       Text(
                         category.encouragement,
-                        style: TextStyle(color: category.color, fontWeight: FontWeight.w600, fontSize: 12),
+                        style: TextStyle(
+                            color: category.color,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 12),
                       ),
                     ],
                   ),
@@ -87,12 +91,17 @@ class GameAnalyticsCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Text(
-                  l10n.playedBestLabel(category.gamesPlayed, category.bestScore),
-                  style: const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
+                  l10n.playedBestLabel(
+                      category.gamesPlayed, category.bestScore),
+                  style:
+                      const TextStyle(fontSize: 12, color: Color(0xFF9E9E9E)),
                 ),
                 Text(
                   '${(category.progress * 100).round()}%',
-                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: category.color),
+                  style: TextStyle(
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      color: category.color),
                 ),
               ],
             ),

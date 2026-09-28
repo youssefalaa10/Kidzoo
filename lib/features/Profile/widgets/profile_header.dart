@@ -66,7 +66,8 @@ class ProfileHeader extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: Colors.white.withValues(alpha: 0.25),
                         borderRadius: BorderRadius.circular(20),
@@ -103,7 +104,8 @@ class ProfileHeader extends StatelessWidget {
                     onTap: onEditTap,
                     child: const Padding(
                       padding: EdgeInsets.all(12),
-                      child: Icon(Icons.edit_rounded, color: Color(0xFFFF6B81), size: 22),
+                      child: Icon(Icons.edit_rounded,
+                          color: Color(0xFFFF6B81), size: 22),
                     ),
                   ),
                 ),

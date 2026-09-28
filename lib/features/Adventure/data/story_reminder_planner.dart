@@ -63,7 +63,8 @@ class StoryReminderPlanner {
     DateTime? now,
     Duration delay = const Duration(days: 1),
   }) async {
-    final StoryReminderKind? kind = await decide(profileId: profileId, now: now);
+    final StoryReminderKind? kind =
+        await decide(profileId: profileId, now: now);
     if (kind == null) {
       // Nothing to say. Clear any stale reminder rather than leaving one that
       // no longer matches where the child actually is.

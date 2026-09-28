@@ -164,11 +164,13 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           state.ball.calculateBounceAngle(hitPosition, state.topPaddle.width);
       final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
-          
+
       // Smash effect: hitting near edge increases speed
-      final edgeFactor = (hitPosition - state.topPaddle.width / 2).abs() / (state.topPaddle.width / 2);
-      final speedBoost = 1.0 + (edgeFactor.clamp(0.0, 1.0) * 0.15); // Up to 15% extra speed
-      
+      final edgeFactor = (hitPosition - state.topPaddle.width / 2).abs() /
+          (state.topPaddle.width / 2);
+      final speedBoost =
+          1.0 + (edgeFactor.clamp(0.0, 1.0) * 0.15); // Up to 15% extra speed
+
       // Increase speed on each bounce up to max
       final nextSpeed = (currentSpeed * _speedIncreaseFactor * speedBoost)
           .clamp(_initialBallSpeed, _maxBallSpeed);
@@ -190,11 +192,13 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
           .calculateBounceAngle(hitPosition, state.bottomPaddle.width);
       final currentSpeed =
           math.sqrt(newVelocityX * newVelocityX + newVelocityY * newVelocityY);
-          
+
       // Smash effect: hitting near edge increases speed
-      final edgeFactor = (hitPosition - state.bottomPaddle.width / 2).abs() / (state.bottomPaddle.width / 2);
-      final speedBoost = 1.0 + (edgeFactor.clamp(0.0, 1.0) * 0.15); // Up to 15% extra speed
-      
+      final edgeFactor = (hitPosition - state.bottomPaddle.width / 2).abs() /
+          (state.bottomPaddle.width / 2);
+      final speedBoost =
+          1.0 + (edgeFactor.clamp(0.0, 1.0) * 0.15); // Up to 15% extra speed
+
       // Increase speed on each bounce up to max
       final nextSpeed = (currentSpeed * _speedIncreaseFactor * speedBoost)
           .clamp(_initialBallSpeed, _maxBallSpeed);
@@ -336,32 +340,27 @@ class PaddleBounceCubit extends Cubit<PaddleBounceState> {
 
     // Recalculate paddle width proportionally
     final paddleWidth = width * 0.35;
-    
+
     // Scale positions proportionally and clamp
     final newBallX = (state.ball.x * widthScale).clamp(
-      state.ball.radius + _paddlePadding, 
-      width - state.ball.radius - _paddlePadding
-    );
+        state.ball.radius + _paddlePadding,
+        width - state.ball.radius - _paddlePadding);
     final newBallY = (state.ball.y * heightScale).clamp(
-      state.ball.radius + _paddlePadding, 
-      height - state.ball.radius - _paddlePadding
-    );
-    
-    final newTopPaddleX = (state.topPaddle.x * widthScale).clamp(
-      _paddlePadding, 
-      width - paddleWidth - _paddlePadding
-    );
-    final newBottomPaddleX = (state.bottomPaddle.x * widthScale).clamp(
-      _paddlePadding, 
-      width - paddleWidth - _paddlePadding
-    );
+        state.ball.radius + _paddlePadding,
+        height - state.ball.radius - _paddlePadding);
+
+    final newTopPaddleX = (state.topPaddle.x * widthScale)
+        .clamp(_paddlePadding, width - paddleWidth - _paddlePadding);
+    final newBottomPaddleX = (state.bottomPaddle.x * widthScale)
+        .clamp(_paddlePadding, width - paddleWidth - _paddlePadding);
 
     emit(state.copyWith(
       screenWidth: width,
       screenHeight: height,
       ball: state.ball.copyWith(x: newBallX, y: newBallY),
       topPaddle: state.topPaddle.copyWith(x: newTopPaddleX, width: paddleWidth),
-      bottomPaddle: state.bottomPaddle.copyWith(x: newBottomPaddleX, width: paddleWidth),
+      bottomPaddle:
+          state.bottomPaddle.copyWith(x: newBottomPaddleX, width: paddleWidth),
     ));
   }
 }

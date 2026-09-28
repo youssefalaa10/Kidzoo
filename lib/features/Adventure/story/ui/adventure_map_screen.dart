@@ -143,7 +143,7 @@ class _AdventureMapScreenState extends State<AdventureMapScreen> {
               );
             }
 
-            final AdventureContentBundle bundle = snapshot.data!;
+            final AdventureContentBundle? bundle = snapshot.data;
             final int? profileId = _profileId;
             if (profileId == null) {
               // No profile yet: the story is per-child, so there is nothing to
@@ -158,7 +158,7 @@ class _AdventureMapScreenState extends State<AdventureMapScreen> {
             }
 
             return _AdventureJourney(
-              bundle: bundle,
+              bundle: bundle!,
               registry: _registry,
               profileId: profileId,
               storyDao: StoryDao(context.read<AppDatabase>()),

@@ -5,12 +5,11 @@ import 'package:kidzo/core/database/config.dart';
 import 'package:kidzo/core/database/daos/game_scores_dao.dart';
 import 'package:kidzo/core/database/daos/profile_dao.dart';
 
+import '../../../core/helpers/speech.dart';
 import '../data/quiz_models.dart';
 import 'quiz_state.dart';
-import '../../../core/helpers/speech.dart';
 
 class QuizCubit extends Cubit<QuizState> {
-
   QuizCubit({
     required this.gameScoresDao,
     required this.profileDao,
@@ -94,7 +93,7 @@ class QuizCubit extends Cubit<QuizState> {
     if (isCorrect || !allowRetries) {
       _currentIndex++;
     }
-    
+
     if (_currentIndex < _questions.length) {
       emit(QuizActive(_questions[_currentIndex], _score, _currentIndex));
       if (isCorrect || !allowRetries) {

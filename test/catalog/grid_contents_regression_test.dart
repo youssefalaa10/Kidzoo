@@ -131,7 +131,8 @@ void main() {
     test('every icon and flip image exists on disk', () {
       for (final GameDescriptor descriptor in catalog.all) {
         expect(File(descriptor.iconAsset).existsSync(), isTrue,
-            reason: '${descriptor.activityId}: missing ${descriptor.iconAsset}');
+            reason:
+                '${descriptor.activityId}: missing ${descriptor.iconAsset}');
         expect(File(descriptor.flipImageAsset).existsSync(), isTrue,
             reason:
                 '${descriptor.activityId}: missing ${descriptor.flipImageAsset}');

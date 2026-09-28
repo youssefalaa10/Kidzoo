@@ -29,8 +29,8 @@ void main() {
 
   setUpAll(() async {
     registry = buildDefaultEngineRegistry();
-    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
-        .load();
+    bundle =
+        await const AdventureContentLoader(DiskAdventureContentSource()).load();
   });
 
   ActivityCubit<ActivityContent, dynamic> cubitFor(
@@ -43,7 +43,8 @@ void main() {
         registry.require(spec.engineId);
     return engine.createCubit(engine.createSession(
       spec: spec,
-      services: ActivityServices.forTest(seed: seed, languageCode: languageCode),
+      services:
+          ActivityServices.forTest(seed: seed, languageCode: languageCode),
       packs: bundle.packResolver,
       storyNodeId: 'test.node',
     ));
@@ -227,8 +228,8 @@ void main() {
           cubitFor('jungle_ask_animals') as MultipleChoiceCubit;
       await cubit.start();
       while (cubit.state.status == ActivityStatus.running) {
-        await cubit.submit(
-            ChoiceAttempt(cubit.currentStep.question.correctItem.id));
+        await cubit
+            .submit(ChoiceAttempt(cubit.currentStep.question.correctItem.id));
       }
       expect(cubit.state.result.completion, ActivityCompletion.completed);
       expect(cubit.state.result.stepsIndependent, 3);
@@ -246,9 +247,7 @@ void main() {
       expect(cubit.judge(step, TapPointAttempt(step.clue.position)).isCorrect,
           isTrue);
       expect(
-        cubit
-            .judge(step, const TapPointAttempt(Offset(0.02, 0.02)))
-            .isCorrect,
+        cubit.judge(step, const TapPointAttempt(Offset(0.02, 0.02))).isCorrect,
         isFalse,
       );
       await cubit.close();
@@ -261,8 +260,7 @@ void main() {
           cubitFor('jungle_find_page') as HiddenClueCubit;
       await cubit.start();
       final step = cubit.currentStep;
-      final Offset nearMiss =
-          step.clue.position + const Offset(0.05, 0.05);
+      final Offset nearMiss = step.clue.position + const Offset(0.05, 0.05);
       expect(cubit.judge(step, TapPointAttempt(nearMiss)).isCorrect, isTrue);
       await cubit.close();
     });
@@ -275,8 +273,8 @@ void main() {
         await cubit.start();
         for (final step in cubit.buildSteps()) {
           for (final entry in step.noisePositions) {
-            expect((entry.value - step.clue.position).distance,
-                greaterThan(0.1),
+            expect(
+                (entry.value - step.clue.position).distance, greaterThan(0.1),
                 reason: 'seed $seed put a decoy on the clue');
           }
         }
@@ -316,9 +314,8 @@ void main() {
           cubitFor('jungle_sort_watchers') as SortingCubit;
       await cubit.start();
       final step = cubit.currentStep;
-      final String wrongBin = step.bins
-          .firstWhere((b) => b.id != step.correctBinId)
-          .id;
+      final String wrongBin =
+          step.bins.firstWhere((b) => b.id != step.correctBinId).id;
 
       final judgement = cubit.judge(
         step,
@@ -411,22 +408,23 @@ void main() {
         <String, dynamic>{
           'instanceId': 'test.generated_counting',
           'engineId': 'counting',
-          'locales': <String>['en'],
-          'narration': <String, dynamic>{
+          'locales': const <String>['en'],
+          'narration': const <String, dynamic>{
             'prompt': <String, String>{'en': 'How many?'},
           },
           'payload': <String, dynamic>{
             'mode': 'countAndPick',
             'layout': 'tenFrame',
-            'countRange': <int>[2, 6],
+            'countRange': const <int>[2, 6],
             'roundCount': roundCount,
             'itemsRef': 'packs/animals',
-            'itemIds': <String>['monkey', 'bird', 'rabbit'],
+            'itemIds': const <String>['monkey', 'bird', 'rabbit'],
           },
         },
         sourcePath: 'test/generated_counting.json',
       );
-      final ActivityEngine<ActivityContent> engine = registry.require('counting');
+      final ActivityEngine<ActivityContent> engine =
+          registry.require('counting');
       return engine.createCubit(engine.createSession(
         spec: spec,
         services: ActivityServices.forTest(seed: seed),
@@ -461,7 +459,8 @@ void main() {
             .map((CountingStep step) => step.targetCount)
             .toList();
         expect(targets.toSet().length, targets.length,
-            reason: 'seed $seed repeated a count within one activity: $targets');
+            reason:
+                'seed $seed repeated a count within one activity: $targets');
         await cubit.close();
       }
     });

@@ -65,7 +65,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
 
   void _prevAvatar() {
     setState(() {
-      _selectedAvatarIndex = (_selectedAvatarIndex - 1 + _avatars.length) % _avatars.length;
+      _selectedAvatarIndex =
+          (_selectedAvatarIndex - 1 + _avatars.length) % _avatars.length;
     });
   }
 
@@ -291,8 +292,8 @@ class _ProfileSetupScreenState extends State<ProfileSetupScreen> {
                                 child: ElevatedButton(
                                   onPressed: _saveProfile,
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        const Color(0xFF4AC49A), // Kid-friendly green
+                                    backgroundColor: const Color(
+                                        0xFF4AC49A), // Kid-friendly green
                                     foregroundColor: Colors.white,
                                     elevation: 5,
                                     minimumSize:

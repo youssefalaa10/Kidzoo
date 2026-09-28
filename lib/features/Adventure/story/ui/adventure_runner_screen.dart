@@ -130,8 +130,7 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
     super.dispose();
   }
 
-  String get _languageCode =>
-      context.read<LanguageCubit>().state.languageCode;
+  String get _languageCode => context.read<LanguageCubit>().state.languageCode;
 
   ActivityServices _servicesFor() {
     return ActivityServices(
@@ -162,7 +161,8 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       return;
     }
     try {
-      final ActivitySpec spec = widget.bundle.requireActivity(node.activityRef!);
+      final ActivitySpec spec =
+          widget.bundle.requireActivity(node.activityRef!);
       final ActivityEngine<ActivityContent> engine =
           widget.registry.require(spec.engineId);
       final ActivitySession<ActivityContent> session = engine.createSession(
@@ -180,9 +180,9 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
             engine: engine,
             session: session,
             title: widget.bundle
-                    .requireAdventure(widget.adventureId)
-                    .title
-                    .resolve(_languageCode),
+                .requireAdventure(widget.adventureId)
+                .title
+                .resolve(_languageCode),
             // Present, and that is what switches the host's result screen from
             // the free-play one — two equal buttons, one of them labelled
             // "Play again" while actually leaving — to a single button that
@@ -270,8 +270,9 @@ class _AdventureRunnerScreenState extends State<AdventureRunnerScreen>
       value: _runner,
       child: BlocConsumer<AdventureRunnerCubit, AdventureRunnerState>(
         bloc: _runner,
-        listenWhen: (AdventureRunnerState previous, AdventureRunnerState current) =>
-            previous.node?.nodeId != current.node?.nodeId,
+        listenWhen:
+            (AdventureRunnerState previous, AdventureRunnerState current) =>
+                previous.node?.nodeId != current.node?.nodeId,
         listener: (BuildContext context, AdventureRunnerState state) {
           if (state.justEarnedRewardId != null) {
             _startCelebration(state);
@@ -631,8 +632,7 @@ class _StoryMessage extends StatelessWidget {
                   onTap();
                 },
                 child: Container(
-                  constraints:
-                      const BoxConstraints(minHeight: KidUi.minTouch),
+                  constraints: const BoxConstraints(minHeight: KidUi.minTouch),
                   padding: EdgeInsets.symmetric(
                     horizontal: metrics.size(32, min: 22, max: 44),
                   ),

@@ -6,7 +6,6 @@ import 'package:kidzo/core/database/daos/profile_dao.dart';
 import 'profile_state.dart';
 
 class ProfileCubit extends Cubit<ProfileState> {
-
   ProfileCubit(this.profileDao) : super(ProfileInitial());
   final ProfileDao profileDao;
 
@@ -42,7 +41,8 @@ class ProfileCubit extends Cubit<ProfileState> {
   Future<void> createProfile(String name, int avatarIndex) async {
     final safeName = _sanitizeName(name);
     if (safeName == null) {
-      emit(const ProfileError('Name must be at least $minNameLength characters'));
+      emit(const ProfileError(
+          'Name must be at least $minNameLength characters'));
       return;
     }
     emit(ProfileLoading());
@@ -69,7 +69,8 @@ class ProfileCubit extends Cubit<ProfileState> {
     final previous = state;
     final safeName = _sanitizeName(name);
     if (safeName == null) {
-      emit(const ProfileError('Name must be at least $minNameLength characters'));
+      emit(const ProfileError(
+          'Name must be at least $minNameLength characters'));
       emit(previous);
       return;
     }

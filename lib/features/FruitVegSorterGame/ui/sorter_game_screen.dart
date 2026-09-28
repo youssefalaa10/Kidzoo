@@ -105,9 +105,8 @@ class _SorterBoard extends StatelessWidget {
     final m = metrics;
 
     final hasSelection = state.selectedFoodId != null;
-    final accent = round.targetBasket == FoodType.fruit
-        ? KidUi.fruit
-        : KidUi.vegetable;
+    final accent =
+        round.targetBasket == FoodType.fruit ? KidUi.fruit : KidUi.vegetable;
 
     final baskets = _Baskets(metrics: m, state: state, round: round);
     final tray = _FoodTray(metrics: m, state: state, round: round);

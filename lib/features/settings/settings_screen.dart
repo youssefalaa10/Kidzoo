@@ -50,7 +50,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     HeaderSection(
                       mq: mq,
                       title: l10n.funSettings,
-                      textColor: Colors.purple[800]!,
+                      textColor: Colors.purple.shade800,
                     ),
                   ],
                 ),

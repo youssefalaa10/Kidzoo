@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:kidzo/core/utils/assets.dart';
 
 import '../../../core/base/kid_game_screen.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
 import '../../../core/services/background_resolver.dart';
 import '../data/model/animal_quiz_model.dart';
-import '../../../core/helpers/speech.dart';
 
 class AnimalQuizScreen extends KidGameScreen {
   const AnimalQuizScreen({required super.level, super.key});
@@ -298,8 +298,8 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                  BackgroundResolver(context, BackgroundType.jungle).resolveBackground()!
-                ),
+                    BackgroundResolver(context, BackgroundType.jungle)
+                        .resolveBackground()!),
                 fit: BoxFit.cover,
               ),
             ),

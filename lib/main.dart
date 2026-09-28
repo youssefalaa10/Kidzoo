@@ -65,6 +65,7 @@ class MyApp extends StatelessWidget {
     required this.gameAssetManager,
     super.key,
   });
+
   /// Provided to the widget tree so Adventure Mode can build its own DAO.
   /// Passed down rather than reached for globally, per the injected-services
   /// rule that this feature's registry and services also follow.

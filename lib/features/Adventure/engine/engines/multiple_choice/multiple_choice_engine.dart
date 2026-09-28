@@ -54,8 +54,9 @@ class MultipleChoiceCubit
 
   @override
   ActivityStepView describe(MultipleChoiceStep step, ScaffoldLevel level) {
-    final List<String> allIds =
-        step.orderedItems.map((PackItem item) => item.id).toList(growable: false);
+    final List<String> allIds = step.orderedItems
+        .map((PackItem item) => item.id)
+        .toList(growable: false);
     final List<String> live = services.coach.liveOptionsFor(
       level: level,
       allOptionIds: allIds,
@@ -69,11 +70,11 @@ class MultipleChoiceCubit
       // built on, because the next beat assumes the child was told something.
       revealLine: step.question.revealLine,
       liveOptionIds: live,
-      dimmedOptionIds:
-          allIds.where((String id) => !live.contains(id)).toList(growable: false),
-      highlightOptionId: level == ScaffoldLevel.modelled
-          ? step.question.correctItem.id
-          : null,
+      dimmedOptionIds: allIds
+          .where((String id) => !live.contains(id))
+          .toList(growable: false),
+      highlightOptionId:
+          level == ScaffoldLevel.modelled ? step.question.correctItem.id : null,
     );
   }
 }
@@ -104,11 +105,13 @@ class MultipleChoiceEngine extends ActivityEngine<MultipleChoiceContent> {
       );
 
   @override
-  MultipleChoiceContent parseContent(ActivitySpec spec, ItemPackResolver packs) =>
+  MultipleChoiceContent parseContent(
+          ActivitySpec spec, ItemPackResolver packs) =>
       parseMultipleChoiceContent(spec, packs);
 
   @override
-  Iterable<String> assetsFor(MultipleChoiceContent content) => content.assetPaths;
+  Iterable<String> assetsFor(MultipleChoiceContent content) =>
+      content.assetPaths;
 
   @override
   ActivityCubit<MultipleChoiceContent, dynamic> createCubit(

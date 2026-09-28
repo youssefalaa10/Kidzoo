@@ -62,7 +62,8 @@ class _SplashScreenState extends State<SplashScreen>
     )..repeat(reverse: true);
 
     Animation<double> curve(double begin, double end, Curve c) =>
-        CurvedAnimation(parent: _entrance, curve: Interval(begin, end, curve: c));
+        CurvedAnimation(
+            parent: _entrance, curve: Interval(begin, end, curve: c));
 
     // The icon lands first, with a little overshoot so it feels dropped in
     // rather than faded in.

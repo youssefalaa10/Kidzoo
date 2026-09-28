@@ -19,7 +19,8 @@ class BackgroundResolver {
         '$_dir/colorful_bg_mob.png', '$_dir/colorful_bg_tab.jpg'),
     'ocean':
         _BackgroundPlates('$_dir/cloudy_bg_mob.png', '$_dir/cloudy_bg_tab.png'),
-    'star': _BackgroundPlates('$_dir/tech_bg_mob.jpeg', '$_dir/tech_bg_desk.jpg'),
+    'star':
+        _BackgroundPlates('$_dir/tech_bg_mob.jpeg', '$_dir/tech_bg_desk.jpg'),
     'learning':
         _BackgroundPlates('$_dir/learn_bg_mob.png', '$_dir/learn_bg_desk.jpg'),
     'map': _BackgroundPlates('$_dir/map_mob.jpg', '$_dir/map_desk_tab.png'),

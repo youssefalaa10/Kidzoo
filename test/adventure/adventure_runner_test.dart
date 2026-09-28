@@ -20,8 +20,8 @@ void main() {
   late int profileId;
 
   setUpAll(() async {
-    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
-        .load();
+    bundle =
+        await const AdventureContentLoader(DiskAdventureContentSource()).load();
   });
 
   setUp(() async {
@@ -97,8 +97,8 @@ void main() {
       final List<StoryBeat> visited = <StoryBeat>[];
       await runner.start();
       int guard = 0;
-      while (runner.state.status == AdventureRunnerStatus.playing &&
-          guard < 50) {
+      while (
+          runner.state.status == AdventureRunnerStatus.playing && guard < 50) {
         guard++;
         visited.add(runner.state.node!.beat);
         if (runner.state.isOnActivity) {
@@ -131,7 +131,8 @@ void main() {
         if (!node.isActivity) {
           continue;
         }
-        expect(() => bundle.requireActivity(node.activityRef!), returnsNormally);
+        expect(
+            () => bundle.requireActivity(node.activityRef!), returnsNormally);
       }
     });
   });
@@ -160,7 +161,8 @@ void main() {
       await runner.close();
     });
 
-    test('mastery signals are stored even though they change nothing', () async {
+    test('mastery signals are stored even though they change nothing',
+        () async {
       final AdventureRunnerCubit runner = makeRunner();
       await runner.start();
       await runner.continueStory();

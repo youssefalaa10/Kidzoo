@@ -56,7 +56,8 @@ void main() {
     });
 
     test('does not mistake other Arabic voices for Egyptian', () {
-      const saudi = TtsVoiceCandidate(name: 'ar-xa-x-ard-local', locale: 'ar-SA');
+      const saudi =
+          TtsVoiceCandidate(name: 'ar-xa-x-ard-local', locale: 'ar-SA');
       expect(saudi.isArabic, isTrue);
       expect(saudi.isEgyptian, isFalse);
     });
@@ -172,17 +173,20 @@ void main() {
 
     test('reads network_required whether it is a bool or a string', () {
       expect(
-        TtsVoiceCandidate.fromMap({'name': 'a', 'locale': 'ar-EG', 'network_required': true})
+        TtsVoiceCandidate.fromMap(
+                {'name': 'a', 'locale': 'ar-EG', 'network_required': true})
             .networkRequired,
         isTrue,
       );
       expect(
-        TtsVoiceCandidate.fromMap({'name': 'a', 'locale': 'ar-EG', 'network_required': 'true'})
+        TtsVoiceCandidate.fromMap(
+                {'name': 'a', 'locale': 'ar-EG', 'network_required': 'true'})
             .networkRequired,
         isTrue,
       );
       expect(
-        TtsVoiceCandidate.fromMap({'name': 'a', 'locale': 'ar-EG', 'network_required': 'false'})
+        TtsVoiceCandidate.fromMap(
+                {'name': 'a', 'locale': 'ar-EG', 'network_required': 'false'})
             .networkRequired,
         isFalse,
       );
@@ -190,11 +194,13 @@ void main() {
 
     test('reads quality whether it is an int or a string', () {
       expect(
-        TtsVoiceCandidate.fromMap({'name': 'a', 'locale': 'ar-EG', 'quality': '400'}).quality,
+        TtsVoiceCandidate.fromMap(
+            {'name': 'a', 'locale': 'ar-EG', 'quality': '400'}).quality,
         400,
       );
       expect(
-        TtsVoiceCandidate.fromMap({'name': 'a', 'locale': 'ar-EG', 'quality': 400}).quality,
+        TtsVoiceCandidate.fromMap(
+            {'name': 'a', 'locale': 'ar-EG', 'quality': 400}).quality,
         400,
       );
     });
@@ -207,7 +213,8 @@ void main() {
 
   group('Locale-only fallback ordering', () {
     test('puts ar-EG first when the device reports it', () {
-      final attempts = arabicLocaleAttempts(['en-US', 'ar-SA', 'ar-EG', 'fr-FR']);
+      final attempts =
+          arabicLocaleAttempts(['en-US', 'ar-SA', 'ar-EG', 'fr-FR']);
       expect(attempts.first, 'ar-eg');
       expect(attempts, contains('ar-sa'));
       expect(attempts, isNot(contains('en-us')));
@@ -226,7 +233,8 @@ void main() {
     });
 
     test('the preferred locale constant and the ranking agree', () {
-      expect(normalizeLocale(kPreferredArabicLocale), kArabicLocalePreference.first);
+      expect(normalizeLocale(kPreferredArabicLocale),
+          kArabicLocalePreference.first);
     });
   });
 }

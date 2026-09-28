@@ -48,8 +48,8 @@ void main() {
 
   setUpAll(() async {
     registry = buildDefaultEngineRegistry();
-    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
-        .load();
+    bundle =
+        await const AdventureContentLoader(DiskAdventureContentSource()).load();
   });
 
   setUp(() async {
@@ -102,9 +102,9 @@ void main() {
     int guard = 0;
     while (runner.state.status == AdventureRunnerStatus.playing && guard < 60) {
       guard++;
-      final StoryNode node = runner.state.node!;
+      final StoryNode? node = runner.state.node;
 
-      if (!node.isActivity) {
+      if (!node!.isActivity) {
         // A narration beat: the runner screen speaks each line, then moves on.
         for (final line in node.lines) {
           await narrator.speak(line.resolve(languageCode));
@@ -162,13 +162,13 @@ void main() {
   for (final String locale in <String>['en', 'ar']) {
     group('Adventure 1 in $locale', () {
       test('plays from the first beat to the page, answering well', () async {
-        final List<String> spoken =
-            await playAdventure(languageCode: locale);
+        final List<String> spoken = await playAdventure(languageCode: locale);
 
         expect(spoken, isNotEmpty);
         // The page is in the book, which is the entire point of the chapter.
         final List<StoryReward> rewards = await dao.rewardsFor(profileId);
-        expect(rewards.map((StoryReward r) => r.rewardId), contains('green_page'));
+        expect(
+            rewards.map((StoryReward r) => r.rewardId), contains('green_page'));
       });
 
       test('never mixes the two languages in one run', () async {
@@ -181,7 +181,8 @@ void main() {
         for (final String line in spoken) {
           if (locale == 'ar') {
             expect(arabic.hasMatch(line), isTrue,
-                reason: 'an Arabic run said "$line", which has no Arabic in it');
+                reason:
+                    'an Arabic run said "$line", which has no Arabic in it');
           } else {
             expect(arabic.hasMatch(line), isFalse,
                 reason: 'an English run said "$line"');
@@ -209,9 +210,8 @@ void main() {
             ask.payload['questions'] as List<dynamic>;
         for (final dynamic raw in questions) {
           final Map<dynamic, dynamic> question = raw as Map<dynamic, dynamic>;
-          final String reveal =
-              (question['revealLine'] as Map<dynamic, dynamic>)[locale]
-                  as String;
+          final String reveal = (question['revealLine']
+              as Map<dynamic, dynamic>)[locale] as String;
           expect(spoken, contains(reveal),
               reason: 'the clue from "${question['id']}" was never said, so '
                   'the beat that depends on it talks about something the '
@@ -228,8 +228,8 @@ void main() {
         );
 
         final List<StoryReward> rewards = await dao.rewardsFor(profileId);
-        expect(rewards.map((StoryReward r) => r.rewardId),
-            contains('green_page'));
+        expect(
+            rewards.map((StoryReward r) => r.rewardId), contains('green_page'));
       });
 
       test('fast repeated taps do not skip a beat or double a page', () async {

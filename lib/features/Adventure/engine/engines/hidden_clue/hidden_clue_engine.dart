@@ -153,8 +153,7 @@ class HiddenClueCubit extends ActivityCubit<HiddenClueContent, HiddenClueStep> {
       liveOptionIds: <String>[step.clue.id],
       // At `modelled` the scene points straight at it. A search the child
       // cannot finish is worse than one that gives itself away.
-      highlightOptionId:
-          level == ScaffoldLevel.modelled ? step.clue.id : null,
+      highlightOptionId: level == ScaffoldLevel.modelled ? step.clue.id : null,
     );
   }
 }
@@ -173,7 +172,8 @@ class HiddenClueEngine extends ActivityEngine<HiddenClueContent> {
           ContentParameter.list('clues',
               isRequired: true,
               description: 'each with id, normalized position and art'),
-          ContentParameter.integer('visualNoiseCount', minValue: 0, maxValue: 24),
+          ContentParameter.integer('visualNoiseCount',
+              minValue: 0, maxValue: 24),
           ContentParameter.integer('revealOnIdleSeconds',
               minValue: 5, maxValue: 120),
           ContentParameter.text('sceneImage'),
@@ -203,7 +203,8 @@ class HiddenClueEngine extends ActivityEngine<HiddenClueContent> {
     for (int index = 0; index < rawClues.length; index++) {
       final Map<String, dynamic> raw = rawClues[index];
       final JsonReader clueReader = JsonReader(raw, '$path.clues[$index]');
-      final List<int> rawPosition = clueReader.optionalIntList('positionPercent');
+      final List<int> rawPosition =
+          clueReader.optionalIntList('positionPercent');
       if (rawPosition.length != 2) {
         throw ActivityContentException(
           '$path.clues[$index].positionPercent',
@@ -238,8 +239,8 @@ class HiddenClueEngine extends ActivityEngine<HiddenClueContent> {
 
     return HiddenClueContent(
       clues: clues,
-      sceneImage: reader.optionalString('sceneImage') ??
-          spec.presentation.sceneImage,
+      sceneImage:
+          reader.optionalString('sceneImage') ?? spec.presentation.sceneImage,
       visualNoise: noise,
       revealOnIdleSeconds: reader.optionalInt('revealOnIdleSeconds') ?? 15,
       hitToleranceFraction:
@@ -405,7 +406,8 @@ class _HiddenClueBoardState extends State<_HiddenClueBoard> {
             children: <Widget>[
               // Decoys first, so the clue always sits above them and can never
               // be covered by a decoy that happened to land on top.
-              for (final MapEntry<PackItem, Offset> entry in step.noisePositions)
+              for (final MapEntry<PackItem, Offset> entry
+                  in step.noisePositions)
                 Positioned(
                   left: entry.value.dx * box.width - noiseSize / 2,
                   top: entry.value.dy * box.height - noiseSize / 2,

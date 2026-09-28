@@ -35,8 +35,7 @@ class AzureSpeechConfig {
 
   /// Forces the cloud voice even when the device has a usable Egyptian female
   /// voice. Off by default: the local voice is free, instant and works offline.
-  static const bool force =
-      bool.fromEnvironment('AZURE_SPEECH_FORCE');
+  static const bool force = bool.fromEnvironment('AZURE_SPEECH_FORCE');
 
   static bool get isConfigured => key.isNotEmpty;
 

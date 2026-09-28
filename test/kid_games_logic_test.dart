@@ -43,8 +43,8 @@ void main() {
           totalRounds: 10,
           random: random,
         );
-        expect(data.choices.map((f) => f.id).toSet().length,
-            data.choices.length);
+        expect(
+            data.choices.map((f) => f.id).toSet().length, data.choices.length);
         expect(data.choices.contains(data.targetFood), isTrue);
         expect(data.targetBasket, data.targetFood.type);
       }
@@ -135,10 +135,8 @@ void main() {
 
     test('easy rounds contrast the food families, later rounds do not', () {
       final random = Random(23);
-      final lion =
-          FeedAnimalData.allAnimals.firstWhere((a) => a.id == 'lion');
-      final meat =
-          FeedAnimalData.allFoods.firstWhere((f) => f.id == 'meat');
+      final lion = FeedAnimalData.allAnimals.firstWhere((a) => a.id == 'lion');
+      final meat = FeedAnimalData.allFoods.firstWhere((f) => f.id == 'meat');
 
       final easy = FeedAnimalData.buildDistractors(
         animal: lion,
@@ -172,13 +170,13 @@ void main() {
     test('distractors never belong to the scene being asked about', () {
       for (var i = 0; i < 100; i++) {
         for (final question in generateVehicleQuestions()) {
-          final valid = environmentVehicles[question.environmentType]!;
+          final valid = environmentVehicles[question.environmentType];
           final wrong = question.options
               .where((v) => v != question.correctVehicle)
               .toList();
           for (final vehicle in wrong) {
             expect(
-              valid.contains(vehicle),
+              valid?.contains(vehicle),
               isFalse,
               reason: '$vehicle also belongs in ${question.environmentType}',
             );

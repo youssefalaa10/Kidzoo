@@ -1,11 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
-import 'dart:typed_data';
 import 'dart:ui' as ui;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
@@ -50,8 +49,8 @@ void main() {
 
   setUpAll(() async {
     registry = buildDefaultEngineRegistry();
-    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
-        .load();
+    bundle =
+        await const AdventureContentLoader(DiskAdventureContentSource()).load();
     englishL10n = AppLocalizations(
       const Locale('en', ''),
       (json.decode(File('assets/lang/en.json').readAsStringSync())
@@ -130,8 +129,7 @@ void main() {
       final CountingCubit cubit =
           cubitFor('jungle_count_watchers') as CountingCubit;
       await cubit.start();
-      final String success =
-          cubit.spec.narration.success.resolve('en');
+      final String success = cubit.spec.narration.success.resolve('en');
 
       while (cubit.state.status == ActivityStatus.running) {
         await cubit.submit(QuantityAttempt(cubit.currentStep.targetCount));
@@ -315,8 +313,7 @@ void main() {
         const Size(800, 1200),
       ]) {
         final CountingCubit cubit = await pumpBoard(tester, size: size);
-        final Size item =
-            tester.getSize(find.byKey(countableKey(0)).first);
+        final Size item = tester.getSize(find.byKey(countableKey(0)).first);
         expect(item.width, greaterThanOrEqualTo(72),
             reason: 'countable items too small at $size');
         expect(tester.takeException(), isNull);
@@ -356,7 +353,7 @@ void main() {
           await ui.instantiateImageCodec(data.buffer.asUint8List());
       final ui.FrameInfo frame = await codec.getNextFrame();
       final ByteData? pixels =
-          await frame.image.toByteData(format: ui.ImageByteFormat.rawRgba);
+          await frame.image.toByteData();
       expect(pixels, isNotNull);
 
       int green = 0;
@@ -413,7 +410,8 @@ void main() {
             reward: jungleReward(),
             languageCode: languageCode,
             destination: destination,
-            caption: languageCode == 'ar' ? 'عَادَتْ صَفْحَة!' : 'A page came home!',
+            caption:
+                languageCode == 'ar' ? 'عَادَتْ صَفْحَة!' : 'A page came home!',
             onDone: () => done++,
           ),
         ),
@@ -519,7 +517,7 @@ void main() {
       final AdventureRewardBook book = AdventureRewardBook.fromBundle(
         bundle: bundle,
         arc: bundle.primaryArc,
-        earnedIds: <String>{'green_page'},
+        earnedIds: const <String>{'green_page'},
       );
       expect(book.total, bundle.primaryArc.adventureIds.length);
       expect(book.earnedCount, 1);
@@ -584,8 +582,8 @@ void main() {
       // All three at once is the point. Hiding it entirely makes the map a
       // single button; showing it as playable lies; showing its story spends
       // the surprise before the child gets there.
-      int opened = 0;
-      await pumpStop(tester, locked, isLast: true, onOpen: null);
+      final int opened = 0;
+      await pumpStop(tester, locked, isLast: true);
 
       expect(find.text('The Market'), findsOneWidget);
       expect(find.byIcon(Icons.lock_rounded), findsOneWidget);

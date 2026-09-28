@@ -69,11 +69,11 @@ class StoryNode {
         : StoryNodeKind.storyBeat;
     final String nodeId = reader.requireString('nodeId');
 
-    final List<LocalizedText> lines = (json['lines'] as List<dynamic>? ??
-            <dynamic>[])
-        .map((Object? line) =>
-            LocalizedText.fromJson(line, debugPath: '$path.lines'))
-        .toList(growable: false);
+    final List<LocalizedText> lines =
+        (json['lines'] as List<dynamic>? ?? <dynamic>[])
+            .map((Object? line) =>
+                LocalizedText.fromJson(line, debugPath: '$path.lines'))
+            .toList(growable: false);
 
     if (kind == StoryNodeKind.activity && !reader.has('activityRef')) {
       throw ActivityContentException(
@@ -137,13 +137,13 @@ class Adventure {
     }
     final List<StoryNode> nodes = <StoryNode>[];
     for (int index = 0; index < rawNodes.length; index++) {
-      nodes.add(StoryNode.fromJson(
-          rawNodes[index], '$sourcePath.nodes[$index]'));
+      nodes.add(
+          StoryNode.fromJson(rawNodes[index], '$sourcePath.nodes[$index]'));
     }
     return Adventure(
       adventureId: adventureId,
-      title: LocalizedText.fromJson(json['title'],
-          debugPath: '$sourcePath.title'),
+      title:
+          LocalizedText.fromJson(json['title'], debugPath: '$sourcePath.title'),
       backgroundType: reader.optionalString('backgroundType') ?? 'jungle',
       nodes: nodes,
       rewardId: reader.requireString('rewardId'),
@@ -284,8 +284,8 @@ class StoryArc {
     final JsonReader reader = JsonReader(json, sourcePath);
     return StoryArc(
       arcId: reader.requireString('arcId'),
-      title: LocalizedText.fromJson(json['title'],
-          debugPath: '$sourcePath.title'),
+      title:
+          LocalizedText.fromJson(json['title'], debugPath: '$sourcePath.title'),
       premise: LocalizedText.fromJson(json['premise'],
           debugPath: '$sourcePath.premise'),
       adventureIds: reader.requireStringList('adventures'),

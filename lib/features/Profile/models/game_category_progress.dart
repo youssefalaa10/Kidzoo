@@ -49,6 +49,15 @@ class GameCategoryProgress extends Equatable {
   }
 
   @override
-  List<Object?> get props =>
-      [id, title, icon, color, score, bestScore, gamesPlayed, progress, encouragement];
+  List<Object?> get props => [
+        id,
+        title,
+        icon,
+        color,
+        score,
+        bestScore,
+        gamesPlayed,
+        progress,
+        encouragement
+      ];
 }

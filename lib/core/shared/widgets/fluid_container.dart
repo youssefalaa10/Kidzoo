@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 /// It enforces a maximum width to prevent components from stretching
 /// on tablets and desktop monitors, while centering the content.
 class FluidContainer extends StatelessWidget {
-
   const FluidContainer({
     required this.child,
     super.key,

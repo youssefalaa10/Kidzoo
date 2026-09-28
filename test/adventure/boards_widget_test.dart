@@ -28,8 +28,8 @@ void main() {
 
   setUpAll(() async {
     registry = buildDefaultEngineRegistry();
-    bundle = await const AdventureContentLoader(DiskAdventureContentSource())
-        .load();
+    bundle =
+        await const AdventureContentLoader(DiskAdventureContentSource()).load();
   });
 
   /// The sizes that matter, not a comfortable default.
@@ -347,10 +347,13 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Say it again'));
       await tester.pump();
 
-      expect(narrator.spoken, <String>[
-        node.lines.first.resolve('en'),
-        node.lines.first.resolve('en'),
-      ], reason: 'replay must repeat the line the child is on, not advance');
+      expect(
+          narrator.spoken,
+          <String>[
+            node.lines.first.resolve('en'),
+            node.lines.first.resolve('en'),
+          ],
+          reason: 'replay must repeat the line the child is on, not advance');
     });
 
     testWidgets('works in both locales without overflow at every size',
@@ -369,12 +372,8 @@ void main() {
               languageCode: locale,
               onSpeak: (String _) async {},
               onContinue: () {},
-              continueLabel: locale == 'ar'
-                  ? 'هَيَّا نَلْعَب'
-                  : 'Lets play',
-              nextLabel: locale == 'ar'
-                  ? 'التَّالِي'
-                  : 'Next',
+              continueLabel: locale == 'ar' ? 'هَيَّا نَلْعَب' : 'Lets play',
+              nextLabel: locale == 'ar' ? 'التَّالِي' : 'Next',
             ));
             await tester.pump();
             expect(tester.takeException(), isNull,

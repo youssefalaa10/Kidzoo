@@ -389,13 +389,14 @@ class TtsService {
             Expanded(
               child: Text(
                 l10n.ttsFirstRunTitle,
-                style: const TextStyle(
-                    fontWeight: FontWeight.w900, fontSize: 18),
+                style:
+                    const TextStyle(fontWeight: FontWeight.w900, fontSize: 18),
               ),
             ),
           ],
         ),
-        content: Text(l10n.ttsFirstRunBody, style: const TextStyle(height: 1.6)),
+        content:
+            Text(l10n.ttsFirstRunBody, style: const TextStyle(height: 1.6)),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),

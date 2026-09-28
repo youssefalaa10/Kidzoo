@@ -4,11 +4,11 @@ import 'dart:math';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
+import '../../../../../core/helpers/speech.dart';
 import '../../Model/word_model.dart';
 import '../../game_storage.dart';
 import '../../word_list.dart';
 import 'missing_letter_state.dart';
-import '../../../../../core/helpers/speech.dart';
 
 class MissingLetterCubit extends Cubit<MissingLetterState> {
   MissingLetterCubit({
@@ -78,7 +78,8 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
 
     for (var i = 0; i < safeCount; i++) {
       final start = (i * bucketSize).floor();
-      final end = min(length, ((i + 1) * bucketSize).ceil()).clamp(start + 1, length);
+      final end =
+          min(length, ((i + 1) * bucketSize).ceil()).clamp(start + 1, length);
       var guard = 0;
       int idx;
       do {
@@ -184,12 +185,14 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
 
   void removeLetterAt(int index) {
     if (state.isTransitioning) return;
-    final filledLetters = Map<int, String>.from(state.filledLetters)..remove(index);
+    final filledLetters = Map<int, String>.from(state.filledLetters)
+      ..remove(index);
     emit(state.copyWith(filledLetters: filledLetters, isIncorrect: false));
   }
 
   void resetCurrentAnswer() {
-    emit(state.copyWith(filledLetters: const {}, isIncorrect: false, hintRevealed: false));
+    emit(state.copyWith(
+        filledLetters: const {}, isIncorrect: false, hintRevealed: false));
   }
 
   void revealHint() {
@@ -262,7 +265,8 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
 
     if (nextIndex >= WordList.getTotalWords()) {
       unawaited(_storage.completeGame(state.score));
-      emit(state.copyWith(completedWords: completedCount, isTransitioning: false));
+      emit(state.copyWith(
+          completedWords: completedCount, isTransitioning: false));
       return;
     }
 
@@ -274,7 +278,8 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
       wrongAttempts: state.wrongAttempts,
     );
 
-    unawaited(_storage.saveProgress(currentIndex: nextIndex, totalScore: state.score));
+    unawaited(_storage.saveProgress(
+        currentIndex: nextIndex, totalScore: state.score));
     unawaited(_storage.saveCompletedCount(completedCount));
     unawaited(_storage.saveLevel(state.currentLevel));
 
@@ -297,7 +302,8 @@ class MissingLetterCubit extends Cubit<MissingLetterState> {
     final level = await _storage.getLevel();
 
     final entry = WordList.getBaseWordAtIndex(currentIndex);
-    final word = _buildWord(entry, level: level, correctStreak: 0, wrongAttempts: 0);
+    final word =
+        _buildWord(entry, level: level, correctStreak: 0, wrongAttempts: 0);
 
     emit(MissingLetterState(
       currentWord: word,

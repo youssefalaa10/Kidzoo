@@ -58,7 +58,8 @@ class Ball {
   double calculateBounceAngle(double hitPosition, double paddleWidth) {
     // Normalize hit position to -1 to 1 (center is 0)
     // Clamp to [-1, 1] just in case ball overlaps edge slightly
-    final normalized = ((hitPosition - paddleWidth / 2) / (paddleWidth / 2)).clamp(-1.0, 1.0);
+    final normalized =
+        ((hitPosition - paddleWidth / 2) / (paddleWidth / 2)).clamp(-1.0, 1.0);
     // Return angle in radians (max 70 degrees for sharper edge returns)
     return normalized * (math.pi * 70 / 180);
   }
@@ -92,7 +93,6 @@ class Paddle {
     );
   }
 }
-
 
 /// How a given [AIDifficulty] actually plays.
 ///

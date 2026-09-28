@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(flutter analyze *)",
+      "WebSearch"
+    ]
+  }
+}

@@ -159,8 +159,9 @@ class CountingCubit extends ActivityCubit<CountingContent, CountingStep> {
       prompt: prompt,
       revealLine: step.revealLine,
       liveOptionIds: live,
-      dimmedOptionIds:
-          allIds.where((String id) => !live.contains(id)).toList(growable: false),
+      dimmedOptionIds: allIds
+          .where((String id) => !live.contains(id))
+          .toList(growable: false),
       highlightOptionId: level == ScaffoldLevel.modelled
           ? step.optionIdFor(step.targetCount)
           : null,

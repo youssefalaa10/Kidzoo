@@ -26,8 +26,7 @@ class ColorMemoryScreen extends KidGameScreen {
   State<ColorMemoryScreen> createState() => _ColorMemoryScreenState();
 }
 
-class _ColorMemoryScreenState
-    extends KidGameScreenState<ColorMemoryScreen> {
+class _ColorMemoryScreenState extends KidGameScreenState<ColorMemoryScreen> {
   late ColorMemoryBloc _bloc;
   late AudioPlayer _sfxPlayer;
 
@@ -199,7 +198,8 @@ class _ColorMemoryScreenState
     );
   }
 
-  Widget _buildPortraitLayout(ColorMemoryGameState state, dynamic config, dynamic palette) {
+  Widget _buildPortraitLayout(
+      ColorMemoryGameState state, dynamic config, dynamic palette) {
     return Column(
       children: [
         // Header with stats
@@ -243,7 +243,8 @@ class _ColorMemoryScreenState
     );
   }
 
-  Widget _buildLandscapeLayout(ColorMemoryGameState state, dynamic config, dynamic palette) {
+  Widget _buildLandscapeLayout(
+      ColorMemoryGameState state, dynamic config, dynamic palette) {
     return Row(
       children: [
         Expanded(

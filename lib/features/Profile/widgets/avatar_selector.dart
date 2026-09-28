@@ -58,7 +58,8 @@ class _AvatarTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bubbleColor = _bubbleColors[asset.hashCode.abs() % _bubbleColors.length];
+    final bubbleColor =
+        _bubbleColors[asset.hashCode.abs() % _bubbleColors.length];
 
     return Semantics(
       label: AppLocalizations.of(context).avatarOptionLabel,
@@ -73,10 +74,12 @@ class _AvatarTile extends StatelessWidget {
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 250),
             decoration: BoxDecoration(
-              color: isSelected ? bubbleColor : bubbleColor.withValues(alpha: 0.5),
+              color:
+                  isSelected ? bubbleColor : bubbleColor.withValues(alpha: 0.5),
               shape: BoxShape.circle,
               border: Border.all(
-                color: isSelected ? const Color(0xFF1AA6A0) : Colors.transparent,
+                color:
+                    isSelected ? const Color(0xFF1AA6A0) : Colors.transparent,
                 width: 4,
               ),
               boxShadow: isSelected
@@ -105,7 +108,8 @@ class _AvatarTile extends StatelessWidget {
                         color: Color(0xFF4CAF50),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Icons.check, color: Colors.white, size: 16),
+                      child: const Icon(Icons.check,
+                          color: Colors.white, size: 16),
                     ),
                   ),
               ],

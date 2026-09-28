@@ -243,7 +243,6 @@ class _MazeGameContentState extends State<_MazeGameContent> {
       },
     );
   }
-
 }
 
 /// Back, difficulty, stars, timer and the two utility buttons, on one line.

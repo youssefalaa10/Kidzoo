@@ -94,7 +94,9 @@ class _Game2048ScreenState extends State<Game2048Screen> {
           },
           builder: (context, state) {
             return SafeArea(
-              child: isLandscape ? _buildLandscapeLayout(state) : _buildPortraitLayout(state),
+              child: isLandscape
+                  ? _buildLandscapeLayout(state)
+                  : _buildPortraitLayout(state),
             );
           },
         ),
@@ -152,7 +154,7 @@ class _Game2048ScreenState extends State<Game2048Screen> {
             ? constraints.maxWidth
             : constraints.maxHeight;
         final boardSize = (size - 32.0).clamp(150.0, 500.0);
-        
+
         return Center(
           child: SingleChildScrollView(
             child: GameBoard(

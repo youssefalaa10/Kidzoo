@@ -57,9 +57,7 @@ class SortingContent extends ActivityContent {
 
   Iterable<String> get assetPaths => <String>[
         ...items.map((PackItem item) => item.imageAsset),
-        ...bins
-            .map((SortingBin bin) => bin.imageAsset)
-            .whereType<String>(),
+        ...bins.map((SortingBin bin) => bin.imageAsset).whereType<String>(),
       ];
 }
 
@@ -115,7 +113,7 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
         throw ActivityContentException(
           '${spec.sourcePath} > payload.activeAttribute',
           'item "${item.id}" has no "${content.activeAttribute}" attribute, so '
-          'it cannot be sorted by it',
+              'it cannot be sorted by it',
         );
       }
       final SortingBin bin = content.bins.firstWhere(
@@ -123,7 +121,7 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
         orElse: () => throw ActivityContentException(
           '${spec.sourcePath} > payload.bins',
           'no bin accepts "${content.activeAttribute}=$value" (item '
-          '"${item.id}")',
+              '"${item.id}")',
         ),
       );
       steps.add(SortingStep(
@@ -181,8 +179,9 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
       // pack labels are already authored per locale with harakat.
       spokenPrompt: step.index == 0 ? null : step.item.label,
       liveOptionIds: live,
-      dimmedOptionIds:
-          allIds.where((String id) => !live.contains(id)).toList(growable: false),
+      dimmedOptionIds: allIds
+          .where((String id) => !live.contains(id))
+          .toList(growable: false),
       highlightOptionId:
           level == ScaffoldLevel.modelled ? step.correctBinId : null,
     );
@@ -343,9 +342,8 @@ class _SortingBoardState extends State<_SortingBoard> {
               imageAsset: widget.step.item.imageAsset,
               size: tokenSize,
               dragData: widget.step.item.id,
-              state: _isTokenSelected
-                  ? KidCardState.selected
-                  : KidCardState.idle,
+              state:
+                  _isTokenSelected ? KidCardState.selected : KidCardState.idle,
               label: widget.step.item.label.resolve(widget.state.languageCode),
               onTap: () => setState(() => _isTokenSelected = !_isTokenSelected),
             ),
@@ -371,7 +369,6 @@ class _SortingBoardState extends State<_SortingBoard> {
       },
     );
   }
-
 }
 
 class _BinTarget extends StatelessWidget {
@@ -405,7 +402,8 @@ class _BinTarget extends StatelessWidget {
       // which is the classic reason a Flutter drop silently does nothing.
       onWillAcceptWithDetails: (_) => isLive,
       onAcceptWithDetails: (_) => onAccept(),
-      builder: (BuildContext context, List<String?> candidates, List<dynamic> _) {
+      builder:
+          (BuildContext context, List<String?> candidates, List<dynamic> _) {
         final bool isPreviewing = candidates.isNotEmpty;
         return GestureDetector(
           onTap: isLive && isArmed ? onAccept : null,

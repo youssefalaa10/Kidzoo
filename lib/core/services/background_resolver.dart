@@ -11,7 +11,6 @@ enum BackgroundType {
 }
 
 class BackgroundResolver {
-
   const BackgroundResolver(this.context, this.type);
   final BuildContext context;
   final BackgroundType type;

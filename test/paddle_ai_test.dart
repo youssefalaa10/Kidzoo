@@ -74,7 +74,8 @@ double _step(PaddleAi ai, double paddleX, Ball ball) => ai.nextPaddleX(
       basePaddleSpeed: _paddleSpeed,
     );
 
-double _saveRate(AIDifficulty difficulty, {double ballSpeed = 6, int rallies = 400}) {
+double _saveRate(AIDifficulty difficulty,
+    {double ballSpeed = 6, int rallies = 400}) {
   final random = math.Random(4242);
   var saves = 0;
   for (var i = 0; i < rallies; i++) {
@@ -92,7 +93,8 @@ void main() {
     test('easy loses often enough for a child to win', () {
       final rate = _saveRate(AIDifficulty.easy);
       expect(rate, lessThan(0.75), reason: 'easy saved $rate of rallies');
-      expect(rate, greaterThan(0.25), reason: 'easy should still play, not gift');
+      expect(rate, greaterThan(0.25),
+          reason: 'easy should still play, not gift');
     });
 
     test('medium is beatable but noticeably tighter than easy', () {
@@ -124,11 +126,11 @@ void main() {
         AIDifficulty.expert,
       ];
       for (var i = 1; i < order.length; i++) {
-        final slower = AiProfile.byDifficulty[order[i - 1]]!;
-        final faster = AiProfile.byDifficulty[order[i]]!;
-        expect(faster.maxSpeedFactor, greaterThan(slower.maxSpeedFactor));
-        expect(faster.reactionFrames, lessThan(slower.reactionFrames));
-        expect(faster.aimErrorHalfWidths, lessThan(slower.aimErrorHalfWidths));
+        final slower = AiProfile.byDifficulty[order[i - 1]];
+        final faster = AiProfile.byDifficulty[order[i]];
+        expect(faster?.maxSpeedFactor, greaterThan(slower!.maxSpeedFactor));
+        expect(faster?.reactionFrames, lessThan(slower.reactionFrames));
+        expect(faster?.aimErrorHalfWidths, lessThan(slower.aimErrorHalfWidths));
       }
     });
 
@@ -137,7 +139,8 @@ void main() {
           greaterThan(0.3));
       expect(AiProfile.byDifficulty[AIDifficulty.medium]!.theoreticalMissRate,
           greaterThan(0.1));
-      expect(AiProfile.byDifficulty[AIDifficulty.expert]!.theoreticalMissRate, 0);
+      expect(
+          AiProfile.byDifficulty[AIDifficulty.expert]!.theoreticalMissRate, 0);
     });
   });
 

@@ -68,8 +68,6 @@ extension EnvironmentTypeExtension on EnvironmentType {
         return 'assets/gen/images/vehicles/railway.png';
     }
   }
-
-
 }
 
 const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
@@ -86,7 +84,6 @@ const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
 };
 
 class EnvironmentVehicleQuestion {
-
   EnvironmentVehicleQuestion({
     required this.environmentAsset,
     required this.environmentType,
@@ -97,8 +94,7 @@ class EnvironmentVehicleQuestion {
         'Options must be 3 (early rounds) or 4 (later rounds)');
     assert(options.contains(correctVehicle),
         'Options must contain correct answer');
-    assert(options.toSet().length == options.length,
-        'Options must be unique');
+    assert(options.toSet().length == options.length, 'Options must be unique');
   }
   final String environmentAsset;
   final EnvironmentType environmentType;
@@ -153,9 +149,11 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
     final EnvironmentType env = environmentCycle.removeAt(0);
 
     // 2. Select Correct Vehicle (Avoid repeating recently used vehicles)
-    final List<VehicleType> validVehicles = List.from(environmentVehicles[env]!);
-    final List<VehicleType> unusedValid = validVehicles.where((v) => !usedAnswers.contains(v)).toList();
-    
+    final List<VehicleType> validVehicles =
+        List.from(environmentVehicles[env]!);
+    final List<VehicleType> unusedValid =
+        validVehicles.where((v) => !usedAnswers.contains(v)).toList();
+
     VehicleType correctVehicle;
     if (unusedValid.isNotEmpty) {
       unusedValid.shuffle(random);

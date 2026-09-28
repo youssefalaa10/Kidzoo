@@ -135,69 +135,70 @@ class _GuessTheFlagScreenState extends State<GuessTheFlagScreen>
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                Text(
-                  '${l10n.score}: $_score',
-                  style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.orange),
-                ),
-                SizedBox(height: mq.height(5)),
-                Text(
-                  l10n.whichFlagIs(_targetCountry!.localizedName(context)),
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                      fontSize: 28, fontWeight: FontWeight.bold),
-                ).animate().shake(),
-                SizedBox(height: mq.height(5)),
-                GridView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(20),
-                  gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                    crossAxisCount: 2,
-                    crossAxisSpacing: 20,
-                    mainAxisSpacing: 20,
-                    childAspectRatio: 1.5,
+                  Text(
+                    '${l10n.score}: $_score',
+                    style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.orange),
                   ),
-                  itemCount: _options.length,
-                  itemBuilder: (context, index) {
-                    final country = _options[index];
-                    return GestureDetector(
-                      onTap: () => _checkAnswer(country),
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.black12,
-                              blurRadius: 10,
-                              offset: Offset(0, 5),
+                  SizedBox(height: mq.height(5)),
+                  Text(
+                    l10n.whichFlagIs(_targetCountry!.localizedName(context)),
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                        fontSize: 28, fontWeight: FontWeight.bold),
+                  ).animate().shake(),
+                  SizedBox(height: mq.height(5)),
+                  GridView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(20),
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      crossAxisSpacing: 20,
+                      mainAxisSpacing: 20,
+                      childAspectRatio: 1.5,
+                    ),
+                    itemCount: _options.length,
+                    itemBuilder: (context, index) {
+                      final country = _options[index];
+                      return GestureDetector(
+                        onTap: () => _checkAnswer(country),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: const [
+                              BoxShadow(
+                                color: Colors.black12,
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
+                            border: Border.all(
+                              color: _selectedCountryCode == country.code
+                                  ? (_isCorrect == true
+                                      ? Colors.green
+                                      : Colors.red)
+                                  : Colors.transparent,
+                              width: 3,
                             ),
-                          ],
-                          border: Border.all(
-                            color: _selectedCountryCode == country.code
-                                ? (_isCorrect == true
-                                    ? Colors.green
-                                    : Colors.red)
-                                : Colors.transparent,
-                            width: 3,
                           ),
-                        ),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(20),
-                          child: SvgPicture.asset(
-                            country.flagAsset,
-                            fit: BoxFit.cover,
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(20),
+                            child: SvgPicture.asset(
+                              country.flagAsset,
+                              fit: BoxFit.cover,
+                            ),
                           ),
-                        ),
-                      ).animate().scale(delay: (index * 100).ms),
-                    );
-                  },
-                ),
-              ],
-            ),
+                        ).animate().scale(delay: (index * 100).ms),
+                      );
+                    },
+                  ),
+                ],
+              ),
             ),
           ),
           Align(

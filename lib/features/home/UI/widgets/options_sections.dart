@@ -110,7 +110,7 @@ class OptionCardState extends State<OptionCard>
       if (widget.screen != null) {
         Navigator.push(
           context,
-          MaterialPageRoute(builder: (context) => widget.screen!),
+          MaterialPageRoute<void>(builder: (context) => widget.screen!),
         );
       }
     } else {

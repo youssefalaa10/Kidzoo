@@ -378,7 +378,8 @@ class TicTacToeGameState extends State<TicTacToeGame>
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game)
+                .resolveBackground()!),
             fit: BoxFit.cover,
           ),
         ),

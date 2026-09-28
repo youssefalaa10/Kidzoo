@@ -45,7 +45,8 @@ class ImageManager {
   static const String homeBackground = Assets.genImagesHomeCloudyBg;
   static const String mathBg = Assets.genImagesHomeMathBg;
   static const String catsBg = Assets.genImagesHomeCatsBg;
-  static const String learningBg = 'assets/gen/images/backgrounds/learn_bg_mob.png';
+  static const String learningBg =
+      'assets/gen/images/backgrounds/learn_bg_mob.png';
   static const String techBg = Assets.genImagesHomeTechBg;
 
   static const String numbers = Assets.genImagesHomeNumbers;
@@ -178,10 +179,12 @@ class ImageManager {
   static const String worldMap = Assets.genImagesPuzzleEgypt;
 
   // Kid avatars (profile selection)
-  static const String avatarMonster = 'assets/gen/images/avatar/avatar-monstar.png';
+  static const String avatarMonster =
+      'assets/gen/images/avatar/avatar-monstar.png';
   static const String avatarBoy = 'assets/gen/images/avatar/avatar-boy.png';
   static const String avatarGirl = 'assets/gen/images/avatar/avatar-girl.png';
-  static const String avatarAstronaut = 'assets/gen/images/avatar/avatar-astronaut.png';
+  static const String avatarAstronaut =
+      'assets/gen/images/avatar/avatar-astronaut.png';
 
   /// Ordered list of avatar assets. Index corresponds to `Profiles.avatarIndex`.
   static const List<String> kidAvatars = [

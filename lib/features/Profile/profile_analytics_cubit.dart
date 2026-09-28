@@ -24,10 +24,12 @@ class ProfileAnalyticsCubit extends Cubit<ProfileAnalyticsState> {
 
       final totalScore = scores.fold<int>(0, (sum, s) => sum + s.score);
       final gamesPlayed = scores.length;
-      final bestScore =
-          scores.isEmpty ? 0 : scores.map((s) => s.score).reduce((a, b) => a > b ? a : b);
+      final bestScore = scores.isEmpty
+          ? 0
+          : scores.map((s) => s.score).reduce((a, b) => a > b ? a : b);
       final stars = scores.where((s) => s.score >= _starThreshold).length;
-      final currentStreak = _computeStreak(scores.map((s) => s.playedAt).toList());
+      final currentStreak =
+          _computeStreak(scores.map((s) => s.playedAt).toList());
 
       final categories = _buildCategories(scores, l10n);
       final achievements = _buildAchievements(
@@ -71,10 +73,12 @@ class ProfileAnalyticsCubit extends Cubit<ProfileAnalyticsState> {
     return streak;
   }
 
-  List<GameCategoryProgress> _buildCategories(List<GameScore> scores, AppLocalizations l10n) {
+  List<GameCategoryProgress> _buildCategories(
+      List<GameScore> scores, AppLocalizations l10n) {
     return kGameCategories.map((def) {
-      final categoryScores =
-          scores.where((s) => categoryIdForGameKey(s.gameKey) == def.id).toList();
+      final categoryScores = scores
+          .where((s) => categoryIdForGameKey(s.gameKey) == def.id)
+          .toList();
 
       final score = categoryScores.fold<int>(0, (sum, s) => sum + s.score);
       final gamesPlayed = categoryScores.length;
@@ -97,8 +101,8 @@ class ProfileAnalyticsCubit extends Cubit<ProfileAnalyticsState> {
     }).toList();
   }
 
-  String _encouragementFor(
-      AppLocalizations l10n, String categoryId, int gamesPlayed, double progress) {
+  String _encouragementFor(AppLocalizations l10n, String categoryId,
+      int gamesPlayed, double progress) {
     if (gamesPlayed == 0) return l10n.encouragementNewbie;
     if (progress >= 1.0) {
       switch (categoryId) {
@@ -125,7 +129,8 @@ class ProfileAnalyticsCubit extends Cubit<ProfileAnalyticsState> {
     required List<GameCategoryProgress> categories,
     required AppLocalizations l10n,
   }) {
-    GameCategoryProgress categoryOf(String id) => categories.firstWhere((c) => c.id == id);
+    GameCategoryProgress categoryOf(String id) =>
+        categories.firstWhere((c) => c.id == id);
 
     return [
       Achievement(

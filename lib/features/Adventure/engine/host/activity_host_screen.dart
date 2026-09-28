@@ -81,7 +81,8 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
     _hasPrecached = true;
     // Precache here, not in initState: a card popping in after the prompt has
     // already named it reads as the app being broken.
-    for (final String asset in widget.engine.assetsFor(widget.session.content)) {
+    for (final String asset
+        in widget.engine.assetsFor(widget.session.content)) {
       precacheImage(AssetImage(asset), context).catchError((Object _) {
         // A missing asset is caught by the content test; at runtime it must not
         // take the activity down.

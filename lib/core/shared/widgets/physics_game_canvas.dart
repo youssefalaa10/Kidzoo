@@ -6,7 +6,6 @@ import '../../services/background_resolver.dart';
 /// and centers the game canvas. The remaining exterior space is painted
 /// with a dynamically resolved decorative background image to avoid black bars.
 class PhysicsGameCanvas extends StatelessWidget {
-
   const PhysicsGameCanvas({
     required this.child,
     super.key,

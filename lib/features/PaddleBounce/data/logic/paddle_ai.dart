@@ -66,7 +66,8 @@ class PaddleAi {
       // Drift back towards the middle rather than shadowing a ball that is
       // moving away; the old easy AI stayed glued to it and so was never out
       // of position when the ball came back.
-      targetCentreX = centre + (ball.x - centre) * (1 - profile.centeringWhenIdle);
+      targetCentreX =
+          centre + (ball.x - centre) * (1 - profile.centeringWhenIdle);
     } else if (_framesSinceApproach < profile.reactionFrames) {
       targetCentreX = paddleX + halfWidth;
     } else {

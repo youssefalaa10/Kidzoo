@@ -162,7 +162,8 @@ class _TallyStrip extends StatelessWidget {
       child: AnimatedContainer(
         duration: KidUi.medium,
         height: height,
-        padding: EdgeInsets.symmetric(horizontal: metrics.size(14, min: 10, max: 20)),
+        padding: EdgeInsets.symmetric(
+            horizontal: metrics.size(14, min: 10, max: 20)),
         decoration: BoxDecoration(
           color: background.withValues(alpha: isComplete ? 0.95 : 0.92),
           borderRadius: BorderRadius.circular(KidUi.radiusPill),
@@ -184,8 +185,9 @@ class _TallyStrip extends StatelessWidget {
               key: countTotalKey,
               child: AnimatedSwitcher(
                 duration: KidUi.fast,
-                transitionBuilder: (Widget child, Animation<double> animation) =>
-                    ScaleTransition(scale: animation, child: child),
+                transitionBuilder:
+                    (Widget child, Animation<double> animation) =>
+                        ScaleTransition(scale: animation, child: child),
                 child: Text(
                   NumberWords.digits(count, languageCode),
                   key: ValueKey<int>(count),
@@ -309,8 +311,7 @@ class _CountingScene extends StatelessWidget {
       final int row = index ~/ columns;
       // The last row is centred rather than left-packed, so a 7 does not read
       // as "a full row and a stray".
-      final int itemsInRow =
-          math.min(columns, count - row * columns);
+      final int itemsInRow = math.min(columns, count - row * columns);
       final double rowWidth = itemsInRow * cellWidth;
       final double rowLeft = (box.width - rowWidth) / 2;
       centres.add(Offset(
@@ -334,8 +335,9 @@ class _CountingScene extends StatelessWidget {
         closest = math.min(closest, delta.distance);
       }
     }
-    final double size = (closest.isFinite ? closest * 0.92 : box.shortestSide * 0.4)
-        .clamp(_minItem, _maxItem);
+    final double size =
+        (closest.isFinite ? closest * 0.92 : box.shortestSide * 0.4)
+            .clamp(_minItem, _maxItem);
     return _SceneLayout(
       centres: normalized
           .map((Offset p) => Offset(p.dx * box.width, p.dy * box.height))
@@ -362,7 +364,8 @@ class _CountingScene extends StatelessWidget {
         return _freeLayout(
           List<Offset>.generate(count, (int index) {
             final double x = 0.15 + (index % 4) * 0.23;
-            final double y = 0.28 + (index ~/ 4) * 0.3 + (index.isEven ? 0 : 0.1);
+            final double y =
+                0.28 + (index ~/ 4) * 0.3 + (index.isEven ? 0 : 0.1);
             return Offset(x, y.clamp(0.18, 0.82));
           }),
           box,
@@ -418,7 +421,8 @@ class _CountingScene extends StatelessWidget {
 }
 
 /// Identifies the countable object at [index] within the scene.
-ValueKey<String> countableKey(int index) => ValueKey<String>('countable_$index');
+ValueKey<String> countableKey(int index) =>
+    ValueKey<String>('countable_$index');
 
 /// Identifies the control that starts the count over.
 const ValueKey<String> countResetKey = ValueKey<String>('count_reset');
@@ -574,7 +578,8 @@ class _NumeralPad extends StatelessWidget {
                   // Options removed by the ladder stay in place and fade.
                   // Removing them would reflow the row under a finger already
                   // in motion.
-                  isLive: live.isEmpty || live.contains(step.optionIdFor(value)),
+                  isLive:
+                      live.isEmpty || live.contains(step.optionIdFor(value)),
                   isHighlighted: highlight == step.optionIdFor(value),
                   onTap: () => onPick(value),
                 ),

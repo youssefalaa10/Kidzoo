@@ -126,10 +126,9 @@ class _AdventureRewardOverlayState extends State<AdventureRewardOverlay>
       builder: (BuildContext context, BoxConstraints constraints) {
         final Size box = Size(constraints.maxWidth, constraints.maxHeight);
         final Offset start = Offset(box.width / 2, box.height * 0.42);
-        final Offset end = widget.destination ??
-            Offset(box.width / 2, -box.height * 0.08);
-        final double pageSize =
-            (box.shortestSide * 0.46).clamp(120.0, 260.0);
+        final Offset end =
+            widget.destination ?? Offset(box.width / 2, -box.height * 0.08);
+        final double pageSize = (box.shortestSide * 0.46).clamp(120.0, 260.0);
 
         return GestureDetector(
           // Skippable. The fifth time through, a child who wants to get on with
@@ -144,9 +143,8 @@ class _AdventureRewardOverlayState extends State<AdventureRewardOverlay>
             animation: _controller,
             builder: (BuildContext context, Widget? _) {
               final double travel = _travel.value;
-              final Offset centre = Offset.lerp(start, end, travel)!;
-              final double scale =
-                  _arrive.value * (1 - travel) + travel * 0.22;
+              final Offset? centre = Offset.lerp(start, end, travel);
+              final double scale = _arrive.value * (1 - travel) + travel * 0.22;
 
               return Stack(
                 clipBehavior: Clip.none,
@@ -176,8 +174,8 @@ class _AdventureRewardOverlayState extends State<AdventureRewardOverlay>
                       ),
                     ),
                   Positioned(
-                    left: centre.dx - pageSize / 2,
-                    top: centre.dy - pageSize / 2,
+                    left: centre?.dx ?? 0 - pageSize / 2,
+                    top: centre!.dy - pageSize / 2,
                     child: Transform.scale(
                       scale: scale.clamp(0.0, 1.35),
                       child: SizedBox(

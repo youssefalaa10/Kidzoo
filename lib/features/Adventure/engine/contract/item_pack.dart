@@ -14,7 +14,8 @@ class PackItem {
 
   factory PackItem.fromJson(Map<String, dynamic> json, String packId) {
     final JsonReader reader = JsonReader(json, 'packs/$packId.items');
-    final Map<String, dynamic>? rawAttributes = reader.optionalMap('attributes');
+    final Map<String, dynamic>? rawAttributes =
+        reader.optionalMap('attributes');
     return PackItem(
       id: reader.requireString('id'),
       imageAsset: reader.requireString('image'),
@@ -23,7 +24,8 @@ class PackItem {
       attributes: rawAttributes == null
           ? const <String, String>{}
           : rawAttributes.map(
-              (String key, Object? value) => MapEntry<String, String>(key, '$value'),
+              (String key, Object? value) =>
+                  MapEntry<String, String>(key, '$value'),
             ),
     );
   }
@@ -58,7 +60,8 @@ class ItemPack {
         .map((Map<String, dynamic> item) => PackItem.fromJson(item, packId))
         .toList(growable: false);
     if (items.isEmpty) {
-      throw ActivityContentException('packs/$packId.items', 'pack has no items');
+      throw ActivityContentException(
+          'packs/$packId.items', 'pack has no items');
     }
     return ItemPack(packId: packId, items: items);
   }

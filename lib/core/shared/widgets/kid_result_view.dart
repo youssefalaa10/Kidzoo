@@ -77,94 +77,96 @@ class _KidResultViewState extends State<KidResultView> {
           // works against an explicit minimum: fills the screen when it fits,
           // scrolls when it does not.
           child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: m.height - m.pagePadding * 2),
+            constraints:
+                BoxConstraints(minHeight: m.height - m.pagePadding * 2),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-              SizedBox(height: m.gap),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(3, (index) {
-                  final earned = index < stars;
-                  final star = Icon(
-                    earned ? Icons.star_rounded : Icons.star_border_rounded,
-                    size: starSize * (index == 1 ? 1.2 : 1.0),
-                    color: earned ? KidUi.hint : Colors.white70,
-                  );
-                  if (!earned) return star;
-                  return star
-                      .animate(delay: Duration(milliseconds: 250 * index))
-                      .scale(
-                        duration: 500.ms,
-                        curve: Curves.elasticOut,
-                        begin: const Offset(0.2, 0.2),
-                      );
-                }),
-              ),
-              SizedBox(height: m.gap),
-              Text(
-                widget.title ?? l10n.levelComplete,
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: m.size(34, min: 24, max: 44),
-                  fontWeight: FontWeight.w900,
-                  color: Colors.white,
-                  shadows: KidUi.textHalo,
+                SizedBox(height: m.gap),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(3, (index) {
+                    final earned = index < stars;
+                    final star = Icon(
+                      earned ? Icons.star_rounded : Icons.star_border_rounded,
+                      size: starSize * (index == 1 ? 1.2 : 1.0),
+                      color: earned ? KidUi.hint : Colors.white70,
+                    );
+                    if (!earned) return star;
+                    return star
+                        .animate(delay: Duration(milliseconds: 250 * index))
+                        .scale(
+                          duration: 500.ms,
+                          curve: Curves.elasticOut,
+                          begin: const Offset(0.2, 0.2),
+                        );
+                  }),
                 ),
-              ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.3),
-              SizedBox(height: m.gap * 0.6),
-              Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: m.size(24, min: 16, max: 32),
-                  vertical: m.size(12, min: 8, max: 18),
-                ),
-                decoration: BoxDecoration(
-                  color: KidUi.surface,
-                  borderRadius: BorderRadius.circular(KidUi.radiusPill),
-                  boxShadow: KidUi.shadow(KidUi.hint),
-                ),
-                child: Text(
-                  '${l10n.finalScore}  ${widget.score}',
+                SizedBox(height: m.gap),
+                Text(
+                  widget.title ?? l10n.levelComplete,
+                  textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: m.size(24, min: 17, max: 30),
+                    fontSize: m.size(34, min: 24, max: 44),
                     fontWeight: FontWeight.w900,
-                    color: KidUi.ink,
+                    color: Colors.white,
+                    shadows: KidUi.textHalo,
                   ),
+                ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.3),
+                SizedBox(height: m.gap * 0.6),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: m.size(24, min: 16, max: 32),
+                    vertical: m.size(12, min: 8, max: 18),
+                  ),
+                  decoration: BoxDecoration(
+                    color: KidUi.surface,
+                    borderRadius: BorderRadius.circular(KidUi.radiusPill),
+                    boxShadow: KidUi.shadow(KidUi.hint),
+                  ),
+                  child: Text(
+                    '${l10n.finalScore}  ${widget.score}',
+                    style: TextStyle(
+                      fontSize: m.size(24, min: 17, max: 30),
+                      fontWeight: FontWeight.w900,
+                      color: KidUi.ink,
+                    ),
+                  ),
+                ).animate(delay: 300.ms).fadeIn().scale(
+                      begin: const Offset(0.8, 0.8),
+                      curve: Curves.easeOutBack,
+                    ),
+                SizedBox(height: m.gap * 1.5),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: m.gap,
+                  runSpacing: m.gap,
+                  children: [
+                    _BigButton(
+                      metrics: m,
+                      label: l10n.playAgain,
+                      icon: Icons.replay_rounded,
+                      background: KidUi.correct,
+                      onTap: () {
+                        KidHaptics.tap();
+                        widget.onPlayAgain();
+                      },
+                    ).animate(delay: 450.ms).fadeIn().slideY(begin: 0.4),
+                    _BigButton(
+                      metrics: m,
+                      label: l10n.exit,
+                      icon: Icons.home_rounded,
+                      background: KidUi.surface,
+                      foreground: KidUi.ink,
+                      onTap: () {
+                        KidHaptics.tap();
+                        (widget.onExit ??
+                            () => Navigator.of(context).maybePop())();
+                      },
+                    ).animate(delay: 550.ms).fadeIn().slideY(begin: 0.4),
+                  ],
                 ),
-              ).animate(delay: 300.ms).fadeIn().scale(
-                    begin: const Offset(0.8, 0.8),
-                    curve: Curves.easeOutBack,
-                  ),
-              SizedBox(height: m.gap * 1.5),
-              Wrap(
-                alignment: WrapAlignment.center,
-                spacing: m.gap,
-                runSpacing: m.gap,
-                children: [
-                  _BigButton(
-                    metrics: m,
-                    label: l10n.playAgain,
-                    icon: Icons.replay_rounded,
-                    background: KidUi.correct,
-                    onTap: () {
-                      KidHaptics.tap();
-                      widget.onPlayAgain();
-                    },
-                  ).animate(delay: 450.ms).fadeIn().slideY(begin: 0.4),
-                  _BigButton(
-                    metrics: m,
-                    label: l10n.exit,
-                    icon: Icons.home_rounded,
-                    background: KidUi.surface,
-                    foreground: KidUi.ink,
-                    onTap: () {
-                      KidHaptics.tap();
-                      (widget.onExit ?? () => Navigator.of(context).maybePop())();
-                    },
-                  ).animate(delay: 550.ms).fadeIn().slideY(begin: 0.4),
-                ],
-              ),
-              SizedBox(height: m.gap),
+                SizedBox(height: m.gap),
               ],
             ),
           ),
@@ -235,7 +237,8 @@ class _BigButton extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(KidUi.radiusPill),
         child: Container(
-          constraints: BoxConstraints(minHeight: metrics.size(60, min: 52, max: 72)),
+          constraints:
+              BoxConstraints(minHeight: metrics.size(60, min: 52, max: 72)),
           padding: EdgeInsets.symmetric(
             horizontal: metrics.size(28, min: 20, max: 36),
           ),

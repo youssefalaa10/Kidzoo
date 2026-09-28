@@ -38,7 +38,8 @@ class MotivationalQuoteCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          const Icon(Icons.rocket_launch_rounded, color: Colors.white, size: 32),
+          const Icon(Icons.rocket_launch_rounded,
+              color: Colors.white, size: 32),
           const SizedBox(width: 14),
           Expanded(
             child: AnimatedSwitcher(
@@ -46,7 +47,8 @@ class MotivationalQuoteCard extends StatelessWidget {
               transitionBuilder: (child, animation) => FadeTransition(
                 opacity: animation,
                 child: SlideTransition(
-                  position: Tween<Offset>(begin: const Offset(0, 0.15), end: Offset.zero)
+                  position: Tween<Offset>(
+                          begin: const Offset(0, 0.15), end: Offset.zero)
                       .animate(animation),
                   child: child,
                 ),
@@ -75,7 +77,8 @@ class MotivationalQuoteCard extends StatelessWidget {
                 onTap: onRefresh,
                 child: const Padding(
                   padding: EdgeInsets.all(10),
-                  child: Icon(Icons.refresh_rounded, color: Colors.white, size: 22),
+                  child: Icon(Icons.refresh_rounded,
+                      color: Colors.white, size: 22),
                 ),
               ),
             ),

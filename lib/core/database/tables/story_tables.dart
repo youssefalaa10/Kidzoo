@@ -15,7 +15,8 @@ class StoryNodeProgress extends Table {
   ///
   /// There is deliberately no `failed`. Every child who reaches the last step
   /// of an activity completes it, so the story can never stall on performance.
-  TextColumn get completion => text().withDefault(const Constant('completed'))();
+  TextColumn get completion =>
+      text().withDefault(const Constant('completed'))();
 
   /// Mastery signals. They feed the parent report and the adaptive nudge, and
   /// they **never** branch the narrative.

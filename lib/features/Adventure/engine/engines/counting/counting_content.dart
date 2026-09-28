@@ -119,7 +119,8 @@ class CountingContent extends ActivityContent {
 /// `countRange`, `layout` — never a difficulty tier. "Medium counting" would
 /// have to encode both how many things there are *and* how they are arranged,
 /// and those two ladders are independent.
-CountingContent parseCountingContent(ActivitySpec spec, ItemPackResolver packs) {
+CountingContent parseCountingContent(
+    ActivitySpec spec, ItemPackResolver packs) {
   final JsonReader reader = spec.payloadReader;
   final String path = '${spec.sourcePath} > payload';
 

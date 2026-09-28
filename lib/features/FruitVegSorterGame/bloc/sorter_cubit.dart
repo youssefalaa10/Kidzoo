@@ -7,11 +7,11 @@ import 'package:flutter_tts/flutter_tts.dart';
 import '../../../core/database/config.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../data/sorter_data.dart';
 import '../data/sorter_models.dart';
 import 'sorter_state.dart';
-import '../../../core/helpers/speech.dart';
 
 /// Points for a round solved first try. Mistakes cost a little but never zero,
 /// so a struggling child still sees the score move.
@@ -144,8 +144,8 @@ class SorterGameCubit extends Cubit<SorterGameState> {
   }
 
   Future<void> _resolve(FoodItem food, FoodType basketType) async {
-    final data = state.roundData!;
-    final isRightFood = food.id == data.targetFood.id;
+    final data = state.roundData;
+    final isRightFood = food.id == data!.targetFood.id;
     final isRightBasket = basketType == food.type;
 
     if (isRightFood && isRightBasket) {
@@ -170,7 +170,11 @@ class SorterGameCubit extends Cubit<SorterGameState> {
     ));
 
     await _playSound('audio/success.mp3');
-    final phrases = [l10n.sorterGreatJob, l10n.sorterExcellent, l10n.sorterFantastic];
+    final phrases = [
+      l10n.sorterGreatJob,
+      l10n.sorterExcellent,
+      l10n.sorterFantastic
+    ];
     await _speak(phrases[_random.nextInt(phrases.length)]);
 
     await Future<void>.delayed(const Duration(milliseconds: 1400));

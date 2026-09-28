@@ -114,9 +114,8 @@ class _ArabicVoiceSectionState extends State<ArabicVoiceSection> {
         ),
         _Row(
           label: l10n.ttsVoiceLabel,
-          value: voice == null
-              ? l10n.ttsNone
-              : '${voice.name}  (${voice.locale})',
+          value:
+              voice == null ? l10n.ttsNone : '${voice.name}  (${voice.locale})',
         ),
         _Row(
           label: l10n.ttsEgyptianLabel,
@@ -212,7 +211,7 @@ class _StatusBanner extends StatelessWidget {
           Expanded(
             child: Text(
               message,
-              style: TextStyle(
+              style: const TextStyle(
                 color: KidUi.ink,
                 fontWeight: FontWeight.w700,
                 fontSize: 14,

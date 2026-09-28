@@ -302,9 +302,7 @@ class _ContinueButton extends StatelessWidget {
               // The arrow follows the reading direction, so "onward" points
               // the way the child's eye already travels.
               Icon(
-                isRtl
-                    ? Icons.arrow_back_rounded
-                    : Icons.arrow_forward_rounded,
+                isRtl ? Icons.arrow_back_rounded : Icons.arrow_forward_rounded,
                 color: Colors.white,
                 size: metrics.size(22, min: 18, max: 28),
               ),

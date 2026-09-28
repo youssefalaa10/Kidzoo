@@ -134,7 +134,7 @@ class AdventureContentLoader {
       throw ActivityContentException(
           relativePath, 'expected a JSON object at the top level');
     }
-    return decoded
-        .map((Object? key, Object? value) => MapEntry<String, dynamic>('$key', value));
+    return decoded.map((Object? key, Object? value) =>
+        MapEntry<String, dynamic>('$key', value));
   }
 }

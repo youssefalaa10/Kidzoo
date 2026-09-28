@@ -6,10 +6,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../core/database/config.dart';
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../data/fruits_game_engine.dart';
 import 'widgets/conveyor_belt.dart';
-import '../../../core/helpers/speech.dart';
 
 class FruitsGameScreen extends StatefulWidget {
   const FruitsGameScreen({super.key});
@@ -21,7 +21,7 @@ class FruitsGameScreen extends StatefulWidget {
 class _FruitsGameScreenState extends State<FruitsGameScreen> {
   late final FruitsGameEngine _engine;
   bool _isLoading = true;
-  
+
   bool _isFrozen = false;
   FruitItem? _successFruit;
   FruitItem? _shakingFruit;
@@ -43,7 +43,7 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
     });
 
     await _engine.initialize();
-    
+
     if (mounted) {
       setState(() {
         _isLoading = false;
@@ -61,10 +61,10 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
     _isFrozen = false;
     _successFruit = null;
     _shakingFruit = null;
-    
+
     _engine.nextQuestion();
     _engine.generatePrompt(AppLocalizations.of(context));
-    
+
     setState(() {});
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -156,12 +156,13 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
       final audioPlayer = context.read<AudioPlayer>();
       audioPlayer.play(AssetSource('audio/wrong.mp3'));
     } catch (_) {}
-    
+
     Future.delayed(const Duration(milliseconds: 1000), () {
       if (mounted) {
         setState(() {
           _isFrozen = false;
-          _engine.currentOptions = List.from(_engine.currentOptions)..shuffle(_engine.random);
+          _engine.currentOptions = List.from(_engine.currentOptions)
+            ..shuffle(_engine.random);
         });
         _speakPrompt();
       }
@@ -191,7 +192,8 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
           const SizedBox(height: 10),
           Text(
             l10n.excellent,
-            style: const TextStyle(fontSize: 32, color: Colors.green, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+                fontSize: 32, color: Colors.green, fontWeight: FontWeight.w600),
           ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.3),
           const SizedBox(height: 40),
           ElevatedButton.icon(
@@ -200,7 +202,8 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
             label: Text(l10n.playAgain, style: const TextStyle(fontSize: 24)),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
             ),
@@ -209,7 +212,10 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(l10n.backToCategories,
-                style: TextStyle(fontSize: 20, color: Colors.orange[700], fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.orange[700],
+                    fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -227,34 +233,42 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.black54, size: 32),
+                icon: const Icon(Icons.arrow_back_ios,
+                    color: Colors.black54, size: 32),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               Expanded(
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                        BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2)),
                       ],
                     ),
                     child: Text(
                       '${_engine.currentProgress} / ${_engine.totalQuestions}',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.orange),
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.orange),
                     ),
                   ),
                 ),
               ),
-              const SizedBox(width: 32), // Balance the back button without pushing too hard
+              const SizedBox(
+                  width:
+                      32), // Balance the back button without pushing too hard
             ],
           ),
         ),
-        
         const SizedBox(height: 20),
-
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 20),
           child: Container(
@@ -263,7 +277,10 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
               color: Colors.white.withValues(alpha: 0.9),
               borderRadius: BorderRadius.circular(24),
               boxShadow: const [
-                BoxShadow(color: Colors.black12, blurRadius: 10, offset: Offset(0, 5)),
+                BoxShadow(
+                    color: Colors.black12,
+                    blurRadius: 10,
+                    offset: Offset(0, 5)),
               ],
             ),
             child: Text(
@@ -275,11 +292,12 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
                 color: Colors.orange[800],
               ),
             ),
-          ).animate(key: ValueKey(_engine.currentPrompt)).fadeIn(duration: 400.ms).scale(curve: Curves.easeOutBack),
+          )
+              .animate(key: ValueKey(_engine.currentPrompt))
+              .fadeIn(duration: 400.ms)
+              .scale(curve: Curves.easeOutBack),
         ),
-
         const SizedBox(height: 10),
-
         Expanded(
           child: ConveyorBelt(
             fruits: _engine.currentOptions,
@@ -297,7 +315,6 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
             onBeltFinished: _handleBeltFinished,
           ),
         ),
-        
         const SizedBox(height: 20),
       ],
     );
@@ -311,12 +328,14 @@ class _FruitsGameScreenState extends State<FruitsGameScreen> {
       backgroundColor: const Color(0xfffff8e1),
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.orange))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.orange))
             : _gameComplete
                 ? _buildCompletionScreen(l10n)
                 : LayoutBuilder(
                     builder: (context, constraints) {
-                      final isLandscape = constraints.maxWidth > constraints.maxHeight;
+                      final isLandscape =
+                          constraints.maxWidth > constraints.maxHeight;
                       return _buildGameLayout(l10n, isLandscape);
                     },
                   ),

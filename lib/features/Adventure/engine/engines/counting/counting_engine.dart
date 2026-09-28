@@ -26,13 +26,15 @@ class CountingEngine extends ActivityEngine<CountingContent> {
         learningDomains: <LearningDomain>{LearningDomain.counting},
         interactionModes: <InteractionMode>{InteractionMode.stateQuantity},
         contentParameters: <ContentParameter>[
-          ContentParameter.enumeration('mode', <String>['countAndPick', 'giveN'],
+          ContentParameter.enumeration(
+              'mode', <String>['countAndPick', 'giveN'],
               description: 'countAndPick asks "how many"; giveN asks the child '
                   'to produce a set, which is the real cardinality test'),
           ContentParameter.integer('targetCount',
               minValue: 1,
               maxValue: 10,
-              description: 'a fixed count, when the number matters to the story'),
+              description:
+                  'a fixed count, when the number matters to the story'),
           ContentParameter.list('countRange',
               description: '[min, max] when the count may vary per round'),
           ContentParameter.enumeration(

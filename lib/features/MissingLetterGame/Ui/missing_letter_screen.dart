@@ -10,13 +10,13 @@ import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
 import 'package:kidzo/features/MissingLetterGame/Data/Model/word_model.dart';
 
+import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
 import '../../../core/shared/style/kid_ui.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
 import '../../../shared/widgets/game_exit_button.dart';
-import '../../../core/helpers/speech.dart';
 
 class MissingLetterScreen extends StatefulWidget {
   const MissingLetterScreen({super.key});
@@ -137,7 +137,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                   decoration: BoxDecoration(
                     image: DecorationImage(
                       image: AssetImage(
-                          BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+                          BackgroundResolver(context, BackgroundType.game)
+                              .resolveBackground()!),
                       fit: BoxFit.cover,
                     ),
                   ),
@@ -149,7 +150,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                       builder: (context, constraints) {
                         final availableHeight = constraints.maxHeight;
                         final availableWidth = constraints.maxWidth;
-                        final verticalGap = (availableHeight * 0.03).clamp(8.0, 28.0);
+                        final verticalGap =
+                            (availableHeight * 0.03).clamp(8.0, 28.0);
 
                         // A new word clears the per-word UI state. The word
                         // itself is not spoken here - that would give the
@@ -173,15 +175,18 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
 
                         return SingleChildScrollView(
                           padding: EdgeInsets.symmetric(
-                            horizontal: (availableWidth * 0.05).clamp(12.0, 32.0),
+                            horizontal:
+                                (availableWidth * 0.05).clamp(12.0, 32.0),
                             vertical: verticalGap,
                           ),
                           child: Column(
                             children: [
                               SizedBox(height: verticalGap),
-                              _buildWordCard(context, state, word, isArabic, availableWidth, availableHeight),
+                              _buildWordCard(context, state, word, isArabic,
+                                  availableWidth, availableHeight),
                               SizedBox(height: verticalGap * 1.5),
-                              _buildLetterOptions(context, gameCubit, state, word, availableWidth),
+                              _buildLetterOptions(context, gameCubit, state,
+                                  word, availableWidth),
                             ],
                           ),
                         );
@@ -192,14 +197,16 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 if (state.isCorrect)
                   _buildFloatingFeedback(
                     context,
-                    text: l10n.positiveFeedbackMessages[state.positiveFeedbackIndex],
+                    text: l10n
+                        .positiveFeedbackMessages[state.positiveFeedbackIndex],
                     color: Colors.green,
                     icon: Icons.check_circle,
                   ),
                 if (state.isIncorrect)
                   _buildFloatingFeedback(
                     context,
-                    text: l10n.gentleFeedbackMessages[state.negativeFeedbackIndex],
+                    text: l10n
+                        .gentleFeedbackMessages[state.negativeFeedbackIndex],
                     color: Colors.redAccent,
                     icon: Icons.favorite,
                   ),
@@ -234,7 +241,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 fontSize: titleSize,
                 color: Colors.white,
                 shadows: const [
-                  Shadow(color: Colors.black26, offset: Offset(1, 1), blurRadius: 3),
+                  Shadow(
+                      color: Colors.black26,
+                      offset: Offset(1, 1),
+                      blurRadius: 3),
                 ],
               ),
             ),
@@ -247,7 +257,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
           label: l10n.currentLevelShort(state.currentLevel),
         ),
         const SizedBox(width: 8),
-        _HeaderChip(icon: Icons.star_rounded, label: '${state.score}', iconColor: Colors.amber),
+        _HeaderChip(
+            icon: Icons.star_rounded,
+            label: '${state.score}',
+            iconColor: Colors.amber),
         const SizedBox(width: 12),
       ],
     );
@@ -280,8 +293,7 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             ),
             const SizedBox(width: 10),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 5),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(KidUi.radiusPill),
@@ -311,7 +323,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             constraints: BoxConstraints(maxWidth: min(availableWidth, 560)),
             child: Container(
               width: double.infinity,
-              padding: EdgeInsets.all((availableWidth * 0.05).clamp(14.0, 24.0)),
+              padding:
+                  EdgeInsets.all((availableWidth * 0.05).clamp(14.0, 24.0)),
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(32),
@@ -330,7 +343,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   ConstrainedBox(
-                    constraints: BoxConstraints(maxHeight: (availableHeight * 0.22).clamp(90.0, 180.0)),
+                    constraints: BoxConstraints(
+                        maxHeight: (availableHeight * 0.22).clamp(90.0, 180.0)),
                     child: AspectRatio(
                       aspectRatio: 1.4,
                       child: Container(
@@ -342,7 +356,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                         child: Image.asset(word.imagePath, fit: BoxFit.contain),
                       ),
                     ),
-                  ).animate().scale(delay: 200.ms, duration: 500.ms, curve: Curves.easeOutBack),
+                  ).animate().scale(
+                      delay: 200.ms,
+                      duration: 500.ms,
+                      curve: Curves.easeOutBack),
                   SizedBox(height: (availableHeight * 0.02).clamp(8.0, 16.0)),
                   // An opt-in clue: the child chooses to hear the word.
                   Semantics(
@@ -373,7 +390,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                       final maxWidth = constraints.maxWidth;
                       final fontSize =
                           (maxWidth / letterCount * 0.55).clamp(20.0, 46.0);
-                      final gap = (maxWidth / letterCount * 0.08).clamp(2.0, 8.0);
+                      final gap =
+                          (maxWidth / letterCount * 0.08).clamp(2.0, 8.0);
 
                       return Wrap(
                         alignment: WrapAlignment.center,
@@ -384,23 +402,29 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                           final isFilled = filledLetter != null;
                           final isActive = isMissing &&
                               !isFilled &&
-                              word.missingIndices.indexOf(index) == state.activeMissingPosition;
+                              word.missingIndices.indexOf(index) ==
+                                  state.activeMissingPosition;
 
                           final Widget tile = Container(
                             margin: EdgeInsets.symmetric(horizontal: gap / 2),
-                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 8),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 4, vertical: 8),
                             decoration: BoxDecoration(
                               border: Border(
                                 bottom: BorderSide(
                                   color: isMissing
-                                      ? (isFilled ? Colors.green : Colors.orange)
+                                      ? (isFilled
+                                          ? Colors.green
+                                          : Colors.orange)
                                       : Colors.transparent,
                                   width: 4,
                                 ),
                               ),
                             ),
                             child: Text(
-                              isMissing ? (isFilled ? filledLetter : '_') : word.word[index],
+                              isMissing
+                                  ? (isFilled ? filledLetter : '_')
+                                  : word.word[index],
                               style: GoogleFonts.comicNeue(
                                 fontSize: fontSize,
                                 fontWeight: FontWeight.bold,
@@ -413,7 +437,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
 
                           final Widget pulsing = isActive
                               ? tile
-                                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                                  .animate(
+                                      onPlay: (c) => c.repeat(reverse: true))
                                   .scale(
                                     begin: const Offset(1, 1),
                                     end: const Offset(1.12, 1.12),
@@ -426,7 +451,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                             return AnimatedBuilder(
                               animation: _letterBounceController,
                               builder: (context, child) => Transform.scale(
-                                scale: Curves.elasticOut.transform(_letterBounceController.value),
+                                scale: Curves.elasticOut
+                                    .transform(_letterBounceController.value),
                                 child: child,
                               ),
                               child: tile,
@@ -522,7 +548,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 child: FittedBox(
                   child: Text(
                     option,
-                    style: GoogleFonts.daiBannaSil(fontSize: tileSize * 0.45, color: Colors.white),
+                    style: GoogleFonts.daiBannaSil(
+                        fontSize: tileSize * 0.45, color: Colors.white),
                   ),
                 ),
               ),
@@ -530,7 +557,9 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
           ),
         )
             .animate()
-            .fadeIn(delay: Duration(milliseconds: 80 * index), duration: const Duration(milliseconds: 350))
+            .fadeIn(
+                delay: Duration(milliseconds: 80 * index),
+                duration: const Duration(milliseconds: 350))
             .slideY(
               begin: 0.4,
               end: 0,
@@ -559,7 +588,12 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             decoration: BoxDecoration(
               color: color,
               borderRadius: BorderRadius.circular(16),
-              boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 10, offset: const Offset(0, 4))],
+              boxShadow: [
+                BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4))
+              ],
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
@@ -569,12 +603,19 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 Flexible(
                   child: Text(
                     text,
-                    style: GoogleFonts.nunito(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                    style: GoogleFonts.nunito(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white),
                   ),
                 ),
               ],
             ),
-          ).animate().slideY(begin: -0.5, end: 0, duration: const Duration(milliseconds: 350), curve: Curves.easeOutBack),
+          ).animate().slideY(
+              begin: -0.5,
+              end: 0,
+              duration: const Duration(milliseconds: 350),
+              curve: Curves.easeOutBack),
         ),
       ),
     );
@@ -594,7 +635,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             const SizedBox(height: 10),
             Text(
               l10n.congratulations,
-              style: GoogleFonts.nunito(fontSize: 24, fontWeight: FontWeight.bold),
+              style:
+                  GoogleFonts.nunito(fontSize: 24, fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -609,14 +651,20 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             const SizedBox(height: 20),
             Container(
               padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(color: Colors.amber.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: Colors.amber.shade50,
+                  borderRadius: BorderRadius.circular(12)),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(l10n.finalScore, style: GoogleFonts.nunito(fontSize: 16)),
+                  Text(l10n.finalScore,
+                      style: GoogleFonts.nunito(fontSize: 16)),
                   Text(
                     '${state.score}',
-                    style: GoogleFonts.nunito(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.amber.shade700),
+                    style: GoogleFonts.nunito(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.amber.shade700),
                   ),
                 ],
               ),
@@ -640,9 +688,11 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text(l10n.playAgain, style: GoogleFonts.nunito(fontSize: 16)),
+            child:
+                Text(l10n.playAgain, style: GoogleFonts.nunito(fontSize: 16)),
           ),
         ],
       ),
@@ -659,28 +709,39 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Icon(Icons.pause_circle_outline, color: Colors.orange, size: 32),
+            const Icon(Icons.pause_circle_outline,
+                color: Colors.orange, size: 32),
             const SizedBox(width: 12),
-            Text(l10n.pauseGame, style: GoogleFonts.nunito(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(l10n.pauseGame,
+                style: GoogleFonts.nunito(
+                    fontSize: 22, fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(l10n.doYouWantToExit, style: GoogleFonts.nunito(fontSize: 16), textAlign: TextAlign.center),
+            Text(l10n.doYouWantToExit,
+                style: GoogleFonts.nunito(fontSize: 16),
+                textAlign: TextAlign.center),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(12)),
+              decoration: BoxDecoration(
+                  color: Colors.blue.shade50,
+                  borderRadius: BorderRadius.circular(12)),
               child: Column(
                 children: [
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.currentScore, style: GoogleFonts.nunito(fontSize: 14)),
+                      Text(l10n.currentScore,
+                          style: GoogleFonts.nunito(fontSize: 14)),
                       Text(
                         '${state.score}',
-                        style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+                        style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700),
                       ),
                     ],
                   ),
@@ -688,10 +749,14 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text(l10n.progress, style: GoogleFonts.nunito(fontSize: 14)),
+                      Text(l10n.progress,
+                          style: GoogleFonts.nunito(fontSize: 14)),
                       Text(
                         '${state.completedWords}/${state.totalWords}',
-                        style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.blue.shade700),
+                        style: GoogleFonts.nunito(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue.shade700),
                       ),
                     ],
                   ),
@@ -701,7 +766,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             const SizedBox(height: 12),
             Text(
               l10n.yourProgressWillBeSaved,
-              style: GoogleFonts.nunito(fontSize: 12, color: Colors.grey.shade600, fontStyle: FontStyle.italic),
+              style: GoogleFonts.nunito(
+                  fontSize: 12,
+                  color: Colors.grey.shade600,
+                  fontStyle: FontStyle.italic),
               textAlign: TextAlign.center,
             ),
           ],
@@ -709,7 +777,9 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
         actions: [
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
-            child: Text(l10n.resume, style: GoogleFonts.nunito(fontSize: 16, fontWeight: FontWeight.bold)),
+            child: Text(l10n.resume,
+                style: GoogleFonts.nunito(
+                    fontSize: 16, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -717,11 +787,13 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.exit_to_app),
-            label: Text(l10n.exitAndSave, style: GoogleFonts.nunito(fontSize: 16)),
+            label:
+                Text(l10n.exitAndSave, style: GoogleFonts.nunito(fontSize: 16)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           ),
         ],
@@ -731,7 +803,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
 }
 
 class _HeaderChip extends StatelessWidget {
-  const _HeaderChip({required this.icon, required this.label, this.iconColor = Colors.white});
+  const _HeaderChip(
+      {required this.icon, required this.label, this.iconColor = Colors.white});
 
   final IconData icon;
   final String label;
@@ -752,7 +825,8 @@ class _HeaderChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.nunito(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.nunito(
+                fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
           ),
         ],
       ),

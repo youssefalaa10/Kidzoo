@@ -90,7 +90,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
       body: Container(
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game)
+                .resolveBackground()!),
             fit: BoxFit.cover,
           ),
         ),
@@ -98,156 +99,157 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
           child: FluidContainer(
             padding: EdgeInsets.zero,
             child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                // Back button and language toggle
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.arrow_back_ios_new,
-                          color: Colors.white),
-                    ),
-                    IconButton(
-                      onPressed: () => _showLanguageDialog(context),
-                      icon: const Icon(Icons.language, color: Colors.white),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                // Title
-                Center(
-                  child: Text(
-                    l10n.missingLetter,
-                    style: GoogleFonts.daiBannaSil(
-                      fontSize: 42,
-                      color: Colors.white,
-                      shadows: [
-                        const Shadow(
-                          color: Colors.black26,
-                          offset: Offset(2, 2),
-                          blurRadius: 4,
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10),
-                Center(
-                  child: Text(
-                    l10n.learnTheAlphabet,
-                    style: GoogleFonts.nunito(
-                      fontSize: 18,
-                      color: Colors.white.withValues(alpha: 0.9),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 40),
-                // Stats Container
-                Container(
-                  padding: const EdgeInsets.all(24),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  // Back button and language toggle
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: () => Navigator.pop(context),
+                        icon: const Icon(Icons.arrow_back_ios_new,
+                            color: Colors.white),
+                      ),
+                      IconButton(
+                        onPressed: () => _showLanguageDialog(context),
+                        icon: const Icon(Icons.language, color: Colors.white),
                       ),
                     ],
                   ),
-                  child: Column(
-                    children: [
-                      Text(
-                        l10n.yourProgress,
-                        style: GoogleFonts.nunito(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF6C63FF),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildStatItem(
-                            icon: Icons.emoji_events,
-                            label: l10n.bestScore,
-                            value: '$_bestScore',
-                            color: Colors.amber,
-                          ),
-                          Container(
-                            width: 1,
-                            height: 50,
-                            color: Colors.grey.shade300,
-                          ),
-                          _buildStatItem(
-                            icon: Icons.check_circle,
-                            label: l10n.completed,
-                            value: '$_completedWords/${WordList.getTotalWords()}',
-                            color: Colors.green,
+                  const SizedBox(height: 20),
+                  // Title
+                  Center(
+                    child: Text(
+                      l10n.missingLetter,
+                      style: GoogleFonts.daiBannaSil(
+                        fontSize: 42,
+                        color: Colors.white,
+                        shadows: [
+                          const Shadow(
+                            color: Colors.black26,
+                            offset: Offset(2, 2),
+                            blurRadius: 4,
                           ),
                         ],
                       ),
-                      if (_hasProgress) ...[
-                        const SizedBox(height: 20),
-                        Container(
-                          padding: const EdgeInsets.all(12),
-                          decoration: BoxDecoration(
-                            color: Colors.blue.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                l10n.currentScore,
-                                style: GoogleFonts.nunito(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              Text(
-                                '$_currentScore',
-                                style: GoogleFonts.nunito(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue.shade700,
-                                ),
-                              ),
-                            ],
-                          ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      l10n.learnTheAlphabet,
+                      style: GoogleFonts.nunito(
+                        fontSize: 18,
+                        color: Colors.white.withValues(alpha: 0.9),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 40),
+                  // Stats Container
+                  Container(
+                    padding: const EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.1),
+                          blurRadius: 20,
+                          offset: const Offset(0, 10),
                         ),
                       ],
-                    ],
+                    ),
+                    child: Column(
+                      children: [
+                        Text(
+                          l10n.yourProgress,
+                          style: GoogleFonts.nunito(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF6C63FF),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            _buildStatItem(
+                              icon: Icons.emoji_events,
+                              label: l10n.bestScore,
+                              value: '$_bestScore',
+                              color: Colors.amber,
+                            ),
+                            Container(
+                              width: 1,
+                              height: 50,
+                              color: Colors.grey.shade300,
+                            ),
+                            _buildStatItem(
+                              icon: Icons.check_circle,
+                              label: l10n.completed,
+                              value:
+                                  '$_completedWords/${WordList.getTotalWords()}',
+                              color: Colors.green,
+                            ),
+                          ],
+                        ),
+                        if (_hasProgress) ...[
+                          const SizedBox(height: 20),
+                          Container(
+                            padding: const EdgeInsets.all(12),
+                            decoration: BoxDecoration(
+                              color: Colors.blue.shade50,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  l10n.currentScore,
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '$_currentScore',
+                                  style: GoogleFonts.nunito(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.blue.shade700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
                   ),
-                ),
-                const Spacer(),
-                // Action Buttons
-                if (_hasProgress)
+                  const Spacer(),
+                  // Action Buttons
+                  if (_hasProgress)
+                    _buildButton(
+                      label: l10n.continueGame,
+                      icon: Icons.play_arrow_rounded,
+                      colors: const [Color(0xFF4CAF50), Color(0xFF8BC34A)],
+                      onPressed: _continueGame,
+                    ),
+                  if (_hasProgress) const SizedBox(height: 16),
                   _buildButton(
-                    label: l10n.continueGame,
-                    icon: Icons.play_arrow_rounded,
-                    colors: const [Color(0xFF4CAF50), Color(0xFF8BC34A)],
-                    onPressed: _continueGame,
+                    label: l10n.newGame,
+                    icon: Icons.refresh_rounded,
+                    colors: const [Color(0xFFFF9800), Color(0xFFFF5722)],
+                    onPressed: _startNewGame,
                   ),
-                if (_hasProgress) const SizedBox(height: 16),
-                _buildButton(
-                  label: l10n.newGame,
-                  icon: Icons.refresh_rounded,
-                  colors: const [Color(0xFFFF9800), Color(0xFFFF5722)],
-                  onPressed: _startNewGame,
-                ),
-                const SizedBox(height: 40),
-              ],
+                  const SizedBox(height: 40),
+                ],
+              ),
             ),
           ),
         ),
-      ),
       ),
     );
   }

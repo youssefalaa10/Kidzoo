@@ -83,12 +83,12 @@ void main() {
     test('the quiet period is respected to the hour', () async {
       await dao.saveResumePoint(
           profileId: profileId, adventureId: 'jungle', nodeId: 'jungle.n4');
-      await backdateLastPlayed(
-          StoryReminderPlanner.minimumQuietPeriod - const Duration(minutes: 30));
+      await backdateLastPlayed(StoryReminderPlanner.minimumQuietPeriod -
+          const Duration(minutes: 30));
       expect(await planner.decide(profileId: profileId), isNull);
 
-      await backdateLastPlayed(
-          StoryReminderPlanner.minimumQuietPeriod + const Duration(minutes: 30));
+      await backdateLastPlayed(StoryReminderPlanner.minimumQuietPeriod +
+          const Duration(minutes: 30));
       expect(await planner.decide(profileId: profileId), isNotNull);
     });
 

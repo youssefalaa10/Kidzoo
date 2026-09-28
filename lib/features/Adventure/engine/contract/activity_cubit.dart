@@ -350,10 +350,11 @@ abstract class ActivityCubit<TContent extends ActivityContent,
 
   Future<void> _speakPrompt() async {
     final ActivityStepView? view = state.view;
-    final String line = (view?.spokenPrompt ?? view?.prompt)
-            ?.resolve(services.languageCode) ??
-        '';
-    final String fallback = spec.narration.prompt.resolve(services.languageCode);
+    final String line =
+        (view?.spokenPrompt ?? view?.prompt)?.resolve(services.languageCode) ??
+            '';
+    final String fallback =
+        spec.narration.prompt.resolve(services.languageCode);
     await _speak(line.isNotEmpty ? line : fallback);
   }
 

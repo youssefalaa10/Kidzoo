@@ -65,12 +65,13 @@ MultipleChoiceContent parseMultipleChoiceContent(
         '$path.optionCount', 'need at least two options');
   }
 
-  final List<Map<String, dynamic>> rawQuestions = reader.optionalMapList('questions');
+  final List<Map<String, dynamic>> rawQuestions =
+      reader.optionalMapList('questions');
   if (rawQuestions.isEmpty) {
     throw ActivityContentException(
       '$path.questions',
       'multiple_choice needs authored questions; generated wording cannot '
-      'carry a story beat',
+          'carry a story beat',
     );
   }
 

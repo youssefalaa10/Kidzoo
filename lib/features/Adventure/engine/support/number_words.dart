@@ -13,7 +13,16 @@ class NumberWords {
   const NumberWords._();
 
   static const List<String> _easternDigits = <String>[
-    '٠', '١', '٢', '٣', '٤', '٥', '٦', '٧', '٨', '٩',
+    '٠',
+    '١',
+    '٢',
+    '٣',
+    '٤',
+    '٥',
+    '٦',
+    '٧',
+    '٨',
+    '٩',
   ];
 
   /// Spoken cardinal numbers, 1..10, authored whole.
@@ -23,12 +32,28 @@ class NumberWords {
   /// job is that the child hears the number named correctly.
   static const Map<String, List<String>> _spoken = <String, List<String>>{
     'en': <String>[
-      'one', 'two', 'three', 'four', 'five',
-      'six', 'seven', 'eight', 'nine', 'ten',
+      'one',
+      'two',
+      'three',
+      'four',
+      'five',
+      'six',
+      'seven',
+      'eight',
+      'nine',
+      'ten',
     ],
     'ar': <String>[
-      'وَاحِد', 'اِثْنَان', 'ثَلَاثَة', 'أَرْبَعَة', 'خَمْسَة',
-      'سِتَّة', 'سَبْعَة', 'ثَمَانِيَة', 'تِسْعَة', 'عَشَرَة',
+      'وَاحِد',
+      'اِثْنَان',
+      'ثَلَاثَة',
+      'أَرْبَعَة',
+      'خَمْسَة',
+      'سِتَّة',
+      'سَبْعَة',
+      'ثَمَانِيَة',
+      'تِسْعَة',
+      'عَشَرَة',
     ],
   };
 

@@ -8,6 +8,7 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 import '../../../core/database/daos/game_scores_dao.dart';
 import '../../../core/database/daos/profile_dao.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/services/background_resolver.dart';
@@ -19,7 +20,6 @@ import '../../QuizEngine/bloc/quiz_cubit.dart';
 import '../../QuizEngine/bloc/quiz_state.dart';
 import '../../QuizEngine/data/quiz_models.dart';
 import '../data/environment_vehicle_question.dart';
-import '../../../core/helpers/speech.dart';
 
 const int _kPointsPerQuestion = 10;
 
@@ -330,7 +330,8 @@ class _SceneCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(KidUi.radiusCard),
-        border: Border.all(color: Colors.white, width: metrics.size(6, min: 4, max: 8)),
+        border: Border.all(
+            color: Colors.white, width: metrics.size(6, min: 4, max: 8)),
         boxShadow: KidUi.shadow(Colors.black, strength: 1.2),
         image: DecorationImage(
           image: AssetImage(assetPath),
