@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.deliver",
+  "engineId": "code_path",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Build the whole way first, then press go.",
+      "ar": "اِبْنِ الطَّرِيقَ كُلَّهُ أَوَّلًا، ثُمَّ اضْغَطْ اِنْطَلِق."
+    },
+    "hint1": {
+      "en": "Watch where it stopped. What would you change?",
+      "ar": "اُنْظُرْ أَيْنَ تَوَقَّفَتْ. مَاذَا سَتُغَيِّر؟"
+    },
+    "hint2": {
+      "en": "Start with the glowing arrow, then keep going.",
+      "ar": "اِبْدَأْ بِالسَّهْمِ المُضِيء، ثُمَّ وَاصِل."
+    },
+    "model": {
+      "en": "Watch the whole way through once. Then you drive it.",
+      "ar": "شَاهِدِ الطَّرِيقَ كُلَّهُ مَرَّةً. ثُمَّ قُدْهَا أَنْت."
+    },
+    "success": {
+      "en": "Both baskets delivered, and nothing tipped over.",
+      "ar": "وَصَلَتِ السَّلَّتَان، وَلَمْ يَنْقَلِبْ شَيْء."
+    }
+  },
+  "payload": {
+    "_comment": "The only activity in this chapter where the child commits to a whole plan before seeing any of it happen. Everything else answers one tap at a time. Predict, run, watch, revise is the thing being practised, which is why the cart drives the child's program in full — including a wrong one — before anything is judged: watching what your plan did IS the lesson, and telling them the answer while the cart was still moving would take it away.",
+    "_commandComment": "Absolute arrows, not turn-and-go. A three-year-old can read 'that way' straight off the screen; 'turn left, then forward' asks them to hold a heading in mind and rotate it, which is a later skill. The engine simulates both, so the harder set is a one-word content change when a later Adventure wants it. The arrows are spatial rather than textual, so they are NOT mirrored in Arabic — a mirrored arrow would drive the cart the wrong way.",
+    "grid": [4, 3],
+    "commandMode": "absolute",
+    "maxCommands": 8,
+    "vehicleImage": "assets/gen/images/vehicles/truck.png",
+    "itemsRef": "packs/market_goods",
+    "routes": [
+      {
+        "id": "to_the_fruit_stall",
+        "start": [0, 2],
+        "startFacing": "north",
+        "goal": [3, 2],
+        "blocked": [[1, 2]],
+        "cargoItemId": "apple",
+        "label": {
+          "en": "The fruit stall is at the end of the lane. A barrel is in the way.",
+          "ar": "كُشْكُ الفَاكِهَةِ فِي آخِرِ المَمَرّ. وَهُنَاكَ بِرْمِيلٌ يَسُدُّ الطَّرِيق."
+        },
+        "revealLine": {
+          "en": "The apples are there. One more basket to go.",
+          "ar": "وَصَلَ التُّفَّاح. بَقِيَتْ سَلَّةٌ وَاحِدَة."
+        }
+      },
+      {
+        "id": "to_the_vegetable_stall",
+        "start": [0, 0],
+        "startFacing": "east",
+        "goal": [2, 2],
+        "blocked": [[1, 1]],
+        "cargoItemId": "carrot",
+        "label": {
+          "en": "Now the vegetable stall, down at the corner. Mind the crates.",
+          "ar": "وَالآنَ كُشْكُ الخُضَارِ عِنْدَ الزَّاوِيَة. اِنْتَبِهْ لِلصَّنَادِيق."
+        },
+        "revealLine": {
+          "en": "Delivered. Both stalls have what they were waiting for.",
+          "ar": "تَمَّ التَّوْصِيل. صَارَ لَدَى الكُشْكَيْنِ مَا كَانَا يَنْتَظِرَانِه."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 4,
+    "max": 12
+  },
+  "elofGoal": "COG.reasoning.planning_sequence",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

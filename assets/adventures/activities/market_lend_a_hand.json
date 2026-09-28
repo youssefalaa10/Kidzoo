@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.lend_a_hand",
+  "engineId": "multiple_choice",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "What would help?",
+      "ar": "مَا الَّذِي سَيُسَاعِد؟"
+    },
+    "hint1": {
+      "en": "Think about what they actually need, not what looks nicest.",
+      "ar": "فَكِّرْ فِيمَا يَحْتَاجُونَهُ حَقًّا، لَا فِيمَا يَبْدُو أَجْمَل."
+    },
+    "hint2": {
+      "en": "One of these two would really help them.",
+      "ar": "وَاحِدٌ مِنْ هَذَيْنِ سَيُسَاعِدُهُمْ فِعْلًا."
+    },
+    "model": {
+      "en": "This one. Look why, then choose it yourself.",
+      "ar": "هَذَا. اُنْظُرْ لِمَاذَا، ثُمَّ اخْتَرْهُ بِنَفْسِك."
+    },
+    "success": {
+      "en": "You noticed what three grown-ups walked straight past.",
+      "ar": "اِنْتَبَهْتَ لِمَا مَرَّ بِهِ ثَلَاثَةُ كِبَارٍ دُونَ أَنْ يَرَوْه."
+    }
+  },
+  "payload": {
+    "_comment": "The social beat, and deliberately built out of the same produce as everything else rather than out of a special set of 'kindness' objects. Helping somebody in a market means noticing what they actually need and knowing enough about the things on the stall to pick it — which is practical reasoning, not a separate moral subject bolted on.",
+    "_nofailComment": "Errorless, like every other activity: a wrong pick here gets a gentler question and another go, never a face pulling a sad expression. A no-fail rule that had an exception for the kindness question would be teaching exactly the wrong thing about kindness.",
+    "optionCount": 3,
+    "itemsRef": "packs/market_goods",
+    "questions": [
+      {
+        "id": "thirsty",
+        "prompt": {
+          "en": "The smallest one is thirsty, and there is no water yet. Which is full of juice?",
+          "ar": "الصَّغِيرُ عَطْشَان، وَلَا مَاءَ بَعْد. أَيُّهَا مَلِيءٌ بِالعَصِير؟"
+        },
+        "correctItemId": "watermelon",
+        "distractorItemIds": ["onion", "potato"],
+        "revealLine": {
+          "en": "Watermelon is nearly all water. He drank half of it.",
+          "ar": "البِطِّيخُ كُلُّهُ مَاءٌ تَقْرِيبًا. شَرِبَ نِصْفَهُ."
+        }
+      },
+      {
+        "id": "soft",
+        "prompt": {
+          "en": "Grandma asked for something soft she can eat without her teeth.",
+          "ar": "طَلَبَتِ الجَدَّةُ شَيْئًا لَيِّنًا تَأْكُلُهُ بِلَا أَسْنَان."
+        },
+        "correctItemId": "banana",
+        "distractorItemIds": ["carrot", "corn"],
+        "revealLine": {
+          "en": "A banana. She did not even have to ask twice.",
+          "ar": "مَوْزَة. وَلَمْ تَحْتَجْ حَتَّى أَنْ تَطْلُبَ مَرَّتَيْن."
+        }
+      },
+      {
+        "id": "lightest",
+        "prompt": {
+          "en": "This one is already carrying too much. Which is the lightest to hand them?",
+          "ar": "هَذِهِ تَحْمِلُ الكَثِيرَ بِالفِعْل. أَيُّهَا أَخَفُّ لِتُنَاوِلَهَا إِيَّاه؟"
+        },
+        "correctItemId": "apple",
+        "distractorItemIds": ["watermelon", "cabbage"],
+        "revealLine": {
+          "en": "The apple. You remembered what the scale showed you.",
+          "ar": "التُّفَّاحَة. تَذَكَّرْتَ مَا أَرَاكَ إِيَّاهُ المِيزَان."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 2,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 2,
+    "max": 4
+  },
+  "elofGoal": "SEL.social_awareness.notice_needs",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

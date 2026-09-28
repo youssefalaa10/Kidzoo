@@ -1,0 +1,82 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.light_the_wall",
+  "engineId": "trace_path",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8"
+  },
+  "narration": {
+    "prompt": {
+      "en": "To light the trench wall, draw the line point by point.",
+      "ar": "لِتُضِيءَ جِدَارَ الأُخْدُود، اِرْسُمِ الخَطَّ نُقْطَةً بَعْدَ نُقْطَة."
+    },
+    "hint1": {
+      "en": "Start where it is glowing.",
+      "ar": "اِبْدَأْ مِنْ حَيْثُ يُضِيء."
+    },
+    "hint2": {
+      "en": "Keep going to the next dot. You can lift your finger and tap them.",
+      "ar": "وَاصِلْ إِلَى النُّقْطَةِ التَّالِيَة. يُمْكِنُكَ رَفْعُ إِصْبَعِكَ وَلَمْسُهَا."
+    },
+    "model": {
+      "en": "Watch the light run down the wall. Then you draw it.",
+      "ar": "شَاهِدِ الضَّوْءَ يَجْرِي عَلَى الجِدَار. ثُمَّ اِرْسُمْهُ أَنْت."
+    },
+    "success": {
+      "en": "Down and back up, both lit. Now you can see the gate.",
+      "ar": "النُّزُولُ وَالصُّعُود، كِلَاهُمَا مُضِيء. تَسْتَطِيعُ الآنَ أَنْ تَرَى البَوَّابَة."
+    }
+  },
+  "payload": {
+    "_comment": "The glow-weed the child gathered is what they are drawing with, and both lines stay lit — so the activity ends with the whole route they made on screen at once, rather than with the last stroke of it. That is why keepCompleted is on here and off by default: these two figures are one thing, not two shapes that happen to share a box.",
+    "_figureComment": "Down first with every kind of help — the dotted road AND the numbers, because it is the first stroke of the chapter. Back up with the numbers only: the child has just drawn a descending zig-zag, so they have seen how the line behaves and can work out the return without the road being drawn for them.",
+    "_returnComment": "The second line is the way HOME, which is the point of drawing it. A route you made is a route you can come back along, and the chapter needs the child to believe that before it sends them through the gate.",
+    "tolerancePercent": 15,
+    "keepCompleted": true,
+    "figures": [
+      {
+        "id": "down_the_wall",
+        "closed": false,
+        "showNumbers": true,
+        "showGuide": true,
+        "points": [[20, 12], [46, 26, 1], [24, 42, 1], [52, 56, 1], [30, 72, 1], [58, 86]],
+        "label": {
+          "en": "Down the wall first, all the way to the bottom.",
+          "ar": "اِنْزِلْ عَلَى الجِدَارِ أَوَّلًا، حَتَّى القَاعِ تَمَامًا."
+        },
+        "revealLine": {
+          "en": "The wall is lit all the way down. Now the way back.",
+          "ar": "أَضَاءَ الجِدَارُ حَتَّى الأَسْفَل. وَالآنَ طَرِيقُ العَوْدَة."
+        }
+      },
+      {
+        "id": "back_up",
+        "closed": false,
+        "showNumbers": true,
+        "showGuide": false,
+        "points": [[72, 88], [64, 68, 1], [78, 50, 1], [62, 32, 1], [76, 14]],
+        "label": {
+          "en": "Now the way home. Follow the numbers up.",
+          "ar": "وَالآنَ طَرِيقُ العَوْدَة. اِتْبَعِ الأَرْقَامَ صَاعِدًا."
+        },
+        "revealLine": {
+          "en": "Both lines hold. Down there, something is opening and shutting.",
+          "ar": "الخَطَّانِ ثَابِتَان. فِي الأَسْفَلِ شَيْءٌ يَنْفَتِحُ وَيَنْغَلِق."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 8,
+    "max": 24
+  },
+  "elofGoal": "PHY.fine_motor.controlled_stroke",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

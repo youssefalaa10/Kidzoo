@@ -17,32 +17,19 @@
     "ar": "كِتَابُ الحِكَايَات"
   },
   "adventures": [
-    "jungle"
+    "jungle",
+    "market",
+    "ocean"
   ],
   "_upcomingComment": "Destinations the child can SEE but not yet play. They exist so the map reads as a journey rather than a single button, and they carry a title and nothing else: revealing the story of a locked Adventure spends the surprise before the child gets there. The one-line `peek` is shown only once the Adventure before it is finished, which is what makes finishing feel like it opened something. These are deliberately NOT in `adventures` - that list is validated to name real, playable content.",
   "upcoming": [
     {
-      "id": "market",
-      "icon": "market",
-      "title": { "en": "The Market", "ar": "السُّوق" },
-      "peek": {
-        "en": "A page blew into a busy market, full of colour.",
-        "ar": "طَارَتْ صَفْحَةٌ إِلَى سُوقٍ مُزْدَحِمٍ مَلِيءٍ بِالأَلْوَان."
-      }
-    },
-    {
-      "id": "ocean",
-      "icon": "ocean",
-      "title": { "en": "The Deep Blue", "ar": "الأَزْرَقُ العَمِيق" },
-      "peek": {
-        "en": "A page sank somewhere cold and blue.",
-        "ar": "غَرِقَتْ صَفْحَةٌ فِي مَكَانٍ بَارِدٍ وَأَزْرَق."
-      }
-    },
-    {
       "id": "stars",
       "icon": "stars",
-      "title": { "en": "Up Among the Stars", "ar": "بَيْنَ النُّجُوم" },
+      "title": {
+        "en": "Up Among the Stars",
+        "ar": "بَيْنَ النُّجُوم"
+      },
       "peek": {
         "en": "The last page went up, far past the clouds.",
         "ar": "صَعِدَتِ الصَّفْحَةُ الأَخِيرَةُ بَعِيدًا خَلْفَ الغُيُوم."

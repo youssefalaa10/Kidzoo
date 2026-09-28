@@ -671,6 +671,42 @@ void main() {
         }
       }
     });
+
+    test('every asset path inside an activity payload exists on disk', () {
+      // Only `rewardArt` used to be checked, so a mistyped path anywhere in a
+      // payload - a clue image, a scene prop, a cover - shipped as a grey box
+      // in a child's game and nothing failed. Walking the payload catches all
+      // of them, including the fields no engine has invented yet.
+      final List<String> missing = <String>[];
+
+      void walk(Object? node, String where) {
+        if (node is String) {
+          if (node.startsWith('assets/') && !File(node).existsSync()) {
+            missing.add('$where -> $node');
+          }
+          return;
+        }
+        if (node is List<dynamic>) {
+          for (int index = 0; index < node.length; index++) {
+            walk(node[index], '$where[$index]');
+          }
+          return;
+        }
+        if (node is Map<String, dynamic>) {
+          node.forEach((String key, Object? value) {
+            // `_comment` fields are prose and may mention a path in passing.
+            if (!key.startsWith('_')) {
+              walk(value, '$where.$key');
+            }
+          });
+        }
+      }
+
+      for (final ActivitySpec spec in bundle.activities.values) {
+        walk(spec.payload, spec.sourcePath);
+      }
+      expect(missing, isEmpty, reason: 'missing art: $missing');
+    });
   });
 
   group('A sorting activity holds constant what it says it holds constant', () {
@@ -778,6 +814,133 @@ void main() {
                     'template. Author the sentence whole.');
           }
         }
+      }
+    });
+  });
+
+  group('Pattern rounds ask something that has to be read', () {
+    List<Map<String, dynamic>> roundsOf(ActivitySpec spec) =>
+        (spec.payload['rounds'] as List<dynamic>? ?? <dynamic>[])
+            .cast<Map<String, dynamic>>();
+
+    Iterable<ActivitySpec> patternActivities() => bundle.activities.values
+        .where((ActivitySpec spec) => spec.engineId == 'patterns');
+
+    test('every gap sits inside the strip it belongs to', () {
+      for (final ActivitySpec spec in patternActivities()) {
+        for (final Map<String, dynamic> round in roundsOf(spec)) {
+          final int unit = (round['unit'] as List<dynamic>).length;
+          final int repeats = (round['repeats'] as num?)?.toInt() ?? 3;
+          final int length = unit * repeats;
+          for (final dynamic gap in round['gaps'] as List<dynamic>) {
+            expect(gap as int, lessThan(length),
+                reason: '${spec.sourcePath}: round "${round['id']}" opens a '
+                    'hole at $gap in a strip of $length');
+          }
+        }
+      }
+    });
+
+    test('no round can be answered by copying one repeat back', () {
+      // Holes that all land on the same position within the unit are one
+      // question asked repeatedly: a child copies the tile a fixed distance
+      // back and never works out what the unit is.
+      for (final ActivitySpec spec in patternActivities()) {
+        for (final Map<String, dynamic> round in roundsOf(spec)) {
+          final int unit = (round['unit'] as List<dynamic>).length;
+          final List<int> gaps =
+              (round['gaps'] as List<dynamic>).cast<int>();
+          if (gaps.length < 2) {
+            continue;
+          }
+          expect(gaps.map((int gap) => gap % unit).toSet().length,
+              greaterThan(1),
+              reason: '${spec.sourcePath}: round "${round['id']}" asks the '
+                  'same question in every hole');
+        }
+      }
+    });
+
+    test('no two rounds ask the same question', () {
+      for (final ActivitySpec spec in patternActivities()) {
+        final List<String> signatures = roundsOf(spec)
+            .map((Map<String, dynamic> round) =>
+                '${(round['unit'] as List<dynamic>).join('-')}'
+                '|${(round['gaps'] as List<dynamic>).toList()..sort()}')
+            .toList();
+        expect(signatures.toSet().length, signatures.length,
+            reason: '${spec.sourcePath} repeats a round: $signatures');
+      }
+    });
+
+    test('a unit is never all one item', () {
+      for (final ActivitySpec spec in patternActivities()) {
+        for (final Map<String, dynamic> round in roundsOf(spec)) {
+          final List<dynamic> unit = round['unit'] as List<dynamic>;
+          expect(unit.toSet().length, greaterThan(1),
+              reason: '${spec.sourcePath}: round "${round['id']}" repeats one '
+                  'item, so there is no rule to find');
+        }
+      }
+    });
+
+    test('the tray always keeps a tile that belongs in no hole', () {
+      // Without a spare, the last hole of a round is answerable by
+      // elimination rather than by reading the pattern.
+      for (final ActivitySpec spec in patternActivities()) {
+        final int extras =
+            (spec.payload['trayExtraCount'] as num?)?.toInt() ?? 1;
+        expect(extras, greaterThanOrEqualTo(1),
+            reason: '${spec.sourcePath} offers no decoy tile');
+      }
+    });
+
+    test('each round carries its own wording in every declared locale', () {
+      for (final ActivitySpec spec in patternActivities()) {
+        for (final Map<String, dynamic> round in roundsOf(spec)) {
+          for (final String field in <String>['prompt', 'revealLine']) {
+            final LocalizedText text = LocalizedText.fromJson(round[field],
+                debugPath: '${spec.sourcePath}.rounds.$field');
+            for (final String locale in spec.locales) {
+              expect(text.hasLanguage(locale), isTrue,
+                  reason: '${spec.sourcePath}: a round has no "$locale" '
+                      '$field');
+            }
+          }
+        }
+      }
+    });
+  });
+
+  group('The thing being built is on screen', () {
+    Iterable<ActivitySpec> staged() => bundle.activities.values.where(
+        (ActivitySpec spec) => spec.presentation.stage != null);
+
+    test('every stage names art that exists on disk', () {
+      for (final ActivitySpec spec in staged()) {
+        final String art = spec.presentation.stage!.art;
+        expect(File(art).existsSync(), isTrue,
+            reason: '${spec.sourcePath} stages "$art", which is not on disk');
+      }
+    });
+
+    test('a stage is used where the board does not already show the work', () {
+      // The stage exists so an activity's progress is a picture of the thing
+      // being made rather than a counter. It is deliberately NOT on every
+      // activity: a scene being uncovered, a line being drawn and a gate being
+      // opened are already the world changing, and a stage on top of those
+      // would say the same thing twice.
+      final Set<String> staffed =
+          staged().map((ActivitySpec spec) => spec.instanceId).toSet();
+      expect(staffed, isNotEmpty,
+          reason: 'nothing uses the stage, so the knob is dead');
+      for (final ActivitySpec spec in staged()) {
+        expect(
+          const <String>{'hidden_clue', 'trace_path', 'patterns'},
+          isNot(contains(spec.engineId)),
+          reason: '${spec.sourcePath} stages progress its own board already '
+              'shows',
+        );
       }
     });
   });

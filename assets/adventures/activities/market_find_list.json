@@ -1,0 +1,86 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.find_list",
+  "engineId": "hidden_clue",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Dalia's list blew in here somewhere. Can you find it?",
+      "ar": "طَارَتْ قَائِمَةُ دَالْيَا إِلَى هُنَا فِي مَكَانٍ مَا. هَلْ تَجِدُهَا؟"
+    },
+    "hint1": {
+      "en": "Look low down, where the wind would have dropped it.",
+      "ar": "اُنْظُرْ إِلَى الأَسْفَل، حَيْثُ أَسْقَطَتْهَا الرِّيح."
+    },
+    "hint2": {
+      "en": "It is white, and flat, with writing on it.",
+      "ar": "إِنَّهَا بَيْضَاء، وَمُسَطَّحَة، وَعَلَيْهَا كِتَابَة."
+    },
+    "model": {
+      "en": "There it is, under the basket. Touch it.",
+      "ar": "هَا هِيَ، تَحْتَ السَّلَّة. اِلْمِسْهَا."
+    },
+    "success": {
+      "en": "You found it! Now we know what the market needs.",
+      "ar": "وَجَدْتَهَا! الآنَ نَعْرِفُ مَاذَا يَحْتَاجُ السُّوق."
+    }
+  },
+  "payload": {
+    "_comment": "The list is NOT the page. Both are paper, so they are drawn to be told apart on sight: the list is cold white with grey ruling and no motif, the page is warm amber with a basket on it. A child who thought they had already found the page here would spend the rest of the chapter confused about why the story kept going.",
+    "_sceneComment": "Furniture, not scenery. `crate`, `basket`, `awning`, `barrel` and `sign` were added to the shared prop set for this scene and named for what they are rather than where they came from, so a workshop, a harbour or a cargo bay can use the same ones without extending the enum again. Every one is a drawn stand-in: swapping `shape` for an `image` path is a content edit with no code change, and the positions below carry over untouched.",
+    "clues": [
+      {
+        "id": "order_list",
+        "positionPercent": [58, 64],
+        "image": "assets/gen/images/story/order_list.png",
+        "scale": 1.0,
+        "label": { "en": "the order list", "ar": "قَائِمَةُ الطَّلَبَات" }
+      }
+    ],
+    "ground": "ground",
+    "props": [
+      { "shape": "awning", "positionPercent": [24, 22], "scale": 1.3 },
+      { "shape": "awning", "positionPercent": [76, 20], "scale": 1.2, "flip": true },
+      { "shape": "sign", "positionPercent": [50, 26], "scale": 0.85 },
+      { "shape": "crate", "positionPercent": [16, 72], "scale": 1.05, "turn": -3 },
+      { "shape": "crate", "positionPercent": [86, 76], "scale": 0.95, "turn": 4 },
+      { "shape": "barrel", "positionPercent": [32, 84], "scale": 0.9 },
+      { "shape": "basket", "positionPercent": [78, 88], "scale": 0.85 }
+    ],
+    "_coverComment": "Anchored to the clue in percentages of the CLUE's own size, not to the scene, so the overlap the author drew is the overlap every child sees on every screen. Both covers deliberately leave a corner of the list showing: tapping that corner wins without moving anything, which keeps the floor of this activity on the ground. Moving a cover is not an attempt, so a child who shoves three things aside has made no mistakes.",
+    "covers": [
+      {
+        "id": "basket_over_list",
+        "shape": "basket",
+        "offsetFromCluePercent": [-52, -40],
+        "scale": 1.0,
+        "turn": -12,
+        "move": "slideLeft"
+      },
+      {
+        "id": "crate_over_list",
+        "shape": "crate",
+        "offsetFromCluePercent": [56, 44],
+        "scale": 0.8,
+        "turn": 9,
+        "move": "slideRight"
+      }
+    ],
+    "visualNoiseCount": 6,
+    "revealOnIdleSeconds": 8,
+    "hitToleranceFraction": 0.14,
+    "itemsRef": "packs/market_goods",
+    "noiseItemIds": ["apple", "carrot", "orange", "onion", "corn", "grapes"]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "elofGoal": "COG.visual_search.sustained_attention",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

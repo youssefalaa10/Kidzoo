@@ -36,6 +36,25 @@ enum InteractionMode {
   tapInScene,
   traceStroke,
   buildText,
+
+  // Adventure 3 added three. Each exists because the capability key was
+  // already claimed by an engine doing a genuinely different thing, and
+  // reusing the incumbent's mode would have made the registry's uniqueness
+  // check pass by lying rather than by being satisfied.
+  /// Moves a light, lens or window across a scene, so what is visible is a
+  /// consequence of where the child put it. Distinct from [tapInScene], where
+  /// the whole scene is visible and only the answer is hidden.
+  sweepScene,
+
+  /// Orients a thing that will act later — a gate, a fan, a points lever — and
+  /// then releases it. Distinct from [orderSequence], which composes a list of
+  /// instructions; here there is one configuration and one run of it.
+  setDirection,
+
+  /// Reproduces a sequence that was played rather than shown. Distinct from
+  /// [orderSequence] because nothing stays on screen to be re-read: the child
+  /// answers from memory of something that has already stopped.
+  echoRhythm,
 }
 
 /// One gameplay parameter an engine accepts from content.

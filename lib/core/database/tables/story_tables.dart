@@ -57,6 +57,31 @@ class StoryChapterProgress extends Table {
   DateTimeColumn get lastPlayedAt =>
       dateTime().withDefault(currentDateAndTime)();
 
+  /// The beat [currentNodeId] belongs to, stored alongside the id rather than
+  /// derived from it.
+  ///
+  /// It is the drift handle. A node id is a content identifier, and content
+  /// gets renamed, reordered and rewritten between releases; when the id a
+  /// child was parked on no longer exists, the beat is enough to put them back
+  /// in the right part of the story instead of at its first line.
+  TextColumn get currentBeat => text().nullable()();
+
+  /// The in-flight activity, as versioned JSON, or null when the child is on a
+  /// narration beat or has finished the activity they were on.
+  ///
+  /// One opaque column rather than nine typed ones, and deliberately so. Its
+  /// contents are a *cursor format*, not a schema the database has opinions
+  /// about: it carries a version, and a cursor written by an older or newer
+  /// build simply fails to parse and the current activity restarts. Spreading
+  /// the same fields across nine columns would make every future change to the
+  /// cursor a migration, for data whose entire lifetime is "until this child
+  /// finishes this mini-game".
+  ///
+  /// What it holds is **logical** progress — which step, which seed, what has
+  /// been earned so far. Never animation frames, drag coordinates or playback
+  /// positions: those are how the screen looked, not where the child got to.
+  TextColumn get activityCheckpoint => text().nullable()();
+
   @override
   List<Set<Column<Object>>> get uniqueKeys => <Set<Column<Object>>>[
         <Column<Object>>{profileId, adventureId},

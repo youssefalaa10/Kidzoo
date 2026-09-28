@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.float_or_sink",
+  "engineId": "sorting",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8",
+    "stage": {
+      "art": "assets/gen/images/sea/lift_basket.png",
+      "mode": "fill"
+    }
+  },
+  "narration": {
+    "prompt": {
+      "en": "To build the lift, say where each piece goes: up with the floats, or down on the sand.",
+      "ar": "لِتَبْنِيَ الرَّافِعَة، قُلْ أَيْنَ تَذْهَبُ كُلُّ قِطْعَة: فَوْقُ مَعَ العَوَّامَات، أَمْ تَحْتُ عَلَى الرَّمْل."
+    },
+    "hint1": {
+      "en": "Not quite. Watch what it did when you let go.",
+      "ar": "لَيْسَ تَمَامًا. اُنْظُرْ مَاذَا فَعَلَتْ حِينَ تَرَكْتَهَا."
+    },
+    "hint2": {
+      "en": "Size is not the answer. A whole log rides up, and so does a thread of kelp.",
+      "ar": "الحَجْمُ لَيْسَ هُوَ الجَوَاب. جِذْعٌ كَامِلٌ يَطْفُو، وَخَيْطُ عُشْبٍ يَطْفُو كَذَلِك."
+    },
+    "model": {
+      "en": "This is where it ends up. Now you send one.",
+      "ar": "هُنَا يَنْتَهِي بِهَا المَطَاف. أَرْسِلْ أَنْتَ وَاحِدَةً الآن."
+    },
+    "success": {
+      "en": "Floats on top, weights below. That is a lift.",
+      "ar": "العَوَّامَاتُ فَوْق، وَالأَثْقَالُ تَحْت. هَذِهِ رَافِعَة."
+    }
+  },
+  "payload": {
+    "_comment": "An experiment, not a quiz about one. The child has to predict — buoyancy is the one property here that cannot be seen, only reasoned about — and then the object answers. A float dropped on the sand drifts back up, in front of them, which is a better correction than any sound: it tells them WHAT THE THING IS, which is something they can use on the next piece.",
+    "_castComment": "Cross-balanced against size in BOTH directions, and the second direction is the one that is easy to forget. Driftwood, a coconut and a crate are big and float, so 'big things sink' fails immediately. But a cast whose floaters are all big still lets a child run 'small things sink' undefeated for the whole round and score full marks on a rule that is false — so kelp is in here as a small thing that rides up, and a stone and a chain are big things that do not. Neither naive rule survives a single round.",
+    "_heldConstantComment": "heldConstant is deliberately EMPTY. Sorting activities normally hold the other attributes still so the target one is the only thing varying — but here size has to vary, and vary against the answer, or the round teaches a rule that is not true. Claiming size as held constant would be a lie the validator catches, correctly.",
+    "activeAttribute": "buoyancy",
+    "heldConstant": [],
+    "itemsPerRound": 4,
+    "roundCount": 2,
+    "itemsRef": "packs/tide_pool",
+    "itemIds": [
+      "driftwood",
+      "coconut",
+      "ring_buoy",
+      "wooden_crate",
+      "kelp",
+      "reef_stone",
+      "chains",
+      "anchor",
+      "old_key",
+      "coin"
+    ],
+    "bins": [
+      {
+        "id": "surface",
+        "value": "float",
+        "settleMotion": "rise",
+        "label": { "en": "rides up", "ar": "يَطْفُو" }
+      },
+      {
+        "id": "seabed",
+        "value": "sink",
+        "settleMotion": "sink",
+        "label": { "en": "stays down", "ar": "يَغْرَق" }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 3,
+    "max": 8
+  },
+  "elofGoal": "COG.classification.sort_by_property",
+  "prereqSkills": [],
+  "masteryThreshold": 0.7
+}

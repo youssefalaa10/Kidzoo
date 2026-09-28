@@ -1,0 +1,66 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.restock",
+  "engineId": "sorting",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Put each one back on the stall it belongs to.",
+      "ar": "أَعِدْ كُلَّ وَاحِدَةٍ إِلَى الكُشْكِ الَّذِي تَنْتَمِي إِلَيْه."
+    },
+    "hint1": {
+      "en": "Does it grow on a tree, or under the ground?",
+      "ar": "هَلْ تَنْمُو عَلَى شَجَرَة، أَمْ تَحْتَ الأَرْض؟"
+    },
+    "hint2": {
+      "en": "It goes on one of these two.",
+      "ar": "إِنَّهَا تُوضَعُ عَلَى وَاحِدٍ مِنْ هَذَيْن."
+    },
+    "model": {
+      "en": "This is its stall. Now you try.",
+      "ar": "هَذَا هُوَ كُشْكُهَا. جَرِّبْ أَنْتَ الآن."
+    },
+    "success": {
+      "en": "Both stalls are full, and everything is where a customer would look.",
+      "ar": "اِمْتَلَأَ الكُشْكَان، وَكُلُّ شَيْءٍ فِي المَكَانِ الَّذِي يَبْحَثُ فِيهِ الزَّبُون."
+    }
+  },
+  "payload": {
+    "_comment": "activeAttribute is the ONE thing being taught, and heldConstant records what deliberately does not vary alongside it — young children attend to the most salient attribute even when it is irrelevant, so teaching 'fruit or vegetable' while the sizes also differ risks teaching size. A test checks the claim against the cast rather than trusting the comment.",
+    "_colourComment": "The cast is also balanced on colour, which no test can check because colour is not held constant — it is *shared*. Red and orange each appear once on each stall (apple/red_pepper, orange/carrot), so a child who sorts by colour gets exactly half of them right and finds out quickly that colour is not the rule. Picking four items of four different colours would have let colour work by accident.",
+    "activeAttribute": "stall",
+    "heldConstant": ["size"],
+    "itemsRef": "packs/market_goods",
+    "itemIds": ["apple", "orange", "carrot", "red_pepper"],
+    "itemsPerRound": 4,
+    "roundCount": 1,
+    "bins": [
+      {
+        "id": "stall_fruit",
+        "value": "fruit",
+        "label": { "en": "the fruit stall", "ar": "كُشْكُ الفَاكِهَة" }
+      },
+      {
+        "id": "stall_vegetable",
+        "value": "vegetable",
+        "label": { "en": "the vegetable stall", "ar": "كُشْكُ الخُضَار" }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless",
+    "allowTapToSelect": true
+  },
+  "adaptation": {
+    "min": 3,
+    "max": 8
+  },
+  "elofGoal": "COG.classification.single_attribute",
+  "prereqSkills": [],
+  "masteryThreshold": 0.75
+}

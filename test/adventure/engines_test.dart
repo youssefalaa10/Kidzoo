@@ -5,6 +5,7 @@ import 'package:kidzo/features/Adventure/data/adventure_content_loader.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_attempt.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_engine.dart';
+import 'package:kidzo/features/Adventure/engine/contract/activity_engine_descriptor.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_engine_registry.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
@@ -14,6 +15,7 @@ import 'package:kidzo/features/Adventure/engine/engines/counting/counting_cubit.
 import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/trace_path/trace_engine.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
 
 import 'support/disk_content_source.dart';
@@ -363,6 +365,92 @@ void main() {
     });
   });
 
+  group('The world answers, rather than a verdict', () {
+    // The two adaptations Adventure 3 made to shipped engines. Both exist for
+    // the same reason: an activity whose only sign that anything happened is a
+    // sound and a step counter is a quiz wearing the story's clothes.
+
+    test('a bin says which way it sends things', () async {
+      final SortingCubit cubit =
+          cubitFor('ocean_float_or_sink') as SortingCubit;
+      await cubit.start();
+
+      final Map<String, SettleMotion> motions = <String, SettleMotion>{
+        for (final SortingBin bin in cubit.currentStep.bins)
+          bin.id: bin.settleMotion,
+      };
+      expect(motions['surface'], SettleMotion.rise);
+      expect(motions['seabed'], SettleMotion.sink);
+      // The board turns this into the correction a misplaced float gets: it
+      // drifts back up out of the sea floor, which tells the child what the
+      // thing *is* rather than only that they were wrong.
+      expect(SettleMotion.rise.direction, lessThan(0));
+      expect(SettleMotion.sink.direction, greaterThan(0));
+      await cubit.close();
+    });
+
+    test('a bin without a declared motion just settles', () async {
+      // Every sorting activity written before this stays exactly as it was.
+      final SortingCubit cubit =
+          cubitFor('jungle_sort_watchers') as SortingCubit;
+      await cubit.start();
+      for (final SortingBin bin in cubit.currentStep.bins) {
+        expect(bin.settleMotion, SettleMotion.settle);
+      }
+      await cubit.close();
+    });
+
+    test('what has been sorted stays visible in the bin it went to', () async {
+      // The lift the child is building has to be on screen, so the history is
+      // carried on the step rather than accumulated in the board — which also
+      // means it survives a child leaving half way and coming back.
+      final SortingCubit cubit =
+          cubitFor('ocean_float_or_sink') as SortingCubit;
+      await cubit.start();
+
+      expect(cubit.currentStep.alreadySorted, isEmpty);
+      int placed = 0;
+      while (cubit.state.status == ActivityStatus.running) {
+        final SortingStep step = cubit.currentStep;
+        expect(step.alreadySorted.length, placed,
+            reason: 'the bins must hold exactly what has been sorted so far');
+        for (final SortedToken token in step.alreadySorted) {
+          expect(step.sortedInto(token.binId), contains(token));
+        }
+        await cubit.submit(PlacementAttempt(
+          tokenId: step.item.id,
+          targetId: step.correctBinId,
+        ));
+        placed++;
+      }
+      await cubit.close();
+    });
+
+    test('a finished trace figure stays lit while the next is drawn', () async {
+      final TraceCubit cubit = cubitFor('ocean_light_the_wall') as TraceCubit;
+      await cubit.start();
+
+      final List<TraceStep> steps = cubit.buildSteps();
+      expect(steps.first.alreadyDrawn, isEmpty,
+          reason: 'nothing is drawn before the first figure');
+      expect(steps.last.alreadyDrawn, hasLength(steps.length - 1),
+          reason: 'the whole route has to be on screen at the end, or the '
+              'child only ever sees the last stroke of what they made');
+      await cubit.close();
+    });
+
+    test('a trace activity that did not ask for it keeps the old behaviour',
+        () async {
+      // Two unrelated shapes in one box would pile up. Off by default.
+      final TraceCubit cubit = cubitFor('market_mend_sign') as TraceCubit;
+      await cubit.start();
+      for (final TraceStep step in cubit.buildSteps()) {
+        expect(step.alreadyDrawn, isEmpty);
+      }
+      await cubit.close();
+    });
+  });
+
   group('The no-fail ladder terminates for every engine', () {
     test('three wrong answers always reach modelled, then completion',
         () async {
@@ -371,19 +459,27 @@ void main() {
             cubitFor(activityId);
         await cubit.start();
 
+        bool everReachedModelled = false;
+        bool everNamedTheAnswer = false;
+
         int guard = 0;
         while (cubit.state.status == ActivityStatus.running && guard < 200) {
           guard++;
           // A deliberately invalid attempt: wrong for every engine.
           await cubit.submit(const ChoiceAttempt('__definitely_wrong__'));
           if (cubit.state.scaffoldLevel == ScaffoldLevel.modelled) {
-            // The board now offers only the correct option. Feed the engine
-            // the id it highlighted, which is how a real child would finish.
+            everReachedModelled = true;
+            // Where an engine's answer *is* one option, the board now offers
+            // only that one, so feeding back the id it highlighted is how a
+            // real child finishes. Where the answer is a configuration or a
+            // remembered order there is no such id, and the run still has to
+            // end — the base cubit credits the step after modelling, which is
+            // what the `finished` assertion below actually proves.
             final String? correct = cubit.state.view?.highlightOptionId;
-            expect(correct, isNotNull,
-                reason: '$activityId reached modelled without naming the '
-                    'correct option, so the child cannot finish');
-            await cubit.submit(ChoiceAttempt(correct!));
+            if (correct != null) {
+              everNamedTheAnswer = true;
+              await cubit.submit(ChoiceAttempt(correct));
+            }
           }
         }
 
@@ -392,6 +488,24 @@ void main() {
         expect(cubit.state.result.completion, ActivityCompletion.completed);
         expect(cubit.state.result.score, greaterThan(0),
             reason: 'never-zero is the house rule');
+
+        // An engine whose answer is a single option must still name it, or the
+        // modelled rung has nothing to demonstrate and the child is carried
+        // through by the credit path instead of being taught anything.
+        const Set<InteractionMode> picksOneThing = <InteractionMode>{
+          InteractionMode.chooseOne,
+          InteractionMode.dragToTarget,
+          InteractionMode.tapInScene,
+        };
+        final ActivityEngineDescriptor descriptor = registry
+            .require(bundle.requireActivity(activityId).engineId)
+            .descriptor;
+        if (everReachedModelled &&
+            descriptor.interactionModes.any(picksOneThing.contains)) {
+          expect(everNamedTheAnswer, isTrue,
+              reason: '$activityId reached modelled without naming the '
+                  'correct option, so the child is never shown what to do');
+        }
         await cubit.close();
       }
     });

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
@@ -10,7 +12,9 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
 import 'package:kidzo/features/Adventure/engine/host/background_resolver.dart';
+import 'package:kidzo/features/Adventure/engine/host/widgets/activity_feedback_scope.dart';
 import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text.dart';
+import 'package:kidzo/features/Adventure/engine/host/widgets/activity_stage.dart';
 
 /// The one screen every activity runs inside.
 ///
@@ -100,6 +104,10 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
     super.didChangeAppLifecycleState(state);
     if (state != AppLifecycleState.resumed) {
       widget.session.services.narrator.cancel();
+      // Secondary safety only: the step the child is on was already persisted
+      // when they reached it. This just carries across the score and hints
+      // earned *inside* a step that a backgrounding interrupts.
+      unawaited(_cubit.flushCheckpoint());
     }
   }
 
@@ -218,6 +226,11 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
             metrics: metrics,
             text: prompt,
             languageCode: _languageCode,
+            // The thing being built, if this activity is building one. It rides
+            // in the banner's row rather than a band of its own, so it costs no
+            // vertical space on the layouts that have none to give.
+            stage: widget.session.spec.presentation.stage,
+            stageProgress: state.progress,
             onSpeak: state.isBoardLocked
                 ? null
                 : () => _cubit.submit(const HelpRequestedAttempt()),
@@ -226,10 +239,13 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
           Expanded(
             child: AbsorbPointer(
               absorbing: state.isBoardLocked,
-              child: _board(
-                context,
-                state,
-                (ActivityAttempt attempt) => _cubit.submit(attempt),
+              child: ActivityFeedbackScope(
+                soundboard: widget.session.services.soundboard,
+                child: _board(
+                  context,
+                  state,
+                  (ActivityAttempt attempt) => _cubit.submit(attempt),
+                ),
               ),
             ),
           ),
@@ -385,12 +401,16 @@ class _PromptBanner extends StatelessWidget {
     required this.metrics,
     required this.text,
     required this.languageCode,
+    this.stage,
+    this.stageProgress = 0,
     this.onSpeak,
   });
 
   final KidMetrics metrics;
   final String text;
   final String languageCode;
+  final ActivityStageSpec? stage;
+  final double stageProgress;
   final VoidCallback? onSpeak;
 
   @override
@@ -433,6 +453,14 @@ class _PromptBanner extends StatelessWidget {
                   color: KidUi.ink,
                 ),
               ),
+              if (stage != null) ...<Widget>[
+                SizedBox(width: metrics.gap * 0.6),
+                ActivityStage(
+                  spec: stage!,
+                  progress: stageProgress,
+                  size: metrics.size(56, min: 44, max: 84),
+                ),
+              ],
             ],
           ),
         ),

@@ -28,7 +28,10 @@ This is the **single** progress ledger for Spec 006 — there is no second statu
 | 4N — Local story reminders *(new requirement)* | complete | 2026-09-18 | 2026-09-18 |
 | 5 — Polish + real scores | partial — see notes | 2026-09-18 | — |
 | 5P — Adventure 1 UX / story / content polish pass | complete | 2026-09-18 | 2026-09-18 |
-| 6 — Adventures 2–4 | not started (content only) | — | — |
+| 6R — Durable resume *(new requirement)* | complete | 2026-09-20 | 2026-09-20 |
+| 6 — Adventure 2 (The Market Morning) | complete — 3 new engines, see notes | 2026-09-20 | 2026-09-20 |
+| 6b — Adventure 3 (The Deep Blue) | complete — 1 new engine + 3 adaptations, see notes | 2026-09-23 | 2026-09-23 |
+| 6c — Adventure 4 | not started | — | — |
 
 ---
 
@@ -391,17 +394,204 @@ same line.
 
 ---
 
-## Phase 6: Adventures 2–4
+## Phase 6R: Durable resume
 
-*Expanded at the Phase 5 checkpoint.*
+*Added 2026-09-20, ahead of Phase 6, because Adventure 2 is not shippable without it.*
 
-**Content only.** Any code change here is a signal Phases 1–3's abstractions were wrong — treat it as a finding, not a task.
+- [x] T6R01 Reproduce the restart, three ways, before changing anything
+- [x] T6R02 `StoryResumePoint` / `ActivityCheckpoint` / `StoryResumeResolver` in `story/models/story_resume.dart`
+- [x] T6R03 Drift v4: `StoryChapterProgress.currentBeat` + `.activityCheckpoint`, pure-add migration
+- [x] T6R04 `StoryDao`: `resumePointFor`, `saveActivityCheckpoint`, `clearActivityCheckpoint`; `grantReward` returns whether it granted
+- [x] T6R05 `ActivityCubit` writes a checkpoint at every step boundary and restores one on start
+- [x] T6R06 Seed carried on the session, so a restored step index means the same step
+- [x] T6R07 `continueStory` / `completeActivity` take `fromNodeId`, so a superseded callback cannot move the story
+- [x] T6R08 Map says Continue for a replay in progress; opening a bead resumes with no dialog
+- [x] T6R09 `story_resume_test.dart` — 41 tests, including a real cold start over a file-backed database
+- [x] T6R10 `_enterNode` reads the stored cursor on **every** entry, not once at `start`
+
+## Phase 6: Adventure 2 — The Market Morning
+
+*Expanded at the Phase 5 checkpoint. **Not** content-only, and the audit says why.*
+
+- [x] T601 Engine matrix over all 24 catalog games and the 4 reusable engines → [engine-matrix.md](./engine-matrix.md)
+- [x] T602 `code_path` — plan a route, then watch it run
+- [x] T603 `balance_experiment` — act before answering
+- [x] T604 `trace_path` — one model for tracing and connect-the-dots; first consumer of `StrokeAttempt`
+- [x] T605 `counting`'s `giveN` half, which was in the schema with no board behind it
+- [x] T606 Neutral furniture shapes on the shared scene prop set (`crate`, `basket`, `awning`, `barrel`, `sign`)
+- [x] T607 `packs/market_goods.json` + 7 activity files + `adventures/market.json`
+- [x] T608 Arc rewiring: the market moves from `upcoming` to `adventures`
+- [x] T609 `new_engines_test.dart` (39) + Adventure 2 through the existing e2e suite in both locales
+
+---
+
+## Phase 6b: Adventure 3 — The Deep Blue
+
+*Content, plus one engine and three adaptations. Full write-up:
+[adventure-3-report.md](./adventure-3-report.md).*
+
+- [x] T610 Capability audit of the six proposed mechanics against the registry key → four are
+      content, one needs a new engine, one needs a shared piece of chrome
+- [x] T611 `patterns` — `patterning | dragToTarget`, the domain the contract has declared since
+      Phase 1 with nothing behind it
+- [x] T612 `ActivityStage` — the thing being built, shown changing, authored as `presentation.stage`
+- [x] T613 `sorting` rung 2: `bins[].settleMotion` and visible accumulation
+- [x] T614 `trace_path` rung 2: `keepCompleted`
+- [x] T615 `ActivityFeedbackScope`, so a board that owns an animation's clock can own its sound too
+- [x] T616 `background_resolver.dart` — `ocean` pointed at real underwater plates instead of a sky
+- [x] T617 `packs/tide_pool.json` (18 items, Fluent Emoji, MIT) + 6 activity files +
+      `adventures/ocean.json` + the three generated art files
+- [x] T618 Arc rewiring: the ocean moves from `upcoming` into `adventures`
+- [x] T619 `patterns_engine_test.dart` (32) + `ocean_screenshot_test.dart` (6) + Adventure 3 through
+      the existing e2e battery in both locales
 
 ---
 
 ## Notes and decisions
 
 *Append dated entries as work proceeds. Newest first.*
+
+- **2026-09-23** — **Four of the six ocean activities are zero Dart, and the two
+  that are not are not the two you would guess.** The climax needed a new engine,
+  which was expected. What was not: "every activity visibly changes the world"
+  turned out to be the expensive requirement, because no amount of JSON makes a
+  board that shows one object, two boxes and a step counter show anything else.
+  That became `ActivityStage` — one piece of shared chrome, authored per
+  activity, rendered *inside the prompt banner's row* so it costs no vertical
+  space and therefore survives 780x390 rather than being the first thing removed
+  on the layouts that need it most.
+
+- **2026-09-23** — **`patterning` had been a declared `LearningDomain` with no
+  engine since Phase 1, and nothing noticed.** The registry test catches two
+  engines claiming one key; nothing catches a key nobody claims. Worth a test of
+  its own eventually: an enum value the shipped set never uses is either a gap
+  or a lie, and both are worth knowing about before a chapter is planned around
+  one.
+
+- **2026-09-23** — **Most of the new engine is about the ways round reading the
+  pattern.** Gaps that all land on the same position in the unit can be answered
+  by copying a fixed distance back; a tray with no spare tile can be answered by
+  elimination; a "revealedRepeats" that the gaps contradict is scaffolding that
+  silently is not there. Each is now a parse-time rejection, and each test pins
+  the *message* rather than just the exception — the first draft of the
+  end-of-strip test was passing because it tripped a different rule two lines
+  above the one it named.
+
+- **2026-09-23** — **The float/sink round is the Market's colour-balance trick
+  on a new dimension, and it forced `heldConstant` to be empty.** Driftwood and
+  a coconut are big and float; a key and a coin are tiny and sink, so "big
+  things sink" fails on the second piece and "small things float" on the third.
+  That means size has to vary *against* the answer — and claiming it as held
+  constant would have been exactly the kind of comment-that-outlived-its-content
+  the Adventure 1 polish pass turned into an assertion. The validator would have
+  caught it.
+
+- **2026-09-23** — **Two bugs, both caught by tests that already existed, both
+  the same shape as bugs a previous chapter had.** The hidden-clue covers buried
+  the compass completely (the engine's own "the page must always be partly
+  visible" assertion), and the pattern ribbon overflowed 360dp by 45px — which
+  is the `code_path` tray failure at exactly the same width, for exactly the
+  same reason. A row is not its tiles: it also spends width on the band's
+  padding, its border, the gaps between tiles and, here, the gate. The cover
+  offsets are now solved numerically across board widths rather than eyeballed.
+
+- **2026-09-23** — **A board can own a sound now, and only for this reason.**
+  Sound belongs in the cubit, where the answer happens and the tests can see it.
+  The wave's per-tile tick is the other kind: a rhythm whose timing *is* the
+  point and whose clock lives in the widget. Driving it from the cubit would
+  have made every test sit through a wave it cannot see, and animating on two
+  clocks would have drifted. `ActivityFeedbackScope` hands the board the
+  soundboard the host already owns — nothing localized passes through it, so the
+  rule that keeps engines free of `AppLocalizations` still holds.
+
+- **2026-09-23** — **The map's "coming soon" state is load-bearing and needs
+  updating by hand.** Promoting the ocean from `upcoming` to `adventures` turned
+  it from `comingSoon` into `locked`, and two assertions in
+  `story_continuity_test` had pinned the old shape. That is the test doing its
+  job — the two states look different and mean different things — but it is also
+  a step that will recur for every chapter, and it is not in the quickstart
+  checklist.
+
+- **2026-09-23** — **Six activities, not seven.** The Market's own report flagged
+  its length as an untested bet on resume, and attention at four to five runs
+  eight to twelve minutes. Six is the correction, and it is now checked from the
+  other side too: a new e2e test asserts **no chapter repeats an interaction
+  inside itself**, which is the failure that makes a long chapter feel long.
+
+
+- **2026-09-20** — **The Adventure restarted itself three ways, and only one of
+  them was the reported one.** Reproduced before anything was changed:
+  (1) a chapter finished once kept `isCompleted` forever, and `start()` forced
+  index 0 for any completed chapter — so every later *replay* threw away all its
+  progress on every re-entry; (2) `indexOfNode` returning `-1` for a node id
+  content had since renamed fell straight through to index 0, which would have
+  fired for every child on the next content release rather than only for repeat
+  players; (3) the page celebration keyed off *reaching* the resolution node
+  rather than off *earning* the page, so closing the app there replayed the
+  flight into the book on every return. The first two now go through one pure
+  `StoryResumeResolver`, so each rule is a test rather than a condition tangled
+  into an async method that also does I/O.
+
+- **2026-09-20** — **Nothing was stored inside an activity at all.** Node-level
+  resume worked; a six-round mini-game left half-way restarted at round one, on
+  a differently shuffled board, because `Random(DateTime.now())` was constructed
+  fresh each time. The fix is two facts, not one: a step index **and** the seed
+  that decided what that step is. A restored index under a new seed would point
+  into a board that was never built, which is worse than starting over because
+  it looks like it worked.
+
+- **2026-09-20** — **One opaque cursor column, not nine typed ones.** The
+  activity checkpoint is versioned JSON in a single nullable column. Its
+  contents are a cursor *format*, not a schema the database has opinions about,
+  and its entire lifetime is "until this child finishes this mini-game" — so a
+  cursor it cannot fully parse (newer version, changed engine schema, different
+  seed, an index the content no longer has) yields **no** checkpoint, and the
+  child replays one mini-game and keeps the story. Nine columns would have made
+  every future change to that cursor a migration.
+
+- **2026-09-20** — **Resume is what makes a seven-activity chapter legal.**
+  Adventure 1 is four activities partly because a longer one was unfinishable:
+  at this age a session usually ends by the device being taken away. The Market
+  is seven, and that is a consequence of 6R rather than a separate decision.
+
+- **2026-09-20** — **Four of the Market's seven activities are zero Dart.** The
+  audit ran every proposed mechanic against the registry's
+  `(learningDomains, interactionModes)` key: detective, restocking, the recipe
+  and the social choice all collided with an existing engine and became content.
+  Three did not collide with anything, and each brings something no amount of
+  content on an existing engine produces — committing to a plan before seeing it
+  run, acting before answering, and making a stroke. That ratio is the check on
+  whether Phases 1–3 were right, and it passed.
+
+- **2026-09-20** — **`giveN` had been in the content schema since Phase 2 with
+  no board behind it.** An author could ask for the harder question — "bring me
+  three", the real cardinality test — and silently get "how many are there?".
+  Found by the audit, not by a test, which is the argument for auditing an
+  engine's *declared* surface against what it actually does before extending it.
+
+- **2026-09-20** — **`StrokeAttempt` has a consumer at last.** Reserved in
+  Phase 1 with none, on the grounds that adding the first literacy-shaped engine
+  should be a new folder rather than a change to the shared contract. It was:
+  `trace_path` uses it unchanged. The eight-variant cap still holds.
+
+- **2026-09-20** — **`trace_path` is bilingual honestly.** It holds no glyph
+  content of its own — a figure is an ordered point run — so its narration is
+  authored in both locales and its first figure is a language-neutral symbol.
+  Arabic letterforms, when they exist, arrive as content files rather than as a
+  code change. Declaring `{'en','ar'}` for a shape engine is a fact; it would
+  have been a lie for a letter engine, which is what the architecture test
+  guards.
+
+- **2026-09-20** — **Two layout bugs, both landscape, both found by tests that
+  already existed.** `boards_widget_test` picks up every new activity
+  automatically, and caught the `code_path` tray overflowing 202px at 360dp
+  (five primary targets cannot share one row on a phone — they wrap now) and the
+  balance pans overflowing in phone landscape (a pan is square-ish, so it has to
+  answer to the shorter side). A third turned up in `StoryBeatView` while
+  writing the rotation test: with the progress bar above it, the beat card was
+  3.2px over at 800×400. It now lays out side by side when the box is wide and
+  short, and sizes its text from the column it actually occupies rather than
+  from the whole screen.
 
 - **2026-09-18** — **The polish pass found more by listening than by looking.**
   Three of the worst findings were silent, not visual: authored reveal lines that
