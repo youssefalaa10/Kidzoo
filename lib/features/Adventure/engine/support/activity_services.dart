@@ -5,6 +5,7 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_narrator.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_soundboard.dart';
 import 'package:kidzo/features/Adventure/engine/support/no_fail_coach.dart';
+import 'package:kidzo/features/Adventure/story/models/story_resume.dart';
 
 /// One recorded attempt, on its way to persistence.
 @immutable
@@ -53,6 +54,57 @@ class RecordingActivityAttemptSink implements ActivityAttemptSink {
       recorded.add(attempt);
 }
 
+/// Where an in-flight activity's position is stored.
+///
+/// Separate from [ActivityAttemptSink] because the two answer different
+/// questions and have opposite lifetimes: attempts are an append-only history
+/// that outlives the run, a checkpoint is a single mutable "here" that is
+/// deleted the moment the run ends.
+///
+/// The base cubit writes through this at every step boundary. Nothing an engine
+/// does reaches it directly — an engine that wanted to choose its own save
+/// points would be deciding when a child's progress is safe, which is the
+/// lifecycle's job.
+abstract class ActivityCheckpointSink {
+  Future<void> save(ActivityCheckpoint checkpoint);
+
+  /// Called once the activity is over, so a later replay of the same story
+  /// node starts it fresh rather than resuming a finished run.
+  Future<void> clear();
+}
+
+/// Discards checkpoints. The default for free play, where there is no story to
+/// come back to, and for any host without a database.
+class NullActivityCheckpointSink implements ActivityCheckpointSink {
+  const NullActivityCheckpointSink();
+
+  @override
+  Future<void> save(ActivityCheckpoint checkpoint) async {}
+
+  @override
+  Future<void> clear() async {}
+}
+
+/// Keeps the latest checkpoint in memory so a test can assert on it — and so a
+/// test can simulate a cold start by feeding [latest] back into a new session.
+class RecordingActivityCheckpointSink implements ActivityCheckpointSink {
+  final List<ActivityCheckpoint> saved = <ActivityCheckpoint>[];
+  bool wasCleared = false;
+
+  ActivityCheckpoint? get latest => saved.isEmpty ? null : saved.last;
+
+  @override
+  Future<void> save(ActivityCheckpoint checkpoint) async {
+    saved.add(checkpoint);
+    wasCleared = false;
+  }
+
+  @override
+  Future<void> clear() async {
+    wasCleared = true;
+  }
+}
+
 /// Everything an engine cubit is allowed to reach for.
 ///
 /// Note what is **absent**: no `BuildContext`, no `AppLocalizations`, no
@@ -71,6 +123,7 @@ class ActivityServices {
     required this.random,
     this.coach = const NoFailCoach(),
     this.attemptSink = const NullActivityAttemptSink(),
+    this.checkpointSink = const NullActivityCheckpointSink(),
     this.languageCode = 'en',
   });
 
@@ -79,12 +132,14 @@ class ActivityServices {
     int seed = 7,
     String languageCode = 'en',
     ActivityAttemptSink? attemptSink,
+    ActivityCheckpointSink? checkpointSink,
   }) {
     return ActivityServices(
       narrator: RecordingActivityNarrator(),
       soundboard: RecordingActivitySoundboard(),
       random: Random(seed),
       attemptSink: attemptSink ?? const NullActivityAttemptSink(),
+      checkpointSink: checkpointSink ?? const NullActivityCheckpointSink(),
       languageCode: languageCode,
     );
   }
@@ -94,6 +149,7 @@ class ActivityServices {
   final Random random;
   final NoFailCoach coach;
   final ActivityAttemptSink attemptSink;
+  final ActivityCheckpointSink checkpointSink;
 
   /// The locale the child is playing in, so content can resolve its own text
   /// without the engine ever touching Flutter's localization machinery.
@@ -105,6 +161,7 @@ class ActivityServices {
         random: random,
         coach: coach,
         attemptSink: attemptSink,
+        checkpointSink: checkpointSink,
         languageCode: languageCode ?? this.languageCode,
       );
 }

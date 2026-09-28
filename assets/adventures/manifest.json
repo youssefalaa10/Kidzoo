@@ -5,15 +5,32 @@
     "lost_pages"
   ],
   "adventures": [
-    "jungle"
+    "jungle",
+    "market",
+    "ocean"
   ],
   "activities": [
     "jungle_ask_animals",
     "jungle_count_watchers",
     "jungle_sort_watchers",
-    "jungle_find_page"
+    "jungle_find_page",
+    "market_find_list",
+    "market_restock",
+    "market_weigh_orders",
+    "market_deliver",
+    "market_fruit_bowl",
+    "market_lend_a_hand",
+    "market_mend_sign",
+    "ocean_find_marker",
+    "ocean_float_or_sink",
+    "ocean_ride_the_current",
+    "ocean_light_her_shell",
+    "ocean_light_the_wall",
+    "ocean_read_the_current"
   ],
   "packs": [
-    "animals"
+    "animals",
+    "market_goods",
+    "tide_pool"
   ]
 }

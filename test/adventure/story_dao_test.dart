@@ -233,8 +233,35 @@ void main() {
   });
 
   group('Schema', () {
-    test('the database reports schema v3', () {
-      expect(database.schemaVersion, 3);
+    test('the v4 columns are nullable, which is what makes the migration safe',
+        () async {
+      // `addColumn` cannot add a NOT NULL column to a table that already has
+      // rows, so an installed v3 database would fail to open. Asserting
+      // nullability here is cheap; the real upgrade over a populated v3 file
+      // still wants a device check, because an in-memory database is always
+      // created at the current version and never migrates at all.
+      expect(database.storyChapterProgress.currentBeat.$nullable, isTrue);
+      expect(database.storyChapterProgress.activityCheckpoint.$nullable, isTrue);
+
+      // And an existing row survives them being absent.
+      final int id = await database.into(database.storyChapterProgress).insert(
+            StoryChapterProgressCompanion.insert(
+              profileId: profileId,
+              adventureId: 'legacy_row',
+            ),
+          );
+      final StoryChapterProgressData row =
+          await (database.select(database.storyChapterProgress)
+                ..where(($StoryChapterProgressTable t) => t.id.equals(id)))
+              .getSingle();
+      expect(row.currentBeat, isNull);
+      expect(row.activityCheckpoint, isNull);
+    });
+
+    test('the database reports schema v4', () {
+      // v4 adds the two nullable columns durable resume needs, on the chapter
+      // row the resume point already lived on. Pure-add, like v3.
+      expect(database.schemaVersion, 4);
     });
 
     test('GameScores accepts the new nullable story columns', () async {

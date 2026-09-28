@@ -1,0 +1,121 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.find_marker",
+  "engineId": "flashlight",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8"
+  },
+  "narration": {
+    "prompt": {
+      "en": "It is dark down here. Move the light and see what the storm left.",
+      "ar": "الظَّلَامُ هُنَا شَدِيد. حَرِّكِ الضَّوْءَ وَانْظُرْ مَاذَا تَرَكَتِ العَاصِفَة."
+    },
+    "hint1": {
+      "en": "Take the light somewhere you have not been yet.",
+      "ar": "خُذِ الضَّوْءَ إِلَى مَكَانٍ لَمْ تَصِلْ إِلَيْهِ بَعْد."
+    },
+    "hint2": {
+      "en": "Nothing here can hurt you. Make the light bigger and look again.",
+      "ar": "لَا شَيْءَ هُنَا يُؤْذِيك. كَبِّرِ الضَّوْءَ وَانْظُرْ مَرَّةً أُخْرَى."
+    },
+    "model": {
+      "en": "There it is, in the light. Now you touch it.",
+      "ar": "هَا هُوَ ذَا فِي الضَّوْء. اِلْمِسْهُ أَنْتَ الآن."
+    },
+    "success": {
+      "en": "The divers left their compass right at the mouth of the trench.",
+      "ar": "تَرَكَ الغَوَّاصُونَ بُوصَلَتَهُمْ عِنْدَ فَمِ الأُخْدُودِ تَمَامًا."
+    }
+  },
+  "payload": {
+    "_comment": "The chapter opens with looking, and with looking being genuinely hard — not because the answer is small, but because the child can only see where they have put the light. Sweeping is free and is never an attempt, so the first minute of the chapter contains nothing a child can be wrong about, which matters more here than anywhere else in it.",
+    "_creatureComment": "The third find is the beat the whole scene is built around. The turtle is drawn at three and a half times the size of everything else, so the starting beam cannot take her in: a child sees an edge of something enormous and does not know what it is. The fix is theirs and it is not aim — the beam has to be WIDENED past 28 percent before she resolves, and when she does she is a turtle asleep on a ledge. Startle, then relief, then nothing was ever wrong. No sudden motion, no noise, no chase.",
+    "_orderComment": "Authored order, never shuffled. The scene tells a small story — something is here, it is friendly, here is the way on — and a shuffled order tells it backwards about a third of the time. Finding the trench mouth is what ends the scene, so the engine requires the exit to be last rather than trusting the author to put it there.",
+    "_boundsComment": "Every find sits between 8 and 92 percent on both axes, which the parser enforces. Objects are sized from the board's SHORT side, so something authored at 97 percent is comfortably on screen in portrait and off the edge in landscape — a bug that appears on one device and not the other, which is the worst kind to be told about by a play test.",
+    "beamStartPercent": [22, 26],
+    "beamPercent": 16,
+    "maxBeamPercent": 34,
+    "hitToleranceFraction": 0.12,
+    "ground": "ground",
+    "itemsRef": "packs/tide_pool",
+    "finds": [
+      {
+        "id": "drifting_kelp",
+        "kind": "find",
+        "positionPercent": [30, 70],
+        "image": "assets/gen/images/sea/kelp.png",
+        "scale": 1.1,
+        "label": { "en": "a ribbon of kelp", "ar": "شَرِيطٌ مِنَ العُشْبِ البَحْرِيّ" },
+        "revealLine": {
+          "en": "Only kelp, swaying. The water is moving down here.",
+          "ar": "عُشْبٌ بَحْرِيٌّ يَتَمَايَل. المَاءُ يَتَحَرَّكُ فِي الأَسْفَل."
+        }
+      },
+      {
+        "id": "startled_crab",
+        "kind": "find",
+        "positionPercent": [72, 76],
+        "image": "assets/gen/images/sea/crab.png",
+        "scale": 1.0,
+        "label": { "en": "a little crab", "ar": "سَرَطَانٌ صَغِير" },
+        "revealLine": {
+          "en": "A crab, holding on. Something bigger is breathing nearby.",
+          "ar": "سَرَطَانٌ مُتَشَبِّث. وَشَيْءٌ أَكْبَرُ يَتَنَفَّسُ بِالقُرْب."
+        }
+      },
+      {
+        "id": "the_big_shape",
+        "kind": "creature",
+        "positionPercent": [50, 34],
+        "image": "assets/gen/images/sea/turtle.png",
+        "scale": 1.0,
+        "requiresBeamPercent": 28,
+        "label": {
+          "en": "something very big in the dark",
+          "ar": "شَيْءٌ كَبِيرٌ جِدًّا فِي الظَّلَام"
+        },
+        "revealLine": {
+          "en": "It is a turtle, asleep on the ledge. That is Sadaf's grandmother.",
+          "ar": "إِنَّهَا سُلَحْفَاةٌ نَائِمَةٌ عَلَى الحَافَّة. تِلْكَ جَدَّةُ صَدَف."
+        }
+      },
+      {
+        "id": "trench_mouth",
+        "kind": "exit",
+        "positionPercent": [82, 30],
+        "image": "assets/gen/images/sea/compass.png",
+        "scale": 1.1,
+        "label": { "en": "the old compass", "ar": "البُوصَلَةُ القَدِيمَة" },
+        "revealLine": {
+          "en": "A compass, pointing straight down. The trench opens right here.",
+          "ar": "بُوصَلَةٌ تُشِيرُ إِلَى الأَسْفَلِ مُبَاشَرَة. الأُخْدُودُ يَبْدَأُ مِنْ هُنَا."
+        }
+      }
+    ],
+    "props": [
+      { "shape": "rock", "positionPercent": [14, 76], "scale": 1.4 },
+      { "shape": "rock", "positionPercent": [88, 62], "scale": 1.1, "flip": true },
+      { "shape": "bush", "positionPercent": [40, 82], "scale": 1.2 },
+      { "shape": "bush", "positionPercent": [62, 66], "scale": 0.9 },
+      { "shape": "grass", "positionPercent": [20, 88], "scale": 1.3 },
+      { "shape": "frond", "positionPercent": [10, 48], "scale": 1.1, "turn": 340 },
+      { "shape": "frond", "positionPercent": [92, 46], "scale": 1.0, "turn": 20, "flip": true },
+      { "shape": "barrel", "positionPercent": [34, 52], "scale": 0.95, "turn": 14 },
+      { "shape": "crate", "positionPercent": [66, 88], "scale": 0.9, "turn": 350 },
+      { "shape": "log", "positionPercent": [52, 60], "scale": 1.2, "turn": 6 }
+    ]
+  },
+  "support": {
+    "distractorCount": 2,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 10,
+    "max": 30
+  },
+  "elofGoal": "COG.attention.visual_search",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

@@ -22,7 +22,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor]) : super(executor ?? _openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -43,6 +43,17 @@ class AppDatabase extends _$AppDatabase {
             await m.addColumn(gameScores, gameScores.starsEarned);
             await m.addColumn(gameScores, gameScores.durationSeconds);
             await m.addColumn(gameScores, gameScores.storyNodeId);
+          }
+          if (from < 4) {
+            // Durable Adventure resume. Two nullable columns on the chapter
+            // row the resume point already lived on, rather than a second
+            // table: where a child is in a story and where they are inside the
+            // activity they are on are the same fact at two zoom levels, and
+            // splitting them across tables is how the two drift apart.
+            await m.addColumn(
+                storyChapterProgress, storyChapterProgress.currentBeat);
+            await m.addColumn(storyChapterProgress,
+                storyChapterProgress.activityCheckpoint);
           }
         },
       );

@@ -93,12 +93,18 @@ Failures name the JSON path. Fix and re-run.
 
 ## Add a whole Adventure
 
-1. `adventures/ocean.json` — the Adventure, its beats and nodes, and its `presentation` defaults.
+1. `adventures/<id>.json` — the Adventure, its beats and nodes, and its `presentation` defaults.
 2. One activity file per activity node.
-3. A `packs/` file if the items are new (e.g. `sea_creatures.json`).
-4. Art into the existing asset directories.
-5. Add the Adventure to the arc in `arcs/lost_pages.json`, with its page reward.
-6. Update `manifest.json`.
+3. A `packs/` file if the items are new.
+4. Art into the existing asset directories, or a new one — **which needs a line in `pubspec.yaml`**,
+   because asset entries are not recursive and a missing one ships nothing, silently.
+5. Add the Adventure to `adventures` in `arcs/lost_pages.json`, **and delete its entry from
+   `upcoming`**. An id in both fails the suite, and the two states are not interchangeable: a stop in
+   `upcoming` renders as *coming soon* (a silhouette of something unwritten) and one in `adventures`
+   as *locked* (a place the child reaches by finishing the one before it). Promoting a chapter
+   changes which of those the map shows, so expect `story_continuity_test` to need its expectations
+   updated in the same change.
+6. Update `manifest.json` — the adventure, every activity **and** any new pack.
 7. Run the content test, then play it.
 
 **Still no Dart.** If a node needs behaviour no engine provides, that is a new-engine conversation (see the reuse ladder in [plan.md](./plan.md)), not an inline exception.
@@ -107,8 +113,18 @@ Failures name the JSON path. Fix and re-run.
 
 - **Author prompts whole, per locale.** Never assemble a sentence at runtime — Arabic number–noun agreement is irregular (3–10 take a broken plural; 11+ singular accusative), and the validator rejects a `{count}` placeholder in an `ar` string without an explicit `plural` block.
 - **Full harakat, no exceptions**, in every Arabic string an early reader sees.
-- **Check the engine supports Arabic first.** `counting`, `sorting`, `drag_drop`, `patterns`, `multiple_choice` and `hidden_clue` do. The literacy-shaped engines (`tracing`, `phonics`, `word_building`, `read_along`) declare `{'en'}` and authoring an Arabic node against them **fails the suite by design** — see [research.md](./research.md) §6.
-- **Mirroring:** pattern strips and sorting trays mirror; number lines and ten-frames do not. Set `sequenceDirection` and `mirrorAnchorsForRtl` deliberately rather than accepting defaults for scene-based content.
+- **Check the engine supports Arabic first.** All eight shipped engines declare `{'en', 'ar'}`:
+  `counting`, `sorting`, `multiple_choice`, `hidden_clue`, `code_path`, `balance_experiment`,
+  `trace_path` and `patterns`. None of them holds glyph content of its own, which is what makes that
+  claim honest rather than a box ticked — the wording around them is authored per locale. A future
+  literacy-shaped engine would declare `{'en'}` until Arabic letterform content exists, and
+  authoring an Arabic node against it would **fail the suite by design** — see
+  [research.md](./research.md) §6.
+- **Mirroring is a per-engine decision, not a global one, and some of it must NOT happen.**
+  `code_path`'s arrows are spatial, so they are not mirrored: a mirrored arrow drives the cart the
+  wrong way. A `patterns` ribbon lays out in the locale's direction, but the **unit order is never
+  reversed** — a reversed pattern is a different pattern, and the answer would change. Both are
+  pinned by tests rather than left to a content flag.
 
 ## Validation scenarios
 

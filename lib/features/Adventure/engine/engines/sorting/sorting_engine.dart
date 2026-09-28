@@ -1,3 +1,4 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
 import 'package:kidzo/core/shared/widgets/kid_pick_card.dart';
@@ -12,6 +13,47 @@ import 'package:kidzo/features/Adventure/engine/contract/item_pack.dart';
 import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text.dart';
 import 'package:kidzo/features/Adventure/engine/support/localized_text.dart';
 
+/// What a token does when it arrives in a bin, and what it does when it is put
+/// in the wrong one.
+///
+/// This is the difference between a sorting activity and a quiz about sorting.
+/// A bin that is "the sea floor" and a bin that is "the surface" are not two
+/// equivalent boxes: a thing that floats *cannot stay* on the sea floor, and
+/// showing it drift back up is a better answer than any sound a button could
+/// make. The engine has no idea what water is — content says which way each bin
+/// sends things, and the board plays it.
+enum SettleMotion {
+  /// Arrives from below and bobs. Used for floats, balloons, lifts.
+  rise,
+
+  /// Arrives from above and lands heavily. Used for weights, stones, drops.
+  sink,
+
+  /// Just settles in place. The neutral default, and what every existing
+  /// sorting activity keeps without being edited.
+  settle;
+
+  static SettleMotion parse(String raw, String path) {
+    for (final SettleMotion motion in SettleMotion.values) {
+      if (motion.name == raw) {
+        return motion;
+      }
+    }
+    throw ActivityContentException(
+      path,
+      '"$raw" is not a settle motion; expected one of '
+      '${SettleMotion.values.map((SettleMotion m) => m.name).toList()}',
+    );
+  }
+
+  /// Vertical direction, as a multiplier on a travel distance. Negative is up.
+  double get direction => switch (this) {
+        SettleMotion.rise => -1,
+        SettleMotion.sink => 1,
+        SettleMotion.settle => 0,
+      };
+}
+
 /// One destination a token can go to.
 @immutable
 class SortingBin {
@@ -20,12 +62,29 @@ class SortingBin {
     required this.attributeValue,
     required this.label,
     this.imageAsset,
+    this.settleMotion = SettleMotion.settle,
   });
 
   final String id;
   final String attributeValue;
   final LocalizedText label;
   final String? imageAsset;
+  final SettleMotion settleMotion;
+}
+
+/// A token that has already been sorted, kept so the bin it went into can go on
+/// showing it.
+///
+/// Carried on the step rather than accumulated in the board's own state,
+/// because the board is a pure function of the state by contract — and because
+/// a child who leaves half way through and comes back must find the bins as
+/// full as they left them, which board-local state would not survive.
+@immutable
+class SortedToken {
+  const SortedToken({required this.item, required this.binId});
+
+  final PackItem item;
+  final String binId;
 }
 
 class SortingContent extends ActivityContent {
@@ -68,6 +127,7 @@ class SortingStep extends ActivityStep {
     required this.item,
     required this.correctBinId,
     required this.bins,
+    this.alreadySorted = const <SortedToken>[],
   }) : super(stepId);
 
   /// Where this token sits in the round, from zero.
@@ -84,6 +144,17 @@ class SortingStep extends ActivityStep {
   /// Carried on the step so the board is a pure function of the state and does
   /// not have to reach back into the cubit for its own content.
   final List<SortingBin> bins;
+
+  /// Everything sorted before this token, in the bin it belongs to.
+  ///
+  /// The point is not bookkeeping: it is that the child can see the thing they
+  /// are building. Eight placements into a float/sink round, the surface bin
+  /// visibly holds a lift and the floor visibly holds ballast, and that is the
+  /// activity's output rather than a number in the corner of the screen.
+  final List<SortedToken> alreadySorted;
+
+  Iterable<SortedToken> sortedInto(String binId) => alreadySorted
+      .where((SortedToken token) => token.binId == binId);
 
   SortingBin? binById(String id) {
     for (final SortingBin bin in bins) {
@@ -106,6 +177,7 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
         .clamp(1, pool.length * content.roundCount);
 
     final List<SortingStep> steps = <SortingStep>[];
+    final List<SortedToken> sorted = <SortedToken>[];
     for (int index = 0; index < total; index++) {
       final PackItem item = pool[index % pool.length];
       final String? value = item.attribute(content.activeAttribute);
@@ -130,7 +202,9 @@ class SortingCubit extends ActivityCubit<SortingContent, SortingStep> {
         item: item,
         correctBinId: bin.id,
         bins: content.bins,
+        alreadySorted: List<SortedToken>.unmodifiable(sorted),
       ));
+      sorted.add(SortedToken(item: item, binId: bin.id));
     }
     return steps;
   }
@@ -203,7 +277,11 @@ class SortingEngine extends ActivityEngine<SortingContent> {
           ContentParameter.list('heldConstant',
               description: 'attributes kept identical so the target attribute '
                   'is the only thing that varies'),
-          ContentParameter.list('bins', isRequired: true),
+          ContentParameter.list('bins', isRequired: true,
+              description: 'each with id, value, label, optional image and an '
+                  'optional settleMotion (rise | sink | settle) saying which '
+                  'way this bin sends things — which is how a wrong placement '
+                  'gets answered by the world instead of by a buzzer'),
           ContentParameter.integer('itemsPerRound', minValue: 1, maxValue: 12),
           ContentParameter.integer('roundCount', minValue: 1, maxValue: 8),
           ContentParameter.text('itemsRef'),
@@ -242,6 +320,10 @@ class SortingEngine extends ActivityEngine<SortingContent> {
         label: LocalizedText.fromJson(raw['label'],
             debugPath: '$path.bins[$index].label'),
         imageAsset: binReader.optionalString('image'),
+        settleMotion: SettleMotion.parse(
+          binReader.optionalString('settleMotion') ?? 'settle',
+          '$path.bins[$index].settleMotion',
+        ),
       ));
     }
 
@@ -295,7 +377,8 @@ class _SortingBoard extends StatefulWidget {
   State<_SortingBoard> createState() => _SortingBoardState();
 }
 
-class _SortingBoardState extends State<_SortingBoard> {
+class _SortingBoardState extends State<_SortingBoard>
+    with SingleTickerProviderStateMixin {
   /// Set when the child taps the token rather than dragging it.
   ///
   /// Tap-to-select is not a fallback here. Drag succeeds as little as 30% of
@@ -303,11 +386,40 @@ class _SortingBoardState extends State<_SortingBoard> {
   /// single-pointer alternative to every drag, so both routes are first-class.
   bool _isTokenSelected = false;
 
+  /// Plays once each time a token is put somewhere it cannot stay.
+  ///
+  /// The token travels the way it *actually* behaves — a float drifts up, a
+  /// weight drops — and comes back. That is the correction: the object tells
+  /// the child what it is, which is something they can reason from next time.
+  /// A buzzer tells them only that an adult disagreed.
+  late final AnimationController _reject;
+
+  @override
+  void initState() {
+    super.initState();
+    _reject = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 620),
+    );
+  }
+
+  @override
+  void dispose() {
+    _reject.dispose();
+    super.dispose();
+  }
+
   @override
   void didUpdateWidget(_SortingBoard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.step.stepId != widget.step.stepId) {
       _isTokenSelected = false;
+      _reject.value = 0;
+      return;
+    }
+    if (widget.state.wrongAttemptsOnStep >
+        oldWidget.state.wrongAttemptsOnStep) {
+      _reject.forward(from: 0);
     }
   }
 
@@ -319,6 +431,12 @@ class _SortingBoardState extends State<_SortingBoard> {
       droppedAtDistance: distance,
     ));
   }
+
+  /// What this token does when it is where it belongs — which is also what it
+  /// does when it is somewhere it does not.
+  SettleMotion get _trueMotion =>
+      widget.step.binById(widget.step.correctBinId)?.settleMotion ??
+      SettleMotion.settle;
 
   @override
   Widget build(BuildContext context) {
@@ -338,14 +456,30 @@ class _SortingBoardState extends State<_SortingBoard> {
         return Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            KidPickCard<String>(
-              imageAsset: widget.step.item.imageAsset,
-              size: tokenSize,
-              dragData: widget.step.item.id,
-              state:
-                  _isTokenSelected ? KidCardState.selected : KidCardState.idle,
-              label: widget.step.item.label.resolve(widget.state.languageCode),
-              onTap: () => setState(() => _isTokenSelected = !_isTokenSelected),
+            AnimatedBuilder(
+              animation: _reject,
+              builder: (BuildContext context, Widget? child) {
+                // Out and back along one arc, so it reads as the object moving
+                // under its own weight rather than as a rejection shudder.
+                final double travel =
+                    math.sin(_reject.value * math.pi) * tokenSize * 0.42;
+                return Transform.translate(
+                  offset: Offset(0, travel * _trueMotion.direction),
+                  child: child,
+                );
+              },
+              child: KidPickCard<String>(
+                imageAsset: widget.step.item.imageAsset,
+                size: tokenSize,
+                dragData: widget.step.item.id,
+                state: _isTokenSelected
+                    ? KidCardState.selected
+                    : KidCardState.idle,
+                label:
+                    widget.step.item.label.resolve(widget.state.languageCode),
+                onTap: () =>
+                    setState(() => _isTokenSelected = !_isTokenSelected),
+              ),
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -360,6 +494,9 @@ class _SortingBoardState extends State<_SortingBoard> {
                     languageCode: widget.state.languageCode,
                     label: bin.label.resolve(widget.state.languageCode),
                     imageAsset: bin.imageAsset,
+                    settleMotion: bin.settleMotion,
+                    contents:
+                        widget.step.sortedInto(bin.id).toList(growable: false),
                     onAccept: () => _place(bin.id),
                   ),
               ],
@@ -381,6 +518,8 @@ class _BinTarget extends StatelessWidget {
     required this.languageCode,
     required this.label,
     required this.imageAsset,
+    required this.settleMotion,
+    required this.contents,
     required this.onAccept,
   });
 
@@ -392,6 +531,13 @@ class _BinTarget extends StatelessWidget {
   final String languageCode;
   final String label;
   final String? imageAsset;
+  final SettleMotion settleMotion;
+
+  /// What is already in here. Floats collect at the top of the bin and weights
+  /// at the bottom, which costs one alignment and makes the two bins read as
+  /// two different *places* rather than two boxes with different captions.
+  final List<SortedToken> contents;
+
   final VoidCallback onAccept;
 
   @override
@@ -429,14 +575,40 @@ class _BinTarget extends StatelessWidget {
                   ),
                   boxShadow: KidUi.shadow(KidUi.primary, strength: 0.6),
                 ),
+                clipBehavior: Clip.antiAlias,
                 alignment: Alignment.center,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: <Widget>[
-                    if (imageAsset != null)
-                      Expanded(
-                        child: Image.asset(imageAsset!, fit: BoxFit.contain),
+                    Expanded(
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: <Widget>[
+                          if (imageAsset != null)
+                            Opacity(
+                              opacity: contents.isEmpty ? 1.0 : 0.3,
+                              child: Image.asset(imageAsset!,
+                                  fit: BoxFit.contain),
+                            ),
+                          if (contents.isNotEmpty)
+                            Padding(
+                              // Keeps the pile off the bin's rounded corners,
+                              // which otherwise clip the top of whatever
+                              // collected at a `rise` bin's ceiling.
+                              padding: EdgeInsets.all(size * 0.06),
+                              child: Align(
+                                alignment: settleMotion == SettleMotion.rise
+                                    ? Alignment.topCenter
+                                    : Alignment.bottomCenter,
+                                child: _BinContents(
+                                  contents: contents,
+                                  binSize: size,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
+                    ),
                     ActivityGlyphText(
                       label,
                       languageCode: languageCode,
@@ -450,6 +622,49 @@ class _BinTarget extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+/// The pile inside a bin.
+///
+/// Overlapped rather than laid out in a grid, because a heap of things reads as
+/// a heap at any count, while a grid reflows every time something lands and
+/// makes the whole bin twitch.
+class _BinContents extends StatelessWidget {
+  const _BinContents({required this.contents, required this.binSize});
+
+  final List<SortedToken> contents;
+  final double binSize;
+
+  static const int _maxShown = 6;
+
+  @override
+  Widget build(BuildContext context) {
+    final List<SortedToken> shown = contents.length <= _maxShown
+        ? contents
+        : contents.sublist(contents.length - _maxShown);
+    final double chip = binSize * 0.32;
+    final double step = chip * 0.6;
+
+    return SizedBox(
+      height: chip,
+      width: step * (shown.length - 1) + chip,
+      child: Stack(
+        clipBehavior: Clip.none,
+        children: <Widget>[
+          for (int i = 0; i < shown.length; i++)
+            Positioned(
+              left: i * step,
+              child: SizedBox(
+                width: chip,
+                height: chip,
+                child:
+                    Image.asset(shown[i].item.imageAsset, fit: BoxFit.contain),
+              ),
+            ),
+        ],
+      ),
     );
   }
 }

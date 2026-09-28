@@ -29,7 +29,7 @@ import 'package:kidzo/features/Adventure/engine/support/number_words.dart';
 import 'package:kidzo/features/Adventure/story/models/story_models.dart';
 import 'package:kidzo/features/Adventure/story/rewards/adventure_reward.dart';
 import 'package:kidzo/features/Adventure/story/rewards/adventure_reward_overlay.dart';
-import 'package:kidzo/features/Adventure/story/ui/map_stop_tile.dart';
+import 'package:kidzo/features/Adventure/story/ui/journey_trail.dart';
 
 import 'support/disk_content_source.dart';
 
@@ -527,14 +527,16 @@ void main() {
     });
   });
 
-  group('The map reads as a journey', () {
-    /// Renders one stop with the localizations a real screen would have.
-    Future<void> pumpStop(
+  group('The map reads as a journey, not as a list', () {
+    /// Renders a whole trail with the localizations a real screen would have.
+    Future<void> pumpTrail(
       WidgetTester tester,
-      MapStop stop, {
-      required bool isLast,
-      VoidCallback? onOpen,
+      List<MapStop> stops, {
+      void Function(MapStop stop)? onOpen,
     }) async {
+      final ScrollController controller = ScrollController();
+      addTearDown(controller.dispose);
+
       await tester.pumpWidget(MaterialApp(
         locale: const Locale('en', ''),
         localizationsDelegates: <LocalizationsDelegate<dynamic>>[
@@ -544,24 +546,21 @@ void main() {
         ],
         supportedLocales: AppLocalizations.supportedLocales,
         home: Scaffold(
-          body: Builder(
-            builder: (BuildContext context) => LayoutBuilder(
-              builder: (BuildContext context, BoxConstraints constraints) =>
-                  MapStopTile(
-                stop: stop,
-                isLast: isLast,
-                isJustUnlocked: false,
-                isInProgress: false,
-                languageCode: 'en',
-                metrics: KidMetrics.of(constraints),
-                l10n: AppLocalizations.of(context),
-                onOpen: onOpen,
-              ),
+          body: LayoutBuilder(
+            builder: (BuildContext context, BoxConstraints constraints) =>
+                JourneyTrail(
+              stops: stops,
+              languageCode: 'en',
+              metrics: KidMetrics.of(constraints),
+              controller: controller,
+              topInset: 0,
+              statusLabelFor: _statusLabel,
+              onOpen: onOpen,
             ),
           ),
         ),
       ));
-      // Not pumpAndSettle: the stop the child should play next breathes on a
+      // Not pumpAndSettle: the bead the child should play next breathes on a
       // repeating controller, so nothing on this screen is ever "settled". A
       // handful of frames instead, which is also what the asynchronous
       // localization delegate needs before any label exists to assert on.
@@ -570,82 +569,172 @@ void main() {
       }
     }
 
-    const MapStop locked = MapStop(
+    const MapStop market = MapStop(
       id: 'market',
       title: LocalizedText(<String, String>{'en': 'The Market'}),
       teaser: LocalizedText.empty(),
       state: MapStopState.comingSoon,
+      icon: 'market',
     );
 
-    testWidgets('a locked stop is visible, named and not playable',
+    const MapStop current = MapStop(
+      id: 'jungle',
+      title: LocalizedText(<String, String>{'en': 'The Green Page'}),
+      teaser: LocalizedText.empty(),
+      state: MapStopState.open,
+    );
+
+    testWidgets('names do not take permanent space beside every bead',
         (WidgetTester tester) async {
+      // The redesign, as an assertion. A name printed next to every stop is
+      // what made the old map read as a stepper; only the bead the child is on
+      // wears its name, and the rest answer when asked.
+      await pumpTrail(tester, <MapStop>[current, market]);
+
+      expect(find.text('The Green Page'), findsOneWidget,
+          reason: 'the current bead says where the child is');
+      expect(find.text('The Market'), findsNothing,
+          reason: 'a name beside every bead is the stepper being rebuilt');
+    });
+
+    testWidgets('a place that is not written yet is shown, and names itself '
+        'on demand, but cannot be played', (WidgetTester tester) async {
       // All three at once is the point. Hiding it entirely makes the map a
       // single button; showing it as playable lies; showing its story spends
       // the surprise before the child gets there.
-      final int opened = 0;
-      await pumpStop(tester, locked, isLast: true);
+      int opened = 0;
+      await pumpTrail(
+        tester,
+        <MapStop>[market],
+        onOpen: (MapStop _) => opened++,
+      );
+
+      // The motif the content authored, rather than one padlock for every
+      // unwritten place.
+      expect(find.byIcon(Icons.storefront_rounded), findsOneWidget);
+      expect(find.text('The Market'), findsNothing);
+
+      await tester.tap(find.byIcon(Icons.storefront_rounded));
+      await tester.pump();
 
       expect(find.text('The Market'), findsOneWidget);
-      expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
+      expect(opened, 0, reason: 'it is not a place the child can go');
+    });
 
-      await tester.tap(find.text('The Market'));
-      await tester.pump();
-      expect(opened, 0);
+    testWidgets('an unwritten place with no motif still reads as shut',
+        (WidgetTester tester) async {
+      await pumpTrail(tester, const <MapStop>[
+        MapStop(
+          id: 'somewhere',
+          title: LocalizedText(<String, String>{'en': 'Somewhere'}),
+          teaser: LocalizedText.empty(),
+          state: MapStopState.comingSoon,
+        ),
+      ]);
+      expect(find.byIcon(Icons.lock_rounded), findsOneWidget);
     });
 
     testWidgets('a locked stop gives nothing away until it is earned',
         (WidgetTester tester) async {
-      await pumpStop(tester, locked, isLast: true);
+      await pumpTrail(tester, <MapStop>[market]);
+      await tester.tap(find.byIcon(Icons.storefront_rounded));
+      await tester.pump();
       expect(find.textContaining('busy market'), findsNothing);
 
-      await pumpStop(
-        tester,
-        const MapStop(
+      await pumpTrail(tester, const <MapStop>[
+        MapStop(
           id: 'market',
           title: LocalizedText(<String, String>{'en': 'The Market'}),
           teaser: LocalizedText(<String, String>{
             'en': 'A page blew into a busy market.',
           }),
           state: MapStopState.comingSoon,
+          icon: 'market',
         ),
-        isLast: true,
-      );
-      expect(find.textContaining('busy market'), findsOneWidget);
+      ]);
+      await tester.tap(find.byIcon(Icons.storefront_rounded));
+      await tester.pump();
+      expect(find.textContaining('busy market'), findsOneWidget,
+          reason: 'the one earned teaser line belongs on the bead it teases');
     });
 
-    testWidgets('an open stop invites a tap; a finished one offers a replay',
+    testWidgets('the current bead invites a tap and opens its story',
         (WidgetTester tester) async {
       int opened = 0;
-      await pumpStop(
+      await pumpTrail(
         tester,
-        const MapStop(
-          id: 'jungle',
-          title: LocalizedText(<String, String>{'en': 'The Green Page'}),
-          teaser: LocalizedText.empty(),
-          state: MapStopState.open,
-        ),
-        isLast: false,
-        onOpen: () => opened++,
+        <MapStop>[current],
+        onOpen: (MapStop _) => opened++,
       );
+
       expect(find.text('Start'), findsOneWidget);
-      await tester.tap(find.text('The Green Page'));
+
+      await tester.tap(find.byIcon(Icons.play_arrow_rounded));
       await tester.pump();
       expect(opened, 1);
+    });
 
-      await pumpStop(
+    testWidgets('a finished story wears its page and offers a replay',
+        (WidgetTester tester) async {
+      int opened = 0;
+      await pumpTrail(
         tester,
-        const MapStop(
-          id: 'jungle',
-          title: LocalizedText(<String, String>{'en': 'The Green Page'}),
-          teaser: LocalizedText.empty(),
-          state: MapStopState.completed,
-        ),
-        isLast: false,
-        onOpen: () => opened++,
+        const <MapStop>[
+          MapStop(
+            id: 'jungle',
+            title: LocalizedText(<String, String>{'en': 'The Green Page'}),
+            teaser: LocalizedText.empty(),
+            state: MapStopState.completed,
+            art: 'assets/gen/images/story/page_green.png',
+          ),
+        ],
+        onOpen: (MapStop _) => opened++,
       );
-      expect(find.text('Again'), findsOneWidget);
+
+      // The page it gave up, not a tick: the clearest statement of what
+      // playing it was for. The replay wording stays reachable for a screen
+      // reader without printing a word next to every bead.
+      expect(find.byType(Image), findsOneWidget);
+      expect(find.bySemanticsLabel('The Green Page, Again'), findsOneWidget);
+
+      await tester.tap(find.byType(Image));
+      await tester.pump();
+      expect(opened, 1);
+    });
+
+    test('bead positions come from the index, so the trail has no end', () {
+      // The extendability requirement, as an assertion: there is no table of
+      // authored coordinates to run out of, so story 400 is placed by the same
+      // rule as story 1 and adding one costs nothing.
+      for (final int index in <int>[0, 1, 5, 6, 99, 400]) {
+        expect(TrailGeometry.xFor(index), inInclusiveRange(0.0, 1.0));
+      }
+      expect(
+        TrailGeometry.xFor(0),
+        TrailGeometry.xFor(TrailGeometry.lanes.length),
+        reason: 'the lane cycle is what makes the rule total',
+      );
+      expect(
+        <double>{for (int i = 0; i < 4; i++) TrailGeometry.xFor(i)}.length,
+        4,
+        reason: 'four beads running must not stack in the same lane',
+      );
     });
   });
+}
+
+/// The status wording the map screen hands the trail.
+String _statusLabel(MapStop stop) {
+  switch (stop.state) {
+    case MapStopState.completed:
+      return 'Again';
+    case MapStopState.open:
+      return 'Start';
+    case MapStopState.locked:
+      return 'Not yet';
+    case MapStopState.comingSoon:
+      return 'Coming soon';
+  }
 }
 
 /// Hands a widget test its localizations without going through the bundle.
