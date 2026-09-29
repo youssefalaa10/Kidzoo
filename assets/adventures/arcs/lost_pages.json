@@ -19,20 +19,21 @@
   "adventures": [
     "jungle",
     "market",
-    "ocean"
+    "ocean",
+    "stars"
   ],
   "_upcomingComment": "Destinations the child can SEE but not yet play. They exist so the map reads as a journey rather than a single button, and they carry a title and nothing else: revealing the story of a locked Adventure spends the surprise before the child gets there. The one-line `peek` is shown only once the Adventure before it is finished, which is what makes finishing feel like it opened something. These are deliberately NOT in `adventures` - that list is validated to name real, playable content.",
   "upcoming": [
     {
-      "id": "stars",
-      "icon": "stars",
+      "id": "wind",
+      "icon": "wind",
       "title": {
-        "en": "Up Among the Stars",
-        "ar": "بَيْنَ النُّجُوم"
+        "en": "Where the Wind Begins",
+        "ar": "حَيْثُ تُولَدُ الرِّيح"
       },
       "peek": {
-        "en": "The last page went up, far past the clouds.",
-        "ar": "صَعِدَتِ الصَّفْحَةُ الأَخِيرَةُ بَعِيدًا خَلْفَ الغُيُوم."
+        "en": "Every page flew on one wind. Where does it come from?",
+        "ar": "طَارَتْ كُلُّ صَفْحَةٍ عَلَى رِيحٍ وَاحِدَة. فَمِنْ أَيْنَ تَأْتِي؟"
       }
     }
   ]

@@ -189,6 +189,33 @@ abstract class ActivityCubit<TContent extends ActivityContent,
   @protected
   void restoreResumePayload(Map<String, dynamic> payload) {}
 
+  /// Called once when a step finishes, before its reveal line is spoken.
+  ///
+  /// For engines whose steps are answered in the order the *child* chooses
+  /// rather than the order they were built — a difference found, a suspect
+  /// set aside — which is logical progress the step index alone cannot carry.
+  /// [attempt] is what finished the step; when [credited] is true the ladder
+  /// ran out and the attempt was not itself correct, so the engine should
+  /// record whatever it modelled.
+  ///
+  /// Return true when the view needs describing again, so the reveal spoken
+  /// is the one for what the child actually did. Pair it with
+  /// [captureResumePayload], or a resumed run forgets what was done.
+  @protected
+  bool onStepCompleted(
+    TStep step,
+    ActivityAttempt attempt, {
+    required bool credited,
+  }) =>
+      false;
+
+  void _noteStepCompleted(ActivityAttempt attempt, {required bool credited}) {
+    if (onStepCompleted(currentStep, attempt, credited: credited)) {
+      _emitSafely(
+          state.copyWith(view: describe(currentStep, state.scaffoldLevel)));
+    }
+  }
+
   Future<void> start() async {
     if (_hasStarted) {
       return;
@@ -318,6 +345,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       _unlockBoard();
       return;
     }
+    _noteStepCompleted(attempt, credited: false);
     await _settleThenAdvance(await _speakReveal());
   }
 
@@ -387,6 +415,7 @@ abstract class ActivityCubit<TContent extends ActivityContent,
       lastAttemptedOptionId: _optionIdOf(attempt),
     ));
     await services.soundboard.play(ActivitySound.success);
+    _noteStepCompleted(attempt, credited: true);
     // The child still gets the clue. Withholding the story beat from the one
     // child who needed every rung of the ladder would be exactly backwards.
     await _settleThenAdvance(await _speakReveal());

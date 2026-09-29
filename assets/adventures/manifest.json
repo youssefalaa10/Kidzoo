@@ -7,7 +7,8 @@
   "adventures": [
     "jungle",
     "market",
-    "ocean"
+    "ocean",
+    "stars"
   ],
   "activities": [
     "jungle_ask_animals",
@@ -26,11 +27,17 @@
     "ocean_ride_the_current",
     "ocean_light_her_shell",
     "ocean_light_the_wall",
-    "ocean_read_the_current"
+    "ocean_read_the_current",
+    "stars_missing_stars",
+    "stars_what_covers_them",
+    "stars_relight",
+    "stars_star_path",
+    "stars_who_carries_it"
   ],
   "packs": [
     "animals",
     "market_goods",
-    "tide_pool"
+    "tide_pool",
+    "sky"
   ]
 }

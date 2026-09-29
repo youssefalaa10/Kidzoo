@@ -5,10 +5,13 @@ import 'package:kidzo/features/Adventure/engine/engines/balance_experiment/balan
 import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/counting/counting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/current_rider/current_rider_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/deduction/deduction_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/flashlight/flashlight_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/mix_lab/mix_lab_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/shadow_play/shadow_play_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sound_sequence/sound_sequence_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/spot_the_diff/spot_the_diff_engine.dart';
@@ -54,10 +57,18 @@ ActivityEngineRegistry buildDefaultEngineRegistry() {
     const FlashlightEngine(),
     const CurrentRiderEngine(),
     const SoundSequenceEngine(),
-    // Adventure 3 (ocean) added one more. Visual discrimination — comparing two
-    // simultaneous scenes to find what changed — is a genuinely different skill
-    // from visual search of one scene (hidden_clue) or lighting a dark area
-    // (flashlight). compareScene is the mode that earns it its slot.
+    // Visual discrimination — comparing two simultaneous scenes to find what
+    // changed — is a different skill from searching one scene (hidden_clue)
+    // or lighting a dark one (flashlight). compareScene is the mode that earns
+    // it its slot. Adventure 4 is its first chapter.
     const SpotDiffEngine(),
+    // Adventure 4 added three, and two new domains with them. Every engine
+    // above asks the child to recognise, arrange or recall something already
+    // there; none asks them to find a rule by changing something and
+    // watching, and none asks them to reach an answer by ruling everything
+    // else out.
+    const ShadowPlayEngine(),
+    const MixLabEngine(),
+    const DeductionEngine(),
   ]);
 }

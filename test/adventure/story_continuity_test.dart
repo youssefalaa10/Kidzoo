@@ -282,29 +282,30 @@ void main() {
       final JourneyTrail trail =
           tester.widget<JourneyTrail>(find.byType(JourneyTrail));
 
-      // Three playable Adventures plus one place that is not written yet.
+      // Four playable Adventures plus one place that is not written yet.
       // Crucially *not* one bead per activity: the jungle has four activities
-      // and eight nodes, the market has seven and eleven, the ocean six and
-      // ten, and each contributes exactly one stop.
-      expect(trail.stops.length, 4);
+      // and eight nodes, the market seven and eleven, the ocean six and ten,
+      // the stars five and nine, and each contributes exactly one stop.
+      expect(trail.stops.length, 5);
       expect(trail.stops.first.id, 'jungle');
       expect(trail.stops.first.state, MapStopState.open);
       expect(
         trail.stops.skip(1).map((MapStop stop) => stop.id),
-        <String>['market', 'ocean', 'stars'],
+        <String>['market', 'ocean', 'stars', 'wind'],
       );
       // The market and the ocean are real content now, so they are **locked**
       // rather than "coming soon": stops the child will reach by finishing the
       // one before them, not silhouettes of something unwritten. The two
       // states look different and mean different things, and the distinction
       // is what keeps the map honest about which promises it can already keep.
-      // Only the stars are still a silhouette.
+      // Only the wind is still a silhouette.
       expect(trail.stops[1].state, MapStopState.locked);
       expect(trail.stops[2].state, MapStopState.locked);
-      expect(trail.stops[3].state, MapStopState.comingSoon);
+      expect(trail.stops[3].state, MapStopState.locked);
+      expect(trail.stops[4].state, MapStopState.comingSoon);
 
       // The header keeps the one number worth keeping permanently on screen.
-      expect(find.text('0/4'), findsOneWidget);
+      expect(find.text('0/5'), findsOneWidget);
       expect(find.text('The Lost Pages'), findsOneWidget);
 
       // And the premise paragraph is no longer spending the top of the map.
@@ -342,7 +343,38 @@ void main() {
           reason: 'recovering the first page is what opens the second stop');
       expect(stops[2].state, MapStopState.locked,
           reason: 'and it opens exactly one, not everything after it');
-      expect(find.text('1/4'), findsOneWidget);
+      expect(find.text('1/5'), findsOneWidget);
+    });
+
+    testWidgets('the stars open after the ocean; the wind is only a promise',
+        (WidgetTester tester) async {
+      // Adventure 5 is on the map and cannot be played. It must stay a
+      // silhouette however far the child gets, and its one teaser line is
+      // earned by finishing the stars — not shown before.
+      for (final String id in <String>['jungle', 'market', 'ocean']) {
+        await dao.markChapterCompleted(profileId: profileId, adventureId: id);
+      }
+      await pumpMap(tester);
+      List<MapStop> stops =
+          tester.widget<JourneyTrail>(find.byType(JourneyTrail)).stops;
+      expect(stops[3].id, 'stars');
+      expect(stops[3].state, MapStopState.open);
+      expect(stops[4].id, 'wind');
+      expect(stops[4].state, MapStopState.comingSoon);
+      expect(stops[4].isReachable, isFalse);
+      expect(stops[4].teaser.isEmpty, isTrue,
+          reason: 'the teaser is earned by finishing the stars');
+
+      await dao.markChapterCompleted(profileId: profileId, adventureId: 'stars');
+      await pumpMap(tester);
+      stops = tester.widget<JourneyTrail>(find.byType(JourneyTrail)).stops;
+      expect(stops[3].state, MapStopState.completed);
+      expect(stops[4].state, MapStopState.comingSoon);
+      expect(stops[4].isReachable, isFalse,
+          reason: 'finishing everything must not make Adventure 5 playable');
+      expect(stops[4].teaser.resolve('en'),
+          bundle.primaryArc.upcoming.single.peek.resolve('en'));
+      expect(find.text('4/5'), findsOneWidget);
     });
 
     testWidgets('a story in progress says Continue, not Start',

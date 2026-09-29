@@ -25,6 +25,17 @@ enum LearningDomain {
   spatialReasoning,
   arithmetic,
   literacy,
+
+  // Adventure 4 added two. Every domain above is about recognising or
+  // arranging what is already there; neither of these is.
+  /// Changing one thing on purpose and watching what it does to another — a
+  /// shadow growing as its object nears the light, two colours becoming a
+  /// third. The child finds the rule by experiment rather than being told it.
+  causeAndEffect,
+
+  /// Reaching an answer by ruling things out: nothing points at the answer
+  /// directly, and it is only what survives every stated condition.
+  logic,
 }
 
 /// How the child acts. The other half of the uniqueness key.
@@ -60,6 +71,22 @@ enum InteractionMode {
   /// Distinct from [tapInScene], where a single scene holds one hidden target;
   /// here two scenes are shown at once and the comparison itself is the task.
   compareScene,
+
+  // Adventure 4 added three.
+  /// Slides a thing along a continuous track while an effect elsewhere
+  /// changes live. Distinct from [dragToTarget]: there is no target to drop
+  /// on, and the answer is *where along the track* it was left.
+  slideToAdjust,
+
+  /// Adds parts into one whole whose result is judged, and the parts vanish
+  /// into it. Distinct from [dragToTarget], where what matters is where each
+  /// part went; here only what they make together counts.
+  combine,
+
+  /// Sets aside the candidates a stated condition rules out, until one is
+  /// left. Distinct from [chooseOne]: the child never picks the answer, they
+  /// remove everything that cannot be it.
+  eliminate,
 }
 
 /// One gameplay parameter an engine accepts from content.

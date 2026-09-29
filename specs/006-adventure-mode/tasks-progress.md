@@ -31,7 +31,7 @@ This is the **single** progress ledger for Spec 006 — there is no second statu
 | 6R — Durable resume *(new requirement)* | complete | 2026-09-20 | 2026-09-20 |
 | 6 — Adventure 2 (The Market Morning) | complete — 3 new engines, see notes | 2026-09-20 | 2026-09-20 |
 | 6b — Adventure 3 (The Deep Blue) | complete — 1 new engine + 3 adaptations, see notes | 2026-09-23 | 2026-09-23 |
-| 6c — Adventure 4 | not started | — | — |
+| 6c — Adventure 4 (Up Among the Stars) | complete — 3 new engines + 1 repaired, see notes | 2026-09-29 | 2026-09-29 |
 
 ---
 
@@ -444,6 +444,27 @@ same line.
 - [x] T618 Arc rewiring: the ocean moves from `upcoming` into `adventures`
 - [x] T619 `patterns_engine_test.dart` (32) + `ocean_screenshot_test.dart` (6) + Adventure 3 through
       the existing e2e battery in both locales
+
+## Phase 6c: Adventure 4 — Up Among the Stars
+
+*Content, three new engines, and one engine repaired. Full write-up:
+[adventure-4-report.md](./adventure-4-report.md).*
+
+- [x] T620 Baseline repair: the unfinished Ocean `n7b` (`ocean_spot_the_wall`) removed at the
+      user's direction — unregistered, missing both images, no e2e driver entry, 27 red tests
+- [x] T621 `spot_the_diff` rebuilt: order-free finding (cubit-owned progress), no rings before help,
+      square panels so authored fractions land on the art, missed taps not judged, resume payload
+- [x] T622 Contract: `ActivityCubit.onStepCompleted` — the hook for steps answered in the child's
+      order; `LearningDomain.causeAndEffect`, `.logic`; `InteractionMode.slideToAdjust`, `.combine`,
+      `.eliminate`
+- [x] T623 `shadow_play` — `causeAndEffect | slideToAdjust`
+- [x] T624 `mix_lab` — `causeAndEffect | combine`
+- [x] T625 `deduction` — `logic | eliminate`
+- [x] T626 `packs/sky.json` + 5 activity files + `adventures/stars.json`; `stars` background plates;
+      Fluent Emoji (MIT) + generated art, sources recorded in the report
+- [x] T627 Arc: the stars move into `adventures`; Adventure 5 (`wind`) added as `upcoming` only
+- [x] T628 `stars_chapter_test.dart` (33) + `stars_screenshot_test.dart` (15) + Adventure 4 through
+      the e2e battery in both locales + the map pinned to "Adventure 5 is never playable"
 
 ---
 

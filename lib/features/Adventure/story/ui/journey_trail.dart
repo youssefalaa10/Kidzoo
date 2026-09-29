@@ -562,6 +562,8 @@ class _TrailBeadState extends State<_TrailBead>
         return Icons.waves_rounded;
       case 'stars':
         return Icons.auto_awesome_rounded;
+      case 'wind':
+        return Icons.air_rounded;
       default:
         return Icons.lock_rounded;
     }
