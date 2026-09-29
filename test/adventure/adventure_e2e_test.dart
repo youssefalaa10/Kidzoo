@@ -17,12 +17,16 @@ import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_cont
 import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/counting/counting_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/current_rider/current_rider_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/deduction/deduction_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/flashlight/flashlight_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/hidden_clue/hidden_clue_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/mix_lab/mix_lab_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple_choice_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/shadow_play/shadow_play_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sound_sequence/sound_sequence_cubit.dart';
+import 'package:kidzo/features/Adventure/engine/engines/spot_the_diff/spot_the_diff_cubit.dart';
 import 'package:kidzo/features/Adventure/engine/engines/trace_path/trace_engine.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_narrator.dart';
 import 'package:kidzo/features/Adventure/engine/support/activity_services.dart';
@@ -119,6 +123,27 @@ void main() {
     }
     if (step is SoundSequenceStep) {
       return SequenceAttempt(step.round.sequence);
+    }
+    if (step is SpotDiffStep) {
+      // Any difference not yet found; the child picks the order.
+      return ChoiceAttempt(state.view!.liveOptionIds.first);
+    }
+    if (step is ShadowStep) {
+      return QuantityAttempt(step.round.targetPercent);
+    }
+    if (step is MixStep) {
+      return SequenceAttempt(step.round.target);
+    }
+    if (step is DeductionStep) {
+      // A card this clue rules out that is still standing. Not the live
+      // list: that also holds the ones the clue keeps.
+      final Set<String> setAside = state.view!.dimmedOptionIds.toSet();
+      return ChoiceAttempt(step.content
+          .ruledOutBy(step.clueIndex)
+          .map((item) => item.id)
+          .firstWhere((String id) => !setAside.contains(id),
+              // A tap landing after the last card is set aside.
+              orElse: () => '__none__'));
     }
     throw StateError('no correct attempt known for ${step.runtimeType}');
   }
@@ -524,20 +549,144 @@ void main() {
     });
   }
 
+  for (final String locale in <String>['en', 'ar']) {
+    group('Adventure 4 in $locale', () {
+      test('plays from the first beat to the page, answering well', () async {
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'stars');
+
+        expect(spoken, isNotEmpty);
+        final List<StoryReward> rewards = await dao.rewardsFor(profileId);
+        expect(rewards.map((StoryReward r) => r.rewardId),
+            contains('silver_page'));
+      });
+
+      test('never mixes the two languages in one run', () async {
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'stars');
+
+        for (final String line in spoken) {
+          expect(arabic.hasMatch(line), locale == 'ar',
+              reason: 'a "$locale" run said "$line"');
+        }
+      });
+
+      test('never says the same thing twice in a row', () async {
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'stars');
+
+        for (int index = 1; index < spoken.length; index++) {
+          expect(spoken[index], isNot(spoken[index - 1]),
+              reason: 'said "${spoken[index]}" twice running');
+        }
+      });
+
+      test('every clue the chapter is solved with is said out loud', () async {
+        // The mystery is only fair if the child heard every piece of it. Each
+        // activity's reveal lines are the evidence the next one uses — the
+        // line of missing stars, the page-shaped shadow, the three things the
+        // relit stars saw — and a clue that is authored but never spoken
+        // leaves the climax asking about something the child was not told.
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'stars');
+
+        final List<String> activityIds = <String>[
+          for (final StoryNode node in bundle.requireAdventure('stars').nodes)
+            if (node.isActivity) node.activityRef!.split('/').last,
+        ];
+        expect(activityIds, hasLength(5));
+
+        for (final String activityId in activityIds) {
+          final ActivitySpec spec = bundle.requireActivity(activityId);
+          final List<String> reveals = <String>[];
+          void collect(Object? node) {
+            if (node is Map) {
+              final Object? reveal = node['revealLine'];
+              if (reveal is Map && reveal[locale] is String) {
+                reveals.add(reveal[locale] as String);
+              }
+              node.values.forEach(collect);
+            } else if (node is List) {
+              node.forEach(collect);
+            }
+          }
+
+          collect(spec.payload);
+          expect(reveals, isNotEmpty,
+              reason: '$activityId changes nothing the story mentions');
+          for (final String reveal in reveals) {
+            expect(spoken, contains(reveal),
+                reason: '$activityId never said "$reveal"');
+          }
+        }
+      });
+
+      test('the mystery holds until the child solves it', () async {
+        // Nothing may name the comet before the child has left it standing.
+        // A beat or a hint that says it early spends the climax.
+        final List<String> spoken =
+            await playAdventure(languageCode: locale, adventureId: 'stars');
+        final String comet = bundle.packResolver
+            .require('packs/sky', debugPath: 'test')
+            .findById('comet')!
+            .label
+            .resolve(locale);
+        final String solved = bundle
+            .requireActivity('stars_who_carries_it')
+            .narration
+            .success
+            .resolve(locale);
+
+        final int firstMention =
+            spoken.indexWhere((String line) => line.contains(comet));
+        expect(firstMention, spoken.indexOf(solved),
+            reason: 'the comet is named before the child found it: '
+                '"${spoken[firstMention]}"');
+      });
+
+      test('a child who gets everything wrong still reaches the page',
+          () async {
+        await playAdventure(
+          languageCode: locale,
+          adventureId: 'stars',
+          answerEverythingWrong: true,
+        );
+
+        final List<StoryReward> rewards = await dao.rewardsFor(profileId);
+        expect(rewards.map((StoryReward r) => r.rewardId),
+            contains('silver_page'));
+      });
+
+      test('fast repeated taps do not skip a beat or double a page', () async {
+        await playAdventure(
+          languageCode: locale,
+          adventureId: 'stars',
+          tapFast: true,
+        );
+
+        final List<StoryReward> rewards = await dao.rewardsFor(profileId);
+        expect(
+          rewards.where((StoryReward r) => r.rewardId == 'silver_page').length,
+          1,
+        );
+      });
+    });
+  }
+
   group('The arc plays as one journey', () {
-    test('all three chapters run back to back and every page comes home',
+    test('all four chapters run back to back and every page comes home',
         () async {
-      // Finishing the jungle is what opens the market, and the market is what
-      // opens the ocean, so all three have to work in sequence against one
-      // profile rather than only in isolation.
+      // Each chapter is what opens the next, so all four have to work in
+      // sequence against one profile rather than only in isolation.
       await playAdventure(languageCode: 'en');
       await playAdventure(languageCode: 'en', adventureId: 'market');
       await playAdventure(languageCode: 'en', adventureId: 'ocean');
+      await playAdventure(languageCode: 'en', adventureId: 'stars');
 
       final List<StoryReward> rewards = await dao.rewardsFor(profileId);
       expect(
         rewards.map((StoryReward r) => r.rewardId).toSet(),
-        <String>{'green_page', 'amber_page', 'blue_page'},
+        <String>{'green_page', 'amber_page', 'blue_page', 'silver_page'},
       );
     });
 
@@ -573,13 +722,25 @@ void main() {
       expect(oceanEngines.intersection(marketEngines), isNotEmpty,
           reason: 'the ocean reused nothing, which would mean every chapter '
               'costs a new engine');
+
+      final Set<String> starsEngines = <String>{
+        for (final StoryNode node in bundle.requireAdventure('stars').nodes)
+          if (node.isActivity)
+            bundle.requireActivity(node.activityRef!).engineId,
+      };
+      final Set<String> before =
+          jungleEngines.union(marketEngines).union(oceanEngines);
+      expect(starsEngines.difference(before), isNotEmpty,
+          reason: 'the stars bring nothing the child has not already met');
+      expect(starsEngines.intersection(before), isNotEmpty,
+          reason: 'the stars reused nothing');
     });
 
     test('no chapter repeats an interaction inside itself', () async {
       // Variety within one sitting, not only between chapters. Six activities
       // that are six rounds of the same interaction is the failure this
       // catches, and it is invisible to every per-activity test.
-      for (final String adventureId in <String>['jungle', 'market', 'ocean']) {
+      for (final String adventureId in bundle.adventures.keys) {
         final List<String> engines = <String>[
           for (final StoryNode node
               in bundle.requireAdventure(adventureId).nodes)

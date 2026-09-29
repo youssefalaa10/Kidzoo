@@ -73,6 +73,9 @@ flutter:
     # scattered through animal/ and vehicles/, because the whole set is one
     # visual family and has to stay swappable as a set.
     - assets/gen/images/sea/
+    # The sky, its travellers and the Stars chapter's scenes, for the same
+    # reason: one family, replaceable as a set.
+    - assets/gen/images/stars/
     - assets/gen/images/puzzle/
     - assets/gen/images/puzzle/gazelle block/
     - assets/gen/images/puzzle/ghost block/
