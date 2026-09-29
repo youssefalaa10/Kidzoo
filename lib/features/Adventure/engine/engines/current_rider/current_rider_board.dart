@@ -49,6 +49,10 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
   /// Cells already ticked, so the drift sounds once per cell.
   int _ticked = 0;
 
+  /// Which gate the D-Pad currently controls. Resets on every new step so the
+  /// child always starts on the first gate rather than a stale selection.
+  int _activeGateIndex = 0;
+
   @override
   void initState() {
     super.initState();
@@ -68,11 +72,10 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
   void didUpdateWidget(CurrentRiderBoard oldWidget) {
     super.didUpdateWidget(oldWidget);
     if (oldWidget.step.stepId != widget.step.stepId) {
-      // A new board is a new set of gates. Carrying the old setting over would
-      // silently pre-answer part of the next round.
       setState(() {
         _setting = Map<String, Drift>.of(widget.step.round.initialSetting);
         _running = null;
+        _activeGateIndex = 0;
       });
       _run.stop();
     }
@@ -92,14 +95,26 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
           ? _round.gateToTurn(_setting)
           : null;
 
-  void _turn(CurrentGate gate) {
-    if (!_isLive) {
-      return;
-    }
-    final Drift now = _setting[gate.id] ?? gate.initial;
-    final int next = (gate.choices.indexOf(now) + 1) % gate.choices.length;
-    setState(() => _setting[gate.id] = gate.choices[next]);
+  /// Sets the active gate to [direction] directly. Called by the D-Pad.
+  ///
+  /// If [direction] is not in the active gate's choices the press is a no-op —
+  /// rather than an error — so a disabled button can still register a tap
+  /// without breaking anything.
+  void _setDirection(Drift direction) {
+    if (!_isLive || _round.gates.isEmpty) return;
+    final int safeIndex = _activeGateIndex.clamp(0, _round.gates.length - 1);
+    final CurrentGate gate = _round.gates[safeIndex];
+    if (!gate.choices.contains(direction)) return;
+    setState(() => _setting[gate.id] = direction);
     ActivityFeedbackScope.maybeOf(context)?.soundboard.play(ActivitySound.tap);
+  }
+
+  /// Selects which gate the D-Pad controls. Only relevant when there are
+  /// multiple gates — the child taps one on the board to focus the pad on it.
+  void _selectGate(int index) {
+    if (!_isLive || index == _activeGateIndex) return;
+    KidHaptics.tap();
+    setState(() => _activeGateIndex = index);
   }
 
   /// Runs the current, then reports the configuration that produced it.
@@ -118,8 +133,6 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
       _ticked = 0;
     });
     _run.duration = _driftPerCell * ride.path.length + _settle;
-    // `orCancel` rejects if the board is disposed mid-run — a child backing
-    // out of the activity while she is still drifting, which is ordinary.
     await _run.forward(from: 0).orCancel.catchError((Object _) {});
     if (!mounted) {
       return;
@@ -150,10 +163,6 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
   }
 
   /// Where the rider is, in fractional cell coordinates.
-  ///
-  /// Between cells while the run is playing, and on the last safe cell once it
-  /// is over — which is the gentle return the round needs. Nothing is ever
-  /// removed from the board and there is no failure state to land in.
   Offset get _riderAt {
     final Ride? ride = _running;
     if (ride == null) {
@@ -173,8 +182,6 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
     );
   }
 
-  /// The run occupies the drift portion of the controller; the settle at the
-  /// end is time for the child to see where she stopped.
   double get _totalOverTravel {
     final Ride? ride = _running;
     if (ride == null || ride.path.length < 2) {
@@ -189,6 +196,7 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
   Widget build(BuildContext context) {
     final String language = widget.state.languageCode;
     final String? glowing = _gateToGlow;
+    final bool multiGate = _round.gates.length > 1;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
@@ -197,12 +205,19 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
         final double height =
             constraints.maxHeight.isFinite ? constraints.maxHeight : 480;
 
-        // The button is measured first and the grid gets what is left, rather
-        // than the grid taking what it wants and the button overflowing. That
-        // ordering is the whole reason this fits at 780x390, where the height
-        // left for a 4-row grid is under a hundred pixels per row.
-        final double buttonHeight = math.min(KidUi.minTouch, height * 0.2);
-        final double gridHeight = height - buttonHeight - 16;
+        // Controls are measured first; the grid gets what is left. This is the
+        // ordering that makes everything fit at 780×390.
+        //
+        // D-Pad: 3 rows of buttons plus 2 internal gaps.
+        final double dpadBtnSize =
+            math.min(52.0, (height * 0.30 - 16.0) / 3).clamp(28.0, 52.0);
+        final double dpadHeight = dpadBtnSize * 3 + 16.0;
+        final double runHeight =
+            math.min(KidUi.minTouch * 0.75, height * 0.10).clamp(40.0, 56.0);
+        const double gapTotal = 8.0 * 3;
+        final double gridHeight =
+            (height - dpadHeight - runHeight - gapTotal).clamp(60.0, height);
+
         final double cell = math.max(
           24,
           math.min(gridHeight / _round.rows, width / _round.columns),
@@ -210,10 +225,21 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
         final double boardWidth = cell * _round.columns;
         final double boardHeight = cell * _round.rows;
 
+        final int safeIndex =
+            _activeGateIndex.clamp(0, _round.gates.length - 1);
+        final CurrentGate? activeGate =
+            _round.gates.isEmpty ? null : _round.gates[safeIndex];
+        final Set<Drift> validDrifts =
+            activeGate?.choices.toSet() ?? <Drift>{};
+        final Drift currentDrift = activeGate == null
+            ? Drift.up
+            : _setting[activeGate.id] ?? activeGate.initial;
+
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: <Widget>[
+            // ── board ──────────────────────────────────────────────────────
             SizedBox(
               width: boardWidth,
               height: boardHeight,
@@ -235,8 +261,8 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
                     ),
                     for (final Cell rock in _round.rocks)
                       _AtCell(
-                        cell:
-                            Offset(rock.column.toDouble(), rock.row.toDouble()),
+                        cell: Offset(
+                            rock.column.toDouble(), rock.row.toDouble()),
                         size: cell,
                         child: Padding(
                           padding: EdgeInsets.all(cell * 0.1),
@@ -254,19 +280,30 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
                         accent: _accent,
                       ),
                     ),
-                    for (final CurrentGate gate in _round.gates)
+                    // Gates are visualised as direction arrows. Tapping one
+                    // *selects* it for the D-Pad (when there are several) rather
+                    // than cycling its direction — that is the D-Pad's job now.
+                    for (int i = 0; i < _round.gates.length; i++)
                       _AtCell(
-                        cell: Offset(gate.cell.column.toDouble(),
-                            gate.cell.row.toDouble()),
+                        cell: Offset(
+                          _round.gates[i].cell.column.toDouble(),
+                          _round.gates[i].cell.row.toDouble(),
+                        ),
                         size: cell,
                         child: _GateArrow(
                           size: cell,
-                          flow: _setting[gate.id] ?? gate.initial,
+                          flow: _setting[_round.gates[i].id] ??
+                              _round.gates[i].initial,
                           accent: _accent,
                           enabled: _isLive,
-                          glowing: glowing == gate.id,
-                          label: gate.label.resolve(language),
-                          onTap: () => _turn(gate),
+                          glowing: glowing == _round.gates[i].id,
+                          selected: i == safeIndex,
+                          label: _round.gates[i].label.resolve(language),
+                          // Only wire the tap when there is something to choose
+                          // between; a single-gate board has nothing to select.
+                          onTap: multiGate && _isLive
+                              ? () => _selectGate(i)
+                              : null,
                         ),
                       ),
                     _AtCell(
@@ -282,9 +319,20 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            // ── D-Pad ──────────────────────────────────────────────────────
+            const SizedBox(height: 8),
+            _DirectionPad(
+              buttonSize: dpadBtnSize,
+              accent: _accent,
+              enabled: _isLive,
+              validDrifts: validDrifts,
+              currentDrift: currentDrift,
+              onDirection: _setDirection,
+            ),
+            // ── release ────────────────────────────────────────────────────
+            const SizedBox(height: 8),
             _ReleaseButton(
-              height: buttonHeight,
+              height: runHeight,
               width: math.min(boardWidth, width),
               accent: _accent,
               enabled: _isLive,
@@ -297,6 +345,8 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
     );
   }
 }
+
+// ── grid helpers ──────────────────────────────────────────────────────────────
 
 /// Places a child on the grid, at fractional cell coordinates so the rider can
 /// sit between two cells while it drifts.
@@ -364,22 +414,22 @@ class _WaterPainter extends CustomPainter {
       ..strokeWidth = 1
       ..color = Colors.white.withValues(alpha: 0.10);
     for (int c = 1; c < columns; c++) {
-      canvas.drawLine(Offset(c * cell, 0), Offset(c * cell, size.height), line);
+      canvas.drawLine(
+          Offset(c * cell, 0), Offset(c * cell, size.height), line);
     }
     for (int r = 1; r < rows; r++) {
-      canvas.drawLine(Offset(0, r * cell), Offset(size.width, r * cell), line);
+      canvas.drawLine(
+          Offset(0, r * cell), Offset(size.width, r * cell), line);
     }
 
     final List<Cell>? path = wake;
     if (path == null || path.length < 2) {
       return;
     }
-    // The wake is the record of the run, drawn behind her as she goes, so a
-    // child who got it wrong can see the whole route that did not work rather
-    // than only the rock she stopped at.
     final double reached = wakeProgress * (path.length - 1);
     final Path trail = Path()
-      ..moveTo((path.first.column + 0.5) * cell, (path.first.row + 0.5) * cell);
+      ..moveTo(
+          (path.first.column + 0.5) * cell, (path.first.row + 0.5) * cell);
     for (int index = 1; index < path.length; index++) {
       if (index > reached) {
         break;
@@ -406,9 +456,15 @@ class _WaterPainter extends CustomPainter {
       old.accent != accent;
 }
 
-/// A current the child can turn. Tapped, never dragged: a drag on a cell this
-/// small is a gesture a lot of four-year-olds cannot land, and there is nothing
-/// a rotation drag expresses that a cycle of two or three taps does not.
+// ── gate visualisation ────────────────────────────────────────────────────────
+
+/// A current gate, shown on the board as a direction arrow.
+///
+/// This widget is now **visualisation only**: it shows which way the current is
+/// set and, when there are multiple gates, lets the child tap to *select* it
+/// for the D-Pad. The D-Pad below the board is what changes the direction.
+/// Separating the two removes the small tap-to-cycle target from inside the
+/// grid and replaces it with the large, touch-friendly D-Pad buttons.
 class _GateArrow extends StatelessWidget {
   const _GateArrow({
     required this.size,
@@ -416,6 +472,7 @@ class _GateArrow extends StatelessWidget {
     required this.accent,
     required this.enabled,
     required this.glowing,
+    required this.selected,
     required this.label,
     required this.onTap,
   });
@@ -425,19 +482,27 @@ class _GateArrow extends StatelessWidget {
   final Color accent;
   final bool enabled;
   final bool glowing;
-  final String label;
-  final VoidCallback onTap;
 
-  double get _turns {
+  /// True when this gate is the one the D-Pad is currently controlling.
+  final bool selected;
+
+  final String label;
+
+  /// Null when tapping does nothing (single-gate boards).
+  final VoidCallback? onTap;
+
+  // Icons.arrow_forward_rounded has matchTextDirection: true, so Flutter
+  // mirrors it to point LEFT in RTL. Left/right turns must compensate.
+  double _turnsFor(bool isRtl) {
     switch (flow) {
       case Drift.up:
         return -0.25;
       case Drift.down:
         return 0.25;
       case Drift.left:
-        return 0.5;
+        return isRtl ? 0 : 0.5;
       case Drift.right:
-        return 0;
+        return isRtl ? 0.5 : 0;
     }
   }
 
@@ -456,25 +521,33 @@ class _GateArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
+    final bool interactive = onTap != null && enabled;
+
     return Semantics(
       label: label,
       value: _spokenDirection,
-      button: true,
-      enabled: enabled,
-      hint: 'tap to turn the current',
+      button: interactive,
+      enabled: interactive,
+      hint: interactive ? 'tap to select this current' : null,
       child: GestureDetector(
-        onTap: enabled ? onTap : null,
+        onTap: interactive ? onTap : null,
         child: Padding(
           padding: EdgeInsets.all(size * 0.06),
           child: AnimatedContainer(
             duration: KidUi.fast,
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: glowing ? 0.3 : 0.14),
+              color: Colors.white.withValues(
+                alpha: glowing ? 0.3 : (selected ? 0.22 : 0.14),
+              ),
               borderRadius: BorderRadius.circular(size * 0.22),
               border: Border.all(
-                color:
-                    glowing ? KidUi.hint : Colors.white.withValues(alpha: 0.35),
-                width: glowing ? 3.5 : 2,
+                color: glowing
+                    ? KidUi.hint
+                    : selected
+                        ? accent.withValues(alpha: 0.9)
+                        : Colors.white.withValues(alpha: 0.35),
+                width: glowing ? 3.5 : (selected ? 2.5 : 2),
               ),
               boxShadow: glowing
                   ? <BoxShadow>[
@@ -483,11 +556,18 @@ class _GateArrow extends StatelessWidget {
                         blurRadius: size * 0.4,
                       ),
                     ]
-                  : const <BoxShadow>[],
+                  : selected
+                      ? <BoxShadow>[
+                          BoxShadow(
+                            color: accent.withValues(alpha: 0.3),
+                            blurRadius: size * 0.3,
+                          ),
+                        ]
+                      : const <BoxShadow>[],
             ),
             child: Center(
               child: AnimatedRotation(
-                turns: _turns,
+                turns: _turnsFor(isRtl),
                 duration: KidUi.fast,
                 child: Icon(
                   Icons.arrow_forward_rounded,
@@ -502,6 +582,8 @@ class _GateArrow extends StatelessWidget {
     );
   }
 }
+
+// ── destination ───────────────────────────────────────────────────────────────
 
 /// Where she is going: the art, with the water glowing behind it so the target
 /// reads as a destination rather than as one more object on the board.
@@ -535,6 +617,175 @@ class _Goal extends StatelessWidget {
     );
   }
 }
+
+// ── D-Pad control ─────────────────────────────────────────────────────────────
+
+/// A 4-button directional pad. Replaces the old tap-on-gate mechanic so the
+/// child has one large, reachable control rather than four small arrows
+/// scattered across the grid.
+///
+/// Buttons are positioned with explicit pixel offsets so [TextDirection] never
+/// swaps left and right. A water current that flows left always flows left —
+/// Arabic readers and English readers share the same physical world.
+class _DirectionPad extends StatelessWidget {
+  const _DirectionPad({
+    required this.buttonSize,
+    required this.accent,
+    required this.enabled,
+    required this.validDrifts,
+    required this.currentDrift,
+    required this.onDirection,
+  });
+
+  final double buttonSize;
+  final Color accent;
+  final bool enabled;
+
+  /// The directions this gate can be turned to. Buttons outside this set are
+  /// shown disabled so the child can see all four axes but knows which ones
+  /// actually do something.
+  final Set<Drift> validDrifts;
+
+  /// Which direction the active gate is currently pointing.
+  final Drift currentDrift;
+
+  final ValueChanged<Drift> onDirection;
+
+  @override
+  Widget build(BuildContext context) {
+    Widget btn(Drift drift, IconData icon, String label) {
+      final bool valid = enabled && validDrifts.contains(drift);
+      return _DPadButton(
+        size: buttonSize,
+        icon: icon,
+        accent: accent,
+        enabled: valid,
+        isActive: currentDrift == drift,
+        onTap: valid ? () => onDirection(drift) : null,
+        semanticLabel: label,
+      );
+    }
+
+    return SizedBox(
+      width: buttonSize * 3,
+      height: buttonSize * 3,
+      child: Stack(
+        children: <Widget>[
+          Positioned(
+            left: buttonSize,
+            top: 0,
+            child: btn(Drift.up, Icons.keyboard_arrow_up_rounded, 'up'),
+          ),
+          Positioned(
+            left: 0,
+            top: buttonSize,
+            child: btn(Drift.left, Icons.keyboard_arrow_left_rounded, 'left'),
+          ),
+          Positioned(
+            left: buttonSize * 2,
+            top: buttonSize,
+            child:
+                btn(Drift.right, Icons.keyboard_arrow_right_rounded, 'right'),
+          ),
+          Positioned(
+            left: buttonSize,
+            top: buttonSize * 2,
+            child: btn(Drift.down, Icons.keyboard_arrow_down_rounded, 'down'),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// One button on a D-Pad. Stateful so it can animate a pressed scale.
+class _DPadButton extends StatefulWidget {
+  const _DPadButton({
+    required this.size,
+    required this.icon,
+    required this.accent,
+    required this.enabled,
+    required this.isActive,
+    required this.onTap,
+    required this.semanticLabel,
+  });
+
+  final double size;
+  final IconData icon;
+  final Color accent;
+  final bool enabled;
+
+  /// True when this direction is what the gate is currently set to.
+  final bool isActive;
+
+  final VoidCallback? onTap;
+  final String semanticLabel;
+
+  @override
+  State<_DPadButton> createState() => _DPadButtonState();
+}
+
+class _DPadButtonState extends State<_DPadButton> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final bool live = widget.enabled && widget.onTap != null;
+
+    return Semantics(
+      button: true,
+      enabled: live,
+      label: widget.semanticLabel,
+      child: GestureDetector(
+        onTapDown: live ? (_) => setState(() => _pressed = true) : null,
+        onTapUp: live
+            ? (_) {
+                setState(() => _pressed = false);
+                widget.onTap!();
+              }
+            : null,
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.84 : 1.0,
+          duration: const Duration(milliseconds: 80),
+          child: Container(
+            width: widget.size,
+            height: widget.size,
+            decoration: BoxDecoration(
+              color: widget.isActive
+                  ? widget.accent
+                  : Colors.white
+                      .withValues(alpha: live ? 0.92 : 0.30),
+              borderRadius: BorderRadius.circular(widget.size * 0.28),
+              boxShadow: live
+                  ? KidUi.shadow(
+                      widget.isActive ? widget.accent : Colors.black,
+                      strength: 0.4,
+                    )
+                  : null,
+              border: widget.isActive
+                  ? null
+                  : Border.all(
+                      color: Colors.white.withValues(alpha: live ? 0.55 : 0.20),
+                      width: 1.5,
+                    ),
+            ),
+            child: Icon(
+              widget.icon,
+              size: widget.size * 0.55,
+              color: widget.isActive
+                  ? Colors.white
+                  : widget.accent
+                      .withValues(alpha: live ? 1.0 : 0.30),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── release button ────────────────────────────────────────────────────────────
 
 /// "Let's go". One button, and the only thing on the board that is an answer.
 class _ReleaseButton extends StatelessWidget {
@@ -576,8 +827,6 @@ class _ReleaseButton extends StatelessWidget {
             child: Center(
               child: Icon(
                 running ? Icons.waves_rounded : Icons.play_arrow_rounded,
-                // Sized off the button rather than fixed, so it shrinks with
-                // the button on a short landscape board instead of pushing it.
                 size: height * 0.5,
                 color: Colors.white,
               ),

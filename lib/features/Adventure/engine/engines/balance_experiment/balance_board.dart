@@ -44,6 +44,14 @@ class _BalanceBoardState extends State<BalanceBoard> {
 
   bool get _isLevel => widget.step.isLevel(_total);
 
+  Map<String, int> get _panCounts {
+    final Map<String, int> counts = <String, int>{};
+    for (final WeighedItem item in _onPan) {
+      counts[item.id] = (counts[item.id] ?? 0) + 1;
+    }
+    return counts;
+  }
+
   @override
   void didUpdateWidget(BalanceBoard oldWidget) {
     super.didUpdateWidget(oldWidget);
@@ -75,6 +83,10 @@ class _BalanceBoardState extends State<BalanceBoard> {
 
   void _add(WeighedItem item) {
     if (widget.state.isBoardLocked) {
+      return;
+    }
+    final int? limit = item.quantity;
+    if (limit != null && (_panCounts[item.id] ?? 0) >= limit) {
       return;
     }
     KidHaptics.tap();
@@ -151,6 +163,7 @@ class _BalanceBoardState extends State<BalanceBoard> {
             SizedBox(height: metrics.gap * 0.5),
             _Counter(
               items: widget.step.round.available,
+              panCounts: _panCounts,
               edge: trayEdge,
               accent: accent,
               languageCode: languageCode,
@@ -438,6 +451,7 @@ class _LoadedFace extends StatelessWidget {
 class _Counter extends StatelessWidget {
   const _Counter({
     required this.items,
+    required this.panCounts,
     required this.edge,
     required this.accent,
     required this.languageCode,
@@ -447,6 +461,10 @@ class _Counter extends StatelessWidget {
   });
 
   final List<WeighedItem> items;
+
+  /// How many of each item (by id) are already on the pan this round.
+  final Map<String, int> panCounts;
+
   final double edge;
   final Color accent;
   final String languageCode;
@@ -462,62 +480,100 @@ class _Counter extends StatelessWidget {
       runSpacing: edge * 0.12,
       children: <Widget>[
         for (final WeighedItem item in items)
-          Semantics(
-            button: true,
-            enabled: isEnabled,
-            label: item.label.resolve(languageCode),
-            child: GestureDetector(
-              onTap: isEnabled ? () => onPick(item) : null,
-              // Tap, not drag. Both work for a pan this size, but only one of
-              // them works reliably for a four-year-old, so the tap is the
-              // primary route rather than the fallback.
-              child: AnimatedContainer(
-                duration: KidUi.fast,
-                width: edge,
-                height: edge,
-                padding: EdgeInsets.all(edge * 0.1),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: isEnabled ? 0.94 : 0.5),
-                  borderRadius: BorderRadius.circular(edge * 0.24),
-                  border: Border.all(
-                    color:
-                        highlightedId == item.id ? KidUi.hint : Colors.transparent,
-                    width: highlightedId == item.id ? edge * 0.07 : 0,
-                  ),
-                  boxShadow: KidUi.shadow(accent, strength: 0.5),
-                ),
-                child: Stack(
-                  children: <Widget>[
-                    Positioned.fill(
-                      child: Image.asset(item.imageAsset, fit: BoxFit.contain),
-                    ),
-                    // The weight, on the thing itself. A child cannot plan a
-                    // load out of objects whose size they have to remember.
-                    Align(
-                      alignment: Alignment.bottomRight,
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: edge * 0.1,
-                          vertical: edge * 0.02,
+          Builder(
+            builder: (BuildContext context) {
+              final int used = panCounts[item.id] ?? 0;
+              final int? limit = item.quantity;
+              final bool exhausted = limit != null && used >= limit;
+              final bool tappable = isEnabled && !exhausted;
+              return Semantics(
+                button: true,
+                enabled: tappable,
+                label: item.label.resolve(languageCode),
+                child: GestureDetector(
+                  onTap: tappable ? () => onPick(item) : null,
+                  child: AnimatedOpacity(
+                    duration: KidUi.fast,
+                    opacity: exhausted ? 0.35 : 1,
+                    child: AnimatedContainer(
+                      duration: KidUi.fast,
+                      width: edge,
+                      height: edge,
+                      padding: EdgeInsets.all(edge * 0.1),
+                      decoration: BoxDecoration(
+                        color: Colors.white
+                            .withValues(alpha: isEnabled ? 0.94 : 0.5),
+                        borderRadius: BorderRadius.circular(edge * 0.24),
+                        border: Border.all(
+                          color: highlightedId == item.id
+                              ? KidUi.hint
+                              : Colors.transparent,
+                          width: highlightedId == item.id ? edge * 0.07 : 0,
                         ),
-                        decoration: BoxDecoration(
-                          color: accent,
-                          borderRadius:
-                              BorderRadius.circular(KidUi.radiusPill),
-                        ),
-                        child: ActivityGlyphText(
-                          '${item.weight}',
-                          languageCode: languageCode,
-                          fontSize: edge * 0.2,
-                          color: Colors.white,
-                          maxLines: 1,
-                        ),
+                        boxShadow: KidUi.shadow(accent, strength: 0.5),
+                      ),
+                      child: Stack(
+                        children: <Widget>[
+                          Positioned.fill(
+                            child:
+                                Image.asset(item.imageAsset, fit: BoxFit.contain),
+                          ),
+                          // Weight badge — bottom right.
+                          Align(
+                            alignment: Alignment.bottomRight,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: edge * 0.1,
+                                vertical: edge * 0.02,
+                              ),
+                              decoration: BoxDecoration(
+                                color: accent,
+                                borderRadius:
+                                    BorderRadius.circular(KidUi.radiusPill),
+                              ),
+                              child: ActivityGlyphText(
+                                '${item.weight}',
+                                languageCode: languageCode,
+                                fontSize: edge * 0.2,
+                                color: Colors.white,
+                                maxLines: 1,
+                              ),
+                            ),
+                          ),
+                          // Remaining-quantity badge — top left, only when
+                          // there is a finite supply. Lets the child see at a
+                          // glance how many apples are still on the counter.
+                          if (limit != null)
+                            Align(
+                              alignment: Alignment.topLeft,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: edge * 0.08,
+                                  vertical: edge * 0.02,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: exhausted
+                                      ? KidUi.stone
+                                      : KidUi.correct,
+                                  borderRadius: BorderRadius.circular(
+                                      KidUi.radiusPill),
+                                ),
+                                child: ActivityGlyphText(
+                                  '${limit - used}',
+                                  languageCode: languageCode,
+                                  fontSize: edge * 0.18,
+                                  color: Colors.white,
+                                  maxLines: 1,
+                                ),
+                              ),
+                            ),
+                        ],
                       ),
                     ),
-                  ],
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
       ],
     );

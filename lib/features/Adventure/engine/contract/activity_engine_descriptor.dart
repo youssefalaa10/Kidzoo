@@ -55,6 +55,11 @@ enum InteractionMode {
   /// [orderSequence] because nothing stays on screen to be re-read: the child
   /// answers from memory of something that has already stopped.
   echoRhythm,
+
+  /// Identifies what differs between two simultaneous views of the same scene.
+  /// Distinct from [tapInScene], where a single scene holds one hidden target;
+  /// here two scenes are shown at once and the comparison itself is the task.
+  compareScene,
 }
 
 /// One gameplay parameter an engine accepts from content.

@@ -1,5 +1,6 @@
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
+import 'package:kidzo/core/helpers/speech.dart';
 import 'package:kidzo/core/shared/style/kid_ui.dart';
 import 'package:kidzo/core/shared/widgets/kid_pick_card.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_attempt.dart';
@@ -61,6 +62,7 @@ class SortingBin {
     required this.id,
     required this.attributeValue,
     required this.label,
+    this.spokenLabel,
     this.imageAsset,
     this.settleMotion = SettleMotion.settle,
   });
@@ -68,6 +70,13 @@ class SortingBin {
   final String id;
   final String attributeValue;
   final LocalizedText label;
+
+  /// What the narrator reads when this bin is tapped for inspection (without a
+  /// token selected). Defaults to [label] when absent. Lets the market stall
+  /// say something richer than its display name, like the kinds of things that
+  /// belong there.
+  final LocalizedText? spokenLabel;
+
   final String? imageAsset;
   final SettleMotion settleMotion;
 }
@@ -319,6 +328,10 @@ class SortingEngine extends ActivityEngine<SortingContent> {
         attributeValue: binReader.requireString('value'),
         label: LocalizedText.fromJson(raw['label'],
             debugPath: '$path.bins[$index].label'),
+        spokenLabel: raw['spokenLabel'] == null
+            ? null
+            : LocalizedText.fromJson(raw['spokenLabel'],
+                debugPath: '$path.bins[$index].spokenLabel'),
         imageAsset: binReader.optionalString('image'),
         settleMotion: SettleMotion.parse(
           binReader.optionalString('settleMotion') ?? 'settle',
@@ -432,6 +445,18 @@ class _SortingBoardState extends State<_SortingBoard>
     ));
   }
 
+  /// Speaks the bin's identity when the child taps it without holding a token.
+  ///
+  /// Lets the child explore what each stall is for before deciding where to put
+  /// something. Skipped while the narrator is speaking (board locked) so the
+  /// two voices never overlap.
+  void _inspectBin(SortingBin bin) {
+    if (widget.state.isBoardLocked) return;
+    final String text =
+        (bin.spokenLabel ?? bin.label).resolve(widget.state.languageCode);
+    if (text.isNotEmpty) Speech.speak(text);
+  }
+
   /// What this token does when it is where it belongs — which is also what it
   /// does when it is somewhere it does not.
   SettleMotion get _trueMotion =>
@@ -498,6 +523,7 @@ class _SortingBoardState extends State<_SortingBoard>
                     contents:
                         widget.step.sortedInto(bin.id).toList(growable: false),
                     onAccept: () => _place(bin.id),
+                    onInspect: () => _inspectBin(bin),
                   ),
               ],
             ),
@@ -521,6 +547,7 @@ class _BinTarget extends StatelessWidget {
     required this.settleMotion,
     required this.contents,
     required this.onAccept,
+    required this.onInspect,
   });
 
   final String binId;
@@ -540,6 +567,11 @@ class _BinTarget extends StatelessWidget {
 
   final VoidCallback onAccept;
 
+  /// Called when the child taps the bin WITHOUT a token selected — an
+  /// exploratory tap that asks "what is this?". The board speaks the stall name
+  /// or description so the child can learn each bin before committing.
+  final VoidCallback onInspect;
+
   @override
   Widget build(BuildContext context) {
     return DragTarget<String>(
@@ -552,7 +584,7 @@ class _BinTarget extends StatelessWidget {
           (BuildContext context, List<String?> candidates, List<dynamic> _) {
         final bool isPreviewing = candidates.isNotEmpty;
         return GestureDetector(
-          onTap: isLive && isArmed ? onAccept : null,
+          onTap: isLive && isArmed ? onAccept : onInspect,
           child: AnimatedScale(
             // Preview the snap before release, so the child can see it will
             // work before committing to letting go.

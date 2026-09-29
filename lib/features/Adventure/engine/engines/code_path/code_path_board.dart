@@ -8,7 +8,13 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
 import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_content.dart';
 import 'package:kidzo/features/Adventure/engine/engines/code_path/code_path_engine.dart';
 
-/// The board, the instruction tray and the strip of instructions so far.
+/// The board, the instruction strip and the D-Pad controller.
+///
+/// The D-Pad replaces the old grid of command buttons. In absolute mode the
+/// four arrow keys map directly to north/south/east/west; in relative mode
+/// they map to forward/turnLeft/turnRight (the down button is unused in
+/// relative mode and shown disabled). The strip shows the growing program and
+/// offers undo and clear; the Go button runs it.
 ///
 /// The strip is the point. A pre-reader cannot read a program, but they can
 /// watch a highlight travel along a row of pictures while the thing each
@@ -50,9 +56,6 @@ class _CodePathBoardState extends State<CodePathBoard> {
     if (oldWidget.step.stepId != widget.step.stepId) {
       _reset();
     }
-    // The base cubit raises this at `modelled`: the correct route is shown
-    // being driven, and then the child drives it themselves. Watching is not
-    // the same as doing, so the demonstration never submits anything.
     if (!oldWidget.state.isDemonstrating && widget.state.isDemonstrating) {
       _demonstrate();
     }
@@ -128,9 +131,6 @@ class _CodePathBoardState extends State<CodePathBoard> {
     widget.submit(SequenceAttempt(
       _program.map((PathCommand command) => command.name).toList(),
     ));
-    // The vehicle stays where it stopped while the coach speaks, then comes
-    // home for the next try. Snapping it back instantly would erase the one
-    // piece of evidence the child has about what their plan did.
     if (run.outcome != RunOutcome.arrived) {
       setState(() {
         _running = null;
@@ -160,8 +160,6 @@ class _CodePathBoardState extends State<CodePathBoard> {
     if (!mounted) {
       return;
     }
-    // The strip is left empty so the child builds it rather than pressing Go
-    // on someone else's answer.
     setState(() {
       _program.clear();
       _running = null;
@@ -214,23 +212,65 @@ class _CodePathBoardState extends State<CodePathBoard> {
         ? KidUi.primary
         : Color(content.accentColorValue!);
     final String? highlighted = widget.state.view?.highlightOptionId;
+    final bool canAdd =
+        !_isBusy && _program.length < content.maxCommands;
+    final bool canRun = !_isBusy && _program.isNotEmpty;
 
     return LayoutBuilder(
       builder: (BuildContext context, BoxConstraints constraints) {
         final KidMetrics metrics = KidMetrics.of(constraints);
-        // The instruction buttons are primary targets, so they keep their size
-        // and **wrap** onto a second row rather than shrinking to fit a narrow
-        // phone. Five controls in one row at 360dp works out at 62dp each,
-        // which is half the young-child guidance and exactly the sort of
-        // target a four-year-old misses; the board above is the thing that can
-        // afford to give up the height.
-        final double idealEdge =
-            metrics.size(KidUi.minTouchYoung, min: 68, max: 132);
-        final double spacing = idealEdge * 0.14;
-        final double trayEdge =
-            [idealEdge, (constraints.maxWidth - spacing * 3) / 3]
-                .reduce((double a, double b) => a < b ? a : b);
-        final double stripHeight = trayEdge * 0.62;
+
+        // D-Pad button size scales with height so the control section never
+        // crowds the grid in landscape. Each button is at most 11% of the
+        // available height, capped at KidUi.minTouchYoung / 2 so it stays
+        // large enough to hit comfortably.
+        final double dpadBtnSize = (constraints.maxHeight.isFinite
+                ? constraints.maxHeight * 0.11
+                : 44.0)
+            .clamp(32.0, KidUi.minTouchYoung * 0.52);
+
+        final double runBtnSize = dpadBtnSize * 1.1;
+        final double stripHeight = dpadBtnSize * 0.7;
+
+        // In landscape the D-Pad and Go button sit side by side, saving the
+        // row a stacked layout would cost. In portrait they stack.
+        final bool landscape = constraints.maxWidth > constraints.maxHeight;
+
+        final Widget dpad = _CodeDPad(
+          buttonSize: dpadBtnSize,
+          accent: accent,
+          commandMode: content.commandMode,
+          enabled: canAdd,
+          highlightedCommand: highlighted,
+          onCommand: _append,
+        );
+
+        final Widget goBtn = _GoButton(
+          size: runBtnSize,
+          accent: accent,
+          canRun: canRun,
+          onRun: _run,
+        );
+
+        final Widget controls = landscape
+            ? Row(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  dpad,
+                  SizedBox(width: metrics.gap),
+                  goBtn,
+                ],
+              )
+            : Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  dpad,
+                  SizedBox(height: metrics.gap * 0.5),
+                  goBtn,
+                ],
+              );
 
         return Column(
           children: <Widget>[
@@ -255,24 +295,16 @@ class _CodePathBoardState extends State<CodePathBoard> {
               isEnabled: !_isBusy,
             ),
             SizedBox(height: metrics.gap * 0.5),
-            _CommandTray(
-              commands: content.commands,
-              edge: trayEdge,
-              spacing: spacing,
-              accent: accent,
-              highlightedCommand: highlighted,
-              isEnabled: !_isBusy &&
-                  _program.length < content.maxCommands,
-              canRun: !_isBusy && _program.isNotEmpty,
-              onCommand: _append,
-              onRun: _run,
-            ),
+            controls,
+            SizedBox(height: metrics.gap * 0.5),
           ],
         );
       },
     );
   }
 }
+
+// ── grid ──────────────────────────────────────────────────────────────────────
 
 /// The squares, the walls, the destination and the vehicle.
 class _Grid extends StatelessWidget {
@@ -416,17 +448,12 @@ class _Vehicle extends StatelessWidget {
         : Icon(Icons.local_shipping_rounded, size: edge * 0.62, color: accent);
 
     return Opacity(
-      // The demonstration is visibly *not* the child's own vehicle, so nobody
-      // has to work out whether what they are watching is something they did.
       opacity: isGhost ? 0.45 : 1,
       child: AnimatedRotation(
         duration: KidUi.fast,
-        // Quarter turns from north, so the nose points the way it is going.
         turns: facing.index / 4,
         child: AnimatedScale(
           duration: KidUi.fast,
-          // A small recoil instead of a buzzer. Bumping a wall is information,
-          // not a mistake to be told off for.
           scale: isBump ? 0.86 : 1,
           child: Padding(
             padding: EdgeInsets.all(edge * 0.12),
@@ -453,6 +480,8 @@ class _Vehicle extends StatelessWidget {
   }
 }
 
+// ── program strip ─────────────────────────────────────────────────────────────
+
 /// The instructions placed so far, in order.
 class _ProgramStrip extends StatelessWidget {
   const _ProgramStrip({
@@ -469,10 +498,7 @@ class _ProgramStrip extends StatelessWidget {
   final List<PathCommand> program;
   final double height;
   final Color accent;
-
-  /// Which instruction is being carried out right now, or -1 when idle.
   final int activeIndex;
-
   final CommandMode commandMode;
   final VoidCallback onRemoveLast;
   final VoidCallback onClear;
@@ -581,121 +607,269 @@ class _StripButton extends StatelessWidget {
   }
 }
 
-/// The instructions on offer, plus the control that runs them.
-class _CommandTray extends StatelessWidget {
-  const _CommandTray({
-    required this.commands,
-    required this.edge,
-    required this.spacing,
+// ── D-Pad ─────────────────────────────────────────────────────────────────────
+
+/// Directional pad that appends commands to the program.
+///
+/// In **absolute** mode four buttons map to north / south / west / east — the
+/// same physical directions as the arrows on the board. In **relative** mode
+/// three buttons map to forward / turn-left / turn-right, laid out as a
+/// T-shape (forward on top, turns below it). The down button is not shown in
+/// relative mode because there is no "back" command.
+///
+/// Buttons are placed with explicit pixel offsets so [TextDirection] never
+/// mirrors them. Spatial controls must match the board, not the text flow.
+class _CodeDPad extends StatelessWidget {
+  const _CodeDPad({
+    required this.buttonSize,
     required this.accent,
+    required this.commandMode,
+    required this.enabled,
     required this.highlightedCommand,
-    required this.isEnabled,
-    required this.canRun,
     required this.onCommand,
-    required this.onRun,
   });
 
-  final List<PathCommand> commands;
-  final double edge;
-  final double spacing;
+  final double buttonSize;
   final Color accent;
-
-  /// Set when the coach is pointing at the instruction to start with.
+  final CommandMode commandMode;
+  final bool enabled;
   final String? highlightedCommand;
-
-  final bool isEnabled;
-  final bool canRun;
   final void Function(PathCommand) onCommand;
-  final VoidCallback onRun;
 
   @override
   Widget build(BuildContext context) {
-    return Wrap(
-      alignment: WrapAlignment.center,
-      spacing: spacing,
-      runSpacing: spacing,
-      children: <Widget>[
-        for (final PathCommand command in commands)
-          _CommandButton(
-            command: command,
-            edge: edge,
-            accent: accent,
-            isHighlighted: highlightedCommand == command.name,
-            onTap: isEnabled ? () => onCommand(command) : null,
-          ),
-        Semantics(
-          button: true,
-          enabled: canRun,
-          label: 'Go',
-          child: GestureDetector(
-            onTap: canRun ? onRun : null,
-            child: AnimatedOpacity(
-              duration: KidUi.fast,
-              opacity: canRun ? 1 : 0.35,
-              child: Container(
-                width: edge,
-                height: edge,
-                decoration: BoxDecoration(
-                  color: KidUi.correct,
-                  shape: BoxShape.circle,
-                  boxShadow: KidUi.shadow(KidUi.correct, strength: 0.7),
-                ),
-                child: Icon(
-                  Icons.play_arrow_rounded,
-                  size: edge * 0.56,
-                  color: Colors.white,
-                ),
+    Widget btn(PathCommand command, IconData icon, String label) {
+      final bool isHighlighted = highlightedCommand == command.name;
+      return _DPadButton(
+        size: buttonSize,
+        icon: icon,
+        accent: accent,
+        enabled: enabled,
+        isHighlighted: isHighlighted,
+        onTap: enabled ? () => onCommand(command) : null,
+        semanticLabel: label,
+      );
+    }
+
+    if (commandMode == CommandMode.relative) {
+      // T-shape: forward on top row centre, turns on bottom row sides.
+      return SizedBox(
+        width: buttonSize * 3,
+        height: buttonSize * 2 + 8,
+        child: Stack(
+          children: <Widget>[
+            Positioned(
+              left: buttonSize,
+              top: 0,
+              child: btn(
+                PathCommand.forward,
+                Icons.arrow_upward_rounded,
+                'forward',
               ),
             ),
-          ),
+            Positioned(
+              left: 0,
+              top: buttonSize + 8,
+              child: btn(
+                PathCommand.turnLeft,
+                Icons.turn_left_rounded,
+                'turn left',
+              ),
+            ),
+            Positioned(
+              left: buttonSize * 2,
+              top: buttonSize + 8,
+              child: btn(
+                PathCommand.turnRight,
+                Icons.turn_right_rounded,
+                'turn right',
+              ),
+            ),
+          ],
         ),
-      ],
+      );
+    }
+
+    // Absolute mode: 4-button cross.
+    return SizedBox(
+      width: buttonSize * 3,
+      height: buttonSize * 3,
+      child: Stack(
+        children: <Widget>[
+          Positioned(
+            left: buttonSize,
+            top: 0,
+            child: btn(
+              PathCommand.north,
+              Icons.keyboard_arrow_up_rounded,
+              'up',
+            ),
+          ),
+          Positioned(
+            left: 0,
+            top: buttonSize,
+            child: btn(
+              PathCommand.west,
+              Icons.keyboard_arrow_left_rounded,
+              'left',
+            ),
+          ),
+          Positioned(
+            left: buttonSize * 2,
+            top: buttonSize,
+            child: btn(
+              PathCommand.east,
+              Icons.keyboard_arrow_right_rounded,
+              'right',
+            ),
+          ),
+          Positioned(
+            left: buttonSize,
+            top: buttonSize * 2,
+            child: btn(
+              PathCommand.south,
+              Icons.keyboard_arrow_down_rounded,
+              'down',
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
 
-class _CommandButton extends StatelessWidget {
-  const _CommandButton({
-    required this.command,
-    required this.edge,
+/// One button on a D-Pad. Stateful so it can animate a pressed scale.
+class _DPadButton extends StatefulWidget {
+  const _DPadButton({
+    required this.size,
+    required this.icon,
     required this.accent,
+    required this.enabled,
     required this.isHighlighted,
     required this.onTap,
+    required this.semanticLabel,
   });
 
-  final PathCommand command;
-  final double edge;
+  final double size;
+  final IconData icon;
   final Color accent;
+  final bool enabled;
+
+  /// True when the scaffold coach is pointing at this command.
   final bool isHighlighted;
+
   final VoidCallback? onTap;
+  final String semanticLabel;
+
+  @override
+  State<_DPadButton> createState() => _DPadButtonState();
+}
+
+class _DPadButtonState extends State<_DPadButton> {
+  bool _pressed = false;
 
   @override
   Widget build(BuildContext context) {
+    final bool live = widget.enabled && widget.onTap != null;
+
     return Semantics(
       button: true,
-      enabled: onTap != null,
-      label: command.name,
+      enabled: live,
+      label: widget.semanticLabel,
       child: GestureDetector(
-        onTap: onTap,
-        child: AnimatedContainer(
-          duration: KidUi.fast,
-          width: edge,
-          height: edge,
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: onTap == null ? 0.4 : 0.94),
-            borderRadius: BorderRadius.circular(edge * 0.26),
-            border: Border.all(
-              color: isHighlighted ? KidUi.hint : Colors.transparent,
-              width: isHighlighted ? edge * 0.08 : 0,
+        onTapDown: live ? (_) => setState(() => _pressed = true) : null,
+        onTapUp: live
+            ? (_) {
+                setState(() => _pressed = false);
+                widget.onTap!();
+              }
+            : null,
+        onTapCancel: () => setState(() => _pressed = false),
+        child: AnimatedScale(
+          scale: _pressed ? 0.84 : 1.0,
+          duration: const Duration(milliseconds: 80),
+          child: AnimatedContainer(
+            duration: KidUi.fast,
+            width: widget.size,
+            height: widget.size,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: live ? 0.94 : 0.30),
+              borderRadius: BorderRadius.circular(widget.size * 0.28),
+              border: widget.isHighlighted
+                  ? Border.all(
+                      color: KidUi.hint,
+                      width: widget.size * 0.08,
+                    )
+                  : Border.all(
+                      color: Colors.white.withValues(alpha: live ? 0.55 : 0.20),
+                      width: 1.5,
+                    ),
+              boxShadow: live
+                  ? KidUi.shadow(
+                      widget.isHighlighted ? KidUi.hint : Colors.black,
+                      strength: widget.isHighlighted ? 0.7 : 0.4,
+                    )
+                  : null,
             ),
-            boxShadow: KidUi.shadow(accent, strength: 0.5),
+            child: Icon(
+              widget.icon,
+              size: widget.size * 0.55,
+              color: widget.accent.withValues(alpha: live ? 1.0 : 0.30),
+            ),
           ),
-          child: Icon(_iconFor(command), size: edge * 0.52, color: accent),
         ),
       ),
     );
   }
 }
+
+/// The run button — a circle distinct from the D-Pad so the child cannot
+/// accidentally press it while building the program.
+class _GoButton extends StatelessWidget {
+  const _GoButton({
+    required this.size,
+    required this.accent,
+    required this.canRun,
+    required this.onRun,
+  });
+
+  final double size;
+  final Color accent;
+  final bool canRun;
+  final VoidCallback onRun;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      button: true,
+      enabled: canRun,
+      label: 'Go',
+      child: GestureDetector(
+        onTap: canRun ? onRun : null,
+        child: AnimatedOpacity(
+          duration: KidUi.fast,
+          opacity: canRun ? 1 : 0.35,
+          child: Container(
+            width: size,
+            height: size,
+            decoration: BoxDecoration(
+              color: KidUi.correct,
+              shape: BoxShape.circle,
+              boxShadow: KidUi.shadow(KidUi.correct, strength: 0.7),
+            ),
+            child: Icon(
+              Icons.play_arrow_rounded,
+              size: size * 0.56,
+              color: Colors.white,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+// ── icon helpers ──────────────────────────────────────────────────────────────
 
 /// One glyph per instruction, the same one in the tray and in the strip.
 ///

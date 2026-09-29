@@ -11,6 +11,7 @@ import 'package:kidzo/features/Adventure/engine/engines/multiple_choice/multiple
 import 'package:kidzo/features/Adventure/engine/engines/patterns/patterns_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sorting/sorting_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/sound_sequence/sound_sequence_engine.dart';
+import 'package:kidzo/features/Adventure/engine/engines/spot_the_diff/spot_the_diff_engine.dart';
 import 'package:kidzo/features/Adventure/engine/engines/trace_path/trace_engine.dart';
 
 /// The engines the app ships with.
@@ -53,5 +54,10 @@ ActivityEngineRegistry buildDefaultEngineRegistry() {
     const FlashlightEngine(),
     const CurrentRiderEngine(),
     const SoundSequenceEngine(),
+    // Adventure 3 (ocean) added one more. Visual discrimination — comparing two
+    // simultaneous scenes to find what changed — is a genuinely different skill
+    // from visual search of one scene (hidden_clue) or lighting a dark area
+    // (flashlight). compareScene is the mode that earns it its slot.
+    const SpotDiffEngine(),
   ]);
 }

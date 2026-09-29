@@ -167,14 +167,14 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
       value: 'giraffe',
     ),
     AnimalQuizModel(
-      animalName: 'A',
-      animalImage: Assets.genImagesAlphabetA,
-      value: 'A',
+      animalName: 'panda',
+      animalImage: Assets.genImagesAnimalPanda,
+      value: 'panda',
     ),
     AnimalQuizModel(
-      animalName: 'B',
-      animalImage: Assets.genImagesAlphabetB,
-      value: 'B',
+      animalName: 'bird',
+      animalImage: Assets.genImagesAnimalBird,
+      value: 'bird',
     ),
   ];
 
@@ -308,10 +308,6 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
         return l10n.giraffe;
       case 'panda':
         return l10n.panda;
-      case 'a':
-        return 'A';
-      case 'b':
-        return 'B';
       default:
         return name;
     }
@@ -500,6 +496,12 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
                             ),
                             child: Column(
                               children: [
+                                const Icon(
+                                  Icons.emoji_events,
+                                  size: 60,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(height: 12),
                                 Text(
                                   l10n.gameComplete,
                                   style: Theme.of(context)
@@ -604,6 +606,29 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
                               ),
                             ),
                           ],
+                          const SizedBox(height: 16),
+                          Container(
+                            width: MediaQuery.of(context).size.width / 2,
+                            height: MediaQuery.of(context).size.width / 10,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade400,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: TextButton(
+                              onPressed: () =>
+                                  Navigator.of(context).maybePop(),
+                              child: Text(
+                                l10n.exit,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -618,9 +643,9 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
 
   String result() {
     final l10n = AppLocalizations.of(context);
-    if (score >= targetScoreForLevel * maxLevel) {
+    if (score >= targetScoreForLevel) {
       return l10n.excellent;
-    } else if (score >= (targetScoreForLevel * maxLevel * 0.7)) {
+    } else if (score >= (targetScoreForLevel * 0.7).round()) {
       return l10n.greatJob;
     } else {
       return l10n.tryAgainToGetBetterScore;
@@ -628,9 +653,9 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
   }
 
   Color getResultColor() {
-    if (score >= targetScoreForLevel * maxLevel) {
+    if (score >= targetScoreForLevel) {
       return Colors.green;
-    } else if (score >= (targetScoreForLevel * maxLevel * 0.7)) {
+    } else if (score >= (targetScoreForLevel * 0.7).round()) {
       return Colors.orange;
     } else {
       return Colors.red;

@@ -186,7 +186,7 @@ class MyApp extends StatelessWidget {
                             );
                     }
                     return const Scaffold(
-                      body: Center(child: CircularProgressIndicator()),
+                      backgroundColor: Color(0xFF5E7BB9),
                     );
                   },
                 ),
