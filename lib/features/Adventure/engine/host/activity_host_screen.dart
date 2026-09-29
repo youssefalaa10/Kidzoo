@@ -219,32 +219,34 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
                 : () => _cubit.submit(const HelpRequestedAttempt()),
           ),
           SizedBox(height: metrics.gap),
-          // The banner is the prompt's written form; tapping it repeats the
-          // spoken one, because audio is primary for a pre-reader and text is
-          // decoration.
           _PromptBanner(
             metrics: metrics,
             text: prompt,
             languageCode: _languageCode,
-            // The thing being built, if this activity is building one. It rides
-            // in the banner's row rather than a band of its own, so it costs no
-            // vertical space on the layouts that have none to give.
             stage: widget.session.spec.presentation.stage,
             stageProgress: state.progress,
+            isSpeaking: state.isBoardLocked,
             onSpeak: state.isBoardLocked
                 ? null
                 : () => _cubit.submit(const HelpRequestedAttempt()),
           ),
           SizedBox(height: metrics.gap),
+          // Dim the board while the narrator is speaking so it reads as
+          // "not yet" rather than "broken". AbsorbPointer already blocks taps;
+          // this makes the visual state match the interactive one.
           Expanded(
-            child: AbsorbPointer(
-              absorbing: state.isBoardLocked,
-              child: ActivityFeedbackScope(
-                soundboard: widget.session.services.soundboard,
-                child: _board(
-                  context,
-                  state,
-                  (ActivityAttempt attempt) => _cubit.submit(attempt),
+            child: AnimatedOpacity(
+              duration: KidUi.medium,
+              opacity: state.isBoardLocked ? 0.45 : 1.0,
+              child: AbsorbPointer(
+                absorbing: state.isBoardLocked,
+                child: ActivityFeedbackScope(
+                  soundboard: widget.session.services.soundboard,
+                  child: _board(
+                    context,
+                    state,
+                    (ActivityAttempt attempt) => _cubit.submit(attempt),
+                  ),
                 ),
               ),
             ),
@@ -403,6 +405,7 @@ class _PromptBanner extends StatelessWidget {
     required this.languageCode,
     this.stage,
     this.stageProgress = 0,
+    this.isSpeaking = false,
     this.onSpeak,
   });
 
@@ -411,6 +414,10 @@ class _PromptBanner extends StatelessWidget {
   final String languageCode;
   final ActivityStageSpec? stage;
   final double stageProgress;
+
+  /// True while the narrator is speaking the prompt. Shows an animated wave
+  /// so the banner communicates "listen" rather than looking like a freeze.
+  final bool isSpeaking;
   final VoidCallback? onSpeak;
 
   @override
@@ -438,10 +445,22 @@ class _PromptBanner extends StatelessWidget {
           ),
           child: Row(
             children: <Widget>[
-              Icon(
-                Icons.volume_up_rounded,
-                size: metrics.size(30, min: 24, max: 40),
-                color: KidUi.primary,
+              // Speaker icon swaps for a breathing wave while narrating, so
+              // the child can see the voice is the active thing, not the board.
+              AnimatedSwitcher(
+                duration: KidUi.medium,
+                child: isSpeaking
+                    ? _NarratorWave(
+                        key: const ValueKey<bool>(true),
+                        size: metrics.size(30, min: 24, max: 40),
+                        color: KidUi.primary,
+                      )
+                    : Icon(
+                        key: const ValueKey<bool>(false),
+                        Icons.volume_up_rounded,
+                        size: metrics.size(30, min: 24, max: 40),
+                        color: KidUi.primary,
+                      ),
               ),
               SizedBox(width: metrics.gap * 0.6),
               Expanded(
@@ -464,6 +483,76 @@ class _PromptBanner extends StatelessWidget {
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+/// Three bars that pulse in sequence while the narrator is speaking.
+///
+/// Sits inside the prompt banner and replaces the static speaker icon during
+/// narration, giving the child a clear "listen" signal without a spinner that
+/// reads as a network wait.
+class _NarratorWave extends StatefulWidget {
+  const _NarratorWave({required this.size, required this.color, super.key});
+
+  final double size;
+  final Color color;
+
+  @override
+  State<_NarratorWave> createState() => _NarratorWaveState();
+}
+
+class _NarratorWaveState extends State<_NarratorWave>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _controller = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 900),
+  )..repeat();
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  double _heightFor(int index) {
+    final double phase = (_controller.value + index / 3) % 1.0;
+    final double wave = 1 - (phase * 2 - 1).abs();
+    return 0.3 + 0.7 * wave.clamp(0.0, 1.0);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final double barWidth = widget.size * 0.18;
+    final double maxHeight = widget.size * 0.8;
+
+    return SizedBox(
+      width: widget.size,
+      height: widget.size,
+      child: AnimatedBuilder(
+        animation: _controller,
+        builder: (BuildContext context, Widget? child) {
+          return Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: <Widget>[
+              for (int index = 0; index < 3; index++)
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: barWidth * 0.25),
+                  child: AnimatedContainer(
+                    duration: Duration.zero,
+                    width: barWidth,
+                    height: maxHeight * _heightFor(index),
+                    decoration: BoxDecoration(
+                      color: widget.color,
+                      borderRadius: BorderRadius.circular(barWidth / 2),
+                    ),
+                  ),
+                ),
+            ],
+          );
+        },
       ),
     );
   }

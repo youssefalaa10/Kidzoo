@@ -109,6 +109,18 @@
       ]
     },
     {
+      "nodeId": "ocean.n7b",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/ocean_spot_the_wall",
+      "lines": [
+        {
+          "en": "The glow reaches the wall. Two sections, side by side — and they are not the same.",
+          "ar": "يَصِلُ التَّوَهُّجُ إِلَى الجِدَار. قِسْمَانِ جَنْبًا إِلَى جَنْب، وَهُمَا لَيْسَا سَوَاء."
+        }
+      ]
+    },
+    {
       "nodeId": "ocean.n8",
       "beat": "climax",
       "type": "activity",

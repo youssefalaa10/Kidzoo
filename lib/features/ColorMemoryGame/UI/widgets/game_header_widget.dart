@@ -41,7 +41,8 @@ class GameHeaderWidget extends StatelessWidget {
                   ],
                 ),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                  icon: const Icon(Icons.exit_to_app, color: Colors.black87),
+                  tooltip: AppLocalizations.of(context).exit,
                   onPressed: onBack,
                 ),
               ),
@@ -71,6 +72,7 @@ class GameHeaderWidget extends StatelessWidget {
                 ),
                 child: IconButton(
                   icon: const Icon(Icons.refresh, color: Colors.black87),
+                  tooltip: AppLocalizations.of(context).restart,
                   onPressed: onRestart,
                 ),
               ),

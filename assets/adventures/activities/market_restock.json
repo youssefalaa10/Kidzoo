@@ -42,12 +42,20 @@
       {
         "id": "stall_fruit",
         "value": "fruit",
-        "label": { "en": "the fruit stall", "ar": "كُشْكُ الفَاكِهَة" }
+        "label": { "en": "the fruit stall", "ar": "كُشْكُ الفَاكِهَة" },
+        "spokenLabel": {
+          "en": "This is the fruit stall — apples and oranges go here.",
+          "ar": "هَذَا كُشْكُ الفَاكِهَة، هُنَا يُوضَعُ التُّفَّاحُ وَالبُرْتُقَال."
+        }
       },
       {
         "id": "stall_vegetable",
         "value": "vegetable",
-        "label": { "en": "the vegetable stall", "ar": "كُشْكُ الخُضَار" }
+        "label": { "en": "the vegetable stall", "ar": "كُشْكُ الخُضَار" },
+        "spokenLabel": {
+          "en": "This is the vegetable stall — carrots and peppers go here.",
+          "ar": "هَذَا كُشْكُ الخُضَار، هُنَا يُوضَعُ الجَزَرُ وَالفِلْفِل."
+        }
       }
     ]
   },

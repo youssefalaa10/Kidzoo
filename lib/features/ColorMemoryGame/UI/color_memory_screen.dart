@@ -166,6 +166,10 @@ class _ColorMemoryScreenState extends KidGameScreenState<ColorMemoryScreen> {
                       Navigator.of(dialogContext).pop();
                       _goToNextTierOrExit();
                     },
+                    onExit: () {
+                      Navigator.of(dialogContext).pop();
+                      Navigator.of(context).maybePop();
+                    },
                   ));
               break;
 

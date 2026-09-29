@@ -1,0 +1,87 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.spot_the_wall",
+  "engineId": "spot_the_diff",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8"
+  },
+  "narration": {
+    "prompt": {
+      "en": "The two walls look alike, but they are not. Find what is different.",
+      "ar": "الجِدَارَانِ يَبْدُوَانِ مُتَشَابِهَيْن، لَكِنَّهُمَا لَيْسَا كَذَلِك. جِدِ الفَرْق."
+    },
+    "hint1": {
+      "en": "Look at the creatures — are all of them in the same place?",
+      "ar": "اُنْظُرْ إِلَى الكَائِنَات؛ هَلْ كُلُّهَا فِي نَفْسِ المَكَان؟"
+    },
+    "hint2": {
+      "en": "Something on this side is missing from the other.",
+      "ar": "شَيْءٌ مَا هُنَا غَائِبٌ مِنَ الجَانِبِ الآخَر."
+    },
+    "model": {
+      "en": "There. That is the difference. Now look for the next one.",
+      "ar": "هُنَاك. ذَاكَ هُوَ الفَرْق. الآنَ ابْحَثْ عَنِ التَّالِي."
+    },
+    "success": {
+      "en": "You found every difference. The page must be behind this wall.",
+      "ar": "وَجَدْتَ كُلَّ الفُرُوق. لَا بُدَّ أَنَّ الصَّفْحَةَ خَلْفَ هَذَا الجِدَار."
+    }
+  },
+  "payload": {
+    "_comment": "Two sections of the same trench wall, lit by Sadaf's glow-weed. Three creatures are displaced between the panels — a crab that moved left, a shell missing from one side, and a small fish behind a rock on one side only. These are not random: the shell's absence is a plot clue (it is the one holding the page), so finding it is what makes the reveal meaningful rather than arbitrary.",
+    "imageLeft":  "assets/gen/images/ocean/wall_a.png",
+    "imageRight": "assets/gen/images/ocean/wall_b.png",
+    "spots": [
+      {
+        "id": "crab_moved",
+        "posLeft":  [0.62, 0.48],
+        "posRight": [0.38, 0.48],
+        "hitRadius": 0.13,
+        "label": {
+          "en": "a crab that moved",
+          "ar": "سَرَطَانٌ تَحَرَّك"
+        },
+        "revealLine": {
+          "en": "The crab is on the other side! Crabs move when something disturbs them.",
+          "ar": "السَّرَطَانُ فِي الجِهَةِ الأُخْرَى! السَّرَطَانَاتُ تَتَحَرَّكُ حِينَ يُزْعِجُهَا شَيْء."
+        }
+      },
+      {
+        "id": "missing_shell",
+        "posLeft":  [0.28, 0.71],
+        "posRight": [0.28, 0.71],
+        "hitRadius": 0.12,
+        "label": {
+          "en": "a shell that is missing",
+          "ar": "صَدَفَةٌ مَفْقُودَة"
+        },
+        "revealLine": {
+          "en": "That shell is gone from the right wall. Something took it — or it fell behind.",
+          "ar": "اِخْتَفَتِ الصَّدَفَةُ مِنَ الجِدَارِ الأَيْمَن. شَيْءٌ مَا أَخَذَهَا، أَوِ انْزَلَقَتْ إِلَى الخَلْف."
+        }
+      },
+      {
+        "id": "hidden_fish",
+        "posLeft":  [0.51, 0.29],
+        "posRight": [0.51, 0.29],
+        "hitRadius": 0.11,
+        "label": {
+          "en": "a fish that appears",
+          "ar": "سَمَكَةٌ ظَهَرَت"
+        },
+        "revealLine": {
+          "en": "A small fish is hiding on the left wall but not on the right. It has been watching.",
+          "ar": "سَمَكَةٌ صَغِيرَةٌ تَخْتَبِئُ فِي الجِدَارِ الأَيْسَرِ وَلَيْسَ فِي الأَيْمَن. كَانَتْ تُرَاقِب."
+        }
+      }
+    ]
+  },
+  "support": {
+    "scaffolding": "errorless"
+  },
+  "elofGoal": "COG.visual_discrimination.compare",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

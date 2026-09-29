@@ -8,12 +8,20 @@ import 'package:kidzo/features/Adventure/engine/support/localized_text.dart';
 /// The weight comes off a pack attribute rather than out of the activity file,
 /// so an item weighs the same everywhere it appears. A crate that is heavy in
 /// one story and light in the next is not a world, it is a quiz.
+///
+/// [quantity] caps how many times this item may be placed on the pan in one
+/// round. Null means unlimited. A story that says "there is one apple on the
+/// counter" should set quantity: 1; two apples means Apple+Apple=4 is wrong
+/// regardless of whether the weights add up.
 @immutable
 class WeighedItem {
-  const WeighedItem({required this.item, required this.weight});
+  const WeighedItem({required this.item, required this.weight, this.quantity});
 
   final PackItem item;
   final int weight;
+
+  /// How many of this item are available in this round. Null = unlimited.
+  final int? quantity;
 
   String get id => item.id;
   String get imageAsset => item.imageAsset;
@@ -47,38 +55,43 @@ class BalanceRound {
   /// Whether the target can be made at all from what is on offer.
   ///
   /// Checked when the file is parsed rather than discovered by a child who
-  /// cannot finish. Items may be used more than once, so this is a coin
-  /// problem over very small numbers.
+  /// cannot finish. When an item has a quantity cap the problem is bounded
+  /// knapsack; when all items are unlimited it degenerates to the coin problem.
   bool get isReachable {
-    final List<int> weights = available
-        .map((WeighedItem item) => item.weight)
-        .where((int weight) => weight > 0 && weight <= target)
-        .toList(growable: false);
-    if (weights.isEmpty) {
-      return false;
-    }
     final List<bool> canMake = List<bool>.filled(target + 1, false);
     canMake[0] = true;
-    for (int total = 1; total <= target; total++) {
-      for (final int weight in weights) {
-        if (weight <= total && canMake[total - weight]) {
-          canMake[total] = true;
-          break;
+    for (final WeighedItem item in available) {
+      final int w = item.weight;
+      if (w <= 0) continue;
+      // limit: how many times this item may be used (null = floor(target/w))
+      final int limit = item.quantity ?? (target ~/ w);
+      // Snapshot to prevent reuse of this item's own contribution within one sweep
+      final List<bool> prev = List<bool>.from(canMake);
+      for (int total = w; total <= target; total++) {
+        for (int k = 1; k <= limit && k * w <= total; k++) {
+          if (prev[total - k * w]) {
+            canMake[total] = true;
+            break;
+          }
         }
       }
     }
     return canMake[target];
   }
 
-  /// One way to make the target, smallest first. Used to demonstrate.
+  /// One way to make the target, heaviest-first greedy. Used to demonstrate.
   List<WeighedItem> get oneSolution {
     final List<WeighedItem> sorted = <WeighedItem>[...available]
       ..sort((WeighedItem a, WeighedItem b) => b.weight.compareTo(a.weight));
     final List<WeighedItem> chosen = <WeighedItem>[];
+    final Map<String, int> used = <String, int>{};
     int remaining = target;
     for (final WeighedItem item in sorted) {
+      final int limit = item.quantity ?? remaining;
       while (item.weight > 0 && item.weight <= remaining) {
+        if ((used[item.id] ?? 0) >= limit) break;
         chosen.add(item);
+        used[item.id] = (used[item.id] ?? 0) + 1;
         remaining -= item.weight;
       }
     }
@@ -145,12 +158,17 @@ BalanceContent parseBalanceContent(ActivitySpec spec, ItemPackResolver packs) {
     final String where = '$path.rounds[$index]';
     final JsonReader roundReader = JsonReader(raw, where);
 
+    final List<String> itemIds = roundReader.optionalStringList('itemIds');
     final List<PackItem> items = pack.select(
-      roundReader.optionalStringList('itemIds'),
+      itemIds,
       debugPath: '$where.itemIds',
     );
+    // Optional parallel list: itemQtys[i] caps how many times itemIds[i] may
+    // be placed on the pan. Omit the list (or make it shorter) for unlimited.
+    final List<int> rawQtys = roundReader.optionalIntList('itemQtys');
     final List<WeighedItem> weighed = <WeighedItem>[];
-    for (final PackItem item in items) {
+    for (int i = 0; i < items.length; i++) {
+      final PackItem item = items[i];
       final String? rawWeight = item.attribute(attribute);
       final int? weight = rawWeight == null ? null : int.tryParse(rawWeight);
       if (weight == null || weight <= 0) {
@@ -160,7 +178,9 @@ BalanceContent parseBalanceContent(ActivitySpec spec, ItemPackResolver packs) {
           'cannot be put on a scale',
         );
       }
-      weighed.add(WeighedItem(item: item, weight: weight));
+      final int? qty =
+          (i < rawQtys.length && rawQtys[i] > 0) ? rawQtys[i] : null;
+      weighed.add(WeighedItem(item: item, weight: weight, quantity: qty));
     }
 
     final BalanceRound round = BalanceRound(
