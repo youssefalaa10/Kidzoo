@@ -556,8 +556,6 @@ class AppLocalizations {
   String get vehicles => _localizedValues['vehicles']!;
   String get fruits => _localizedValues['fruits']!;
   String get vegetables => _localizedValues['vegetables']!;
-  String get splashTitle => _localizedValues['splashTitle']!;
-  String get splashSubtitle => _localizedValues['splashSubtitle']!;
   String get backgroundMusicTitle => _localizedValues['backgroundMusicTitle']!;
   String get backgroundMusicDesc => _localizedValues['backgroundMusicDesc']!;
   String get track1 => _localizedValues['track1']!;

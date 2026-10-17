@@ -182,6 +182,30 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
     );
   }
 
+  /// Whether the rider should face right right now. At rest she faces the way
+  /// she will set off; during a run, the last sideways step she took, so going
+  /// up or down does not flip her back and forth.
+  bool get _riderFacesRight {
+    final Drift startFlow = _round.startFlow;
+    final bool atRest = startFlow != Drift.left;
+    final Ride? ride = _running;
+    if (ride == null || ride.path.length < 2) {
+      return atRest;
+    }
+    final double travelled =
+        (_run.value * (ride.path.length - 1) * _totalOverTravel)
+            .clamp(0.0, (ride.path.length - 1).toDouble());
+    for (int index = math.min(travelled.floor(), ride.path.length - 2);
+        index >= 0;
+        index--) {
+      final int dx = ride.path[index + 1].column - ride.path[index].column;
+      if (dx != 0) {
+        return dx > 0;
+      }
+    }
+    return atRest;
+  }
+
   double get _totalOverTravel {
     final Ride? ride = _running;
     if (ride == null || ride.path.length < 2) {
@@ -229,117 +253,142 @@ class _CurrentRiderBoardState extends State<CurrentRiderBoard>
             _activeGateIndex.clamp(0, _round.gates.length - 1);
         final CurrentGate? activeGate =
             _round.gates.isEmpty ? null : _round.gates[safeIndex];
-        final Set<Drift> validDrifts =
-            activeGate?.choices.toSet() ?? <Drift>{};
+        final Set<Drift> validDrifts = activeGate?.choices.toSet() ?? <Drift>{};
         final Drift currentDrift = activeGate == null
             ? Drift.up
             : _setting[activeGate.id] ?? activeGate.initial;
 
-        return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: <Widget>[
-            // ── board ──────────────────────────────────────────────────────
-            SizedBox(
-              width: boardWidth,
-              height: boardHeight,
-              child: AnimatedBuilder(
-                animation: _run,
-                builder: (BuildContext context, Widget? _) => Stack(
-                  children: <Widget>[
-                    Positioned.fill(
-                      child: CustomPaint(
-                        painter: _WaterPainter(
-                          columns: _round.columns,
-                          rows: _round.rows,
-                          accent: _accent,
-                          depth: widget.step.depth,
-                          wake: _running?.path,
-                          wakeProgress: _running == null ? 0 : _run.value,
+        // The board is a physical map: left is left in every language. Forcing
+        // LTR here means nothing inside (Stack, icons, D-Pad) can be mirrored
+        // by an Arabic locale, so the right button always sends the water right.
+        return Directionality(
+          textDirection: TextDirection.ltr,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            children: <Widget>[
+              // ── board ──────────────────────────────────────────────────────
+              // Only the wake and the rider move during a run, so only they
+              // listen to the controller. Water, rocks, goal and gates are built
+              // once per setState instead of once per frame.
+              SizedBox(
+                width: boardWidth,
+                height: boardHeight,
+                child: RepaintBoundary(
+                  child: Stack(
+                    children: <Widget>[
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _WaterPainter(
+                            columns: _round.columns,
+                            rows: _round.rows,
+                            accent: _accent,
+                            depth: widget.step.depth,
+                          ),
                         ),
                       ),
-                    ),
-                    for (final Cell rock in _round.rocks)
+                      Positioned.fill(
+                        child: CustomPaint(
+                          painter: _WakePainter(
+                            columns: _round.columns,
+                            wake: _running?.path,
+                            progress: _run,
+                          ),
+                        ),
+                      ),
+                      for (final Cell rock in _round.rocks)
+                        _AtCell(
+                          cell: Offset(
+                              rock.column.toDouble(), rock.row.toDouble()),
+                          size: cell,
+                          child: Padding(
+                            padding: EdgeInsets.all(cell * 0.1),
+                            child: Image.asset(widget.step.rockImage,
+                                fit: BoxFit.contain),
+                          ),
+                        ),
                       _AtCell(
-                        cell: Offset(
-                            rock.column.toDouble(), rock.row.toDouble()),
+                        cell: Offset(_round.goal.column.toDouble(),
+                            _round.goal.row.toDouble()),
                         size: cell,
+                        child: _Goal(
+                          size: cell,
+                          image: widget.step.goalImage,
+                          accent: _accent,
+                        ),
+                      ),
+                      // Gates are visualised as direction arrows. Tapping one
+                      // *selects* it for the D-Pad (when there are several) rather
+                      // than cycling its direction — that is the D-Pad's job now.
+                      for (int i = 0; i < _round.gates.length; i++)
+                        _AtCell(
+                          cell: Offset(
+                            _round.gates[i].cell.column.toDouble(),
+                            _round.gates[i].cell.row.toDouble(),
+                          ),
+                          size: cell,
+                          child: _GateArrow(
+                            size: cell,
+                            flow: _setting[_round.gates[i].id] ??
+                                _round.gates[i].initial,
+                            accent: _accent,
+                            enabled: _isLive,
+                            glowing: glowing == _round.gates[i].id,
+                            selected: i == safeIndex,
+                            label: _round.gates[i].label.resolve(language),
+                            // Only wire the tap when there is something to choose
+                            // between; a single-gate board has nothing to select.
+                            onTap: multiGate && _isLive
+                                ? () => _selectGate(i)
+                                : null,
+                          ),
+                        ),
+                      AnimatedBuilder(
+                        animation: _run,
+                        builder: (BuildContext context, Widget? rider) =>
+                            _AtCell(
+                          cell: _riderAt,
+                          size: cell,
+                          // The art is drawn facing one way; mirror it so she
+                          // always faces where the water is taking her.
+                          child: Transform.flip(
+                            flipX:
+                                widget.step.riderFacesLeft == _riderFacesRight,
+                            child: rider,
+                          ),
+                        ),
                         child: Padding(
-                          padding: EdgeInsets.all(cell * 0.1),
-                          child: Image.asset(widget.step.rockImage,
+                          padding: EdgeInsets.all(cell * 0.08),
+                          child: Image.asset(widget.step.riderImage,
                               fit: BoxFit.contain),
                         ),
                       ),
-                    _AtCell(
-                      cell: Offset(_round.goal.column.toDouble(),
-                          _round.goal.row.toDouble()),
-                      size: cell,
-                      child: _Goal(
-                        size: cell,
-                        image: widget.step.goalImage,
-                        accent: _accent,
-                      ),
-                    ),
-                    // Gates are visualised as direction arrows. Tapping one
-                    // *selects* it for the D-Pad (when there are several) rather
-                    // than cycling its direction — that is the D-Pad's job now.
-                    for (int i = 0; i < _round.gates.length; i++)
-                      _AtCell(
-                        cell: Offset(
-                          _round.gates[i].cell.column.toDouble(),
-                          _round.gates[i].cell.row.toDouble(),
-                        ),
-                        size: cell,
-                        child: _GateArrow(
-                          size: cell,
-                          flow: _setting[_round.gates[i].id] ??
-                              _round.gates[i].initial,
-                          accent: _accent,
-                          enabled: _isLive,
-                          glowing: glowing == _round.gates[i].id,
-                          selected: i == safeIndex,
-                          label: _round.gates[i].label.resolve(language),
-                          // Only wire the tap when there is something to choose
-                          // between; a single-gate board has nothing to select.
-                          onTap: multiGate && _isLive
-                              ? () => _selectGate(i)
-                              : null,
-                        ),
-                      ),
-                    _AtCell(
-                      cell: _riderAt,
-                      size: cell,
-                      child: Padding(
-                        padding: EdgeInsets.all(cell * 0.08),
-                        child: Image.asset(widget.step.riderImage,
-                            fit: BoxFit.contain),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            // ── D-Pad ──────────────────────────────────────────────────────
-            const SizedBox(height: 8),
-            _DirectionPad(
-              buttonSize: dpadBtnSize,
-              accent: _accent,
-              enabled: _isLive,
-              validDrifts: validDrifts,
-              currentDrift: currentDrift,
-              onDirection: _setDirection,
-            ),
-            // ── release ────────────────────────────────────────────────────
-            const SizedBox(height: 8),
-            _ReleaseButton(
-              height: runHeight,
-              width: math.min(boardWidth, width),
-              accent: _accent,
-              enabled: _isLive,
-              running: _run.isAnimating,
-              onPressed: _release,
-            ),
-          ],
+              // ── D-Pad ──────────────────────────────────────────────────────
+              const SizedBox(height: 8),
+              _DirectionPad(
+                buttonSize: dpadBtnSize,
+                accent: _accent,
+                enabled: _isLive,
+                validDrifts: validDrifts,
+                currentDrift: currentDrift,
+                onDirection: _setDirection,
+              ),
+              // ── release ────────────────────────────────────────────────────
+              const SizedBox(height: 8),
+              _ReleaseButton(
+                height: runHeight,
+                width: math.min(boardWidth, width),
+                accent: _accent,
+                enabled: _isLive,
+                running: _run.isAnimating,
+                onPressed: _release,
+              ),
+            ],
+          ),
         );
       },
     );
@@ -369,15 +418,13 @@ class _AtCell extends StatelessWidget {
   }
 }
 
-/// The water, its grid, and the wake behind the rider.
+/// The water and its grid. Static during a run, so it never repaints per frame.
 class _WaterPainter extends CustomPainter {
   const _WaterPainter({
     required this.columns,
     required this.rows,
     required this.accent,
     required this.depth,
-    required this.wake,
-    required this.wakeProgress,
   });
 
   final int columns;
@@ -388,9 +435,6 @@ class _WaterPainter extends CustomPainter {
   /// so a child who has got through two boards is visibly deeper than one who
   /// has got through none — progress told by the world rather than by a bar.
   final double depth;
-
-  final List<Cell>? wake;
-  final double wakeProgress;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -414,22 +458,44 @@ class _WaterPainter extends CustomPainter {
       ..strokeWidth = 1
       ..color = Colors.white.withValues(alpha: 0.10);
     for (int c = 1; c < columns; c++) {
-      canvas.drawLine(
-          Offset(c * cell, 0), Offset(c * cell, size.height), line);
+      canvas.drawLine(Offset(c * cell, 0), Offset(c * cell, size.height), line);
     }
     for (int r = 1; r < rows; r++) {
-      canvas.drawLine(
-          Offset(0, r * cell), Offset(size.width, r * cell), line);
+      canvas.drawLine(Offset(0, r * cell), Offset(size.width, r * cell), line);
     }
+  }
 
+  @override
+  bool shouldRepaint(_WaterPainter old) =>
+      old.columns != columns ||
+      old.rows != rows ||
+      old.depth != depth ||
+      old.accent != accent;
+}
+
+/// The wake behind the rider. Repaints straight off the run controller, so the
+/// widget tree is not rebuilt to draw it.
+class _WakePainter extends CustomPainter {
+  _WakePainter({
+    required this.columns,
+    required this.wake,
+    required this.progress,
+  }) : super(repaint: progress);
+
+  final int columns;
+  final List<Cell>? wake;
+  final Animation<double> progress;
+
+  @override
+  void paint(Canvas canvas, Size size) {
     final List<Cell>? path = wake;
     if (path == null || path.length < 2) {
       return;
     }
-    final double reached = wakeProgress * (path.length - 1);
+    final double cell = size.width / columns;
+    final double reached = progress.value * (path.length - 1);
     final Path trail = Path()
-      ..moveTo(
-          (path.first.column + 0.5) * cell, (path.first.row + 0.5) * cell);
+      ..moveTo((path.first.column + 0.5) * cell, (path.first.row + 0.5) * cell);
     for (int index = 1; index < path.length; index++) {
       if (index > reached) {
         break;
@@ -449,11 +515,8 @@ class _WaterPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_WaterPainter old) =>
-      old.depth != depth ||
-      old.wake != wake ||
-      old.wakeProgress != wakeProgress ||
-      old.accent != accent;
+  bool shouldRepaint(_WakePainter old) =>
+      old.wake != wake || old.columns != columns || old.progress != progress;
 }
 
 // ── gate visualisation ────────────────────────────────────────────────────────
@@ -491,18 +554,20 @@ class _GateArrow extends StatelessWidget {
   /// Null when tapping does nothing (single-gate boards).
   final VoidCallback? onTap;
 
-  // Icons.arrow_forward_rounded has matchTextDirection: true, so Flutter
-  // mirrors it to point LEFT in RTL. Left/right turns must compensate.
-  double _turnsFor(bool isRtl) {
+  /// One fixed icon per direction. The compass icons never mirror in RTL, so
+  /// the arrow always points where the water physically goes. The old rotated
+  /// `arrow_forward` mirrored itself in Arabic, and rotating the mirrored glyph
+  /// sent the arrows the wrong way.
+  IconData get _icon {
     switch (flow) {
       case Drift.up:
-        return -0.25;
+        return Icons.north_rounded;
       case Drift.down:
-        return 0.25;
+        return Icons.south_rounded;
       case Drift.left:
-        return isRtl ? 0 : 0.5;
+        return Icons.west_rounded;
       case Drift.right:
-        return isRtl ? 0.5 : 0;
+        return Icons.east_rounded;
     }
   }
 
@@ -521,7 +586,6 @@ class _GateArrow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bool isRtl = Directionality.of(context) == TextDirection.rtl;
     final bool interactive = onTap != null && enabled;
 
     return Semantics(
@@ -566,14 +630,10 @@ class _GateArrow extends StatelessWidget {
                       : const <BoxShadow>[],
             ),
             child: Center(
-              child: AnimatedRotation(
-                turns: _turnsFor(isRtl),
-                duration: KidUi.fast,
-                child: Icon(
-                  Icons.arrow_forward_rounded,
-                  size: size * 0.5,
-                  color: KidUi.hint,
-                ),
+              child: Icon(
+                _icon,
+                size: size * 0.5,
+                color: KidUi.hint,
               ),
             ),
           ),
@@ -754,8 +814,7 @@ class _DPadButtonState extends State<_DPadButton> {
             decoration: BoxDecoration(
               color: widget.isActive
                   ? widget.accent
-                  : Colors.white
-                      .withValues(alpha: live ? 0.92 : 0.30),
+                  : Colors.white.withValues(alpha: live ? 0.92 : 0.30),
               borderRadius: BorderRadius.circular(widget.size * 0.28),
               boxShadow: live
                   ? KidUi.shadow(
@@ -775,8 +834,7 @@ class _DPadButtonState extends State<_DPadButton> {
               size: widget.size * 0.55,
               color: widget.isActive
                   ? Colors.white
-                  : widget.accent
-                      .withValues(alpha: live ? 1.0 : 0.30),
+                  : widget.accent.withValues(alpha: live ? 1.0 : 0.30),
             ),
           ),
         ),

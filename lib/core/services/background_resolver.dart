@@ -5,7 +5,6 @@ enum BackgroundType {
   game,
   map,
   tech,
-  splash,
   jungle,
   none,
 }
@@ -61,13 +60,6 @@ class BackgroundResolver {
         tabletPortrait = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
         tabletLandscape = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
         desktop = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
-        break;
-      case BackgroundType.splash:
-        mobilePortrait = 'assets/gen/images/backgrounds/cloudy_bg_mob.png';
-        mobileLandscape = 'assets/gen/images/backgrounds/cloudy_bg_mob.png';
-        tabletPortrait = 'assets/gen/images/backgrounds/cloudy_bg_tab.png';
-        tabletLandscape = 'assets/gen/images/backgrounds/cloudy_bg_tab.png';
-        desktop = 'assets/gen/images/backgrounds/colorful_bg_desk.jpg';
         break;
       case BackgroundType.jungle:
         mobilePortrait = 'assets/gen/images/backgrounds/jungle_mob.png';

@@ -4,7 +4,7 @@ class ImageManager {
   // General images
   /// The launcher icon, copied out of the Android mipmaps so Flutter can load
   /// it. `logo` used to point at a cloudy *background* image, which is why the
-  /// splash showed a stretched sky instead of the app's own mark.
+  /// app showed a stretched sky instead of its own mark.
   static const String appIcon = 'assets/gen/icons/app_icon.png';
   static const String appIconForeground =
       'assets/gen/icons/app_icon_foreground.png';
