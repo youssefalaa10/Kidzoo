@@ -15,6 +15,7 @@ class CurrentRiderStep extends ActivityStep {
     required this.riderImage,
     required this.goalImage,
     required this.rockImage,
+    this.riderFacesLeft = true,
     this.accentColorValue,
   }) : super(stepId);
 
@@ -22,6 +23,10 @@ class CurrentRiderStep extends ActivityStep {
   final int roundIndex;
   final int roundCount;
   final String riderImage;
+
+  /// Which way [riderImage] is drawn. The board mirrors it so the rider always
+  /// faces the way it is moving.
+  final bool riderFacesLeft;
   final String goalImage;
   final String rockImage;
   final int? accentColorValue;
@@ -86,6 +91,7 @@ class CurrentRiderCubit
           roundIndex: index,
           roundCount: content.rounds.length,
           riderImage: content.riderImage,
+          riderFacesLeft: content.riderFacesLeft,
           goalImage: content.goalImage,
           rockImage: content.rockImage,
           accentColorValue: content.accentColorValue,

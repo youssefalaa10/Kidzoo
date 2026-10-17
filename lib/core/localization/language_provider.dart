@@ -3,8 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LanguageCubit extends Cubit<Locale> {
-  LanguageCubit() : super(const Locale('en', '')) {
-    _loadLanguage();
+  /// Pass [initial] when the saved language is already known (as at startup)
+  /// so the first frame is not drawn in English and then swapped.
+  LanguageCubit({Locale? initial}) : super(initial ?? const Locale('en', '')) {
+    if (initial == null) _loadLanguage();
   }
 
   static const String _languageKey = 'selected_language';

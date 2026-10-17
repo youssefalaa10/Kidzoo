@@ -59,8 +59,9 @@ void main() async {
   // Resolve the voice up front using the language the user last chose, so the
   // first prompt of a saved Arabic session already uses the right voice
   // instead of switching a moment later.
+  final String savedLanguage = await LanguageCubit.savedLanguageCode();
   unawaited(
-    Speech.configureLanguage(await LanguageCubit.savedLanguageCode())
+    Speech.configureLanguage(savedLanguage)
         // Survey the device's Arabic capability up front, whatever language
         // the UI is in, so the first-launch prompt has something to act on.
         .then((_) => Speech.surveyArabic())
@@ -68,7 +69,14 @@ void main() async {
   );
   final gameAssetManager = GameAssetManager();
 
+  // Read the profile before the first frame so the app opens straight onto
+  // the right screen instead of flashing a blank colored one while it loads.
+  final profileCubit = ProfileCubit(profileDao, badgeService: badgeService);
+  await profileCubit.checkProfile();
+
   runApp(MyApp(
+    initialLanguage: savedLanguage,
+    profileCubit: profileCubit,
     database: database,
     profileDao: profileDao,
     gameScoresDao: gameScoresDao,
@@ -84,6 +92,8 @@ void main() async {
 
 class MyApp extends StatelessWidget {
   const MyApp({
+    required this.initialLanguage,
+    required this.profileCubit,
     required this.database,
     required this.profileDao,
     required this.gameScoresDao,
@@ -101,6 +111,12 @@ class MyApp extends StatelessWidget {
   /// Passed down rather than reached for globally, per the injected-services
   /// rule that this feature's registry and services also follow.
   final AppDatabase database;
+
+  /// Read before [runApp] so the first frame is already in this language.
+  final String initialLanguage;
+
+  /// Already holds the loaded profile when the app starts.
+  final ProfileCubit profileCubit;
 
   final ProfileDao profileDao;
   final GameScoresDao gameScoresDao;
@@ -129,18 +145,16 @@ class MyApp extends StatelessWidget {
       ],
       child: MultiBlocProvider(
         providers: [
-          BlocProvider(create: (context) => LanguageCubit()),
+          BlocProvider(
+              create: (context) =>
+                  LanguageCubit(initial: Locale(initialLanguage, ''))),
           BlocProvider(create: (context) => SettingsCubit()),
           BlocProvider<BadgeCelebrationCubit>(
             create: (context) =>
                 BadgeCelebrationCubit(badgeService: badgeService),
           ),
           BlocProvider(create: (context) => MusicCubit()),
-          BlocProvider(
-              create: (context) =>
-                  ProfileCubit(context.read<ProfileDao>(),
-                      badgeService: badgeService)
-                    ..checkProfile()),
+          BlocProvider<ProfileCubit>.value(value: profileCubit),
         ],
         // The shared FlutterTts instance is configured centrally whenever the
         // app language changes. Individual games used to be responsible for

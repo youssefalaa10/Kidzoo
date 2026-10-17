@@ -281,10 +281,15 @@ class CurrentRiderContent extends ActivityContent {
     required this.riderImage,
     required this.goalImage,
     required this.rockImage,
+    this.riderFacesLeft = true,
     this.accentColorValue,
   });
 
   final List<CurrentRound> rounds;
+
+  /// Which way the rider art is drawn facing. The turtle art faces left, so
+  /// that is the default.
+  final bool riderFacesLeft;
 
   /// Who is being carried. An asset path from content, so the engine never
   /// learns what a turtle is.
@@ -540,8 +545,21 @@ CurrentRiderContent parseCurrentRiderContent(
     riderImage: imageOf('riderImage', 'turtle'),
     goalImage: imageOf('goalImage', 'compass'),
     rockImage: imageOf('rockImage', 'reef_stone'),
+    riderFacesLeft: _facesLeft(reader.optionalString('riderFaces'), path),
     accentColorValue: _accentValue(spec.presentation.accent),
   );
+}
+
+bool _facesLeft(String? raw, String path) {
+  switch (raw) {
+    case null:
+    case 'left':
+      return true;
+    case 'right':
+      return false;
+  }
+  throw ActivityContentException(
+      '$path.riderFaces', '"$raw" is not "left" or "right"');
 }
 
 int? _accentValue(String? hex) {

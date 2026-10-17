@@ -49,6 +49,10 @@ class CurrentRiderEngine extends ActivityEngine<CurrentRiderContent> {
               description: 'who is carried; defaults to the pack item named by '
                   'riderImageItemId'),
           ContentParameter.text('riderImageItemId'),
+          ContentParameter.text('riderFaces',
+              description: '"left" or "right": which way the rider art is '
+                  'drawn facing, so the board can turn it to face where it '
+                  'swims. Defaults to "left"'),
           ContentParameter.text('goalImage'),
           ContentParameter.text('goalImageItemId'),
           ContentParameter.text('rockImage'),
