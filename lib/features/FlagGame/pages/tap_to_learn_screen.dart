@@ -61,41 +61,41 @@ class _TapToLearnScreenState extends State<TapToLearnScreen>
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-              SvgPicture.asset(
-                country.flagAsset,
-                width: 200,
-                placeholderBuilder: (context) =>
-                    const CircularProgressIndicator(),
-              ).animate().shake(),
-              const SizedBox(height: 20),
-              Text(
-                country.localizedName(context),
-                style:
-                    const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 10),
-              Text(
-                '${AppLocalizations.of(context).continent}: ${country.continent}',
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              Text(
-                '${AppLocalizations.of(context).capital}: ${country.capital}',
-                style: const TextStyle(fontSize: 18, color: Colors.grey),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.green,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10)),
+                SvgPicture.asset(
+                  country.flagAsset,
+                  width: 200,
+                  placeholderBuilder: (context) =>
+                      const CircularProgressIndicator(),
+                ).animate().shake(),
+                const SizedBox(height: 20),
+                Text(
+                  country.localizedName(context),
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
-                child: Text(AppLocalizations.of(context).close,
-                    style: const TextStyle(color: Colors.white)),
-              ),
-            ],
+                const SizedBox(height: 10),
+                Text(
+                  '${AppLocalizations.of(context).continent}: ${country.continent}',
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+                Text(
+                  '${AppLocalizations.of(context).capital}: ${country.capital}',
+                  style: const TextStyle(fontSize: 18, color: Colors.grey),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () => Navigator.pop(context),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Text(AppLocalizations.of(context).close,
+                      style: const TextStyle(color: Colors.white)),
+                ),
+              ],
+            ),
           ),
-        ),
         ),
       ),
     );

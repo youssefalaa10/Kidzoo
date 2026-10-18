@@ -69,13 +69,13 @@ class _AnimatedTileState extends State<AnimatedTile>
             widget.tile.previousCol != widget.tile.col);
 
     if (hasMoved) {
-      final fromRow = widget.tile.previousRow!;
-      final fromCol = widget.tile.previousCol!;
+      final fromRow = widget.tile.previousRow;
+      final fromCol = widget.tile.previousCol;
       final toRow = widget.tile.row;
       final toCol = widget.tile.col;
 
-      final dx = (fromCol - toCol) * (widget.tileSize + widget.spacing);
-      final dy = (fromRow - toRow) * (widget.tileSize + widget.spacing);
+      final dx = (fromCol! - toCol) * (widget.tileSize + widget.spacing);
+      final dy = (fromRow! - toRow) * (widget.tileSize + widget.spacing);
 
       _positionAnimation = Tween<Offset>(
         begin: Offset(dx, dy),

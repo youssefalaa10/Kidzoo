@@ -2,7 +2,13 @@ import '../../utils/assets.dart';
 
 class ImageManager {
   // General images
-  static const String logo = Assets.genImagesHomeCloudyBg; // Fallback for missing Page Border
+  /// The launcher icon, copied out of the Android mipmaps so Flutter can load
+  /// it. `logo` used to point at a cloudy *background* image, which is why the
+  /// app showed a stretched sky instead of its own mark.
+  static const String appIcon = 'assets/gen/icons/app_icon.png';
+  static const String appIconForeground =
+      'assets/gen/icons/app_icon_foreground.png';
+  static const String logo = appIcon;
 
   // Shapes
   static const String square = Assets.genImagesShapesSquare;
@@ -39,7 +45,8 @@ class ImageManager {
   static const String homeBackground = Assets.genImagesHomeCloudyBg;
   static const String mathBg = Assets.genImagesHomeMathBg;
   static const String catsBg = Assets.genImagesHomeCatsBg;
-  static const String learningBg = 'assets/gen/images/backgrounds/learn_bg_mob.png';
+  static const String learningBg =
+      'assets/gen/images/backgrounds/learn_bg_mob.webp';
   static const String techBg = Assets.genImagesHomeTechBg;
 
   static const String numbers = Assets.genImagesHomeNumbers;
@@ -150,7 +157,7 @@ class ImageManager {
   static const String ghost4 = Assets.genImagesPuzzleGhostBlock4;
 
   // party
-  static const String party = 'assets/gen/images/puzzle/party.png';
+  static const String party = 'assets/gen/images/puzzle/party.webp';
   static const String party1 = 'assets/gen/images/puzzle/party block/1.png';
   static const String party2 = 'assets/gen/images/puzzle/party block/2.png';
   static const String party3 = 'assets/gen/images/puzzle/party block/3.png';
@@ -172,10 +179,12 @@ class ImageManager {
   static const String worldMap = Assets.genImagesPuzzleEgypt;
 
   // Kid avatars (profile selection)
-  static const String avatarMonster = 'assets/gen/images/avatar/avatar-monstar.png';
-  static const String avatarBoy = 'assets/gen/images/avatar/avatar-boy.png';
-  static const String avatarGirl = 'assets/gen/images/avatar/avatar-girl.png';
-  static const String avatarAstronaut = 'assets/gen/images/avatar/avatar-astronaut.png';
+  static const String avatarMonster =
+      'assets/gen/images/avatar/avatar-monstar.webp';
+  static const String avatarBoy = 'assets/gen/images/avatar/avatar-boy.webp';
+  static const String avatarGirl = 'assets/gen/images/avatar/avatar-girl.webp';
+  static const String avatarAstronaut =
+      'assets/gen/images/avatar/avatar-astronaut.webp';
 
   /// Ordered list of avatar assets. Index corresponds to `Profiles.avatarIndex`.
   static const List<String> kidAvatars = [

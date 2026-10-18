@@ -1,0 +1,43 @@
+{
+  "schemaVersion": 1,
+  "_comment": "The index of every content file. Asset bundles cannot be listed at runtime, so this is the directory. A test asserts it agrees with the disk in BOTH directions, which is what stops a file being added and silently never shipping.",
+  "arcs": [
+    "lost_pages"
+  ],
+  "adventures": [
+    "jungle",
+    "market",
+    "ocean",
+    "stars"
+  ],
+  "activities": [
+    "jungle_ask_animals",
+    "jungle_count_watchers",
+    "jungle_sort_watchers",
+    "jungle_find_page",
+    "market_find_list",
+    "market_restock",
+    "market_weigh_orders",
+    "market_deliver",
+    "market_fruit_bowl",
+    "market_lend_a_hand",
+    "market_mend_sign",
+    "ocean_find_marker",
+    "ocean_float_or_sink",
+    "ocean_ride_the_current",
+    "ocean_light_her_shell",
+    "ocean_light_the_wall",
+    "ocean_read_the_current",
+    "stars_missing_stars",
+    "stars_what_covers_them",
+    "stars_relight",
+    "stars_star_path",
+    "stars_who_carries_it"
+  ],
+  "packs": [
+    "animals",
+    "market_goods",
+    "tide_pool",
+    "sky"
+  ]
+}

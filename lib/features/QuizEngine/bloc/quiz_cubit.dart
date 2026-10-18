@@ -1,18 +1,15 @@
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:kidzo/core/database/config.dart';
-import 'package:kidzo/core/database/daos/game_scores_dao.dart';
-import 'package:kidzo/core/database/daos/profile_dao.dart';
+import 'package:kidzo/core/scoring/game_score_recorder.dart';
 
+import '../../../core/helpers/speech.dart';
 import '../data/quiz_models.dart';
 import 'quiz_state.dart';
 
 class QuizCubit extends Cubit<QuizState> {
-
   QuizCubit({
-    required this.gameScoresDao,
-    required this.profileDao,
+    required this.scoreRecorder,
     required this.flutterTts,
     required this.audioPlayer,
     required List<QuizQuestion> questions,
@@ -31,8 +28,7 @@ class QuizCubit extends Cubit<QuizState> {
   final String? tryAgainText;
   final Duration transitionDuration;
   final Duration wrongFeedbackDuration;
-  final GameScoresDao gameScoresDao;
-  final ProfileDao profileDao;
+  final GameScoreRecorder scoreRecorder;
   final FlutterTts flutterTts;
   final AudioPlayer audioPlayer;
 
@@ -53,7 +49,11 @@ class QuizCubit extends Cubit<QuizState> {
 
   Future<void> _speakPrompt(String text) async {
     try {
-      await flutterTts.speak(text);
+      await Speech.stop();
+      final spoke = await Speech.speak(text);
+      if (spoke) {
+        await Future<void>.delayed(const Duration(milliseconds: 500));
+      }
     } catch (_) {}
   }
 
@@ -62,11 +62,19 @@ class QuizCubit extends Cubit<QuizState> {
     if (isCorrect) {
       _score += 10;
       try {
-        await flutterTts.speak(option.text);
+        await Speech.stop();
+        final spoke = await Speech.speak(option.text);
+        if (spoke) {
+          await Future<void>.delayed(const Duration(milliseconds: 800));
+        }
       } catch (_) {}
     } else if (allowRetries) {
       try {
-        await flutterTts.speak(tryAgainText ?? 'Try again');
+        await Speech.stop();
+        final spoke = await Speech.speak(tryAgainText ?? 'Try again');
+        if (spoke) {
+          await Future<void>.delayed(const Duration(milliseconds: 600));
+        }
       } catch (_) {}
     }
 
@@ -74,14 +82,14 @@ class QuizCubit extends Cubit<QuizState> {
         _questions[_currentIndex], isCorrect, _score, _currentIndex));
 
     final delay = isCorrect ? transitionDuration : wrongFeedbackDuration;
-    await Future.delayed(delay);
+    await Future<void>.delayed(delay);
 
     if (isClosed) return;
 
     if (isCorrect || !allowRetries) {
       _currentIndex++;
     }
-    
+
     if (_currentIndex < _questions.length) {
       emit(QuizActive(_questions[_currentIndex], _score, _currentIndex));
       if (isCorrect || !allowRetries) {
@@ -93,15 +101,11 @@ class QuizCubit extends Cubit<QuizState> {
   }
 
   Future<void> _finishQuiz() async {
-    final profiles = await profileDao.getAllProfiles();
-    if (profiles.isNotEmpty) {
-      final profileId = profiles.first.id;
-      await gameScoresDao.insertScore(GameScoresCompanion.insert(
-        profileId: profileId,
-        gameKey: _gameKey,
-        score: _score,
-      ));
-    }
+    await scoreRecorder.recordPlay(
+      gameKey: _gameKey,
+      score: _score,
+      maxScore: _questions.length,
+    );
     emit(QuizCompleted(_score));
   }
 }

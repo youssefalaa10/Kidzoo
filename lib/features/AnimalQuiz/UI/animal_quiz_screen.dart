@@ -1,21 +1,30 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:kidzo/core/utils/assets.dart';
 
-import '../../../core/base/protected_game_screen.dart';
+import '../../../core/base/kid_game_screen.dart';
+import '../../../core/difficulty/difficulty_run_scope.dart';
+import '../../../core/difficulty/kid_difficulty.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/helpers/tts_service.dart';
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/services/background_resolver.dart';
+import '../../../core/shared/style/kid_ui.dart';
+import '../data/animal_quiz_star_rule.dart';
 import '../data/model/animal_quiz_model.dart';
 
-class AnimalQuizScreen extends ProtectedGameScreen {
+class AnimalQuizScreen extends KidGameScreen {
   const AnimalQuizScreen({required super.level, super.key});
 
   @override
   State<AnimalQuizScreen> createState() => _AnimalQuizScreenState();
 }
 
-class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
+class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
     with TTSMusicMixin {
   List<AnimalQuizModel> animals = [];
   List<AnimalQuizModel> chooseAnimals = [];
@@ -27,7 +36,11 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
   int penaltyPerWrongMatch = 5;
   int targetScoreForLevel = 100;
 
-  final TtsService _ttsService = TtsService();
+  /// How many animals this tier started with.
+  ///
+  /// Captured at setup because [animals] is emptied as the child plays, so by
+  /// the time the round is scored it is always zero.
+  int _animalsThisRound = 0;
 
   // All available animals across levels
   final List<AnimalQuizModel> allAnimals = [
@@ -152,14 +165,14 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
       value: 'giraffe',
     ),
     AnimalQuizModel(
-      animalName: 'A',
-      animalImage: Assets.genImagesAlphabetA,
-      value: 'A',
+      animalName: 'panda',
+      animalImage: Assets.genImagesAnimalPanda,
+      value: 'panda',
     ),
     AnimalQuizModel(
-      animalName: 'B',
-      animalImage: Assets.genImagesAlphabetB,
-      value: 'B',
+      animalName: 'bird',
+      animalImage: Assets.genImagesAnimalBird,
+      value: 'bird',
     ),
   ];
 
@@ -197,6 +210,7 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
         break;
     }
 
+    _animalsThisRound = animals.length;
     chooseAnimals = List<AnimalQuizModel>.from(animals);
     animals.shuffle();
     chooseAnimals.shuffle();
@@ -207,17 +221,33 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
       final l10n = AppLocalizations.of(context);
       // Show a brief congratulations message
       speak(l10n.levelComplete);
-
-      // Add a small delay to allow the speech to be heard
+      _recordWin();
+      // Let the congratulation be heard, then show the result panel.
+      //
+      // This used to pop(true) to the level map so it would open the next
+      // stage. The level map is gone, so the panel below — which was dead
+      // code, because the pop always fired first — is what a child sees now.
       Future.delayed(const Duration(milliseconds: 1500), () {
-        // Always return to map screen with completion status
-        // This will signal the level map to automatically open the next stage
         if (mounted) {
-          Navigator.of(context)
-              .pop(true); // Return true to indicate level completion
+          setState(() => gameOver = true);
         }
       });
     }
+  }
+
+  /// Writes the finished run, which is what unlocks the next tier.
+  void _recordWin() {
+    final int maxScore = AnimalQuizStarRule.maxScoreFor(
+      pointsPerCorrectMatch: pointsPerCorrectMatch,
+      animalCount: _animalsThisRound,
+    );
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'animal_quiz',
+          difficulty: KidDifficulty.fromLevel(level),
+          score: score,
+          stars: AnimalQuizStarRule.rate(score: score, maxScore: maxScore),
+          maxScore: maxScore,
+        ));
   }
 
   void speak(String text) async {
@@ -225,8 +255,9 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     stopForSpeech();
 
     final languageCode = Localizations.localeOf(context).languageCode;
-    await _ttsService.setLanguage(languageCode);
-    await _ttsService.speak(text);
+    await Speech.configureLanguage(languageCode);
+    await Speech.speakAndWait(text);
+    if (mounted) resumeAfterSpeech();
   }
 
   @override
@@ -240,14 +271,6 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
     if (locale.languageCode == 'ar') {
       TtsService.checkAndRequestArabicVoice(context);
     }
-
-    // Initialize TTS completion handler
-    _ttsService.setCompletionHandler(() {
-      if (mounted) resumeAfterSpeech();
-    });
-    _ttsService.setErrorHandler((msg) {
-      if (mounted) resumeAfterSpeech();
-    });
 
     speak(l10n.welcomeToAnimalQuiz(level));
   }
@@ -276,10 +299,6 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
         return l10n.giraffe;
       case 'panda':
         return l10n.panda;
-      case 'a':
-        return 'A';
-      case 'b':
-        return 'B';
       default:
         return name;
     }
@@ -297,8 +316,8 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
             decoration: BoxDecoration(
               image: DecorationImage(
                 image: AssetImage(
-                  BackgroundResolver(context, BackgroundType.jungle).resolveBackground()!
-                ),
+                    BackgroundResolver(context, BackgroundType.jungle)
+                        .resolveBackground()!),
                 fit: BoxFit.cover,
               ),
             ),
@@ -468,6 +487,12 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                             ),
                             child: Column(
                               children: [
+                                const Icon(
+                                  Icons.emoji_events,
+                                  size: 60,
+                                  color: Colors.amber,
+                                ),
+                                const SizedBox(height: 12),
                                 Text(
                                   l10n.gameComplete,
                                   style: Theme.of(context)
@@ -515,13 +540,76 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
                             ),
                             child: TextButton(
                               onPressed: () {
+                                // Replays the tier the child chose. This used
+                                // to reset to level 1, so finishing Hard and
+                                // tapping Play Again silently dropped them to
+                                // Easy.
                                 setState(() {
-                                  level = 1;
+                                  level = widget.level;
                                   initGame();
                                 });
                               },
                               child: Text(
                                 l10n.playAgain,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyLarge
+                                    ?.copyWith(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ),
+                          if (DifficultyRunScope.maybeOf(context)
+                                  ?.hasNextDifficulty ==
+                              true) ...<Widget>[
+                            const SizedBox(height: 16),
+                            Container(
+                              width: MediaQuery.of(context).size.width / 2,
+                              height: MediaQuery.of(context).size.width / 10,
+                              decoration: BoxDecoration(
+                                color: KidUi.primary,
+                                borderRadius: BorderRadius.circular(16),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color:
+                                        KidUi.primary.withValues(alpha: 0.4),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: TextButton(
+                                onPressed: () => DifficultyRunScope.maybeOf(
+                                        context)!
+                                    .playNext(context),
+                                child: Text(
+                                  l10n.nextLevel,
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyLarge
+                                      ?.copyWith(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                ),
+                              ),
+                            ),
+                          ],
+                          const SizedBox(height: 16),
+                          Container(
+                            width: MediaQuery.of(context).size.width / 2,
+                            height: MediaQuery.of(context).size.width / 10,
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade400,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: TextButton(
+                              onPressed: () =>
+                                  Navigator.of(context).maybePop(),
+                              child: Text(
+                                l10n.exit,
                                 style: Theme.of(context)
                                     .textTheme
                                     .bodyLarge
@@ -546,9 +634,9 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
 
   String result() {
     final l10n = AppLocalizations.of(context);
-    if (score >= targetScoreForLevel * maxLevel) {
+    if (score >= targetScoreForLevel) {
       return l10n.excellent;
-    } else if (score >= (targetScoreForLevel * maxLevel * 0.7)) {
+    } else if (score >= (targetScoreForLevel * 0.7).round()) {
       return l10n.greatJob;
     } else {
       return l10n.tryAgainToGetBetterScore;
@@ -556,9 +644,9 @@ class _AnimalQuizScreenState extends ProtectedGameScreenState<AnimalQuizScreen>
   }
 
   Color getResultColor() {
-    if (score >= targetScoreForLevel * maxLevel) {
+    if (score >= targetScoreForLevel) {
       return Colors.green;
-    } else if (score >= (targetScoreForLevel * maxLevel * 0.7)) {
+    } else if (score >= (targetScoreForLevel * 0.7).round()) {
       return Colors.orange;
     } else {
       return Colors.red;

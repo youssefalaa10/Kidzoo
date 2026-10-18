@@ -26,7 +26,8 @@ class _GamesScreenState extends State<GamesScreen> with BackgroundMusicMixin {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game)
+                .resolveBackground()!),
             fit: BoxFit.cover,
           ),
         ),
@@ -46,7 +47,7 @@ class _GamesScreenState extends State<GamesScreen> with BackgroundMusicMixin {
                     HeaderSection(
                       mq: mq,
                       title: AppLocalizations.of(context).funGames,
-                      textColor: Colors.blue[800]!,
+                      textColor: Colors.blue.shade800,
                     ),
                   ],
                 ),

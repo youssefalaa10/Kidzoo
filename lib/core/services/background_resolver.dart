@@ -5,13 +5,11 @@ enum BackgroundType {
   game,
   map,
   tech,
-  splash,
   jungle,
   none,
 }
 
 class BackgroundResolver {
-
   const BackgroundResolver(this.context, this.type);
   final BuildContext context;
   final BackgroundType type;
@@ -36,25 +34,25 @@ class BackgroundResolver {
 
     switch (type) {
       case BackgroundType.education:
-        mobilePortrait = 'assets/gen/images/backgrounds/learn_bg_mob.png';
-        mobileLandscape = 'assets/gen/images/backgrounds/learn_bg_mob.png';
+        mobilePortrait = 'assets/gen/images/backgrounds/learn_bg_mob.webp';
+        mobileLandscape = 'assets/gen/images/backgrounds/learn_bg_mob.webp';
         tabletPortrait = 'assets/gen/images/backgrounds/colorful_bg_tab.jpg';
         tabletLandscape = 'assets/gen/images/backgrounds/colorful_bg_tab.jpg';
         desktop = 'assets/gen/images/backgrounds/math_bg_desk.jpg';
         break;
       case BackgroundType.game:
-        mobilePortrait = 'assets/gen/images/backgrounds/cloudy_bg_mob.png';
-        mobileLandscape = 'assets/gen/images/backgrounds/cloudy_bg_mob.png';
-        tabletPortrait = 'assets/gen/images/backgrounds/cloudy_bg_tab.png';
-        tabletLandscape = 'assets/gen/images/backgrounds/cloudy_bg_tab.png';
+        mobilePortrait = 'assets/gen/images/backgrounds/cloudy_bg_mob.webp';
+        mobileLandscape = 'assets/gen/images/backgrounds/cloudy_bg_mob.webp';
+        tabletPortrait = 'assets/gen/images/backgrounds/cloudy_bg_tab.webp';
+        tabletLandscape = 'assets/gen/images/backgrounds/cloudy_bg_tab.webp';
         desktop = 'assets/gen/images/backgrounds/colorful_bg_desk.jpg';
         break;
       case BackgroundType.map:
-        mobilePortrait = 'assets/gen/images/backgrounds/map_mob.jpg';
-        mobileLandscape = 'assets/gen/images/backgrounds/map_mob.jpg';
-        tabletPortrait = 'assets/gen/images/backgrounds/map_desk_tab.png';
-        tabletLandscape = 'assets/gen/images/backgrounds/map_desk_tab.png';
-        desktop = 'assets/gen/images/backgrounds/map_desk_tab.png';
+        mobilePortrait = 'assets/gen/images/backgrounds/map_mob.webp';
+        mobileLandscape = 'assets/gen/images/backgrounds/map_mob.webp';
+        tabletPortrait = 'assets/gen/images/backgrounds/map_desk_tab.webp';
+        tabletLandscape = 'assets/gen/images/backgrounds/map_desk_tab.webp';
+        desktop = 'assets/gen/images/backgrounds/map_desk_tab.webp';
         break;
       case BackgroundType.tech:
         mobilePortrait = 'assets/gen/images/backgrounds/tech_bg_mob.jpeg';
@@ -63,16 +61,9 @@ class BackgroundResolver {
         tabletLandscape = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
         desktop = 'assets/gen/images/backgrounds/tech_bg_desk.jpg';
         break;
-      case BackgroundType.splash:
-        mobilePortrait = 'assets/gen/images/backgrounds/cloudy_bg_mob.png';
-        mobileLandscape = 'assets/gen/images/backgrounds/cloudy_bg_mob.png';
-        tabletPortrait = 'assets/gen/images/backgrounds/cloudy_bg_tab.png';
-        tabletLandscape = 'assets/gen/images/backgrounds/cloudy_bg_tab.png';
-        desktop = 'assets/gen/images/backgrounds/colorful_bg_desk.jpg';
-        break;
       case BackgroundType.jungle:
-        mobilePortrait = 'assets/gen/images/backgrounds/jungle_mob.png';
-        mobileLandscape = 'assets/gen/images/backgrounds/jungle_mob.png';
+        mobilePortrait = 'assets/gen/images/backgrounds/jungle_mob.webp';
+        mobileLandscape = 'assets/gen/images/backgrounds/jungle_mob.webp';
         tabletPortrait = 'assets/gen/images/backgrounds/jungle-tab.jpg';
         tabletLandscape = 'assets/gen/images/backgrounds/jungle-tab.jpg';
         desktop = 'assets/gen/images/backgrounds/jungle-tab.jpg';

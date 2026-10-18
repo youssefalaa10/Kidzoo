@@ -83,8 +83,22 @@ class MazeCell {
 /// Game difficulty levels
 enum MazeDifficulty {
   easy, // 5x5
-  medium, // 10x10
-  hard; // 20x20
+  medium, // 7x7
+  hard; // 12x12
+
+  /// The `int level` the catalog and the difficulty picker speak.
+  int get level => index + 1;
+
+  /// Maps that level back onto a maze size.
+  static MazeDifficulty fromLevel(int level) {
+    if (level <= 1) {
+      return MazeDifficulty.easy;
+    }
+    if (level == 2) {
+      return MazeDifficulty.medium;
+    }
+    return MazeDifficulty.hard;
+  }
 
   int get gridSize {
     switch (this) {
@@ -119,25 +133,31 @@ enum MazeDifficulty {
     }
   }
 
-  String get displayName {
+  /// Key into AppLocalizations, not a display string.
+  ///
+  /// These were hardcoded bilingual literals ('سهل - Easy'), which showed both
+  /// languages at once whichever one the child had chosen. The descriptions
+  /// also lied: they claimed 5x5/10x10/20x20 while [gridSize] has always
+  /// returned 5/7/12.
+  String get nameKey {
     switch (this) {
       case MazeDifficulty.easy:
-        return 'سهل - Easy';
+        return 'easy';
       case MazeDifficulty.medium:
-        return 'متوسط - Medium';
+        return 'medium';
       case MazeDifficulty.hard:
-        return 'صعب - Hard';
+        return 'hard';
     }
   }
 
-  String get description {
+  String get descriptionKey {
     switch (this) {
       case MazeDifficulty.easy:
-        return 'متاهة صغيرة 5×5 - طريق واضح وقصير';
+        return 'mazeEasyDescription';
       case MazeDifficulty.medium:
-        return 'متاهة 10×10 - اجمع 3 نجوم';
+        return 'mazeMediumDescription';
       case MazeDifficulty.hard:
-        return 'متاهة معقدة 20×20 - اجمع 5 نجوم في دقيقتين';
+        return 'mazeHardDescription';
     }
   }
 

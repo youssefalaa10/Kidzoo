@@ -1,0 +1,146 @@
+{
+  "adventureId": "stars",
+  "title": {
+    "en": "Up Among the Stars",
+    "ar": "بَيْنَ النُّجُوم"
+  },
+  "backgroundType": "stars",
+  "accent": "#7B6CF6",
+  "rewardId": "silver_page",
+  "rewardTitle": {
+    "en": "The Silver Page",
+    "ar": "الصَّفْحَةُ الفِضِّيَّة"
+  },
+  "rewardArt": "assets/gen/images/story/page_silver.png",
+  "_comment": "A mystery, told as one. The stars are going out, and every activity answers a question the one before it raised. WHAT is happening? Stars are missing, in a line (compare). WHY? Something flat is passing in front of them — a page (experiment). WHO saw it? The stars it covered; relight them and they speak (mix). HOW do we get there? Join the relit stars into a path (trace). WHO has it? Rule the travellers out, clue by clue, until one is left (deduce). Take any one away and the next has nothing to stand on.",
+  "_shapeComment": "Five activities, not six. The Ocean's six sat at the top of the eight-to-twelve minutes attention holds at four to five, and this chapter's activities are each longer to think about than the Ocean's were — deducing, experimenting and mixing all ask a child to try something before answering. Fewer, deeper, and every one of them on screen for a reason.",
+  "_agencyComment": "Suha never solves anything. She shines, she carries, and she says what she saw — but the rule about shadows, the colours, the path and the answer are all the child's. The reveal is theirs too: the success line of the climax names the comet only after the child has left it standing.",
+  "_arcComment": "The chapter closes the Stars mystery and opens the arc's. The comet did not take the page, it caught it; and it saw that every page rode the same wind. That is the thread Adventure 5 picks up, and all this chapter says about it is that the wind came from somewhere.",
+  "nodes": [
+    {
+      "nodeId": "stars.n1",
+      "beat": "openingProblem",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/stars/suha.png",
+      "lines": [
+        {
+          "en": "Above the clouds, the night is going out, one star at a time.",
+          "ar": "فَوْقَ الغُيُومِ يَنْطَفِئُ اللَّيْل، نَجْمَةً بَعْدَ نَجْمَة."
+        },
+        {
+          "en": "The smallest star, Suha, saw something flat and dark slide past her.",
+          "ar": "رَأَتْ أَصْغَرُ نَجْمَةٍ، سُهَى، شَيْئًا مُسَطَّحًا مُظْلِمًا يَنْزَلِقُ بِجَانِبِهَا."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n2",
+      "beat": "discovery",
+      "type": "activity",
+      "activityRef": "activities/stars_missing_stars",
+      "lines": [
+        {
+          "en": "The Blue Page has a picture of this sky. Hold it up, and compare.",
+          "ar": "فِي الصَّفْحَةِ الزَّرْقَاءِ صُورَةٌ لِهَذِهِ السَّمَاء. اِرْفَعْهَا، وَقَارِن."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n3",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/stars_what_covers_them",
+      "lines": [
+        {
+          "en": "Stars do not just vanish. Suha shines: see what happens when something passes in front.",
+          "ar": "النُّجُومُ لَا تَخْتَفِي هَكَذَا. تُضِيءُ سُهَى؛ فَانْظُرْ مَاذَا يَحْدُثُ حِينَ يَمُرُّ شَيْءٌ أَمَامَهَا."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n4",
+      "beat": "progress",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/stars/page.png",
+      "lines": [
+        {
+          "en": "So nobody is stealing the stars. Something flat, as big as a page, is passing in front of them.",
+          "ar": "إِذَنْ لَا أَحَدَ يَسْرِقُ النُّجُوم. شَيْءٌ مُسَطَّحٌ بِحَجْمِ صَفْحَةٍ يَمُرُّ أَمَامَهَا."
+        },
+        {
+          "en": "The stars it covered went grey and cold. They saw it up close.",
+          "ar": "وَالنُّجُومُ الَّتِي غَطَّاهَا صَارَتْ رَمَادِيَّةً بَارِدَة. لَقَدْ رَأَتْهُ عَنْ قُرْب."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n5",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/stars_relight",
+      "lines": [
+        {
+          "en": "Every star has its own colour. Mix the stardust, and each one you relight will say what it saw.",
+          "ar": "لِكُلِّ نَجْمَةٍ لَوْنُهَا. اِمْزُجْ غُبَارَ النُّجُوم، وَكُلُّ نَجْمَةٍ تُضِيئُهَا سَتَقُولُ مَا رَأَت."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n6",
+      "beat": "obstacle",
+      "type": "activity",
+      "activityRef": "activities/stars_star_path",
+      "lines": [
+        {
+          "en": "The relit stars make a path, up to where the sky travellers cross.",
+          "ar": "النُّجُومُ المُضِيئَةُ تَصْنَعُ دَرْبًا، يَصْعَدُ إِلَى حَيْثُ يَعْبُرُ مُسَافِرُو السَّمَاء."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n7",
+      "beat": "climax",
+      "type": "activity",
+      "activityRef": "activities/stars_who_carries_it",
+      "lines": [
+        {
+          "en": "Six travellers cross here tonight, and one of them has the page. Suha does not know which. You can find out.",
+          "ar": "سِتَّةُ مُسَافِرِينَ يَعْبُرُونَ هُنَا اللَّيْلَة، وَأَحَدُهُمْ مَعَهُ الصَّفْحَة. سُهَى لَا تَعْرِفُ مَنْ. وَأَنْتَ تَسْتَطِيع."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n8",
+      "beat": "resolution",
+      "type": "storyBeat",
+      "rewardId": "silver_page",
+      "speakerArt": "assets/gen/images/story/page_silver.png",
+      "lines": [
+        {
+          "en": "The comet never took the page. It caught on its tail, and a comet cannot look behind.",
+          "ar": "لَمْ يَأْخُذِ المُذَنَّبُ الصَّفْحَة. عَلِقَتْ بِذَيْلِه، وَالمُذَنَّبُ لَا يَرَى مَا خَلْفَه."
+        },
+        {
+          "en": "Suha lifts it free, and every covered star shines again: the Silver Page.",
+          "ar": "تُحَرِّرُهَا سُهَى، فَتَلْمَعُ كُلُّ نَجْمَةٍ مُغَطَّاةٍ مِنْ جَدِيد: الصَّفْحَةُ الفِضِّيَّة."
+        }
+      ]
+    },
+    {
+      "nodeId": "stars.n9",
+      "beat": "clueOnward",
+      "type": "storyBeat",
+      "speakerArt": "assets/gen/images/stars/comet.png",
+      "lines": [
+        {
+          "en": "Before it goes, the comet says: it saw every page fly away on the same wind.",
+          "ar": "وَقَبْلَ أَنْ يَمْضِيَ يَقُولُ المُذَنَّب: رَأَى كُلَّ الصَّفَحَاتِ تَطِيرُ عَلَى رِيحٍ وَاحِدَة."
+        },
+        {
+          "en": "And that wind did not blow by chance. It came from somewhere.",
+          "ar": "وَتِلْكَ الرِّيحُ لَمْ تَهُبَّ صُدْفَة. لَقَدْ جَاءَتْ مِنْ مَكَانٍ مَا."
+        }
+      ]
+    }
+  ]
+}

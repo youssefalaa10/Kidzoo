@@ -35,7 +35,8 @@ class _FlagGameMenuScreenState extends State<FlagGameMenuScreen>
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.game).resolveBackground()!),
+            image: AssetImage(BackgroundResolver(context, BackgroundType.game)
+                .resolveBackground()!),
             fit: BoxFit.cover,
           ),
         ),
@@ -127,7 +128,6 @@ class _FlagGameMenuScreenState extends State<FlagGameMenuScreen>
 }
 
 class _MenuButton extends StatelessWidget {
-
   const _MenuButton({
     required this.title,
     required this.subtitle,

@@ -16,11 +16,16 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "dev.annotex.kidzo"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        // Required by flutter_local_notifications (v10+), which uses
+        // java.time to schedule the story reminder. Without this the Android
+        // build fails outright, whether or not a notification is ever
+        // scheduled.
+        isCoreLibraryDesugaringEnabled = true
     }
 
     kotlin {
@@ -53,8 +58,8 @@ buildTypes {
     getByName("release") {
         signingConfig = signingConfigs.getByName("release")
 
-        isMinifyEnabled = false
-        isShrinkResources = false
+        isMinifyEnabled = true
+        isShrinkResources = true
 
         proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -66,4 +71,8 @@ buildTypes {
 
 flutter {
     source = "../.."
+}
+
+dependencies {
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.4")
 }

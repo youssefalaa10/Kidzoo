@@ -20,11 +20,26 @@ class AppLocalizations {
     Locale('ar', ''),
   ];
 
+  /// Looks up a key without throwing when it is absent.
+  ///
+  /// Deliberately different from the getters below, which are
+  /// `_localizedValues['key']!` and blow up on a missing key. That is the right
+  /// behaviour for UI strings, where a missing key is a bug the build should
+  /// surface. It is the wrong behaviour for **content** keys, which are data:
+  /// Adventure content ships hundreds of authored strings, and one missing
+  /// translation must degrade to a fallback rather than crash a child's story.
+  ///
+  /// Returns [fallback] when the key is absent, or the key itself when no
+  /// fallback is given, so the missing key is visible without being fatal.
+  String resolve(String key, {String? fallback}) =>
+      _localizedValues[key] ?? fallback ?? key;
+
+  /// Whether [key] has text in the current locale. Lets callers choose a
+  /// different rendering rather than displaying a fallback.
+  bool hasText(String key) => _localizedValues.containsKey(key);
+
   // DrawLab translations
   String get drawLab => _localizedValues['drawLab']!;
-  String get navigationNotAllowed => _localizedValues['navigationNotAllowed']!;
-  String get gamesOnlyThroughLevelMap =>
-      _localizedValues['gamesOnlyThroughLevelMap']!;
   String get goBack => _localizedValues['goBack']!;
   String get toolSettings => _localizedValues['toolSettings']!;
   String get failedToShare => _localizedValues['failedToShare']!;
@@ -354,12 +369,8 @@ class AppLocalizations {
   String get flappyBird => _localizedValues['flappyBird']!;
   String get game2048 => _localizedValues['game2048']!;
 
-  String currentLevelLabel(int level) => _localizedValues['currentLevelLabel']!
-      .replaceAll('{level}', level.toString());
   String levelLabel(int level) =>
       _localizedValues['levelLabel']!.replaceAll('{level}', level.toString());
-  String difficultyLevel(int level) => _localizedValues['difficultyLevel']!
-      .replaceAll('{level}', level.toString());
   String get gameTypesLabel => _localizedValues['gameTypesLabel']!;
   String get memoryGameCongrats => _localizedValues['memoryGameCongrats']!;
   String get memoryGameTimeResult => _localizedValues['memoryGameTimeResult']!;
@@ -368,9 +379,6 @@ class AppLocalizations {
   String pairsLabel(int current, int total) => _localizedValues['pairsLabel']!
       .replaceAll('{current}', current.toString())
       .replaceAll('{total}', total.toString());
-  String lockedLevelMessage(int level) =>
-      _localizedValues['lockedLevelMessage']!
-          .replaceAll('{level}', level.toString());
 
   // Learning Activities translations
   String get numbers => _localizedValues['numbers']!;
@@ -523,12 +531,16 @@ class AppLocalizations {
   String get shape => _localizedValues['shape']!;
   String get text => _localizedValues['text']!;
   String get galleryAccessDenied => _localizedValues['galleryAccessDenied']!;
-  
+
   // Vehicles Game
-  String get whichVehicleFliesInSky => _localizedValues['which_vehicle_flies_in_sky']!;
-  String get whichVehicleTravelsOnRailway => _localizedValues['which_vehicle_travels_on_railway']!;
-  String get whichVehicleDrivesOnRoad => _localizedValues['which_vehicle_drives_on_road']!;
-  String get whichVehicleTravelsOnWater => _localizedValues['which_vehicle_travels_on_water']!;
+  String get whichVehicleFliesInSky =>
+      _localizedValues['which_vehicle_flies_in_sky']!;
+  String get whichVehicleTravelsOnRailway =>
+      _localizedValues['which_vehicle_travels_on_railway']!;
+  String get whichVehicleDrivesOnRoad =>
+      _localizedValues['which_vehicle_drives_on_road']!;
+  String get whichVehicleTravelsOnWater =>
+      _localizedValues['which_vehicle_travels_on_water']!;
   String get airplane => _localizedValues['airplane']!;
   String get car => _localizedValues['car']!;
   String get train => _localizedValues['train']!;
@@ -544,8 +556,6 @@ class AppLocalizations {
   String get vehicles => _localizedValues['vehicles']!;
   String get fruits => _localizedValues['fruits']!;
   String get vegetables => _localizedValues['vegetables']!;
-  String get splashTitle => _localizedValues['splashTitle']!;
-  String get splashSubtitle => _localizedValues['splashSubtitle']!;
   String get backgroundMusicTitle => _localizedValues['backgroundMusicTitle']!;
   String get backgroundMusicDesc => _localizedValues['backgroundMusicDesc']!;
   String get track1 => _localizedValues['track1']!;
@@ -554,7 +564,8 @@ class AppLocalizations {
   // Feed The Animal
   String get apple => _localizedValues['apple']!;
   String get banana => _localizedValues['banana']!;
-  String get orangeFruit => _localizedValues['orange_fruit']!; // 'orange' is already used for color
+  String get orangeFruit =>
+      _localizedValues['orange_fruit']!; // 'orange' is already used for color
   String get grapes => _localizedValues['grapes']!;
   String get watermelon => _localizedValues['watermelon']!;
   String get mango => _localizedValues['mango']!;
@@ -562,14 +573,21 @@ class AppLocalizations {
   String get cherries => _localizedValues['cherries']!;
   String get monkey => _localizedValues['monkey']!;
   String get rabbit => _localizedValues['rabbit']!;
-  
-  String promptGiveMeFruit(String fruit) => _localizedValues['prompt_give_me_fruit']!.replaceAll('{fruit}', fruit);
-  String promptFindColorFruit(String color) => _localizedValues['prompt_find_color_fruit']!.replaceAll('{color}', color);
-  String promptWhichIsCalled(String fruit) => _localizedValues['prompt_which_is_called']!.replaceAll('{fruit}', fruit);
-  String yummyFruit(String fruit) => _localizedValues['yummy_fruit']!.replaceAll('{fruit}', fruit);
-  String successPhrase1(String fruit) => _localizedValues['success_phrase_1']!.replaceAll('{fruit}', fruit);
-  String successPhrase2(String fruit) => _localizedValues['success_phrase_2']!.replaceAll('{fruit}', fruit);
-  String successPhrase3(String fruit) => _localizedValues['success_phrase_3']!.replaceAll('{fruit}', fruit);
+
+  String promptGiveMeFruit(String fruit) =>
+      _localizedValues['prompt_give_me_fruit']!.replaceAll('{fruit}', fruit);
+  String promptFindColorFruit(String color) =>
+      _localizedValues['prompt_find_color_fruit']!.replaceAll('{color}', color);
+  String promptWhichIsCalled(String fruit) =>
+      _localizedValues['prompt_which_is_called']!.replaceAll('{fruit}', fruit);
+  String yummyFruit(String fruit) =>
+      _localizedValues['yummy_fruit']!.replaceAll('{fruit}', fruit);
+  String successPhrase1(String fruit) =>
+      _localizedValues['success_phrase_1']!.replaceAll('{fruit}', fruit);
+  String successPhrase2(String fruit) =>
+      _localizedValues['success_phrase_2']!.replaceAll('{fruit}', fruit);
+  String successPhrase3(String fruit) =>
+      _localizedValues['success_phrase_3']!.replaceAll('{fruit}', fruit);
   String get tryAgainPrompt => _localizedValues['try_again_prompt']!;
   String get feedAnimalTitle => _localizedValues['feed_animal_title']!;
 
@@ -585,7 +603,10 @@ class AppLocalizations {
   String get tomato => _localizedValues['tomato']!;
   String get fruitsBasket => _localizedValues['fruitsBasket']!;
   String get vegetablesBasket => _localizedValues['vegetablesBasket']!;
-  String putItemInBasket(String item, String basket) => _localizedValues['putItemInBasket']!.replaceAll('{item}', item).replaceAll('{basket}', basket);
+  String putItemInBasket(String item, String basket) =>
+      _localizedValues['putItemInBasket']!
+          .replaceAll('{item}', item)
+          .replaceAll('{basket}', basket);
   String get sorterGreatJob => _localizedValues['sorterGreatJob']!;
   String get sorterExcellent => _localizedValues['sorterExcellent']!;
   String get sorterFantastic => _localizedValues['sorterFantastic']!;
@@ -597,8 +618,56 @@ class AppLocalizations {
   String get meat => _localizedValues['meat']!;
   String get fantastic => _localizedValues['fantastic']!;
   String get wellDone => _localizedValues['wellDone']!;
-  String promptFeedAnimal(String animal) => _localizedValues['promptFeedAnimal']!.replaceAll('{animal}', animal);
-  String promptWhatDoesAnimalEat(String animal) => _localizedValues['promptWhatDoesAnimalEat']!.replaceAll('{animal}', animal);
+  String promptFeedAnimal(String animal) =>
+      _localizedValues['promptFeedAnimal']!.replaceAll('{animal}', animal);
+  String promptWhatDoesAnimalEat(String animal) =>
+      _localizedValues['promptWhatDoesAnimalEat']!
+          .replaceAll('{animal}', animal);
+
+  // Shared kid-game UI
+  String get tapOrDragHint => _localizedValues['tapOrDragHint']!;
+  String get tapBasketHint => _localizedValues['tapBasketHint']!;
+  String get keepGoing => _localizedValues['keepGoing']!;
+
+  // Math game: spoken questions
+  String mathSpokenQuestion(String a, String op, String b) =>
+      _localizedValues['mathSpokenQuestion']!
+          .replaceAll('{a}', a)
+          .replaceAll('{op}', op)
+          .replaceAll('{b}', b);
+  String get mathOpPlus => _localizedValues['mathOpPlus']!;
+  String get mathOpMinus => _localizedValues['mathOpMinus']!;
+  String get mathOpTimes => _localizedValues['mathOpTimes']!;
+  String get mathOpDividedBy => _localizedValues['mathOpDividedBy']!;
+  String get listenToQuestion => _localizedValues['listenToQuestion']!;
+
+  String get fullscreen => _localizedValues['fullscreen']!;
+  String get exitFullscreen => _localizedValues['exitFullscreen']!;
+
+  // Arabic voice / TTS setup
+  String get ttsSetupTitle => _localizedValues['ttsSetupTitle']!;
+  String get ttsSetupDesc => _localizedValues['ttsSetupDesc']!;
+  String get ttsEngineLabel => _localizedValues['ttsEngineLabel']!;
+  String get ttsVoiceLabel => _localizedValues['ttsVoiceLabel']!;
+  String get ttsEgyptianLabel => _localizedValues['ttsEgyptianLabel']!;
+  String get ttsInstalledYes => _localizedValues['ttsInstalledYes']!;
+  String get ttsInstalledNo => _localizedValues['ttsInstalledNo']!;
+  String get ttsInstallVoice => _localizedValues['ttsInstallVoice']!;
+  String get ttsTestVoice => _localizedValues['ttsTestVoice']!;
+  String get ttsRefreshVoices => _localizedValues['ttsRefreshVoices']!;
+  String get ttsStatusIdeal => _localizedValues['ttsStatusIdeal']!;
+  String get ttsStatusEgyptianWrongGender =>
+      _localizedValues['ttsStatusEgyptianWrongGender']!;
+  String get ttsStatusArabicNotEgyptian =>
+      _localizedValues['ttsStatusArabicNotEgyptian']!;
+  String get ttsStatusMissing => _localizedValues['ttsStatusMissing']!;
+  String get ttsStatusCloud => _localizedValues['ttsStatusCloud']!;
+  String get ttsNone => _localizedValues['ttsNone']!;
+  String get ttsFirstRunTitle => _localizedValues['ttsFirstRunTitle']!;
+  String get ttsFirstRunBody => _localizedValues['ttsFirstRunBody']!;
+  String get ttsNotNow => _localizedValues['ttsNotNow']!;
+  String get ttsOpenSettings => _localizedValues['ttsOpenSettings']!;
+  String get ttsInstallHint => _localizedValues['ttsInstallHint']!;
 
   String getCountryName(String code) {
     return _localizedValues[code.toLowerCase()] ?? code;
@@ -606,13 +675,15 @@ class AppLocalizations {
 
   String getVegetableName(String key) {
     // try direct key, then lowerCamelCase if there are underscores
-    final camelKey = key.replaceAllMapped(RegExp(r'_([a-z])'), (m) => m[1]!.toUpperCase());
+    final camelKey =
+        key.replaceAllMapped(RegExp(r'_([a-z])'), (m) => m[1]!.toUpperCase());
     return _localizedValues[camelKey] ?? _localizedValues[key] ?? key;
   }
 
   String getFruitName(String key) {
     if (key == 'orange') return _localizedValues['orange_fruit'] ?? key;
-    final camelKey = key.replaceAllMapped(RegExp(r'_([a-z])'), (m) => m[1]!.toUpperCase());
+    final camelKey =
+        key.replaceAllMapped(RegExp(r'_([a-z])'), (m) => m[1]!.toUpperCase());
     return _localizedValues[camelKey] ?? _localizedValues[key] ?? key;
   }
 
@@ -621,7 +692,8 @@ class AppLocalizations {
   String get lemon => _localizedValues['lemon']!;
   String get whatIsThisVegetable => _localizedValues['whatIsThisVegetable']!;
 
-  String get vegetablesGameComplete => _localizedValues['vegetablesGameComplete']!;
+  String get vegetablesGameComplete =>
+      _localizedValues['vegetablesGameComplete']!;
   String get backToCategories => _localizedValues['backToCategories']!;
 
   String get fruitsGameComplete => _localizedValues['fruitsGameComplete']!;
@@ -632,7 +704,8 @@ class AppLocalizations {
       _localizedValues['vocab_tap_the']!.replaceAll('{item}', itemName),
       _localizedValues['vocab_touch_the']!.replaceAll('{item}', itemName),
       _localizedValues['vocab_find_the']!.replaceAll('{item}', itemName),
-      _localizedValues['vocab_can_you_find_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_can_you_find_the']!
+          .replaceAll('{item}', itemName),
       _localizedValues['vocab_catch_the']!.replaceAll('{item}', itemName),
       _localizedValues['vocab_where_is_the']!.replaceAll('{item}', itemName),
       _localizedValues['vocab_point_to_the']!.replaceAll('{item}', itemName),
@@ -640,8 +713,10 @@ class AppLocalizations {
       _localizedValues['vocab_choose_the']!.replaceAll('{item}', itemName),
       _localizedValues['vocab_lets_find_the']!.replaceAll('{item}', itemName),
       _localizedValues['vocab_can_you_tap_the']!.replaceAll('{item}', itemName),
-      _localizedValues['vocab_touch_picture_of']!.replaceAll('{item}', itemName),
-      _localizedValues['vocab_which_one_is_the']!.replaceAll('{item}', itemName),
+      _localizedValues['vocab_touch_picture_of']!
+          .replaceAll('{item}', itemName),
+      _localizedValues['vocab_which_one_is_the']!
+          .replaceAll('{item}', itemName),
     ];
   }
 
@@ -657,6 +732,7 @@ class AppLocalizations {
   String get whatsYourName => _localizedValues['whatsYourName']!;
   String get namePlaceholder => _localizedValues['namePlaceholder']!;
   String get nameEmptyError => _localizedValues['nameEmptyError']!;
+  String get nameTooShortError => _localizedValues['nameTooShortError']!;
   String get age => _localizedValues['age']!;
   String iAmYearsOld(int age) =>
       _localizedValues['iAmYearsOld']!.replaceAll('{age}', age.toString());
@@ -686,27 +762,47 @@ class AppLocalizations {
   String get categoryMathGames => _localizedValues['categoryMathGames']!;
   String get categoryPuzzleGames => _localizedValues['categoryPuzzleGames']!;
   String get categorySportsGames => _localizedValues['categorySportsGames']!;
-  String get categoryLanguageGames => _localizedValues['categoryLanguageGames']!;
+  String get categoryLanguageGames =>
+      _localizedValues['categoryLanguageGames']!;
   String get encouragementNewbie => _localizedValues['encouragementNewbie']!;
-  String get encouragementMemoryMastered => _localizedValues['encouragementMemoryMastered']!;
-  String get encouragementMathMastered => _localizedValues['encouragementMathMastered']!;
-  String get encouragementPuzzleMastered => _localizedValues['encouragementPuzzleMastered']!;
-  String get encouragementSportsMastered => _localizedValues['encouragementSportsMastered']!;
-  String get encouragementLanguageMastered => _localizedValues['encouragementLanguageMastered']!;
-  String get encouragementImproving => _localizedValues['encouragementImproving']!;
-  String get encouragementKeepPracticing => _localizedValues['encouragementKeepPracticing']!;
-  String get achievementFirstWinTitle => _localizedValues['achievementFirstWinTitle']!;
-  String get achievementFirstWinDesc => _localizedValues['achievementFirstWinDesc']!;
-  String get achievementMemoryMasterTitle => _localizedValues['achievementMemoryMasterTitle']!;
-  String get achievementMemoryMasterDesc => _localizedValues['achievementMemoryMasterDesc']!;
-  String get achievementMathStarTitle => _localizedValues['achievementMathStarTitle']!;
-  String get achievementMathStarDesc => _localizedValues['achievementMathStarDesc']!;
-  String get achievementFiveDayStreakTitle => _localizedValues['achievementFiveDayStreakTitle']!;
-  String get achievementFiveDayStreakDesc => _localizedValues['achievementFiveDayStreakDesc']!;
-  String get achievementPuzzleHeroTitle => _localizedValues['achievementPuzzleHeroTitle']!;
-  String get achievementPuzzleHeroDesc => _localizedValues['achievementPuzzleHeroDesc']!;
-  String get achievementSuperLearnerTitle => _localizedValues['achievementSuperLearnerTitle']!;
-  String get achievementSuperLearnerDesc => _localizedValues['achievementSuperLearnerDesc']!;
+  String get encouragementMemoryMastered =>
+      _localizedValues['encouragementMemoryMastered']!;
+  String get encouragementMathMastered =>
+      _localizedValues['encouragementMathMastered']!;
+  String get encouragementPuzzleMastered =>
+      _localizedValues['encouragementPuzzleMastered']!;
+  String get encouragementSportsMastered =>
+      _localizedValues['encouragementSportsMastered']!;
+  String get encouragementLanguageMastered =>
+      _localizedValues['encouragementLanguageMastered']!;
+  String get encouragementImproving =>
+      _localizedValues['encouragementImproving']!;
+  String get encouragementKeepPracticing =>
+      _localizedValues['encouragementKeepPracticing']!;
+  String get achievementFirstWinTitle =>
+      _localizedValues['achievementFirstWinTitle']!;
+  String get achievementFirstWinDesc =>
+      _localizedValues['achievementFirstWinDesc']!;
+  String get achievementMemoryMasterTitle =>
+      _localizedValues['achievementMemoryMasterTitle']!;
+  String get achievementMemoryMasterDesc =>
+      _localizedValues['achievementMemoryMasterDesc']!;
+  String get achievementMathStarTitle =>
+      _localizedValues['achievementMathStarTitle']!;
+  String get achievementMathStarDesc =>
+      _localizedValues['achievementMathStarDesc']!;
+  String get achievementFiveDayStreakTitle =>
+      _localizedValues['achievementFiveDayStreakTitle']!;
+  String get achievementFiveDayStreakDesc =>
+      _localizedValues['achievementFiveDayStreakDesc']!;
+  String get achievementPuzzleHeroTitle =>
+      _localizedValues['achievementPuzzleHeroTitle']!;
+  String get achievementPuzzleHeroDesc =>
+      _localizedValues['achievementPuzzleHeroDesc']!;
+  String get achievementSuperLearnerTitle =>
+      _localizedValues['achievementSuperLearnerTitle']!;
+  String get achievementSuperLearnerDesc =>
+      _localizedValues['achievementSuperLearnerDesc']!;
   String get pleaseEnterNameError => _localizedValues['pleaseEnterNameError']!;
   String get nameFieldHint => _localizedValues['nameFieldHint']!;
   String get theSmartKid => _localizedValues['theSmartKid']!;
@@ -720,10 +816,12 @@ class AppLocalizations {
   String get editProfileLabel => _localizedValues['editProfileLabel']!;
   String ageValueLabel(int age) =>
       _localizedValues['ageValueLabel']!.replaceAll('{age}', age.toString());
-  String playedBestLabel(int played, int best) => _localizedValues['playedBestLabel']!
-      .replaceAll('{played}', played.toString())
-      .replaceAll('{best}', best.toString());
-  String gameAnalyticsSemanticLabel(String title, int score, int played, int best) =>
+  String playedBestLabel(int played, int best) =>
+      _localizedValues['playedBestLabel']!
+          .replaceAll('{played}', played.toString())
+          .replaceAll('{best}', best.toString());
+  String gameAnalyticsSemanticLabel(
+          String title, int score, int played, int best) =>
       _localizedValues['gameAnalyticsSemanticLabel']!
           .replaceAll('{title}', title)
           .replaceAll('{score}', score.toString())
@@ -742,8 +840,8 @@ class AppLocalizations {
         _localizedValues['feedbackAlmost']!,
         _localizedValues['feedbackYouCanDoIt']!,
       ];
-  String currentLevelShort(int level) =>
-      _localizedValues['currentLevelShort']!.replaceAll('{level}', level.toString());
+  String currentLevelShort(int level) => _localizedValues['currentLevelShort']!
+      .replaceAll('{level}', level.toString());
 
   /// Clever, environment-based prompts for the Vehicles game, e.g.
   /// "Which vehicle can fly in the sky?" instead of "Where is the {item}?".
@@ -778,6 +876,50 @@ class AppLocalizations {
         return [_localizedValues['vocab_where_is_the']!];
     }
   }
+
+  // Difficulty tiers. The per-game tier descriptions are resolved by key from
+  // the picker rather than given getters, because they are catalog data; see
+  // test/difficulty/tier_description_keys_test.dart for the guard that
+  // replaces the getter cross-check.
+  String get chooseDifficulty => _localizedValues['chooseDifficulty']!;
+  String get nextLevel => _localizedValues['nextLevel']!;
+  String get tierLocked => _localizedValues['tierLocked']!;
+  String get notPlayedYet => _localizedValues['notPlayedYet']!;
+  String get freePlayCard => _localizedValues['freePlayCard']!;
+  String finishPreviousTier(String tier) =>
+      _localizedValues['finishPreviousTier']!.replaceAll('{tier}', tier);
+  String tierBestScore(int score) => _localizedValues['tierBestScore']!
+      .replaceAll('{score}', score.toString());
+
+  // Badges and the Profile's progress tab. The per-badge title and
+  // description keys are catalog data and are read with resolve(), guarded by
+  // test/badges/badge_localization_keys_test.dart.
+  String get badgeEarnedCaption => _localizedValues['badgeEarnedCaption']!;
+  String get badgeWallTitle => _localizedValues['badgeWallTitle']!;
+  String get badgeLockedLabel => _localizedValues['badgeLockedLabel']!;
+  String badgeEarnedOnLabel(String date) =>
+      _localizedValues['badgeEarnedOnLabel']!.replaceAll('{date}', date);
+  String badgeWallCount(int earned, int total) =>
+      _localizedValues['badgeWallCount']!
+          .replaceAll('{earned}', earned.toString())
+          .replaceAll('{total}', total.toString());
+  String get profileTabMe => _localizedValues['profileTabMe']!;
+  String get profileTabProgress => _localizedValues['profileTabProgress']!;
+  String get recentActivityTitle => _localizedValues['recentActivityTitle']!;
+  String get recentActivityEmpty => _localizedValues['recentActivityEmpty']!;
+  String get storyProgressTitle => _localizedValues['storyProgressTitle']!;
+  String get storyPagesFoundLabel =>
+      _localizedValues['storyPagesFoundLabel']!;
+  String get storyBeatsLabel => _localizedValues['storyBeatsLabel']!;
+  String get adventuresCompletedLabel =>
+      _localizedValues['adventuresCompletedLabel']!;
+  String get justNow => _localizedValues['justNow']!;
+  String hoursAgoShort(int hours) => _localizedValues['hoursAgoShort']!
+      .replaceAll('{hours}', hours.toString());
+  String daysAgoShort(int days) =>
+      _localizedValues['daysAgoShort']!.replaceAll('{days}', days.toString());
+  String pointsShortLabel(int points) => _localizedValues['pointsShortLabel']!
+      .replaceAll('{points}', points.toString());
 }
 
 class _AppLocalizationsDelegate

@@ -23,8 +23,7 @@ class ScoreSummary extends StatelessWidget {
   Widget build(BuildContext context) {
     // Pills grow taller (never narrower) when the user bumps the system font
     // size, so the value/label column always has room.
-    final textScale =
-        MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8);
+    final textScale = MediaQuery.textScalerOf(context).scale(1).clamp(1.0, 1.8);
 
     return LayoutBuilder(
       builder: (context, constraints) {

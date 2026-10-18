@@ -15,8 +15,8 @@ class NumberBloc extends Bloc<NumberEvent, NumberState> {
         };
 
         if (numberMap.containsKey(event.number)) {
-          final selectedModel = numberMap[event.number]!;
-          emit(NumberLoadedState(selectedModel.num, selectedModel.example));
+          final selectedModel = numberMap[event.number];
+          emit(NumberLoadedState(selectedModel!.num, selectedModel.example));
         } else {
           emit(const NumberErrorState(
               'Example not found for the selected number.'));

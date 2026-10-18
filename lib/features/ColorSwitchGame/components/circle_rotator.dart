@@ -41,7 +41,6 @@ class CircleRotator extends PositionComponent with HasGameRef<ColorSwitchGame> {
 }
 
 class CircleArc extends PositionComponent with ParentIsA<CircleRotator> {
-
   CircleArc({
     required this.color,
     required this.startAngle,

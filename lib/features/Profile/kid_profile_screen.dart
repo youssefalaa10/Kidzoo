@@ -3,8 +3,14 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/badges/badge_service.dart';
+import 'package:kidzo/core/badges/badge_stats_reader.dart';
+import 'package:kidzo/core/badges/default_badge_catalog.dart';
+import 'package:kidzo/core/catalog/default_game_catalog.dart';
 import 'package:kidzo/core/database/config.dart';
+import 'package:kidzo/core/database/daos/badge_dao.dart';
 import 'package:kidzo/core/database/daos/game_scores_dao.dart';
+import 'package:kidzo/core/database/daos/story_dao.dart';
 import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
@@ -14,21 +20,29 @@ import 'profile_analytics_cubit.dart';
 import 'profile_analytics_state.dart';
 import 'profile_cubit.dart';
 import 'profile_state.dart';
-import 'widgets/achievement_badge.dart';
-import 'widgets/age_selector.dart';
-import 'widgets/avatar_selector.dart';
-import 'widgets/game_analytics_card.dart';
-import 'widgets/motivational_quote_card.dart';
-import 'widgets/profile_header.dart';
-import 'widgets/score_summary.dart';
+import 'widgets/profile_me_tab.dart';
+import 'widgets/profile_progress_tab.dart';
 
 class KidProfileScreen extends StatelessWidget {
   const KidProfileScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (context) => ProfileAnalyticsCubit(context.read<GameScoresDao>()),
+    final GameScoresDao gameScoresDao = context.read<GameScoresDao>();
+    final StoryDao storyDao = context.read<StoryDao>();
+    return BlocProvider<ProfileAnalyticsCubit>(
+      create: (BuildContext _) => ProfileAnalyticsCubit(
+        gameScoresDao: gameScoresDao,
+        storyDao: storyDao,
+        badgeDao: context.read<BadgeDao>(),
+        badgeCatalog: buildDefaultBadgeCatalog(),
+        badgeStatsReader: BadgeStatsReader(
+          gameScoresDao: gameScoresDao,
+          storyDao: storyDao,
+        ),
+        gameCatalog: buildDefaultGameCatalog(),
+        badgeService: context.read<BadgeService>(),
+      ),
       child: const _KidProfileView(),
     );
   }
@@ -41,10 +55,15 @@ class _KidProfileView extends StatefulWidget {
   State<_KidProfileView> createState() => _KidProfileViewState();
 }
 
-class _KidProfileViewState extends State<_KidProfileView> {
+class _KidProfileViewState extends State<_KidProfileView>
+    with SingleTickerProviderStateMixin {
+  static const int _minNameLength = 3;
+
   final _nameController = TextEditingController();
   final _nameFieldKey = GlobalKey();
   final _random = Random();
+
+  late final TabController _tabController;
 
   int _selectedAvatarIndex = 0;
   int _age = 7;
@@ -59,6 +78,7 @@ class _KidProfileViewState extends State<_KidProfileView> {
   @override
   void initState() {
     super.initState();
+    _tabController = TabController(length: 2, vsync: this);
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) setState(() => _showEntrance = true);
     });
@@ -66,6 +86,7 @@ class _KidProfileViewState extends State<_KidProfileView> {
 
   @override
   void dispose() {
+    _tabController.dispose();
     _nameController.dispose();
     super.dispose();
   }
@@ -74,10 +95,13 @@ class _KidProfileViewState extends State<_KidProfileView> {
     if (_initialized) return;
     _initialized = true;
     _nameController.text = profile.name;
-    _selectedAvatarIndex = profile.avatarIndex.clamp(0, ImageManager.kidAvatars.length - 1);
+    _selectedAvatarIndex =
+        profile.avatarIndex.clamp(0, ImageManager.kidAvatars.length - 1);
     _age = profile.age;
     _currentQuote = _pickQuote(context);
-    context.read<ProfileAnalyticsCubit>().load(profile.id, AppLocalizations.of(context));
+    context
+        .read<ProfileAnalyticsCubit>()
+        .load(profile.id, AppLocalizations.of(context));
     _loadedProfileId = profile.id;
   }
 
@@ -95,10 +119,16 @@ class _KidProfileViewState extends State<_KidProfileView> {
     setState(() => _currentQuote = _pickQuote(context, exclude: _currentQuote));
   }
 
+  /// The name field lives on the Me tab, so reaching it can mean switching
+  /// tabs first: the header's edit button is tappable from either one.
   void _scrollToName() {
+    if (_tabController.index != 0) {
+      _tabController.animateTo(0);
+    }
     final ctx = _nameFieldKey.currentContext;
     if (ctx != null) {
-      Scrollable.ensureVisible(ctx, duration: const Duration(milliseconds: 400));
+      Scrollable.ensureVisible(ctx,
+          duration: const Duration(milliseconds: 400));
     }
     FocusScope.of(context).requestFocus(FocusNode());
   }
@@ -108,6 +138,14 @@ class _KidProfileViewState extends State<_KidProfileView> {
     final l10n = AppLocalizations.of(context);
     if (name.isEmpty) {
       setState(() => _nameError = l10n.nameEmptyError);
+      _scrollToName();
+      return;
+    }
+    // The Profiles table stores name with a min length of 3, so stop short
+    // names here instead of letting drift throw an InvalidDataException.
+    if (name.length < _minNameLength) {
+      setState(() => _nameError = l10n.nameTooShortError);
+      _scrollToName();
       return;
     }
     setState(() {
@@ -150,10 +188,12 @@ class _KidProfileViewState extends State<_KidProfileView> {
                       SnackBar(
                         behavior: SnackBarBehavior.floating,
                         backgroundColor: const Color(0xFF4CAF50),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                         content: Row(
                           children: [
-                            const Icon(Icons.celebration_rounded, color: Colors.white),
+                            const Icon(Icons.celebration_rounded,
+                                color: Colors.white),
                             const SizedBox(width: 10),
                             Expanded(child: Text(l10n.profileSavedMessage)),
                           ],
@@ -161,9 +201,11 @@ class _KidProfileViewState extends State<_KidProfileView> {
                       ),
                     );
                   }
-                  final profile = state.currentProfile!;
-                  if (_loadedProfileId != profile.id) {
-                    context.read<ProfileAnalyticsCubit>().load(profile.id, l10n);
+                  final profile = state.currentProfile;
+                  if (_loadedProfileId != profile!.id) {
+                    context
+                        .read<ProfileAnalyticsCubit>()
+                        .load(profile.id, l10n);
                     _loadedProfileId = profile.id;
                   }
                 } else if (state is ProfileError) {
@@ -181,8 +223,11 @@ class _KidProfileViewState extends State<_KidProfileView> {
                 return const Center(child: CircularProgressIndicator());
               }
 
-              final profile = state.currentProfile!;
-              _initFromProfile(profile);
+              final profile = state.currentProfile;
+              _initFromProfile(profile!);
+              final displayName = _nameController.text.isEmpty
+                  ? profile.name
+                  : _nameController.text;
 
               return Stack(
                 children: [
@@ -197,156 +242,100 @@ class _KidProfileViewState extends State<_KidProfileView> {
                         opacity: _showEntrance ? 1 : 0,
                         duration: const Duration(milliseconds: 450),
                         child: AnimatedSlide(
-                          offset: _showEntrance ? Offset.zero : const Offset(0, 0.05),
+                          offset: _showEntrance
+                              ? Offset.zero
+                              : const Offset(0, 0.05),
                           duration: const Duration(milliseconds: 450),
                           curve: Curves.easeOutCubic,
-                          child: SingleChildScrollView(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Row(
-                                  children: [
-                                    IconButton(
-                                      onPressed: () => Navigator.of(context).maybePop(),
-                                      icon: const Icon(
-                                        Icons.arrow_back_ios_new_rounded,
-                                        color: Color(0xFF2D3142),
-                                      ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            children: [
+                              Row(
+                                children: [
+                                  IconButton(
+                                    onPressed: () =>
+                                        Navigator.of(context).maybePop(),
+                                    icon: const Icon(
+                                      Icons.arrow_back_ios_new_rounded,
+                                      color: Color(0xFF2D3142),
                                     ),
-                                    Text(
-                                      l10n.myProfile,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.w900,
-                                        color: Color(0xFF2D3142),
+                                  ),
+                                  Text(
+                                    l10n.myProfile,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w900,
+                                      color: Color(0xFF2D3142),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              _ProfileTabBar(
+                                controller: _tabController,
+                                meLabel: l10n.profileTabMe,
+                                progressLabel: l10n.profileTabProgress,
+                              ),
+                              const SizedBox(height: 12),
+                              // TabBarView clips and scrolls each child
+                              // separately, so each tab owns its own scroll
+                              // view rather than sharing one for the page.
+                              Expanded(
+                                child: TabBarView(
+                                  controller: _tabController,
+                                  children: [
+                                    ProfileMeTab(
+                                      displayName: displayName,
+                                      age: _age,
+                                      selectedAvatarIndex: _selectedAvatarIndex,
+                                      quote: _currentQuote ??
+                                          l10n.youAreDoingAmazing,
+                                      nameField: _NameField(
+                                        key: _nameFieldKey,
+                                        controller: _nameController,
+                                        errorText: _nameError,
+                                        hintText: l10n.namePlaceholder,
+                                        onChanged: (_) {
+                                          if (_nameError != null) {
+                                            setState(() => _nameError = null);
+                                          }
+                                          setState(() {});
+                                        },
                                       ),
+                                      saveButton: _SaveButton(
+                                        label: l10n.saveMyProfile,
+                                        onPressed: () {
+                                          HapticFeedback.lightImpact();
+                                          _saveProfile(profile);
+                                        },
+                                      ),
+                                      onAvatarSelected: (index) => setState(
+                                          () => _selectedAvatarIndex = index),
+                                      onAgeChanged: (value) =>
+                                          setState(() => _age = value),
+                                      onRefreshQuote: _refreshQuote,
+                                      onEditTap: _scrollToName,
+                                      bottomPadding: mq.height(3),
+                                    ),
+                                    BlocBuilder<ProfileAnalyticsCubit,
+                                        ProfileAnalyticsState>(
+                                      builder: (context, analyticsState) {
+                                        if (analyticsState
+                                            is! ProfileAnalyticsLoaded) {
+                                          return const Center(
+                                            child: CircularProgressIndicator(),
+                                          );
+                                        }
+                                        return ProfileProgressTab(
+                                          analytics: analyticsState,
+                                          bottomPadding: mq.height(3),
+                                        );
+                                      },
                                     ),
                                   ],
                                 ),
-                                const SizedBox(height: 8),
-                                ProfileHeader(
-                                  avatarAsset: ImageManager.kidAvatars[_selectedAvatarIndex],
-                                  name: _nameController.text.isEmpty
-                                      ? profile.name
-                                      : _nameController.text,
-                                  age: _age,
-                                  greeting:
-                                      '${l10n.helloKidName(_nameController.text.isEmpty ? profile.name : _nameController.text)} ${l10n.readyForAdventure}',
-                                  onEditTap: _scrollToName,
-                                ),
-                                const SizedBox(height: 18),
-                                MotivationalQuoteCard(
-                                  quote: _currentQuote ?? l10n.youAreDoingAmazing,
-                                  onRefresh: _refreshQuote,
-                                ),
-                                const SizedBox(height: 24),
-                                _SectionTitle(title: l10n.chooseYourHero, subtitle: l10n.pickAvatarSubtitle),
-                                const SizedBox(height: 12),
-                                AvatarSelector(
-                                  avatarAssets: ImageManager.kidAvatars,
-                                  selectedIndex: _selectedAvatarIndex,
-                                  onSelected: (index) =>
-                                      setState(() => _selectedAvatarIndex = index),
-                                ),
-                                const SizedBox(height: 24),
-                                _SectionTitle(title: l10n.whatsYourName),
-                                const SizedBox(height: 12),
-                                _NameField(
-                                  key: _nameFieldKey,
-                                  controller: _nameController,
-                                  errorText: _nameError,
-                                  hintText: l10n.namePlaceholder,
-                                  onChanged: (_) {
-                                    if (_nameError != null) setState(() => _nameError = null);
-                                    setState(() {});
-                                  },
-                                ),
-                                const SizedBox(height: 24),
-                                _SectionTitle(title: l10n.age),
-                                const SizedBox(height: 12),
-                                AgeSelector(
-                                  age: _age,
-                                  onChanged: (value) => setState(() => _age = value),
-                                ),
-                                const SizedBox(height: 24),
-                                BlocBuilder<ProfileAnalyticsCubit, ProfileAnalyticsState>(
-                                  builder: (context, analyticsState) {
-                                    if (analyticsState is! ProfileAnalyticsLoaded) {
-                                      return const Padding(
-                                        padding: EdgeInsets.symmetric(vertical: 24),
-                                        child: Center(child: CircularProgressIndicator()),
-                                      );
-                                    }
-                                    return Column(
-                                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                                      children: [
-                                        ScoreSummary(
-                                          metrics: [
-                                            ScoreMetric(
-                                              icon: Icons.stars_rounded,
-                                              label: l10n.totalScoreLabel,
-                                              value: '${analyticsState.totalScore}',
-                                              color: const Color(0xFF7C4DFF),
-                                            ),
-                                            ScoreMetric(
-                                              icon: Icons.auto_awesome_rounded,
-                                              label: l10n.starsEarnedLabel,
-                                              value: '${analyticsState.stars}',
-                                              color: const Color(0xFFFFC107),
-                                            ),
-                                            ScoreMetric(
-                                              icon: Icons.videogame_asset_rounded,
-                                              label: l10n.gamesPlayedLabel,
-                                              value: '${analyticsState.gamesPlayed}',
-                                              color: const Color(0xFF26C6DA),
-                                            ),
-                                            ScoreMetric(
-                                              icon: Icons.local_fire_department_rounded,
-                                              label: l10n.currentStreakLabel,
-                                              value:
-                                                  '${analyticsState.currentStreak} ${l10n.daysSuffix}',
-                                              color: const Color(0xFFFF5252),
-                                            ),
-                                            ScoreMetric(
-                                              icon: Icons.emoji_events_rounded,
-                                              label: l10n.bestScoreLabel,
-                                              value: '${analyticsState.bestScore}',
-                                              color: const Color(0xFF66BB6A),
-                                            ),
-                                          ],
-                                        ),
-                                        const SizedBox(height: 24),
-                                        _SectionTitle(title: l10n.gameProgressTitle),
-                                        const SizedBox(height: 12),
-                                        ...analyticsState.categories
-                                            .map((c) => GameAnalyticsCard(category: c)),
-                                        const SizedBox(height: 12),
-                                        _SectionTitle(title: l10n.achievementsTitle),
-                                        const SizedBox(height: 12),
-                                        SizedBox(
-                                          height: 168,
-                                          child: ListView(
-                                            scrollDirection: Axis.horizontal,
-                                            children: analyticsState.achievements
-                                                .map((a) => AchievementBadge(achievement: a))
-                                                .toList(),
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 28),
-                                _SaveButton(
-                                  label: l10n.saveMyProfile,
-                                  onPressed: () {
-                                    HapticFeedback.lightImpact();
-                                    _saveProfile(profile);
-                                  },
-                                ),
-                                SizedBox(height: mq.height(3)),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
                         ),
                       ),
@@ -367,7 +356,8 @@ class _KidProfileViewState extends State<_KidProfileView> {
                                 color: Color(0xFF4CAF50),
                                 shape: BoxShape.circle,
                               ),
-                              child: const Icon(Icons.check_rounded, color: Colors.white, size: 60),
+                              child: const Icon(Icons.check_rounded,
+                                  color: Colors.white, size: 60),
                             ),
                           ),
                         ),
@@ -383,47 +373,51 @@ class _KidProfileViewState extends State<_KidProfileView> {
   }
 }
 
-class _SectionTitle extends StatelessWidget {
-  const _SectionTitle({required this.title, this.subtitle});
+/// Two pills: who I am, and what I have done.
+class _ProfileTabBar extends StatelessWidget {
+  const _ProfileTabBar({
+    required this.controller,
+    required this.meLabel,
+    required this.progressLabel,
+  });
 
-  final String title;
-  final String? subtitle;
+  final TabController controller;
+  final String meLabel;
+  final String progressLabel;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          children: [
-            Container(
-              width: 6,
-              height: 20,
-              margin: const EdgeInsets.only(right: 8),
-              decoration: BoxDecoration(
-                color: const Color(0xFFFF6B81),
-                borderRadius: BorderRadius.circular(4),
-              ),
-            ),
-            Text(
-              title,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w900,
-                color: Color(0xFF2D3142),
-              ),
-            ),
-          ],
-        ),
-        if (subtitle != null)
-          Padding(
-            padding: const EdgeInsets.only(top: 4, left: 14),
-            child: Text(
-              subtitle!,
-              style: const TextStyle(fontSize: 13, color: Color(0xFF9E9E9E)),
-            ),
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(999),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 8,
+            offset: const Offset(0, 3),
           ),
-      ],
+        ],
+      ),
+      padding: const EdgeInsets.all(5),
+      child: TabBar(
+        controller: controller,
+        indicator: BoxDecoration(
+          color: const Color(0xFFFF6B81),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        indicatorSize: TabBarIndicatorSize.tab,
+        dividerColor: Colors.transparent,
+        labelColor: Colors.white,
+        unselectedLabelColor: const Color(0xFF9E9E9E),
+        labelStyle: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900),
+        unselectedLabelStyle:
+            const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+        tabs: [
+          Tab(height: 40, text: meLabel),
+          Tab(height: 40, text: progressLabel),
+        ],
+      ),
     );
   }
 }
@@ -459,7 +453,8 @@ class _NameField extends StatelessWidget {
         prefixIcon: const Icon(Icons.face_rounded, color: Color(0xFF1AA6A0)),
         filled: true,
         fillColor: Colors.white,
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(20),
           borderSide: BorderSide.none,
@@ -493,7 +488,8 @@ class _SaveButton extends StatelessWidget {
           backgroundColor: const Color(0xFF4CAF50),
           foregroundColor: Colors.white,
           elevation: 4,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
         ),
         icon: const Icon(Icons.favorite_rounded),
         label: Text(
@@ -516,10 +512,22 @@ class _BackgroundBlobs extends StatelessWidget {
       child: IgnorePointer(
         child: Stack(
           children: [
-            Positioned(top: -70, right: -50, child: _Blob(size: 190, color: Color(0x33FF8A65))),
-            Positioned(top: 190, left: -60, child: _Blob(size: 150, color: Color(0x331AA6A0))),
-            Positioned(bottom: -80, right: -60, child: _Blob(size: 230, color: Color(0x33FFD166))),
-            Positioned(bottom: 260, left: -40, child: _Blob(size: 110, color: Color(0x33FF6B81))),
+            Positioned(
+                top: -70,
+                right: -50,
+                child: _Blob(size: 190, color: Color(0x33FF8A65))),
+            Positioned(
+                top: 190,
+                left: -60,
+                child: _Blob(size: 150, color: Color(0x331AA6A0))),
+            Positioned(
+                bottom: -80,
+                right: -60,
+                child: _Blob(size: 230, color: Color(0x33FFD166))),
+            Positioned(
+                bottom: 260,
+                left: -40,
+                child: _Blob(size: 110, color: Color(0x33FF6B81))),
           ],
         ),
       ),

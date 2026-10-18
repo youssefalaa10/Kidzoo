@@ -185,6 +185,8 @@ class _GameDialogState extends State<GameDialog>
               emissionFrequency: 0.05,
               numberOfParticles: 20,
               gravity: 0.1,
+              minimumSize: const Size(6, 6),
+              maximumSize: const Size(14, 14),
               colors: const [
                 Colors.green,
                 Colors.blue,

@@ -2,10 +2,15 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../../core/base/protected_game_screen.dart';
+import '../../../core/base/kid_game_screen.dart';
+import '../../../core/difficulty/difficulty_run_scope.dart';
+import '../../../core/difficulty/kid_difficulty.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../../../core/shared/widgets/fluid_container.dart';
+import '../data/memory_star_rule.dart';
 
 enum GameLevel {
   easy,
@@ -13,14 +18,14 @@ enum GameLevel {
   hard,
 }
 
-class MemoryGameScreen extends ProtectedGameScreen {
+class MemoryGameScreen extends KidGameScreen {
   const MemoryGameScreen({required super.level, super.key});
 
   @override
   State<MemoryGameScreen> createState() => _MemoryGameScreenState();
 }
 
-class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
+class _MemoryGameScreenState extends KidGameScreenState<MemoryGameScreen>
     with TickerProviderStateMixin {
   // Define emojis for all levels
   final List<String> _allEmojis = [
@@ -210,6 +215,20 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     }
   }
 
+  /// Writes the finished run, which is what unlocks the next tier.
+  void _recordCompletion() {
+    final int stars =
+        MemoryStarRule.rate(totalPairs: _totalPairs, moves: _moves);
+    unawaited(context.read<GameScoreRecorder>().recordWin(
+          gameKey: 'memory_game',
+          difficulty: KidDifficulty.fromLevel(widget.level),
+          score: MemoryStarRule.scoreFor(
+              totalPairs: _totalPairs, moves: _moves),
+          stars: stars,
+          maxScore: 100,
+          durationSeconds: _stopwatch.elapsed.inSeconds,
+        ));
+  }
   void _checkForMatch() {
     if (_firstFlippedIndex != null && _secondFlippedIndex != null) {
       if (_cards[_firstFlippedIndex!].content ==
@@ -226,6 +245,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
             _stopwatch.stop();
             _timer?.cancel();
             _gameCompletedController.forward();
+            _recordCompletion();
           }
         });
       } else {
@@ -276,7 +296,9 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
       body: SafeArea(
         child: FluidContainer(
           padding: EdgeInsets.zero,
-          child: isLandscape ? _buildLandscapeLayout(l10n) : _buildPortraitLayout(l10n),
+          child: isLandscape
+              ? _buildLandscapeLayout(l10n)
+              : _buildPortraitLayout(l10n),
         ),
       ),
     );
@@ -286,8 +308,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
     return Column(
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(
-              horizontal: 16.0, vertical: 24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 24.0),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -387,8 +408,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
             itemBuilder: (context, index) {
               return _cards[index].isEmpty
                   ? Container() // Empty space for easy level
-                  : _buildCard(
-                      _cards[index], () => _flipCard(index));
+                  : _buildCard(_cards[index], () => _flipCard(index));
             },
           ),
         ),
@@ -460,8 +480,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: Text(
@@ -474,8 +493,18 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                           Flexible(
                             child: ElevatedButton(
                               onPressed: () {
-                                // Return to level map with completion status
-                                Navigator.of(context).pop(true);
+                                // Next tier if there is one, otherwise back to
+                                // the picker. The old pop(true) reported
+                                // completion to a LevelMapScreen that no
+                                // longer exists.
+                                final DifficultyRunScope? scope =
+                                    DifficultyRunScope.maybeOf(context);
+                                if (scope != null &&
+                                    scope.hasNextDifficulty) {
+                                  scope.playNext(context);
+                                  return;
+                                }
+                                Navigator.of(context).maybePop();
                               },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.green[400],
@@ -483,12 +512,15 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
                                 padding: const EdgeInsets.symmetric(
                                     horizontal: 16, vertical: 12),
                                 shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(30),
+                                  borderRadius: BorderRadius.circular(30),
                                 ),
                               ),
                               child: Text(
-                                l10n.continueText,
+                                DifficultyRunScope.maybeOf(context)
+                                            ?.hasNextDifficulty ==
+                                        true
+                                    ? l10n.nextLevel
+                                    : l10n.continueText,
                                 style: const TextStyle(fontSize: 14),
                               ),
                             ),
@@ -554,7 +586,7 @@ class _MemoryGameScreenState extends ProtectedGameScreenState<MemoryGameScreen>
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [Colors.blue[300]!, Colors.blue[500]!],
+              colors: [Colors.blue.shade300, Colors.blue.shade500],
             ),
             boxShadow: [
               BoxShadow(

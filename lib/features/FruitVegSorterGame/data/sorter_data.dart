@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import '../../../core/localization/app_localizations.dart';
 import 'sorter_models.dart';
 
@@ -105,4 +107,45 @@ class SorterGameData {
   ];
 
   static List<FoodItem> get allFoods => [...allFruits, ...allVegetables];
+
+  /// Builds a round that actually tests the fruit/vegetable distinction.
+  ///
+  /// The previous logic took N random foods from the combined list, so a round
+  /// could contain only fruits - the vegetable basket was then obviously wrong
+  /// and the child could succeed without looking at the picture. Every round
+  /// now contains at least one of each category.
+  ///
+  /// [avoidTargets] holds recently requested foods so the same item is not
+  /// asked for twice in a row.
+  static SorterGameRoundData buildRound({
+    required int round,
+    required int totalRounds,
+    required Random random,
+    Set<String> avoidTargets = const {},
+  }) {
+    final progress = totalRounds <= 0 ? 1.0 : round / totalRounds;
+    final numChoices = progress <= 0.3
+        ? 2
+        : progress <= 0.6
+            ? 3
+            : progress <= 0.8
+                ? 4
+                : 5;
+
+    final fruits = List<FoodItem>.from(allFruits)..shuffle(random);
+    final vegetables = List<FoodItem>.from(allVegetables)..shuffle(random);
+
+    final choices = <FoodItem>[fruits.removeAt(0), vegetables.removeAt(0)];
+    final filler = [...fruits, ...vegetables]..shuffle(random);
+    while (choices.length < numChoices && filler.isNotEmpty) {
+      choices.add(filler.removeAt(0));
+    }
+    choices.shuffle(random);
+
+    final fresh = choices.where((f) => !avoidTargets.contains(f.id)).toList();
+    final pool = fresh.isNotEmpty ? fresh : choices;
+    final targetFood = pool[random.nextInt(pool.length)];
+
+    return SorterGameRoundData(choices: choices, targetFood: targetFood);
+  }
 }

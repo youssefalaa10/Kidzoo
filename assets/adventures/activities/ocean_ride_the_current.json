@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "ocean.ride_the_current",
+  "engineId": "current_rider",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "ocean",
+    "accent": "#4A9FD8",
+    "stage": {
+      "art": "assets/gen/images/sea/lift_basket.png",
+      "mode": "both"
+    }
+  },
+  "narration": {
+    "prompt": {
+      "en": "The water carries her, not you. Turn the currents, then let go.",
+      "ar": "المَاءُ هُوَ الَّذِي يَحْمِلُهَا، لَا أَنْت. أَدِرِ التَّيَّارَات، ثُمَّ أَطْلِقْهَا."
+    },
+    "hint1": {
+      "en": "Follow it with your finger first. Where does that arrow send her?",
+      "ar": "تَتَبَّعْهُ بِإِصْبَعِكَ أَوَّلًا. إِلَى أَيْنَ يُرْسِلُهَا ذَلِكَ السَّهْم؟"
+    },
+    "hint2": {
+      "en": "She only turns where an arrow is. Everywhere else she keeps going.",
+      "ar": "لَا تَنْعَطِفُ إِلَّا عِنْدَ سَهْم. وَفِيمَا عَدَا ذَلِكَ تُوَاصِلُ طَرِيقَهَا."
+    },
+    "model": {
+      "en": "This arrow is the one pointing the wrong way. Turn it, then let go.",
+      "ar": "هَذَا السَّهْمُ هُوَ المُتَّجِهُ فِي الاتِّجَاهِ الخَطَأ. أَدِرْهُ ثُمَّ أَطْلِق."
+    },
+    "success": {
+      "en": "Two currents read, and the basket is all the way down.",
+      "ar": "قَرَأْتَ تَيَّارَيْن، وَنَزَلَتِ السَّلَّةُ إِلَى القَاع."
+    }
+  },
+  "payload": {
+    "_comment": "The one activity in the chapter where the child acts on the WORLD and not on the answer. They turn two or three currents and then have no say at all: the water carries Sadaf, and what they are being asked for is a prediction rather than a move. Turning arrows is free and unjudged, so they can set them, trace the route with a finger, change their mind and set them again as often as they like. Only letting go is an answer.",
+    "_notCodePathComment": "The Market's delivery asked the child to compose a list of instructions and the runner obeyed them in order. This is the other direction: the board acts on its own and the child changes what the board IS. 'What should she do?' is composition; 'what will happen to her?' is prediction, and it is the earlier and harder of the two.",
+    "_failureComment": "There is no failing state and nothing to lose. A run that ends at a rock draws the whole wrong route as a wake, puts Sadaf back in the last safe water, and lets the child look at what happened. Seeing the route that did not work is the entire lesson; a board that snapped back to the start would throw that away.",
+    "_solvabilityComment": "The parser tries every setting of the gates on every board and refuses one that cannot be solved, and refuses one that is ALREADY solved before the child touches it. An unsolvable board is not a hard board — it is a child pressing the only button on screen until the no-fail ladder credits the step out of pity, and that is the kind of bug a play test finds late and a parse-time check finds instantly.",
+    "itemsRef": "packs/tide_pool",
+    "riderImageItemId": "turtle",
+    "goalImageItemId": "compass",
+    "rockImageItemId": "reef_stone",
+    "rounds": [
+      {
+        "id": "over_the_edge",
+        "_comment": "Two gates, and the first is on the route she is already taking, so the child meets the rule — she turns where an arrow is, and nowhere else — before they have to plan with it.",
+        "columns": 5,
+        "rows": 4,
+        "start": [0, 0],
+        "startFlow": "right",
+        "goal": [4, 3],
+        "rocks": [[4, 0], [0, 3]],
+        "gates": [
+          {
+            "id": "ledge_current",
+            "cell": [2, 0],
+            "choices": ["right", "down"],
+            "initialIndex": 0,
+            "label": { "en": "the current on the ledge", "ar": "تَيَّارُ الحَافَّة" }
+          },
+          {
+            "id": "floor_current",
+            "cell": [2, 3],
+            "choices": ["right", "left"],
+            "initialIndex": 1,
+            "label": { "en": "the current along the bottom", "ar": "التَّيَّارُ عِنْدَ القَاع" }
+          }
+        ],
+        "prompt": {
+          "en": "Straight on she goes over the rock. Send her down, then along.",
+          "ar": "إِنْ مَضَتْ مُسْتَقِيمَةً اصْطَدَمَتْ بِالصَّخْرَة. أَنْزِلْهَا ثُمَّ سَيِّرْهَا."
+        },
+        "revealLine": {
+          "en": "Down past the reef edge. The water is colder already.",
+          "ar": "نَزَلَتْ تَحْتَ حَافَّةِ الشِّعَاب. صَارَ المَاءُ أَبْرَدَ بِالفِعْل."
+        }
+      },
+      {
+        "id": "down_the_trench",
+        "_comment": "Three gates, and the route doubles back on itself. The one that matters is the middle one: the obvious setting sends her into a rock she can see from the start, so the child has to look ahead of where she is rather than at where she is.",
+        "columns": 5,
+        "rows": 4,
+        "start": [0, 1],
+        "startFlow": "down",
+        "goal": [4, 2],
+        "rocks": [[1, 2], [3, 3], [4, 0]],
+        "gates": [
+          {
+            "id": "wall_current",
+            "cell": [0, 3],
+            "choices": ["up", "right"],
+            "initialIndex": 0,
+            "label": { "en": "the current at the wall", "ar": "التَّيَّارُ عِنْدَ الجِدَار" }
+          },
+          {
+            "id": "deep_current",
+            "cell": [2, 3],
+            "choices": ["right", "up"],
+            "initialIndex": 0,
+            "label": { "en": "the deep current", "ar": "التَّيَّارُ العَمِيق" }
+          },
+          {
+            "id": "shelf_current",
+            "cell": [2, 2],
+            "choices": ["up", "right"],
+            "initialIndex": 0,
+            "label": { "en": "the current on the shelf", "ar": "تَيَّارُ الرَّفّ" }
+          }
+        ],
+        "prompt": {
+          "en": "Three currents now. One of them sends her straight into a rock.",
+          "ar": "ثَلَاثَةُ تَيَّارَاتٍ الآن. وَاحِدٌ مِنْهَا يَدْفَعُهَا إِلَى صَخْرَةٍ مُبَاشَرَة."
+        },
+        "revealLine": {
+          "en": "The basket is on the trench floor, and there is no light at all.",
+          "ar": "وَصَلَتِ السَّلَّةُ إِلَى قَاعِ الأُخْدُود، وَلَا ضَوْءَ عَلَى الإِطْلَاق."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 0,
+    "max": 2
+  },
+  "elofGoal": "COG.reasoning.predict_outcome",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

@@ -2,11 +2,10 @@ import 'package:flutter/material.dart';
 import '../../data/quiz_models.dart';
 
 class QuizOptionsRow extends StatelessWidget {
-
   const QuizOptionsRow({
-    super.key,
     required this.options,
     required this.onOptionSelected,
+    super.key,
     this.showFeedback = false,
   });
   final List<QuizOption> options;

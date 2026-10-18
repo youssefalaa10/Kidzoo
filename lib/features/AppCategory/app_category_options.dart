@@ -1,49 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:kidzo/core/catalog/default_game_catalog.dart';
+import 'package:kidzo/core/catalog/game_catalog.dart';
+import 'package:kidzo/core/catalog/game_descriptor.dart';
+import 'package:kidzo/core/catalog/game_surface.dart';
 import 'package:kidzo/core/helpers/media_query.dart';
 import 'package:kidzo/core/localization/app_localizations.dart';
 import 'package:kidzo/core/shared/style/image_manager.dart';
-import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
-import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
-import 'package:kidzo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
-import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
-import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
-import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
-import 'package:kidzo/features/FeedTheAnimalGame/ui/feed_animal_screen.dart';
-import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
-import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
-import 'package:kidzo/features/FruitVegSorterGame/ui/sorter_game_screen.dart';
-import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
-import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
-import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
-import 'package:kidzo/features/MissingLetterGame/Ui/missing_letter_home.dart';
-import 'package:kidzo/features/Numbers/bloc/number_bloc.dart';
-import 'package:kidzo/features/Numbers/number_screen.dart';
-import 'package:kidzo/features/PaddleBounce/UI/paddle_bounce_menu_screen.dart';
-import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
-import 'package:kidzo/features/Shapes/shape_screen.dart';
-import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
-import 'package:kidzo/features/VegetablesGame/UI/vegetables_game_screen.dart';
-import 'package:kidzo/features/VehiclesGame/UI/vehicles_game_screen.dart';
-
-// Define the option data structure
-class OptionItem {
-
-  OptionItem({
-    required this.icon,
-    required this.title,
-    required this.screen,
-    required this.flipImage,
-    this.backIcon,
-    this.frontIcon,
-  });
-  final String icon;
-  final String title;
-  final Widget screen;
-  final String flipImage;
-  final IconData? backIcon;
-  final IconData? frontIcon;
-}
 
 // Define app categories
 enum AppCategory {
@@ -51,167 +13,35 @@ enum AppCategory {
   education,
 }
 
-// Reusable options grid
+// Reusable options grid, driven by the injected catalog.
 class OptionsGrid extends StatelessWidget {
-  const OptionsGrid({
+  OptionsGrid({
     required this.mq,
     required this.category,
+    GameCatalog? catalog,
     super.key,
-  });
+  }) : catalog = catalog ?? buildDefaultGameCatalog();
+
   final CustomMQ mq;
   final AppCategory category;
 
-  List<OptionItem> getOptions(BuildContext context) {
+  /// Injected so tests and Adventure Mode can supply their own without any
+  /// global state. Defaults to the catalog the app ships with.
+  final GameCatalog catalog;
+
+  GameSurface get _surface {
     switch (category) {
       case AppCategory.games:
-        return _getGameOptions(context);
+        return GameSurface.games;
       case AppCategory.education:
-        return _getEducationOptions(context);
+        return GameSurface.education;
     }
-  }
-
-  List<OptionItem> _getGameOptions(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return [
-      OptionItem(
-        icon: ImageManager.xo,
-        title: l10n.ticTacToe,
-        screen: const TicTacToeGame(),
-        flipImage: ImageManager.brain,
-        backIcon: Icons.grid_3x3_rounded,
-      ),
-      OptionItem(
-        icon: ImageManager.flappyBird,
-        title: l10n.flappyBird,
-        screen: const FlappyBirdScreen(),
-        flipImage: ImageManager.birdAnimal,
-      ),
-      OptionItem(
-        icon: ImageManager.letterL,
-        title: l10n.missingLetter,
-        screen: const MissingLetterHome(),
-        flipImage: ImageManager.brain,
-        backIcon: Icons.spellcheck_rounded,
-      ),
-      OptionItem(
-        icon: ImageManager.i2048,
-        title: l10n.game2048,
-        screen: BlocProvider(
-          create: (context) => GameCubit(),
-          child: const Game2048Home(),
-        ),
-        flipImage: ImageManager.numbers,
-      ),
-      OptionItem(
-        icon: ImageManager.pen,
-        title: l10n.dotsAndBoxes,
-        screen: const DotsAndBoxesScreen(),
-        flipImage: ImageManager.flipShapes,
-      ),
-      OptionItem(
-        icon: ImageManager.gamepad,
-        title: l10n.paddleBounce,
-        screen: const PaddleBounceMenuScreen(),
-        flipImage: ImageManager.brain,
-        backIcon: Icons.sports_esports_rounded,
-      ),
-      OptionItem(
-        icon: ImageManager.simle,
-        title: l10n.drawLab,
-        screen: const DrawLabScreen(),
-        flipImage: ImageManager.pen,
-      ),
-    ];
-  }
-
-  List<OptionItem> _getEducationOptions(BuildContext context) {
-    final l10n = AppLocalizations.of(context);
-    return [
-      OptionItem(
-        icon: ImageManager.numbers,
-        title: l10n.numbers,
-        screen: BlocProvider(
-          create: (context) => NumberBloc(),
-          child: const NumberScreen(),
-        ),
-        flipImage: ImageManager.flipNumbers,
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/animal/cat.png',
-        title: l10n.animalNames,
-        screen: const AnimalNameGameScreen(),
-        flipImage: 'assets/gen/images/animal/dog.png',
-      ),
-      OptionItem(
-        icon: ImageManager.letters,
-        title: l10n.alphabet,
-        screen: BlocProvider(
-          create: (context) => AlphabetBloc(),
-          child: const AlphabetScreen(),
-        ),
-        flipImage: ImageManager.flipLetters,
-      ),
-      OptionItem(
-        icon: ImageManager.shapes,
-        title: l10n.shapes,
-        screen: BlocProvider(
-          create: (context) => ShapeCubit(),
-          child: const ShapeScreen(),
-        ),
-        flipImage: ImageManager.flipShapes,
-      ),
-      OptionItem(
-        icon: ImageManager.worldMap,
-        title: l10n.learnCountryFlags,
-        screen: const FlagGameMenuScreen(),
-        flipImage: ImageManager.worldMap,
-        frontIcon: Icons.flag_rounded,
-        backIcon: Icons.outlined_flag_rounded,
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/shapes/circle.png',
-        title: l10n.colorSwitch,
-        screen: const ColorSwitchScreen(),
-        flipImage: ImageManager.colorLearn,
-        backIcon: Icons.palette_rounded,
-        frontIcon: Icons.color_lens_rounded,
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/animal/cow.png',
-        title: l10n.feedAnimalTitle,
-        screen: const FeedAnimalScreen(),
-        flipImage: 'assets/gen/images/animal/sheep.png',
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/fruits/watermelon.png',
-        title: l10n.fruitVegSorterTitle,
-        screen: const SorterGameScreen(),
-        flipImage: 'assets/gen/images/vegetables/carrot.png',
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/vehicles/car.png',
-        title: l10n.vehicles,
-        screen: const VehiclesGameScreen(),
-        flipImage: 'assets/gen/images/vehicles/train.png',
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/fruits/mango.png',
-        title: l10n.fruits,
-        screen: const FruitsGameScreen(),
-        flipImage: 'assets/gen/images/fruits/orange.png',
-      ),
-      OptionItem(
-        icon: 'assets/gen/images/vegetables/corn.png',
-        title: l10n.vegetables,
-        screen: const VegetablesGameScreen(),
-        flipImage: 'assets/gen/images/vegetables/potato.png',
-      ),
-    ];
   }
 
   @override
   Widget build(BuildContext context) {
-    final options = getOptions(context);
+    final AppLocalizations l10n = AppLocalizations.of(context);
+    final List<GameDescriptor> descriptors = catalog.forSurface(_surface);
     return GridView.builder(
       padding: EdgeInsets.symmetric(
         horizontal: mq.width(4),
@@ -223,16 +53,16 @@ class OptionsGrid extends StatelessWidget {
         mainAxisSpacing: mq.height(2),
         childAspectRatio: 3 / 2.5,
       ),
-      itemCount: options.length,
+      itemCount: descriptors.length,
       itemBuilder: (context, index) {
-        final option = options[index];
+        final GameDescriptor descriptor = descriptors[index];
         return OptionCard(
-          icon: option.icon,
-          title: option.title,
-          screen: option.screen,
-          flipImage: option.flipImage,
-          backIcon: option.backIcon,
-          frontIcon: option.frontIcon,
+          icon: descriptor.iconAsset,
+          title: l10n.resolve(descriptor.titleLocalizationKey),
+          screenBuilder: descriptor.screenBuilder,
+          flipImage: descriptor.flipImageAsset,
+          backIcon: descriptor.backIcon,
+          frontIcon: descriptor.frontIcon,
           mq: mq,
         );
       },
@@ -245,7 +75,7 @@ class OptionCard extends StatefulWidget {
     required this.icon,
     required this.title,
     required this.flipImage,
-    required this.screen,
+    required this.screenBuilder,
     required this.mq,
     this.backIcon,
     this.frontIcon,
@@ -254,7 +84,7 @@ class OptionCard extends StatefulWidget {
   final String icon;
   final String title;
   final String flipImage;
-  final Widget screen;
+  final Widget Function() screenBuilder;
   final CustomMQ mq;
   final IconData? backIcon;
   final IconData? frontIcon;
@@ -296,7 +126,9 @@ class _OptionCardState extends State<OptionCard>
             if (mounted) {
               Navigator.push(
                 context,
-                MaterialPageRoute<void>(builder: (context) => widget.screen),
+                MaterialPageRoute<void>(
+                  builder: (context) => widget.screenBuilder(),
+                ),
               );
             }
           });

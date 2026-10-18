@@ -4,7 +4,9 @@ import '../../data/vegetables_game_engine.dart';
 
 class DraggableVeggie extends StatelessWidget {
   const DraggableVeggie({
-    required this.option, required this.isLandscape, super.key,
+    required this.option,
+    required this.isLandscape,
+    super.key,
     this.isShaking = false,
     this.isSuccess = false,
     this.isTarget = false,

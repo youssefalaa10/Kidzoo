@@ -3,16 +3,15 @@ import 'package:flutter_animate/flutter_animate.dart';
 import '../../data/fruits_game_engine.dart';
 
 class ConveyorBelt extends StatefulWidget {
-
   const ConveyorBelt({
-    super.key,
     required this.fruits,
     required this.onFruitTapped,
     required this.currentTarget,
     required this.isFrozen,
+    required this.onBeltFinished,
+    super.key,
     this.successFruit,
     this.shakingFruit,
-    required this.onBeltFinished,
   });
   final List<FruitItem> fruits;
   final void Function(FruitItem) onFruitTapped;
@@ -26,7 +25,8 @@ class ConveyorBelt extends StatefulWidget {
   State<ConveyorBelt> createState() => _ConveyorBeltState();
 }
 
-class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderStateMixin {
+class _ConveyorBeltState extends State<ConveyorBelt>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
 
   @override
@@ -64,7 +64,9 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
     } else {
       if (widget.isFrozen && _controller.isAnimating) {
         _controller.stop();
-      } else if (!widget.isFrozen && !_controller.isAnimating && widget.successFruit == null) {
+      } else if (!widget.isFrozen &&
+          !_controller.isAnimating &&
+          widget.successFruit == null) {
         _controller.forward();
       }
     }
@@ -101,7 +103,10 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: Colors.black54, width: 4),
                   boxShadow: const [
-                    BoxShadow(color: Colors.black26, blurRadius: 10, offset: Offset(0, 10))
+                    BoxShadow(
+                        color: Colors.black26,
+                        blurRadius: 10,
+                        offset: Offset(0, 10))
                   ],
                 ),
                 child: Row(
@@ -116,7 +121,7 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                 ),
               ),
             ),
-            
+
             // Fruits
             AnimatedBuilder(
               animation: _controller,
@@ -125,11 +130,14 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                   clipBehavior: Clip.none,
                   children: List.generate(widget.fruits.length, (index) {
                     final fruit = widget.fruits[index];
-                    final startX = screenWidth + (index * (itemWidth + spacing));
+                    final startX =
+                        screenWidth + (index * (itemWidth + spacing));
                     final currentX = startX - (_controller.value * totalTravel);
 
-                    final isSuccess = widget.successFruit?.assetPath == fruit.assetPath;
-                    final isShaking = widget.shakingFruit?.assetPath == fruit.assetPath;
+                    final isSuccess =
+                        widget.successFruit?.assetPath == fruit.assetPath;
+                    final isShaking =
+                        widget.shakingFruit?.assetPath == fruit.assetPath;
 
                     Widget fruitWidget = GestureDetector(
                       onTap: () {
@@ -157,7 +165,9 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                               ),
                           ],
                           border: Border.all(
-                            color: isSuccess ? Colors.yellow.shade600 : Colors.transparent,
+                            color: isSuccess
+                                ? Colors.yellow.shade600
+                                : Colors.transparent,
                             width: isSuccess ? 6 : 0,
                           ),
                         ),
@@ -170,17 +180,29 @@ class _ConveyorBeltState extends State<ConveyorBelt> with SingleTickerProviderSt
                       fruitWidget = fruitWidget
                           .animate(key: UniqueKey())
                           .shakeX(hz: 4, amount: 6, duration: 400.ms)
-                          .tint(color: Colors.red.withValues(alpha: 0.3), duration: 400.ms);
+                          .tint(
+                              color: Colors.red.withValues(alpha: 0.3),
+                              duration: 400.ms);
                     } else if (isSuccess) {
                       fruitWidget = fruitWidget
                           .animate()
-                          .scale(curve: Curves.elasticOut, duration: 800.ms, begin: const Offset(1, 1), end: const Offset(1.5, 1.5))
+                          .scale(
+                              curve: Curves.elasticOut,
+                              duration: 800.ms,
+                              begin: const Offset(1, 1),
+                              end: const Offset(1.5, 1.5))
                           .shimmer(duration: 800.ms);
                     } else {
                       // Slight bounce as it moves
                       fruitWidget = fruitWidget
-                          .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                          .moveY(begin: 0, end: -5, duration: 500.ms, curve: Curves.easeInOut);
+                          .animate(
+                              onPlay: (controller) =>
+                                  controller.repeat(reverse: true))
+                          .moveY(
+                              begin: 0,
+                              end: -5,
+                              duration: 500.ms,
+                              curve: Curves.easeInOut);
                     }
 
                     return Positioned(

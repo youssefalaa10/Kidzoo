@@ -23,27 +23,30 @@ class MazePainter extends CustomPainter {
     _drawStartEnd(canvas);
   }
 
+  // A warm, low-contrast board so the walls and the drawn path are the only
+  // high-contrast things on it - the old flat white grid on black hairlines
+  // read as a spreadsheet rather than a game.
+  static const Color _floor = Color(0xFFFFF8EC);
+  static const Color _wall = Color(0xFF5A4C78);
+  static const Color _trail = Color(0xFF7C4DFF);
+
   void _drawCells(Canvas canvas) {
-    final paint = Paint()..color = Colors.white;
-
-    for (int row = 0; row < state.gridSize; row++) {
-      for (int col = 0; col < state.gridSize; col++) {
-        final x = col * cellSize;
-        final y = row * cellSize;
-
-        canvas.drawRect(
-          Rect.fromLTWH(x, y, cellSize, cellSize),
-          paint,
-        );
-      }
-    }
+    final board = RRect.fromRectAndRadius(
+      Rect.fromLTWH(0, 0, state.gridSize * cellSize, state.gridSize * cellSize),
+      Radius.circular(cellSize * 0.35),
+    );
+    canvas.drawRRect(board, Paint()..color = _floor);
   }
 
   void _drawWalls(Canvas canvas) {
+    // Thicker, rounded walls: they scale with the cell so a big maze on a
+    // small phone still shows readable corridors, and the round caps stop the
+    // junctions looking like broken pixels.
     final wallPaint = Paint()
-      ..color = Colors.black87
-      ..strokeWidth = 3.0
-      ..strokeCap = StrokeCap.square;
+      ..color = _wall
+      ..strokeWidth = (cellSize * 0.14).clamp(3.0, 8.0)
+      ..strokeCap = StrokeCap.round
+      ..strokeJoin = StrokeJoin.round;
 
     for (int row = 0; row < state.gridSize; row++) {
       for (int col = 0; col < state.gridSize; col++) {
@@ -95,16 +98,23 @@ class MazePainter extends CustomPainter {
 
     // Draw path with gradient effect
     if (state.path.length >= 2) {
-      final pathPaint = Paint()
-        ..shader = LinearGradient(
-          colors: [
-            Colors.blue.shade300.withValues(alpha: 0.7),
-            Colors.blue.shade600.withValues(alpha: 0.8),
-          ],
-        ).createShader(Rect.fromLTWH(
-            0, 0, state.gridSize * cellSize, state.gridSize * cellSize))
-        ..strokeWidth = cellSize * 0.25
+      final bounds = Rect.fromLTWH(
+          0, 0, state.gridSize * cellSize, state.gridSize * cellSize);
+
+      final glowPaint = Paint()
+        ..color = _trail.withValues(alpha: 0.22)
+        ..strokeWidth = cellSize * 0.46
         ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
+        ..style = PaintingStyle.stroke;
+
+      final pathPaint = Paint()
+        ..shader = const LinearGradient(
+          colors: [Color(0xFF9C7BFF), _trail],
+        ).createShader(bounds)
+        ..strokeWidth = cellSize * 0.3
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round
         ..style = PaintingStyle.stroke;
 
       final path = Path();
@@ -122,32 +132,36 @@ class MazePainter extends CustomPainter {
         );
       }
 
+      // Glow first, then the trail on top, so the line looks like it is lit.
+      canvas.drawPath(path, glowPaint);
       canvas.drawPath(path, pathPaint);
     }
 
     // Draw current position indicator
     if (state.currentPosition != null) {
       final currentPaint = Paint()
-        ..color = Colors.blue.shade700
+        ..color = _trail
         ..style = PaintingStyle.fill;
 
       final currentPos = state.currentPosition!;
       final centerX = currentPos.col * cellSize + cellSize / 2;
       final centerY = currentPos.row * cellSize + cellSize / 2;
 
-      // Draw pulsing circle at current position
+      // A white halo keeps the token legible where it sits on its own trail.
       canvas.drawCircle(
         Offset(centerX, centerY),
-        cellSize * 0.15,
+        cellSize * 0.24,
+        Paint()..color = Colors.white,
+      );
+      canvas.drawCircle(
+        Offset(centerX, centerY),
+        cellSize * 0.2,
         currentPaint,
       );
-
-      // Draw white center
-      final whitePaint = Paint()..color = Colors.white;
       canvas.drawCircle(
         Offset(centerX, centerY),
-        cellSize * 0.08,
-        whitePaint,
+        cellSize * 0.09,
+        Paint()..color = Colors.white,
       );
     }
   }

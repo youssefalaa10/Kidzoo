@@ -2,12 +2,10 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_tts/flutter_tts.dart';
 
-import '../../../core/database/config.dart';
-import '../../../core/database/daos/game_scores_dao.dart';
-import '../../../core/database/daos/profile_dao.dart';
+import '../../../core/helpers/speech.dart';
 import '../../../core/localization/app_localizations.dart';
+import '../../../core/scoring/game_score_recorder.dart';
 import '../data/vegetables_game_engine.dart';
 import 'widgets/draggable_veggie.dart';
 import 'widgets/veggie_target.dart';
@@ -22,7 +20,7 @@ class VegetablesGameScreen extends StatefulWidget {
 class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
   late final VegetablesGameEngine _engine;
   bool _isLoading = true;
-  
+
   bool _isSuccess = false;
   VegetableItem? _shakingVeggie;
   bool _gameComplete = false;
@@ -43,7 +41,7 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
     });
 
     await _engine.initialize();
-    
+
     if (mounted) {
       setState(() {
         _isLoading = false;
@@ -60,16 +58,15 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
 
     _isSuccess = false;
     _shakingVeggie = null;
-    
+
     _engine.nextQuestion();
     _engine.generatePrompt(AppLocalizations.of(context));
-    
+
     setState(() {});
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        final tts = context.read<FlutterTts>();
-        tts.speak(_engine.currentPrompt);
+        Speech.speak(_engine.currentPrompt);
       }
     });
   }
@@ -80,23 +77,15 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
     });
 
     final audioPlayer = context.read<AudioPlayer>();
-    final profileDao = context.read<ProfileDao>();
-    final gameScoresDao = context.read<GameScoresDao>();
+    final scoreRecorder = context.read<GameScoreRecorder>();
 
     try {
       await audioPlayer.play(AssetSource('audio/success.mp3'));
     } catch (_) {}
 
-    try {
-      final profiles = await profileDao.getAllProfiles();
-      if (profiles.isNotEmpty) {
-        await gameScoresDao.insertScore(GameScoresCompanion.insert(
-          profileId: profiles.first.id,
-          gameKey: 'vegetables',
-          score: _score,
-        ));
-      }
-    } catch (_) {}
+    // The recorder resolves the profile, writes the row and evaluates
+    // badges, and swallows its own failures.
+    await scoreRecorder.recordPlay(gameKey: 'vegetables', score: _score);
   }
 
   void _handleCorrect() {
@@ -106,8 +95,7 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
     });
 
     final l10n = AppLocalizations.of(context);
-    final tts = context.read<FlutterTts>();
-    tts.speak(l10n.greatJob);
+    Speech.speak(l10n.greatJob);
 
     try {
       final audioPlayer = context.read<AudioPlayer>();
@@ -127,8 +115,7 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
     });
 
     final l10n = AppLocalizations.of(context);
-    final tts = context.read<FlutterTts>();
-    tts.speak(l10n.tryAgain);
+    Speech.speak(l10n.tryAgain);
 
     try {
       final audioPlayer = context.read<AudioPlayer>();
@@ -168,7 +155,10 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
           const SizedBox(height: 10),
           Text(
             l10n.excellent,
-            style: const TextStyle(fontSize: 32, color: Colors.orange, fontWeight: FontWeight.w600),
+            style: const TextStyle(
+                fontSize: 32,
+                color: Colors.orange,
+                fontWeight: FontWeight.w600),
           ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.3),
           const SizedBox(height: 40),
           ElevatedButton.icon(
@@ -177,7 +167,8 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
             label: Text(l10n.playAgain, style: const TextStyle(fontSize: 24)),
             style: ElevatedButton.styleFrom(
               padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               backgroundColor: Colors.green,
               foregroundColor: Colors.white,
             ),
@@ -186,7 +177,10 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(l10n.backToCategories,
-                style: TextStyle(fontSize: 20, color: Colors.green[700], fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontSize: 20,
+                    color: Colors.green[700],
+                    fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -205,23 +199,31 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               IconButton(
-                icon: const Icon(Icons.arrow_back_ios, color: Colors.black54, size: 32),
+                icon: const Icon(Icons.arrow_back_ios,
+                    color: Colors.black54, size: 32),
                 onPressed: () => Navigator.of(context).pop(),
               ),
               Expanded(
                 child: Center(
                   child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
                     decoration: BoxDecoration(
                       color: Colors.white,
                       borderRadius: BorderRadius.circular(20),
                       boxShadow: const [
-                        BoxShadow(color: Colors.black12, blurRadius: 4, offset: Offset(0, 2)),
+                        BoxShadow(
+                            color: Colors.black12,
+                            blurRadius: 4,
+                            offset: Offset(0, 2)),
                       ],
                     ),
                     child: Text(
                       '${_engine.currentProgress} / ${_engine.totalQuestions}',
-                      style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.green),
+                      style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.green),
                     ),
                   ),
                 ),
@@ -230,7 +232,7 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 10),
 
         // Question Text
@@ -244,7 +246,10 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
               fontWeight: FontWeight.bold,
               color: Colors.green[800],
             ),
-          ).animate(key: ValueKey(_engine.currentPrompt)).fadeIn(duration: 400.ms).slideY(begin: -0.2),
+          )
+              .animate(key: ValueKey(_engine.currentPrompt))
+              .fadeIn(duration: 400.ms)
+              .slideY(begin: -0.2),
         ),
 
         Expanded(
@@ -261,7 +266,8 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
                       currentTarget: _engine.currentTarget,
                       isSuccess: _isSuccess,
                       onAccept: (data) {
-                        if (data.assetPath == _engine.currentTarget!.assetPath) {
+                        if (data.assetPath ==
+                            _engine.currentTarget!.assetPath) {
                           _handleCorrect();
                         } else {
                           _handleWrong(data);
@@ -287,14 +293,19 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
                             key: ValueKey(option.assetPath),
                             option: option,
                             isLandscape: isLandscape,
-                            isShaking: _shakingVeggie?.assetPath == option.assetPath,
+                            isShaking:
+                                _shakingVeggie?.assetPath == option.assetPath,
                             isSuccess: _isSuccess,
-                            isTarget: _engine.currentTarget?.assetPath == option.assetPath,
+                            isTarget: _engine.currentTarget?.assetPath ==
+                                option.assetPath,
                           ),
                         ),
                       );
                     }).toList(),
-                  ).animate(key: ValueKey(_engine.currentTarget)).fadeIn(duration: 400.ms).slideY(begin: 0.2),
+                  )
+                      .animate(key: ValueKey(_engine.currentTarget))
+                      .fadeIn(duration: 400.ms)
+                      .slideY(begin: 0.2),
                 ),
               ),
             ],
@@ -309,15 +320,18 @@ class _VegetablesGameScreenState extends State<VegetablesGameScreen> {
     final l10n = AppLocalizations.of(context);
 
     return Scaffold(
-      backgroundColor: const Color(0xfff5fcf5), // Gentle light green/beige background
+      backgroundColor:
+          const Color(0xfff5fcf5), // Gentle light green/beige background
       body: SafeArea(
         child: _isLoading
-            ? const Center(child: CircularProgressIndicator(color: Colors.green))
+            ? const Center(
+                child: CircularProgressIndicator(color: Colors.green))
             : _gameComplete
                 ? _buildCompletionScreen(l10n)
                 : LayoutBuilder(
                     builder: (context, constraints) {
-                      final isLandscape = constraints.maxWidth > constraints.maxHeight;
+                      final isLandscape =
+                          constraints.maxWidth > constraints.maxHeight;
                       return _buildGameLayout(l10n, isLandscape);
                     },
                   ),

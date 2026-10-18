@@ -1,0 +1,40 @@
+{
+  "arcId": "lost_pages",
+  "title": {
+    "en": "The Lost Pages",
+    "ar": "الصَّفَحَاتُ الضَّائِعَة"
+  },
+  "premise": {
+    "en": "Noor's storybook came apart, and its pages blew away into different worlds. Every page you bring back makes the book stronger.",
+    "ar": "تَمَزَّقَ كِتَابُ نُور، وَطَارَتْ صَفَحَاتُهُ إِلَى عَوَالِمَ بَعِيدَة. كُلُّ صَفْحَةٍ تُعِيدُهَا تَجْعَلُ الكِتَابَ أَقْوَى."
+  },
+  "companionName": {
+    "en": "Noor",
+    "ar": "نُور"
+  },
+  "bookName": {
+    "en": "the Story Book",
+    "ar": "كِتَابُ الحِكَايَات"
+  },
+  "adventures": [
+    "jungle",
+    "market",
+    "ocean",
+    "stars"
+  ],
+  "_upcomingComment": "Destinations the child can SEE but not yet play. They exist so the map reads as a journey rather than a single button, and they carry a title and nothing else: revealing the story of a locked Adventure spends the surprise before the child gets there. The one-line `peek` is shown only once the Adventure before it is finished, which is what makes finishing feel like it opened something. These are deliberately NOT in `adventures` - that list is validated to name real, playable content.",
+  "upcoming": [
+    {
+      "id": "wind",
+      "icon": "wind",
+      "title": {
+        "en": "Where the Wind Begins",
+        "ar": "حَيْثُ تُولَدُ الرِّيح"
+      },
+      "peek": {
+        "en": "Every page flew on one wind. Where does it come from?",
+        "ar": "طَارَتْ كُلُّ صَفْحَةٍ عَلَى رِيحٍ وَاحِدَة. فَمِنْ أَيْنَ تَأْتِي؟"
+      }
+    }
+  ]
+}

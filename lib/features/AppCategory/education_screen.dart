@@ -31,7 +31,9 @@ class _EducationScreenState extends State<EducationScreen> with TTSMusicMixin {
         height: double.infinity,
         decoration: BoxDecoration(
           image: DecorationImage(
-            image: AssetImage(BackgroundResolver(context, BackgroundType.education).resolveBackground()!),
+            image: AssetImage(
+                BackgroundResolver(context, BackgroundType.education)
+                    .resolveBackground()!),
             fit: BoxFit.cover,
           ),
         ),
@@ -51,7 +53,7 @@ class _EducationScreenState extends State<EducationScreen> with TTSMusicMixin {
                     HeaderSection(
                       mq: mq,
                       title: AppLocalizations.of(context).learningActivities,
-                      textColor: Colors.green[800]!,
+                      textColor: Colors.green.shade800,
                     ),
                   ],
                 ),

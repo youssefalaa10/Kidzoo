@@ -13,7 +13,8 @@ class Ground extends SpriteComponent
   @override
   void onGameResize(Vector2 gameSize) {
     super.onGameResize(gameSize);
-    final gHeight = gameSize.x > gameSize.y ? gameSize.y * 0.10 : gameSize.y * 0.15;
+    final gHeight =
+        gameSize.x > gameSize.y ? gameSize.y * 0.10 : gameSize.y * 0.15;
     size = Vector2(2 * gameSize.x, gHeight);
     position = Vector2(0, gameSize.y - gHeight);
   }

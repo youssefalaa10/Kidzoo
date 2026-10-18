@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 class QuizSceneCard extends StatelessWidget {
-
   const QuizSceneCard({required this.imagePath, super.key});
   final String imagePath;
 

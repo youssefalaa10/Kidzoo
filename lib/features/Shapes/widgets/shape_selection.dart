@@ -23,29 +23,29 @@ class ShapeSelection extends StatelessWidget {
             clipBehavior: Clip.antiAliasWithSaveLayer,
             margin: const EdgeInsets.all(8),
             //height: 80,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-          ),
-          child: isMatched
-              ? Stack(
-                  children: [
-                    const Positioned(
-                        left: 5,
-                        top: 5,
-                        bottom: 5,
-                        right: 5,
-                        child: Icon(
-                          Icons.check,
-                          color: Colors.green,
-                          size: 50,
-                        )),
-                    Image.asset(
-                      temp,
-                      color: Colors.green,
-                    ),
-                  ],
-                )
-              : Image.asset(temp),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: isMatched
+                ? Stack(
+                    children: [
+                      const Positioned(
+                          left: 5,
+                          top: 5,
+                          bottom: 5,
+                          right: 5,
+                          child: Icon(
+                            Icons.check,
+                            color: Colors.green,
+                            size: 50,
+                          )),
+                      Image.asset(
+                        temp,
+                        color: Colors.green,
+                      ),
+                    ],
+                  )
+                : Image.asset(temp),
           ),
         ),
         if (index % 2 != 0)

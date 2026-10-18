@@ -1,5 +1,4 @@
 class QuizOption {
-
   const QuizOption({
     required this.id,
     required this.text,
@@ -13,7 +12,6 @@ class QuizOption {
 }
 
 class QuizQuestion {
-
   const QuizQuestion({
     required this.id,
     required this.prompt,

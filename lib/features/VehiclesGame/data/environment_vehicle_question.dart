@@ -18,7 +18,7 @@ enum VehicleType {
 
 extension VehicleTypeExtension on VehicleType {
   String get assetPath {
-    if (this == VehicleType.boat) return 'assets/gen/images/vehicles/ship.png';
+    if (this == VehicleType.boat) return 'assets/gen/images/vehicles/ship.webp';
     return 'assets/gen/images/vehicles/$name.png';
   }
 
@@ -59,17 +59,15 @@ extension EnvironmentTypeExtension on EnvironmentType {
   String get assetPath {
     switch (this) {
       case EnvironmentType.sky:
-        return 'assets/gen/images/vehicles/sky.png';
+        return 'assets/gen/images/vehicles/sky.webp';
       case EnvironmentType.sea:
-        return 'assets/gen/images/vehicles/sea.png';
+        return 'assets/gen/images/vehicles/sea.webp';
       case EnvironmentType.road:
-        return 'assets/gen/images/vehicles/road.png';
+        return 'assets/gen/images/vehicles/road.webp';
       case EnvironmentType.railway:
-        return 'assets/gen/images/vehicles/railway.png';
+        return 'assets/gen/images/vehicles/railway.webp';
     }
   }
-
-
 }
 
 const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
@@ -86,17 +84,17 @@ const Map<EnvironmentType, List<VehicleType>> environmentVehicles = {
 };
 
 class EnvironmentVehicleQuestion {
-
   EnvironmentVehicleQuestion({
     required this.environmentAsset,
     required this.environmentType,
     required this.correctVehicle,
     required this.options,
   }) {
-    assert(options.length == 3, "Options must be exactly 3");
+    assert(options.length >= 3 && options.length <= 4,
+        'Options must be 3 (early rounds) or 4 (later rounds)');
     assert(options.contains(correctVehicle),
-        "Options must contain correct answer");
-    assert(options.toSet().length == 3, "Options must be unique");
+        'Options must contain correct answer');
+    assert(options.toSet().length == options.length, 'Options must be unique');
   }
   final String environmentAsset;
   final EnvironmentType environmentType;
@@ -151,9 +149,11 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
     final EnvironmentType env = environmentCycle.removeAt(0);
 
     // 2. Select Correct Vehicle (Avoid repeating recently used vehicles)
-    final List<VehicleType> validVehicles = List.from(environmentVehicles[env]!);
-    final List<VehicleType> unusedValid = validVehicles.where((v) => !usedAnswers.contains(v)).toList();
-    
+    final List<VehicleType> validVehicles =
+        List.from(environmentVehicles[env]!);
+    final List<VehicleType> unusedValid =
+        validVehicles.where((v) => !usedAnswers.contains(v)).toList();
+
     VehicleType correctVehicle;
     if (unusedValid.isNotEmpty) {
       unusedValid.shuffle(random);
@@ -167,14 +167,22 @@ List<EnvironmentVehicleQuestion> generateVehicleQuestions({int count = 10}) {
     }
     usedAnswers.add(correctVehicle);
 
-    // 3. Select 2 Invalid Vehicles from DIFFERENT environments
-    // To ensure distractors are very distinct, we pick from 2 distinct incorrect environments
-    final List<EnvironmentType> otherEnvs = EnvironmentType.values.where((e) => e != env).toList();
+    // 3. Select the distractors from DIFFERENT environments.
+    // Distractors can never come from the same environment as the answer:
+    // every vehicle that belongs to the scene is a defensible answer, so a
+    // same-environment distractor would make the question unfair.
+    // Difficulty instead ramps through the number of choices, which is the
+    // lever that actually changes how hard the discrimination is.
+    final int distractorCount = i < count * 0.4 ? 2 : 3;
+
+    final List<EnvironmentType> otherEnvs =
+        EnvironmentType.values.where((e) => e != env).toList();
     otherEnvs.shuffle(random);
-    
+
     final List<VehicleType> invalidVehicles = [];
-    for (int j = 0; j < 2; j++) {
-      final List<VehicleType> pool = List.from(environmentVehicles[otherEnvs[j]]!);
+    for (int j = 0; j < distractorCount && j < otherEnvs.length; j++) {
+      final List<VehicleType> pool =
+          List.from(environmentVehicles[otherEnvs[j]]!);
       pool.shuffle(random);
       invalidVehicles.add(pool.first);
     }

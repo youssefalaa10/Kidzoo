@@ -1,0 +1,95 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "stars.what_covers_them",
+  "engineId": "shadow_play",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "stars",
+    "accent": "#7B6CF6"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Slide it between Suha and the sky, then press the light.",
+      "ar": "حَرِّكْهُ بَيْنَ سُهَى وَالسَّمَاء، ثُمَّ اضْغَطِ الضَّوْء."
+    },
+    "hint1": {
+      "en": "Watch the shadow on the sky while you move it.",
+      "ar": "رَاقِبِ الظِّلَّ عَلَى السَّمَاءِ وَأَنْتَ تُحَرِّكُه."
+    },
+    "hint2": {
+      "en": "Try the glowing arrow. Stop when the shadow fits the outline.",
+      "ar": "جَرِّبِ السَّهْمَ المُضِيء. تَوَقَّفْ حِينَ يُنَاسِبُ الظِّلُّ الشَّكْل."
+    },
+    "model": {
+      "en": "Here. Put it where the faint one is.",
+      "ar": "هُنَا. ضَعْهُ حَيْثُ الصُّورَةُ البَاهِتَة."
+    },
+    "success": {
+      "en": "Near the light, a big shadow. Far away, a small one. The stars are covered, not gone.",
+      "ar": "قُرْبَ الضَّوْءِ ظِلٌّ كَبِير، وَبَعِيدًا ظِلٌّ صَغِير. النُّجُومُ مُغَطَّاة، لَا ضَائِعَة."
+    }
+  },
+  "payload": {
+    "_comment": "The chapter's turn. The child arrives thinking something is TAKING the stars and leaves knowing something is COVERING them — found out by doing it, not told: Suha is the light, the patch of sky is the wall, and every star under the shadow really does go dark on the wall picture. The rule (nearer the light, bigger the shadow) has to be used in BOTH directions, which the parser enforces, so it is a rule and not a habit.",
+    "_roundComment": "Cloud first and big, because 'move it closer to make it bigger' is the surprising half. Leaf second and small, the other half. The page last, at a size in between: the only round where the answer is neither end of the track, so it can only be reached by using the rule — and its reveal is the discovery the next beat is built on.",
+    "itemsRef": "packs/sky",
+    "lightImage": "assets/gen/images/stars/suha.png",
+    "wallImage": "assets/gen/images/stars/sky_wall.png",
+    "trackPercent": [20, 80],
+    "tolerancePercent": 6,
+    "rounds": [
+      {
+        "id": "cloud",
+        "itemId": "cloud",
+        "startPercent": 70,
+        "targetPercent": 28,
+        "label": {
+          "en": "Make the cloud's shadow fill the big outline.",
+          "ar": "اِجْعَلْ ظِلَّ الغَيْمَةِ يَمْلَأُ الشَّكْلَ الكَبِير."
+        },
+        "revealLine": {
+          "en": "Closer to Suha, the shadow grows. The stars behind it went dark.",
+          "ar": "كُلَّمَا اقْتَرَبَتْ مِنْ سُهَى كَبُرَ الظِّلّ. وَأَظْلَمَتِ النُّجُومُ خَلْفَه."
+        }
+      },
+      {
+        "id": "leaf",
+        "itemId": "maple_leaf",
+        "startPercent": 26,
+        "targetPercent": 68,
+        "label": {
+          "en": "Now make the leaf's shadow small enough to fit.",
+          "ar": "وَالآنَ اِجْعَلْ ظِلَّ الوَرَقَةِ صَغِيرًا لِيُنَاسِبَ الشَّكْل."
+        },
+        "revealLine": {
+          "en": "Further away, the shadow shrinks. Only a few stars go dark.",
+          "ar": "كُلَّمَا ابْتَعَدَتْ صَغُرَ الظِّلّ. فَلَا تُظْلِمُ إِلَّا نُجُومٌ قَلِيلَة."
+        }
+      },
+      {
+        "id": "flat_thing",
+        "itemId": "page",
+        "startPercent": 78,
+        "targetPercent": 44,
+        "label": {
+          "en": "Something flat and square. Make its shadow fit the dark gap.",
+          "ar": "شَيْءٌ مُسَطَّحٌ مُرَبَّع. اِجْعَلْ ظِلَّهُ يُنَاسِبُ الفَجْوَةَ المُظْلِمَة."
+        },
+        "revealLine": {
+          "en": "That is the shape Suha saw. A page, passing in front of the stars.",
+          "ar": "هَذَا هُوَ الشَّكْلُ الَّذِي رَأَتْهُ سُهَى. صَفْحَةٌ تَمُرُّ أَمَامَ النُّجُوم."
+        }
+      }
+    ]
+  },
+  "support": {
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 4,
+    "max": 12
+  },
+  "elofGoal": "SCI.cause_and_effect.light_and_shadow",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

@@ -1,0 +1,61 @@
+{
+  "packId": "sky",
+  "_comment": "Everything above the clouds. Pictures are Microsoft Fluent Emoji (MIT); the comet is recoloured icy blue because the third clue of the chapter is 'as cold as ice' and the original is a red fireball — a picture that contradicts the clue it has to satisfy would make the child wrong for looking carefully.",
+  "_suspectComment": "The six travellers are chosen so every clue can be checked against the PICTURE, not against knowledge the child may not have. `height` is low only for things that plainly stay near the ground (an owl, a kite on a string). `tail` is long only where the picture shows one: the kite's ribbon, the dragon's body, the comet's streak. A rocket was tried and dropped — its small flame reads as a tail to some children and not to others, and an ambiguous card makes a careful child wrong. `feel` is decided by the one thing a child reliably knows: a dragon breathes fire.",
+  "items": [
+    {
+      "id": "cloud",
+      "image": "assets/gen/images/stars/cloud.png",
+      "label": { "en": "cloud", "ar": "غَيْمَة" },
+      "attributes": { "kind": "shade" }
+    },
+    {
+      "id": "maple_leaf",
+      "image": "assets/gen/images/stars/maple_leaf.png",
+      "label": { "en": "leaf", "ar": "وَرَقَةُ شَجَر" },
+      "attributes": { "kind": "shade" }
+    },
+    {
+      "id": "page",
+      "image": "assets/gen/images/stars/page.png",
+      "label": { "en": "something flat", "ar": "شَيْءٌ مُسَطَّح" },
+      "attributes": { "kind": "shade" }
+    },
+    {
+      "id": "owl",
+      "image": "assets/gen/images/stars/owl.png",
+      "label": { "en": "owl", "ar": "بُومَة" },
+      "attributes": { "kind": "traveller", "height": "low", "tail": "none", "feel": "warm" }
+    },
+    {
+      "id": "kite",
+      "image": "assets/gen/images/stars/kite.png",
+      "label": { "en": "kite", "ar": "طَائِرَةٌ وَرَقِيَّة" },
+      "attributes": { "kind": "traveller", "height": "low", "tail": "long", "feel": "cool" }
+    },
+    {
+      "id": "flying_saucer",
+      "image": "assets/gen/images/stars/flying_saucer.png",
+      "label": { "en": "flying saucer", "ar": "صَحْنٌ طَائِر" },
+      "attributes": { "kind": "traveller", "height": "high", "tail": "none", "feel": "warm" }
+    },
+    {
+      "id": "satellite",
+      "image": "assets/gen/images/stars/satellite.png",
+      "label": { "en": "satellite", "ar": "قَمَرٌ صِنَاعِيّ" },
+      "attributes": { "kind": "traveller", "height": "high", "tail": "none", "feel": "cool" }
+    },
+    {
+      "id": "dragon",
+      "image": "assets/gen/images/stars/dragon.png",
+      "label": { "en": "dragon", "ar": "تِنِّين" },
+      "attributes": { "kind": "traveller", "height": "high", "tail": "long", "feel": "hot" }
+    },
+    {
+      "id": "comet",
+      "image": "assets/gen/images/stars/comet.png",
+      "label": { "en": "comet", "ar": "مُذَنَّب" },
+      "attributes": { "kind": "traveller", "height": "high", "tail": "long", "feel": "icy" }
+    }
+  ]
+}

@@ -10,7 +10,6 @@ abstract class QuizState extends Equatable {
 class QuizLoading extends QuizState {}
 
 class QuizActive extends QuizState {
-
   const QuizActive(this.question, this.score, this.questionIndex);
   final QuizQuestion question;
   final int score;
@@ -21,7 +20,6 @@ class QuizActive extends QuizState {
 }
 
 class QuizFeedback extends QuizState {
-
   const QuizFeedback(
       this.question, this.isCorrect, this.score, this.questionIndex);
   final QuizQuestion question;

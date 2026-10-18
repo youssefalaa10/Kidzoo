@@ -3,7 +3,7 @@ description: "Kids education app"
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.0+1
+version: 1.0.2+4
 
 environment:
   sdk: ^3.5.1
@@ -32,10 +32,15 @@ dependencies:
   drift: ^2.33.0
   drift_flutter: ^0.3.0
   path_provider: ^2.1.5
+  flutter_local_notifications: ^22.3.1
+  timezone: ^0.11.1
 
 dev_dependencies:
   build_runner: ^2.15.0
   drift_dev: ^2.33.0
+  # Native SQLite for Drift in-memory and migration tests (NativeDatabase.memory).
+  # Only transitive before this, so a test could not depend on it directly.
+  sqlite3: ^3.3.3
   flutter_lints: ^5.0.0
   flutter_test:
     sdk: flutter
@@ -45,12 +50,17 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/gen/images/
     - assets/gen/images/backgrounds/
     - assets/gen/images/feed/
     - assets/gen/images/home/
     - assets/gen/images/flappy/
     - assets/gen/images/shapes/
+    # Story art: recovered pages and other Adventure reward objects. A
+    # reward has to be one picture the child sees in the search scene, in
+    # the flight to the book and in the book afterwards, so it lives here
+    # rather than being borrowed from whichever game folder had something
+    # roughly the right shape.
+    - assets/gen/images/story/
     - assets/gen/images/numbers/
     - assets/gen/images/alphabet/
     - assets/gen/images/animal/
@@ -58,18 +68,31 @@ flutter:
     - assets/gen/images/fruits/
     - assets/gen/images/vegetables/
     - assets/gen/images/vehicles/
+    # Sea life and salvage for the Ocean chapter. Its own directory rather than
+    # scattered through animal/ and vehicles/, because the whole set is one
+    # visual family and has to stay swappable as a set.
+    - assets/gen/images/sea/
+    # The sky, its travellers and the Stars chapter's scenes, for the same
+    # reason: one family, replaceable as a set.
+    - assets/gen/images/stars/
     - assets/gen/images/puzzle/
     - assets/gen/images/puzzle/gazelle block/
     - assets/gen/images/puzzle/ghost block/
     - assets/gen/images/puzzle/party block/
     - assets/gen/icons/
-    - assets/gen/lottie/
-    - assets/gen/gif/
     - assets/data/
     - assets/lang/
     - assets/audio/
     - assets/audio/animals-sounds/
     - assets/flags/
+    # Adventure content. Exactly five directories, fixed forever: pubspec asset
+    # entries are NOT recursive, so a new subdirectory would silently ship
+    # nothing. A content test asserts no subdirectory exists below these.
+    - assets/adventures/
+    - assets/adventures/arcs/
+    - assets/adventures/adventures/
+    - assets/adventures/activities/
+    - assets/adventures/packs/
 
 flutter_assets:
   assets_path: assets/gen/

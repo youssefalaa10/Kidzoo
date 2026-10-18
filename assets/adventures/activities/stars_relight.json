@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "stars.relight",
+  "engineId": "mix_lab",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "stars",
+    "accent": "#7B6CF6"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Give each star its colour back.",
+      "ar": "أَعِدْ إِلَى كُلِّ نَجْمَةٍ لَوْنَهَا."
+    },
+    "hint1": {
+      "en": "Try two kinds of stardust together, and watch the star.",
+      "ar": "جَرِّبْ نَوْعَيْنِ مِنْ غُبَارِ النُّجُومِ مَعًا، وَرَاقِبِ النَّجْمَة."
+    },
+    "hint2": {
+      "en": "One of the right ones is glowing. What goes with it?",
+      "ar": "وَاحِدٌ مِنَ الصَّحِيحَيْنِ يَتَوَهَّج. مَاذَا يُنَاسِبُه؟"
+    },
+    "model": {
+      "en": "These two, together. Tap them, then the light.",
+      "ar": "هَذَانِ مَعًا. اِلْمَسْهُمَا، ثُمَّ الضَّوْء."
+    },
+    "success": {
+      "en": "Three stars, three colours back, and three things they saw.",
+      "ar": "ثَلَاثُ نُجُومٍ عَادَتْ أَلْوَانُهَا، وَثَلَاثَةُ أَشْيَاءَ رَأَتْهَا."
+    }
+  },
+  "payload": {
+    "_comment": "The stars the page passed over went grey and cold. Each one relit says one thing it saw up close — and those three things are the three clues the climax is solved with. So this is not a colour lesson with a star on it: every colour made is a witness woken up.",
+    "_mixComment": "Paint mixing, not light mixing, because it is what a four-year-old can check against their own hands; the stars' colour is stardust, so the story never claims otherwise. The table is complete — all seven combinations say what they make, including all three at once — because a child experimenting WILL try everything, and three-into-mud is itself worth discovering.",
+    "_orderComment": "Orange first: red and yellow are the most familiar pair. Every round needs two, so no round can be answered by the dust that looks most like the target.",
+    "vesselImage": "assets/gen/images/stars/star_vessel.png",
+    "emptyColor": "#8D93A6",
+    "inks": [
+      { "id": "red", "color": "#E8453C", "label": { "en": "red stardust", "ar": "غُبَارٌ أَحْمَر" } },
+      { "id": "yellow", "color": "#F7C531", "label": { "en": "yellow stardust", "ar": "غُبَارٌ أَصْفَر" } },
+      { "id": "blue", "color": "#3F7BE0", "label": { "en": "blue stardust", "ar": "غُبَارٌ أَزْرَق" } }
+    ],
+    "mixes": [
+      { "of": ["red", "yellow"], "color": "#F2892E", "label": { "en": "orange", "ar": "بُرْتُقَالِيّ" } },
+      { "of": ["blue", "yellow"], "color": "#4DB35A", "label": { "en": "green", "ar": "أَخْضَر" } },
+      { "of": ["blue", "red"], "color": "#8E55C9", "label": { "en": "purple", "ar": "بَنَفْسَجِيّ" } },
+      { "of": ["blue", "red", "yellow"], "color": "#7A5A3A", "label": { "en": "brown, like mud", "ar": "بُنِّيٌّ كَالطِّين" } }
+    ],
+    "rounds": [
+      {
+        "id": "orange_star",
+        "make": ["red", "yellow"],
+        "label": {
+          "en": "This star was orange. Make orange, then press the light.",
+          "ar": "كَانَتْ هَذِهِ النَّجْمَةُ بُرْتُقَالِيَّة. اِصْنَعِ البُرْتُقَالِيّ، ثُمَّ اضْغَطِ الضَّوْء."
+        },
+        "revealLine": {
+          "en": "It glows again, and whispers: it went by far above the clouds.",
+          "ar": "تَتَوَهَّجُ مِنْ جَدِيد، وَتَهْمِس: مَرَّ بَعِيدًا فَوْقَ الغُيُوم."
+        }
+      },
+      {
+        "id": "green_star",
+        "make": ["blue", "yellow"],
+        "label": {
+          "en": "This one was green. There is no green dust. Can you make it?",
+          "ar": "هَذِهِ كَانَتْ خَضْرَاء. لَا يُوجَدُ غُبَارٌ أَخْضَر. هَلْ تَسْتَطِيعُ صُنْعَه؟"
+        },
+        "revealLine": {
+          "en": "It shines, and says: it had a long, shining tail.",
+          "ar": "تَلْمَعُ، وَتَقُول: كَانَ لَهُ ذَيْلٌ طَوِيلٌ لَامِع."
+        }
+      },
+      {
+        "id": "purple_star",
+        "make": ["blue", "red"],
+        "label": {
+          "en": "The last one was purple. Which two make purple?",
+          "ar": "الأَخِيرَةُ كَانَتْ بَنَفْسَجِيَّة. أَيُّ اثْنَيْنِ يَصْنَعَانِ البَنَفْسَجِيّ؟"
+        },
+        "revealLine": {
+          "en": "It wakes up shivering: it was cold, as cold as ice.",
+          "ar": "تَسْتَيْقِظُ وَهِيَ تَرْتَجِف: كَانَ بَارِدًا، بَارِدًا كَالثَّلْج."
+        }
+      }
+    ]
+  },
+  "support": {
+    "scaffolding": "errorless"
+  },
+  "elofGoal": "SCI.cause_and_effect.combining",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}
