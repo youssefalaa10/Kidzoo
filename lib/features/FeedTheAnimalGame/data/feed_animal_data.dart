@@ -37,7 +37,7 @@ class FeedAnimalData {
     ),
     FeedItem(
       id: 'grass',
-      imageAsset: 'assets/gen/images/feed/grees.png',
+      imageAsset: 'assets/gen/images/feed/grees.webp',
       kind: FoodKind.plant,
       getLocalizedName: (l10n) => l10n.grass,
     ),
@@ -49,7 +49,7 @@ class FeedAnimalData {
     ),
     FeedItem(
       id: 'meat',
-      imageAsset: 'assets/gen/images/feed/meat.png',
+      imageAsset: 'assets/gen/images/feed/meat.webp',
       kind: FoodKind.meat,
       getLocalizedName: (l10n) => l10n.meat,
     ),

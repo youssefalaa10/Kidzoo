@@ -18,7 +18,7 @@ enum VehicleType {
 
 extension VehicleTypeExtension on VehicleType {
   String get assetPath {
-    if (this == VehicleType.boat) return 'assets/gen/images/vehicles/ship.png';
+    if (this == VehicleType.boat) return 'assets/gen/images/vehicles/ship.webp';
     return 'assets/gen/images/vehicles/$name.png';
   }
 
@@ -59,13 +59,13 @@ extension EnvironmentTypeExtension on EnvironmentType {
   String get assetPath {
     switch (this) {
       case EnvironmentType.sky:
-        return 'assets/gen/images/vehicles/sky.png';
+        return 'assets/gen/images/vehicles/sky.webp';
       case EnvironmentType.sea:
-        return 'assets/gen/images/vehicles/sea.png';
+        return 'assets/gen/images/vehicles/sea.webp';
       case EnvironmentType.road:
-        return 'assets/gen/images/vehicles/road.png';
+        return 'assets/gen/images/vehicles/road.webp';
       case EnvironmentType.railway:
-        return 'assets/gen/images/vehicles/railway.png';
+        return 'assets/gen/images/vehicles/railway.webp';
     }
   }
 }

@@ -14,15 +14,15 @@ class BackgroundResolver {
 
   static const Map<String, _BackgroundPlates> _plates =
       <String, _BackgroundPlates>{
-    'jungle': _BackgroundPlates('$_dir/jungle_mob.png', '$_dir/jungle-tab.jpg'),
+    'jungle': _BackgroundPlates('$_dir/jungle_mob.webp', '$_dir/jungle-tab.jpg'),
     'market': _BackgroundPlates(
-        '$_dir/colorful_bg_mob.png', '$_dir/colorful_bg_tab.jpg'),
-    'ocean': _BackgroundPlates('$_dir/ocean_mob.png', '$_dir/ocean_tab.png'),
+        '$_dir/colorful_bg_mob.webp', '$_dir/colorful_bg_tab.jpg'),
+    'ocean': _BackgroundPlates('$_dir/ocean_mob.webp', '$_dir/ocean_tab.webp'),
     'star': _BackgroundPlates('$_dir/tech_bg_mob.jpeg', '$_dir/tech_bg_desk.jpg'),
-    'stars': _BackgroundPlates('$_dir/stars_mob.png', '$_dir/stars_tab.png'),
+    'stars': _BackgroundPlates('$_dir/stars_mob.webp', '$_dir/stars_tab.webp'),
     'learning':
-        _BackgroundPlates('$_dir/learn_bg_mob.png', '$_dir/learn_bg_desk.jpg'),
-    'map': _BackgroundPlates('$_dir/map_mob.jpg', '$_dir/map_desk_tab.png'),
+        _BackgroundPlates('$_dir/learn_bg_mob.webp', '$_dir/learn_bg_desk.jpg'),
+    'map': _BackgroundPlates('$_dir/map_mob.webp', '$_dir/map_desk_tab.webp'),
     'board': _BackgroundPlates('$_dir/board_mob.jpg', '$_dir/board_tab.jpg'),
   };
 
