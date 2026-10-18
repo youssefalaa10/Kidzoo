@@ -104,13 +104,13 @@ class Assets {
   static const String genImagesNumbers8 = 'assets/gen/images/numbers/8.png';
   static const String genImagesNumbers9 = 'assets/gen/images/numbers/9.png';
   static const String genImagesPuzzle4 = 'assets/gen/images/puzzle/4.png';
-  static const String genImagesPuzzleBird = 'assets/gen/images/puzzle/bird.png';
+  static const String genImagesPuzzleBird = 'assets/gen/images/puzzle/bird.webp';
   static const String genImagesPuzzleEgypt =
-      'assets/gen/images/puzzle/egypt.png';
+      'assets/gen/images/puzzle/egypt.webp';
   static const String genImagesPuzzleGazelle =
       'assets/gen/images/puzzle/gazelle.jpg';
   static const String genImagesPuzzleGhost =
-      'assets/gen/images/puzzle/ghost.png';
+      'assets/gen/images/puzzle/ghost.webp';
   static const String genImagesPuzzleBlocks41 =
       'assets/gen/images/puzzle/blocks4/1.png';
   static const String genImagesPuzzleBlocks42 =

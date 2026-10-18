@@ -46,7 +46,7 @@ class ImageManager {
   static const String mathBg = Assets.genImagesHomeMathBg;
   static const String catsBg = Assets.genImagesHomeCatsBg;
   static const String learningBg =
-      'assets/gen/images/backgrounds/learn_bg_mob.png';
+      'assets/gen/images/backgrounds/learn_bg_mob.webp';
   static const String techBg = Assets.genImagesHomeTechBg;
 
   static const String numbers = Assets.genImagesHomeNumbers;
@@ -157,7 +157,7 @@ class ImageManager {
   static const String ghost4 = Assets.genImagesPuzzleGhostBlock4;
 
   // party
-  static const String party = 'assets/gen/images/puzzle/party.png';
+  static const String party = 'assets/gen/images/puzzle/party.webp';
   static const String party1 = 'assets/gen/images/puzzle/party block/1.png';
   static const String party2 = 'assets/gen/images/puzzle/party block/2.png';
   static const String party3 = 'assets/gen/images/puzzle/party block/3.png';
@@ -180,11 +180,11 @@ class ImageManager {
 
   // Kid avatars (profile selection)
   static const String avatarMonster =
-      'assets/gen/images/avatar/avatar-monstar.png';
-  static const String avatarBoy = 'assets/gen/images/avatar/avatar-boy.png';
-  static const String avatarGirl = 'assets/gen/images/avatar/avatar-girl.png';
+      'assets/gen/images/avatar/avatar-monstar.webp';
+  static const String avatarBoy = 'assets/gen/images/avatar/avatar-boy.webp';
+  static const String avatarGirl = 'assets/gen/images/avatar/avatar-girl.webp';
   static const String avatarAstronaut =
-      'assets/gen/images/avatar/avatar-astronaut.png';
+      'assets/gen/images/avatar/avatar-astronaut.webp';
 
   /// Ordered list of avatar assets. Index corresponds to `Profiles.avatarIndex`.
   static const List<String> kidAvatars = [

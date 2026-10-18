@@ -132,7 +132,7 @@ class _AdventureMapScreenState extends State<AdventureMapScreen> {
         AsyncSnapshot<AdventureContentBundle> snapshot,
       ) {
         return KidGameShell(
-          backgroundAsset: 'assets/gen/images/backgrounds/map_mob.jpg',
+          backgroundAsset: 'assets/gen/images/backgrounds/map_mob.webp',
           builder: (BuildContext context, KidMetrics metrics) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const Center(child: CircularProgressIndicator());
