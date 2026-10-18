@@ -1,0 +1,80 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.mend_sign",
+  "engineId": "trace_path",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Draw the line back in, point by point.",
+      "ar": "أَعِدْ رَسْمَ الخَطّ، نُقْطَةً بَعْدَ نُقْطَة."
+    },
+    "hint1": {
+      "en": "Start where it is glowing.",
+      "ar": "اِبْدَأْ مِنْ حَيْثُ يُضِيء."
+    },
+    "hint2": {
+      "en": "Keep going to the next dot. You can lift your finger and tap them.",
+      "ar": "وَاصِلْ إِلَى النُّقْطَةِ التَّالِيَة. يُمْكِنُكَ رَفْعُ إِصْبَعِكَ وَلَمْسُهَا."
+    },
+    "model": {
+      "en": "Watch the line draw itself. Then you draw it.",
+      "ar": "شَاهِدِ الخَطَّ يَرْسُمُ نَفْسَه. ثُمَّ اِرْسُمْهُ أَنْت."
+    },
+    "success": {
+      "en": "The sign is whole again. Ring the bell!",
+      "ar": "عَادَتِ اللَّافِتَةُ سَلِيمَة. اِقْرَعِ الجَرَس!"
+    }
+  },
+  "payload": {
+    "_comment": "Language-neutral on purpose. This engine could hold Arabic letterforms — a figure is just an ordered point run — but no such content exists yet, and dressing a shape up as literacy to claim the engine is bilingual would be a lie told to a spreadsheet. The frame and the arrow are symbols a child of either language reads the same way.",
+    "_modeComment": "Both readings of the one model, in order. The frame is traced: the road between the points is drawn and the points are numbered too, because it is the child's first figure and there is no reason to withhold either kind of help. The arrow is a plain dot-to-dot: numbers on, road off, so this time they have to work out where the line goes.",
+    "tolerancePercent": 14,
+    "figures": [
+      {
+        "id": "sign_frame",
+        "closed": true,
+        "showNumbers": true,
+        "showGuide": true,
+        "points": [[20, 30, 1], [80, 30, 1], [80, 62, 1], [20, 62, 1]],
+        "label": {
+          "en": "First the frame, all the way round.",
+          "ar": "أَوَّلًا الإِطَار، وَحَوْلَهُ كُلَّه."
+        },
+        "revealLine": {
+          "en": "The frame holds. Now the arrow that tells people the way in.",
+          "ar": "ثَبَتَ الإِطَار. وَالآنَ السَّهْمُ الَّذِي يَدُلُّ النَّاسَ عَلَى المَدْخَل."
+        }
+      },
+      {
+        "id": "open_arrow",
+        "closed": true,
+        "showNumbers": true,
+        "showGuide": false,
+        "points": [[18, 40], [58, 40], [58, 22, 1], [88, 50, 1], [58, 78, 1], [58, 60], [18, 60]],
+        "label": {
+          "en": "Now the arrow. Follow the numbers.",
+          "ar": "وَالآنَ السَّهْم. اِتْبَعِ الأَرْقَام."
+        },
+        "revealLine": {
+          "en": "It points right at the gate. Anyone can find their way in now.",
+          "ar": "يُشِيرُ مُبَاشَرَةً إِلَى البَوَّابَة. يُمْكِنُ لِأَيِّ أَحَدٍ أَنْ يَجِدَ طَرِيقَهُ الآن."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 8,
+    "max": 22
+  },
+  "elofGoal": "PHY.fine_motor.controlled_stroke",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

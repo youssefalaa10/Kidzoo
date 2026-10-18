@@ -1,0 +1,81 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "stars.star_path",
+  "engineId": "trace_path",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "stars",
+    "accent": "#7B6CF6"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Join the stars to make a path up into the sky.",
+      "ar": "صِلِ النُّجُومَ لِتَصْنَعَ دَرْبًا يَصْعَدُ فِي السَّمَاء."
+    },
+    "hint1": {
+      "en": "Start at number one, at the bottom.",
+      "ar": "اِبْدَأْ مِنَ الرَّقْمِ وَاحِد، فِي الأَسْفَل."
+    },
+    "hint2": {
+      "en": "Keep going to the next number. You can lift your finger and tap them.",
+      "ar": "وَاصِلْ إِلَى الرَّقْمِ التَّالِي. يُمْكِنُكَ رَفْعُ إِصْبَعِكَ وَلَمْسُهَا."
+    },
+    "model": {
+      "en": "Watch the path light up, star to star. Then you draw it.",
+      "ar": "شَاهِدِ الدَّرْبَ يُضِيءُ مِنْ نَجْمَةٍ إِلَى نَجْمَة. ثُمَّ اِرْسُمْهُ أَنْت."
+    },
+    "success": {
+      "en": "The star path is lit, all the way up to where the travellers pass.",
+      "ar": "أَضَاءَ دَرْبُ النُّجُوم، حَتَّى المَكَانِ الَّذِي يَمُرُّ بِهِ المُسَافِرُون."
+    }
+  },
+  "payload": {
+    "_comment": "The stars the child relit are the stars they now join: a relit sky is a sky you can find your way across, and the path it makes is how Suha gets up to the crossing where the climax happens. keepCompleted is on because the two halves are one path, and the child should end looking at the whole climb.",
+    "_figureComment": "Numbers but no dotted road on either half — one rung up from the Ocean's first figure, which had both. The child drew a route there and has done it before; here they read the order from the numbers alone.",
+    "tolerancePercent": 14,
+    "keepCompleted": true,
+    "figures": [
+      {
+        "id": "lower_path",
+        "closed": false,
+        "showNumbers": true,
+        "showGuide": false,
+        "points": [[18, 90], [40, 76, 1], [22, 60, 1], [46, 48, 1], [30, 32]],
+        "label": {
+          "en": "Start at the bottom and join the stars, one to the next.",
+          "ar": "اِبْدَأْ مِنَ الأَسْفَلِ وَصِلِ النُّجُوم، وَاحِدَةً بِالتَّالِيَة."
+        },
+        "revealLine": {
+          "en": "The path holds. It climbs higher.",
+          "ar": "الدَّرْبُ ثَابِت. وَهُوَ يَصْعَدُ أَعْلَى."
+        }
+      },
+      {
+        "id": "upper_path",
+        "closed": false,
+        "showNumbers": true,
+        "showGuide": false,
+        "points": [[34, 30], [58, 38, 1], [70, 22, 1], [56, 10, 1], [84, 8]],
+        "label": {
+          "en": "Now the top of the path, up to the crossing.",
+          "ar": "وَالآنَ أَعْلَى الدَّرْب، حَتَّى مُفْتَرَقِ الطُّرُق."
+        },
+        "revealLine": {
+          "en": "At the top, travellers are crossing the sky. One of them has the page.",
+          "ar": "فِي الأَعْلَى يَعْبُرُ المُسَافِرُونَ السَّمَاء. أَحَدُهُمْ مَعَهُ الصَّفْحَة."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 8,
+    "max": 24
+  },
+  "elofGoal": "PHY.fine_motor.controlled_stroke",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

@@ -1,0 +1,89 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "stars.who_carries_it",
+  "engineId": "deduction",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "stars",
+    "accent": "#7B6CF6"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Set aside every traveller the clue rules out.",
+      "ar": "أَبْعِدْ كُلَّ مُسَافِرٍ يَسْتَبْعِدُهُ الدَّلِيل."
+    },
+    "hint1": {
+      "en": "Look at the clue, then at each picture. Does it match?",
+      "ar": "اُنْظُرْ إِلَى الدَّلِيل، ثُمَّ إِلَى كُلِّ صُورَة. هَلْ تُطَابِقُه؟"
+    },
+    "hint2": {
+      "en": "One of these two does not match the clue.",
+      "ar": "وَاحِدٌ مِنْ هَذَيْنِ لَا يُطَابِقُ الدَّلِيل."
+    },
+    "model": {
+      "en": "This one does not match. Set it aside.",
+      "ar": "هَذَا لَا يُطَابِق. أَبْعِدْه."
+    },
+    "success": {
+      "en": "Only the comet is left. It is the one carrying the page!",
+      "ar": "لَمْ يَبْقَ إِلَّا المُذَنَّب. هُوَ الَّذِي يَحْمِلُ الصَّفْحَة!"
+    }
+  },
+  "payload": {
+    "_comment": "The climax, and the child's alone. Suha does not know who it was; the child does, because they woke the three stars that saw it. Each clue here is one of those three whispers, in the order the stars gave them, so the reasoning is built from things the child found rather than things the activity hands them. The answer is never chosen — it is what is left — and the parser proves before anyone plays that the clues leave exactly one.",
+    "_suspectComment": "Six travellers: two ruled out by each clue. The dragon survives until the last clue on purpose — it flies high and has a long tail, so it is the child's best wrong suspect, and it is ruled out by the one thing every child knows about dragons.",
+    "itemsRef": "packs/sky",
+    "candidateIds": ["owl", "kite", "flying_saucer", "satellite", "dragon", "comet"],
+    "clues": [
+      {
+        "id": "above_clouds",
+        "attribute": "height",
+        "value": "high",
+        "image": "assets/gen/images/stars/cloud.png",
+        "label": {
+          "en": "The orange star said: it went by far above the clouds. Set aside what stays lower.",
+          "ar": "قَالَتِ النَّجْمَةُ البُرْتُقَالِيَّة: مَرَّ بَعِيدًا فَوْقَ الغُيُوم. أَبْعِدْ مَا يَبْقَى أَسْفَل."
+        },
+        "revealLine": {
+          "en": "Only things that fly that high are left.",
+          "ar": "لَمْ يَبْقَ إِلَّا مَا يَطِيرُ بِذَلِكَ العُلُوّ."
+        }
+      },
+      {
+        "id": "long_tail",
+        "attribute": "tail",
+        "value": "long",
+        "image": "assets/gen/images/stars/sparkles.png",
+        "label": {
+          "en": "The green star said: it had a long, shining tail. Set aside what has none.",
+          "ar": "قَالَتِ النَّجْمَةُ الخَضْرَاء: كَانَ لَهُ ذَيْلٌ طَوِيلٌ لَامِع. أَبْعِدْ مَا لَيْسَ لَهُ ذَيْل."
+        },
+        "revealLine": {
+          "en": "Two are left, and both have long tails.",
+          "ar": "بَقِيَ اثْنَان، وَلِكِلَيْهِمَا ذَيْلٌ طَوِيل."
+        }
+      },
+      {
+        "id": "icy_cold",
+        "attribute": "feel",
+        "value": "icy",
+        "image": "assets/gen/images/stars/snowflake.png",
+        "label": {
+          "en": "The purple star said: it was as cold as ice. Which one is not?",
+          "ar": "قَالَتِ النَّجْمَةُ البَنَفْسَجِيَّة: كَانَ بَارِدًا كَالثَّلْج. أَيُّهُمَا لَيْسَ كَذَلِك؟"
+        },
+        "revealLine": {
+          "en": "A dragon breathes fire, so it is not the one.",
+          "ar": "التِّنِّينُ يَنْفُثُ النَّار، فَلَيْسَ هُوَ."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "elofGoal": "COG.reasoning.elimination",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

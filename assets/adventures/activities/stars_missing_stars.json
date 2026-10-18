@@ -1,0 +1,78 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "stars.missing_stars",
+  "engineId": "spot_the_diff",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "stars",
+    "accent": "#7B6CF6"
+  },
+  "narration": {
+    "prompt": {
+      "en": "The page shows the sky as it should be. Tap the stars missing tonight.",
+      "ar": "تُظْهِرُ الصَّفْحَةُ السَّمَاءَ كَمَا يَجِب. اِلْمَسِ النُّجُومَ الغَائِبَةَ اللَّيْلَة."
+    },
+    "hint1": {
+      "en": "Pick one bright star in the first picture. Is it in the second one too?",
+      "ar": "اِخْتَرْ نَجْمَةً لَامِعَةً فِي الصُّورَةِ الأُولَى. هَلْ هِيَ فِي الثَّانِيَةِ أَيْضًا؟"
+    },
+    "hint2": {
+      "en": "Look inside the glowing ring. A star was there.",
+      "ar": "اُنْظُرْ دَاخِلَ الدَّائِرَةِ المُضِيئَة. كَانَتْ هُنَاكَ نَجْمَة."
+    },
+    "model": {
+      "en": "Here. A star shone here, and tonight it is gone.",
+      "ar": "هُنَا. كَانَتْ هُنَا نَجْمَةٌ تَلْمَع، وَاللَّيْلَةَ غَابَت."
+    },
+    "success": {
+      "en": "Four stars gone, one after another, in a line. Something went this way.",
+      "ar": "أَرْبَعُ نُجُومٍ غَابَتْ، وَاحِدَةً بَعْدَ أُخْرَى، فِي خَطّ. شَيْءٌ مَا مَرَّ مِنْ هُنَا."
+    }
+  },
+  "payload": {
+    "_comment": "The left panel is the night the Blue Page showed at the end of the Ocean; the right is the real sky tonight. The four missing stars are the only differences, and they lie on one curve from low left to high right — so finding them all is what shows the child that the darkness MOVED, which is the first thing the chapter needs them to know. The moon is the same in both on purpose: a landmark to compare from.",
+    "_orderComment": "Reveal lines never assume an order. The child finds these in whatever order they see them, so each line is a fact about its own star, and the line that draws them together is the closing success line.",
+    "imageLeft": "assets/gen/images/stars/sky_as_drawn.png",
+    "imageRight": "assets/gen/images/stars/sky_tonight.png",
+    "spots": [
+      {
+        "id": "low_left",
+        "posLeft": [0.18, 0.72],
+        "posRight": [0.18, 0.72],
+        "hitRadius": 0.09,
+        "label": { "en": "A star low on the left is missing.", "ar": "نَجْمَةٌ فِي الأَسْفَلِ يَسَارًا غَائِبَة." },
+        "revealLine": { "en": "Gone. Suha says its light stopped all at once.", "ar": "غَابَت. تَقُولُ سُهَى إِنَّ ضَوْءَهَا تَوَقَّفَ فَجْأَة." }
+      },
+      {
+        "id": "middle_left",
+        "posLeft": [0.36, 0.52],
+        "posRight": [0.36, 0.52],
+        "hitRadius": 0.09,
+        "label": { "en": "A star in the middle is missing.", "ar": "نَجْمَةٌ فِي الوَسَطِ غَائِبَة." },
+        "revealLine": { "en": "Gone. The one beside it is still shining.", "ar": "غَابَت. وَالَّتِي بِجِوَارِهَا مَا زَالَتْ تَلْمَع." }
+      },
+      {
+        "id": "middle_right",
+        "posLeft": [0.58, 0.38],
+        "posRight": [0.58, 0.38],
+        "hitRadius": 0.09,
+        "label": { "en": "A star just above the middle is missing.", "ar": "نَجْمَةٌ فَوْقَ الوَسَطِ غَائِبَة." },
+        "revealLine": { "en": "Gone. This one went dark only a moment ago.", "ar": "غَابَت. هَذِهِ أَظْلَمَتْ قَبْلَ لَحْظَةٍ فَقَط." }
+      },
+      {
+        "id": "high_right",
+        "posLeft": [0.80, 0.30],
+        "posRight": [0.80, 0.30],
+        "hitRadius": 0.09,
+        "label": { "en": "A star high on the right, under the moon, is missing.", "ar": "نَجْمَةٌ عَالِيَةٌ يَمِينًا، تَحْتَ القَمَر، غَائِبَة." },
+        "revealLine": { "en": "Gone. And the dark is still moving on from here.", "ar": "غَابَت. وَالظَّلَامُ مَا زَالَ يَمْضِي مِنْ هُنَا." }
+      }
+    ]
+  },
+  "support": {
+    "scaffolding": "errorless"
+  },
+  "elofGoal": "COG.visual_discrimination.compare",
+  "prereqSkills": [],
+  "masteryThreshold": 0.6
+}

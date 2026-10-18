@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Matches the home screen background, so the launch window hands over
+         to the first Flutter frame without a black or white flash. -->
+    <color name="launch_background">#FEF9F3</color>
+</resources>

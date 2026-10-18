@@ -1,0 +1,79 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "market.weigh_orders",
+  "engineId": "balance_experiment",
+  "locales": ["en", "ar"],
+  "presentation": {
+    "backgroundType": "market",
+    "accent": "#F2954A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Fill the basket until the scale sits level, then hand it over.",
+      "ar": "اِمْلَأِ السَّلَّةَ حَتَّى يَسْتَوِيَ المِيزَان، ثُمَّ سَلِّمْهَا."
+    },
+    "hint1": {
+      "en": "Not quite. Watch which way the scale leans.",
+      "ar": "لَيْسَ تَمَامًا. اُنْظُرْ إِلَى أَيِّ جِهَةٍ يَمِيلُ المِيزَان."
+    },
+    "hint2": {
+      "en": "Heavy side goes down. Take one off, or put one on.",
+      "ar": "الجَانِبُ الثَّقِيلُ يَنْزِل. اِرْفَعْ وَاحِدَة، أَوْ ضَعْ وَاحِدَة."
+    },
+    "model": {
+      "en": "Like this. See how it comes level? Now you make one.",
+      "ar": "هَكَذَا. أَرَأَيْتَ كَيْفَ اسْتَوَى؟ اِصْنَعْ أَنْتَ وَاحِدَةً الآن."
+    },
+    "success": {
+      "en": "Every basket is weighed out, and not a gram short.",
+      "ar": "وُزِنَتْ كُلُّ سَلَّة، وَلَا يَنْقُصُهَا شَيْء."
+    }
+  },
+  "payload": {
+    "_comment": "The one activity in the app where the child can act before answering. Adding and removing are free and unjudged — the beam responds at once, so they can try something, see what it does and take it back. Only handing the basket over is an answer. That is why nothing here is gated on the beam being level: the control works whatever the scale says, because a child who hands over the wrong basket should be answered by the seller rather than by a button that quietly refused to be pressed.",
+    "_weightComment": "Weights live on the pack, not here, so an orange weighs two wherever it turns up. The numeral is printed on each item as well: a child cannot plan a load out of objects whose weight they have to remember.",
+    "itemsRef": "packs/market_goods",
+    "weightAttribute": "weight",
+    "tolerance": 0,
+    "unitLabel": { "en": "weights", "ar": "أَوْزَان" },
+    "rounds": [
+      {
+        "id": "order_fruit",
+        "target": 4,
+        "itemIds": ["apple", "orange"],
+        "prompt": {
+          "en": "This one asked for four. Fill it with apples and oranges.",
+          "ar": "هَذِهِ طَلَبَتْ أَرْبَعَة. اِمْلَأْهَا بِالتُّفَّاحِ وَالبُرْتُقَال."
+        },
+        "revealLine": {
+          "en": "Four exactly. That basket is ready to go.",
+          "ar": "أَرْبَعَةٌ بِالضَّبْط. هَذِهِ السَّلَّةُ جَاهِزَةٌ لِلذَّهَاب."
+        }
+      },
+      {
+        "id": "order_vegetable",
+        "target": 5,
+        "itemIds": ["carrot", "red_pepper", "cabbage"],
+        "prompt": {
+          "en": "The next one asked for five. There is more than one way to make it.",
+          "ar": "وَالتَّالِيَةُ طَلَبَتْ خَمْسَة. وَهُنَاكَ أَكْثَرُ مِنْ طَرِيقَةٍ لِتَحْقِيقِهَا."
+        },
+        "revealLine": {
+          "en": "Five. Both baskets can go on the cart now.",
+          "ar": "خَمْسَة. يُمْكِنُ الآنَ وَضْعُ السَّلَّتَيْنِ عَلَى العَرَبَة."
+        }
+      }
+    ]
+  },
+  "support": {
+    "distractorCount": 1,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 0,
+    "max": 2
+  },
+  "elofGoal": "MATH.measurement.compare_quantity",
+  "prereqSkills": ["MATH.counting.cardinality"],
+  "masteryThreshold": 0.7
+}

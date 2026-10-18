@@ -1,0 +1,51 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class LanguageCubit extends Cubit<Locale> {
+  /// Pass [initial] when the saved language is already known (as at startup)
+  /// so the first frame is not drawn in English and then swapped.
+  LanguageCubit({Locale? initial}) : super(initial ?? const Locale('en', '')) {
+    if (initial == null) _loadLanguage();
+  }
+
+  static const String _languageKey = 'selected_language';
+
+  /// The language the user last chose, readable before the cubit exists.
+  static Future<String> savedLanguageCode() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      return prefs.getString(_languageKey) ?? 'en';
+    } catch (_) {
+      return 'en';
+    }
+  }
+
+  Future<void> _loadLanguage() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final languageCode = prefs.getString(_languageKey) ?? 'en';
+      emit(Locale(languageCode, ''));
+    } catch (e) {
+      emit(const Locale('en', ''));
+    }
+  }
+
+  Future<void> setLanguage(Locale locale) async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString(_languageKey, locale.languageCode);
+      emit(locale);
+    } catch (e) {
+      // Handle error silently
+    }
+  }
+
+  Future<void> toggleLanguage() async {
+    final newLanguage = state.languageCode == 'en' ? 'ar' : 'en';
+    await setLanguage(Locale(newLanguage, ''));
+  }
+
+  bool get isArabic => state.languageCode == 'ar';
+  bool get isEnglish => state.languageCode == 'en';
+}
