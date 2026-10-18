@@ -16,7 +16,7 @@ if (keystorePropertiesFile.exists()) {
 android {
     namespace = "dev.annotex.kidzo"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -58,8 +58,8 @@ buildTypes {
     getByName("release") {
         signingConfig = signingConfigs.getByName("release")
 
-        isMinifyEnabled = false
-        isShrinkResources = false
+        isMinifyEnabled = true
+        isShrinkResources = true
 
         proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),

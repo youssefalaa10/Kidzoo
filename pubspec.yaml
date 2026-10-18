@@ -50,7 +50,6 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/gen/images/
     - assets/gen/images/backgrounds/
     - assets/gen/images/feed/
     - assets/gen/images/home/
@@ -81,8 +80,6 @@ flutter:
     - assets/gen/images/puzzle/ghost block/
     - assets/gen/images/puzzle/party block/
     - assets/gen/icons/
-    - assets/gen/lottie/
-    - assets/gen/gif/
     - assets/data/
     - assets/lang/
     - assets/audio/

@@ -42,8 +42,6 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
   /// the time the round is scored it is always zero.
   int _animalsThisRound = 0;
 
-  final TtsService _ttsService = TtsService();
-
   // All available animals across levels
   final List<AnimalQuizModel> allAnimals = [
     // Level 1 animals (easy)
@@ -257,8 +255,9 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
     stopForSpeech();
 
     final languageCode = Localizations.localeOf(context).languageCode;
-    await _ttsService.setLanguage(languageCode);
-    await Speech.speak(text);
+    await Speech.configureLanguage(languageCode);
+    await Speech.speakAndWait(text);
+    if (mounted) resumeAfterSpeech();
   }
 
   @override
@@ -272,14 +271,6 @@ class _AnimalQuizScreenState extends KidGameScreenState<AnimalQuizScreen>
     if (locale.languageCode == 'ar') {
       TtsService.checkAndRequestArabicVoice(context);
     }
-
-    // Initialize TTS completion handler
-    _ttsService.setCompletionHandler(() {
-      if (mounted) resumeAfterSpeech();
-    });
-    _ttsService.setErrorHandler((msg) {
-      if (mounted) resumeAfterSpeech();
-    });
 
     speak(l10n.welcomeToAnimalQuiz(level));
   }
