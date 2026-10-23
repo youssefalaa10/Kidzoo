@@ -3,7 +3,7 @@
   "items": [
     {
       "id": "bread",
-      "image": "assets/gen/images/helpers/bread.png",
+      "image": "assets/gen/images/helpers/bread.webp",
       "label": {
         "en": "Bread",
         "ar": "خُبْزٌ"
@@ -15,7 +15,7 @@
     },
     {
       "id": "grapes",
-      "image": "assets/gen/images/helpers/grapes.png",
+      "image": "assets/gen/images/helpers/grapes.webp",
       "label": {
         "en": "Grapes",
         "ar": "عِنَبٌ"
@@ -27,7 +27,7 @@
     },
     {
       "id": "broccoli",
-      "image": "assets/gen/images/helpers/broccoli.png",
+      "image": "assets/gen/images/helpers/broccoli.webp",
       "label": {
         "en": "Broccoli",
         "ar": "بُرُوكْلِي"
@@ -39,7 +39,7 @@
     },
     {
       "id": "yogurt",
-      "image": "assets/gen/images/helpers/yogurt.png",
+      "image": "assets/gen/images/helpers/yogurt.webp",
       "label": {
         "en": "Plain yogurt",
         "ar": "زَبَادِي سَادَةٌ"
@@ -51,7 +51,7 @@
     },
     {
       "id": "tomato",
-      "image": "assets/gen/images/helpers/tomato.png",
+      "image": "assets/gen/images/helpers/tomato.webp",
       "label": {
         "en": "Tomato",
         "ar": "طَمَاطِمُ"
@@ -63,7 +63,7 @@
     },
     {
       "id": "soda",
-      "image": "assets/gen/images/helpers/soda.png",
+      "image": "assets/gen/images/helpers/soda.webp",
       "label": {
         "en": "Soda",
         "ar": "مَشْرُوبٌ غَازِيٌّ"
@@ -75,7 +75,7 @@
     },
     {
       "id": "cupcake",
-      "image": "assets/gen/images/helpers/cupcake.png",
+      "image": "assets/gen/images/helpers/cupcake.webp",
       "label": {
         "en": "Cupcake",
         "ar": "كَعْكَةٌ صَغِيرَةٌ"
@@ -87,7 +87,7 @@
     },
     {
       "id": "lollipop",
-      "image": "assets/gen/images/helpers/lollipop.png",
+      "image": "assets/gen/images/helpers/lollipop.webp",
       "label": {
         "en": "Lollipop",
         "ar": "حَلْوَى عَلَى عَصًا"
@@ -99,7 +99,7 @@
     },
     {
       "id": "cake",
-      "image": "assets/gen/images/helpers/cake.png",
+      "image": "assets/gen/images/helpers/cake.webp",
       "label": {
         "en": "Cake",
         "ar": "كَعْكٌ"
@@ -111,7 +111,7 @@
     },
     {
       "id": "cereal",
-      "image": "assets/gen/images/helpers/cereal.png",
+      "image": "assets/gen/images/helpers/cereal.webp",
       "label": {
         "en": "Sugary cereal",
         "ar": "حُبُوبٌ مُحَلَّاةٌ"

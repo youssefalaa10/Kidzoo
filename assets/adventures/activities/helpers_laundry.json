@@ -27,8 +27,8 @@
       "ar": "هَذَا مَكَانُهَا. جَرِّبْ أَنْتَ!"
     },
     "success": {
-      "en": "You sorted everything! Great helping!",
-      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَحْسَنْتَ يَا بَطَلُ!"
+      "en": "All sorted! The clean clothes have a tidy home!",
+      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! المَلَابِسُ النَّظِيفَةُ فِي مَكَانِهَا!"
     }
   },
   "payload": {
@@ -43,7 +43,7 @@
       {
         "id": "dirty",
         "value": "dirty",
-        "image": "assets/gen/images/helpers/washer.png",
+        "image": "assets/gen/images/helpers/washer.webp",
         "label": {
           "en": "Needs washing",
           "ar": "يَحْتَاجُ إِلَى الغَسِيلِ"
@@ -52,7 +52,7 @@
       {
         "id": "clean",
         "value": "clean",
-        "image": "assets/gen/images/helpers/wardrobe.png",
+        "image": "assets/gen/images/helpers/wardrobe.webp",
         "label": {
           "en": "Clean and ready",
           "ar": "نَظِيفٌ وَجَاهِزٌ"
@@ -67,5 +67,25 @@
   "adaptation": {
     "min": 10,
     "max": 10
+  },
+  "worksheet": {
+    "prompt": {
+      "en": "Sort the dirty and clean clothes.",
+      "ar": "رَتِّبِ المَلَابِسَ المُتَّسِخَةَ وَالنَّظِيفَةَ."
+    },
+    "retry": {
+      "en": "Try the other box. You can do it!",
+      "ar": "جَرِّبِ الصُّنْدُوقَ الآخَرَ. أَنْتَ تَسْتَطِيعُ!"
+    },
+    "correct": {
+      "dirty": {
+        "en": "These clothes need washing.",
+        "ar": "هَذِهِ المَلَابِسُ تَحْتَاجُ إِلَى الغَسِيلِ."
+      },
+      "clean": {
+        "en": "Clean clothes go in the wardrobe.",
+        "ar": "المَلَابِسُ النَّظِيفَةُ فِي الخِزَانَةِ."
+      }
+    }
   }
 }

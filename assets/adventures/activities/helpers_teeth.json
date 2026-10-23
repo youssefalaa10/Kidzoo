@@ -27,8 +27,8 @@
       "ar": "هَذَا مَكَانُهَا. جَرِّبْ أَنْتَ!"
     },
     "success": {
-      "en": "You sorted everything! Great helping!",
-      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَحْسَنْتَ يَا بَطَلُ!"
+      "en": "All the foods are sorted! What a happy smile!",
+      "ar": "رَتَّبْتَ كُلَّ الطَّعَامِ! يَا لَهَا مِنِ ابْتِسَامَةٍ سَعِيدَةٍ!"
     }
   },
   "payload": {
@@ -41,21 +41,21 @@
     "roundCount": 1,
     "bins": [
       {
-        "id": "everyday",
-        "value": "everyday",
-        "image": "assets/gen/images/helpers/tooth.png",
-        "label": {
-          "en": "Everyday foods",
-          "ar": "طَعَامٌ يَوْمِيٌّ"
-        }
-      },
-      {
         "id": "treat",
         "value": "treat",
-        "image": "assets/gen/images/helpers/sad_tooth.png",
+        "image": "assets/gen/images/helpers/sad_tooth.webp",
         "label": {
           "en": "Sugary treats",
           "ar": "حَلْوَى"
+        }
+      },
+      {
+        "id": "everyday",
+        "value": "everyday",
+        "image": "assets/gen/images/helpers/tooth.webp",
+        "label": {
+          "en": "Everyday foods",
+          "ar": "طَعَامٌ يَوْمِيٌّ"
         }
       }
     ]
@@ -67,5 +67,25 @@
   "adaptation": {
     "min": 10,
     "max": 10
+  },
+  "worksheet": {
+    "prompt": {
+      "en": "Drag each food to its tooth.",
+      "ar": "اِسْحَبْ كُلَّ طَعَامٍ إِلَى السِّنِّ المُنَاسِبَةِ."
+    },
+    "retry": {
+      "en": "Try the other box. You can do it!",
+      "ar": "جَرِّبِ الصُّنْدُوقَ الآخَرَ. أَنْتَ تَسْتَطِيعُ!"
+    },
+    "correct": {
+      "everyday": {
+        "en": "An everyday food. Well done!",
+        "ar": "طَعَامٌ يَوْمِيٌّ. أَحْسَنْتَ!"
+      },
+      "treat": {
+        "en": "A sugary treat. Just sometimes.",
+        "ar": "حَلْوَى مُحَلَّاةٌ. نَأْكُلُهَا أَحْيَانًا."
+      }
+    }
   }
 }

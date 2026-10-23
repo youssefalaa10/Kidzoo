@@ -3,7 +3,7 @@
   "items": [
     {
       "id": "umbrella",
-      "image": "assets/gen/images/helpers/umbrella.png",
+      "image": "assets/gen/images/helpers/umbrella.webp",
       "label": {
         "en": "Umbrella",
         "ar": "مِظَلَّةُ المَطَرِ"
@@ -15,7 +15,7 @@
     },
     {
       "id": "boots",
-      "image": "assets/gen/images/helpers/boots.png",
+      "image": "assets/gen/images/helpers/boots.webp",
       "label": {
         "en": "Rain boots",
         "ar": "حِذَاءُ المَطَرِ"
@@ -27,7 +27,7 @@
     },
     {
       "id": "raincoat",
-      "image": "assets/gen/images/helpers/raincoat.png",
+      "image": "assets/gen/images/helpers/raincoat.webp",
       "label": {
         "en": "Raincoat",
         "ar": "مِعْطَفُ المَطَرِ"
@@ -39,7 +39,7 @@
     },
     {
       "id": "rainhat",
-      "image": "assets/gen/images/helpers/rainhat.png",
+      "image": "assets/gen/images/helpers/rainhat.webp",
       "label": {
         "en": "Rain hat",
         "ar": "قُبَّعَةُ المَطَرِ"
@@ -50,8 +50,20 @@
       }
     },
     {
+      "id": "green_boots",
+      "image": "assets/gen/images/helpers/green_boots.webp",
+      "label": {
+        "en": "Green rain boots",
+        "ar": "حِذَاءُ مَطَرٍ أَخْضَرُ"
+      },
+      "attributes": {
+        "destination": "rainy",
+        "size": "same"
+      }
+    },
+    {
       "id": "sunhat",
-      "image": "assets/gen/images/helpers/sunhat.png",
+      "image": "assets/gen/images/helpers/sunhat.webp",
       "label": {
         "en": "Sun hat",
         "ar": "قُبَّعَةُ الشَّمْسِ"
@@ -63,7 +75,7 @@
     },
     {
       "id": "sunglasses",
-      "image": "assets/gen/images/helpers/sunglasses.png",
+      "image": "assets/gen/images/helpers/sunglasses.webp",
       "label": {
         "en": "Sunglasses",
         "ar": "نَظَّارَةٌ شَمْسِيَّةٌ"
@@ -75,7 +87,7 @@
     },
     {
       "id": "sunscreen",
-      "image": "assets/gen/images/helpers/sunscreen.png",
+      "image": "assets/gen/images/helpers/sunscreen.webp",
       "label": {
         "en": "Sunscreen",
         "ar": "وَاقِي الشَّمْسِ"
@@ -87,7 +99,7 @@
     },
     {
       "id": "fan",
-      "image": "assets/gen/images/helpers/fan.png",
+      "image": "assets/gen/images/helpers/fan.webp",
       "label": {
         "en": "Fan",
         "ar": "مِرْوَحَةٌ يَدَوِيَّةٌ"
@@ -99,7 +111,7 @@
     },
     {
       "id": "ball",
-      "image": "assets/gen/images/helpers/ball.png",
+      "image": "assets/gen/images/helpers/ball.webp",
       "label": {
         "en": "Beach ball",
         "ar": "كُرَةُ الشَّاطِئِ"

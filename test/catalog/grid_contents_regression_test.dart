@@ -55,7 +55,9 @@ void main() {
     // exact order they have always had.
     'animal_quiz',
     'math_game',
-    'little_helpers',
+    'tooth_food_sorting',
+    'weather_sorting',
+    'laundry_sorting',
     'learn_human_body',
   ];
 

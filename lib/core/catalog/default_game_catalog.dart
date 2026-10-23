@@ -23,7 +23,6 @@ import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzo/features/HumanBody/human_body_screen.dart';
-import 'package:kidzo/features/LittleHelpers/little_helpers_screen.dart';
 import 'package:kidzo/features/MathGame/Ui/math_game.dart';
 import 'package:kidzo/features/MazeGame/UI/maze_game_screen.dart';
 import 'package:kidzo/features/MemoryGame/UI/memory_game.dart';
@@ -35,6 +34,7 @@ import 'package:kidzo/features/Puzzle/puzzle_screen.dart';
 import 'package:kidzo/features/Puzzle/ui/puzzle_free_play_card.dart';
 import 'package:kidzo/features/Shapes/bloc/shape_cubit.dart';
 import 'package:kidzo/features/Shapes/shape_screen.dart';
+import 'package:kidzo/features/SortingActivities/sorting_activity_screen.dart';
 import 'package:kidzo/features/Tic-Tac-Toe/UI/tic_tac_toe_game.dart';
 import 'package:kidzo/features/VegetablesGame/UI/vegetables_game_screen.dart';
 import 'package:kidzo/features/VehiclesGame/UI/vehicles_game_screen.dart';
@@ -298,12 +298,28 @@ GameCatalog buildDefaultGameCatalog() {
       gameBuilder: (KidDifficulty d) => MathGame(level: d.level),
     ),
     GameDescriptor(
-      activityId: 'little_helpers',
-      titleLocalizationKey: 'littleHelpers',
-      iconAsset: 'assets/gen/images/helpers/tooth.png',
-      flipImageAsset: 'assets/gen/images/helpers/washer.png',
+      activityId: 'tooth_food_sorting',
+      titleLocalizationKey: 'toothFoodSorting',
+      iconAsset: 'assets/gen/images/helpers/tooth.webp',
+      flipImageAsset: 'assets/gen/images/helpers/sad_tooth.webp',
       surface: GameSurface.education,
-      screenBuilder: () => const LittleHelpersScreen(),
+      screenBuilder: () => const ToothFoodSortingScreen(),
+    ),
+    GameDescriptor(
+      activityId: 'weather_sorting',
+      titleLocalizationKey: 'weatherSorting',
+      iconAsset: 'assets/gen/images/helpers/sun.webp',
+      flipImageAsset: 'assets/gen/images/helpers/rain.webp',
+      surface: GameSurface.education,
+      screenBuilder: () => const WeatherSortingScreen(),
+    ),
+    GameDescriptor(
+      activityId: 'laundry_sorting',
+      titleLocalizationKey: 'laundrySorting',
+      iconAsset: 'assets/gen/images/helpers/washer.webp',
+      flipImageAsset: 'assets/gen/images/helpers/wardrobe.webp',
+      surface: GameSurface.education,
+      screenBuilder: () => const LaundrySortingScreen(),
     ),
     GameDescriptor(
       activityId: 'learn_human_body',

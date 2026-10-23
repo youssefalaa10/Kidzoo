@@ -27,8 +27,8 @@
       "ar": "هَذَا مَكَانُهَا. جَرِّبْ أَنْتَ!"
     },
     "success": {
-      "en": "You sorted everything! Great helping!",
-      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَحْسَنْتَ يَا بَطَلُ!"
+      "en": "All sorted! You are ready for rain or shine!",
+      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَنْتَ جَاهِزٌ لِلْمَطَرِ وَالشَّمْسِ!"
     }
   },
   "payload": {
@@ -37,13 +37,13 @@
       "size"
     ],
     "itemsRef": "packs/helpers_weather",
-    "itemsPerRound": 9,
+    "itemsPerRound": 10,
     "roundCount": 1,
     "bins": [
       {
         "id": "rainy",
         "value": "rainy",
-        "image": "assets/gen/images/helpers/rain.png",
+        "image": "assets/gen/images/helpers/rain.webp",
         "label": {
           "en": "Rainy day",
           "ar": "يَوْمٌ مُمْطِرٌ"
@@ -52,7 +52,7 @@
       {
         "id": "sunny",
         "value": "sunny",
-        "image": "assets/gen/images/helpers/sun.png",
+        "image": "assets/gen/images/helpers/sun.webp",
         "label": {
           "en": "Sunny day",
           "ar": "يَوْمٌ مُشْمِسٌ"
@@ -65,7 +65,27 @@
     "scaffolding": "errorless"
   },
   "adaptation": {
-    "min": 9,
-    "max": 9
+    "min": 10,
+    "max": 10
+  },
+  "worksheet": {
+    "prompt": {
+      "en": "Rain or shine? Sort the pictures.",
+      "ar": "مَطَرٌ أَمْ شَمْسٌ؟ رَتِّبِ الصُّوَرَ."
+    },
+    "retry": {
+      "en": "Try the other box. You can do it!",
+      "ar": "جَرِّبِ الصُّنْدُوقَ الآخَرَ. أَنْتَ تَسْتَطِيعُ!"
+    },
+    "correct": {
+      "rainy": {
+        "en": "Ready for a rainy day!",
+        "ar": "جَاهِزٌ لِيَوْمٍ مُمْطِرٍ!"
+      },
+      "sunny": {
+        "en": "Ready for a sunny day!",
+        "ar": "جَاهِزٌ لِيَوْمٍ مُشْمِسٍ!"
+      }
+    }
   }
 }

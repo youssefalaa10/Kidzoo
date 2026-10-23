@@ -3,7 +3,7 @@
   "items": [
     {
       "id": "dirty_yellow_shirt",
-      "image": "assets/gen/images/helpers/dirty_yellow_shirt.png",
+      "image": "assets/gen/images/helpers/dirty_yellow_shirt.webp",
       "label": {
         "en": "Dirty yellow shirt",
         "ar": "قَمِيصٌ أَصْفَرُ مُتَّسِخٌ"
@@ -14,20 +14,8 @@
       }
     },
     {
-      "id": "yellow_shirt",
-      "image": "assets/gen/images/helpers/yellow_shirt.png",
-      "label": {
-        "en": "Clean yellow shirt",
-        "ar": "قَمِيصٌ أَصْفَرُ نَظِيفٌ"
-      },
-      "attributes": {
-        "destination": "clean",
-        "size": "same"
-      }
-    },
-    {
       "id": "dirty_green_shorts",
-      "image": "assets/gen/images/helpers/dirty_green_shorts.png",
+      "image": "assets/gen/images/helpers/dirty_green_shorts.webp",
       "label": {
         "en": "Dirty green shorts",
         "ar": "سِرْوَالٌ أَخْضَرُ مُتَّسِخٌ"
@@ -38,20 +26,8 @@
       }
     },
     {
-      "id": "green_shorts",
-      "image": "assets/gen/images/helpers/green_shorts.png",
-      "label": {
-        "en": "Clean green shorts",
-        "ar": "سِرْوَالٌ أَخْضَرُ نَظِيفٌ"
-      },
-      "attributes": {
-        "destination": "clean",
-        "size": "same"
-      }
-    },
-    {
       "id": "dirty_blue_shorts",
-      "image": "assets/gen/images/helpers/dirty_blue_shorts.png",
+      "image": "assets/gen/images/helpers/dirty_blue_shorts.webp",
       "label": {
         "en": "Dirty blue shorts",
         "ar": "سِرْوَالٌ أَزْرَقُ مُتَّسِخٌ"
@@ -62,20 +38,8 @@
       }
     },
     {
-      "id": "blue_shorts",
-      "image": "assets/gen/images/helpers/blue_shorts.png",
-      "label": {
-        "en": "Clean blue shorts",
-        "ar": "سِرْوَالٌ أَزْرَقُ نَظِيفٌ"
-      },
-      "attributes": {
-        "destination": "clean",
-        "size": "same"
-      }
-    },
-    {
       "id": "dirty_pink_shirt",
-      "image": "assets/gen/images/helpers/dirty_pink_shirt.png",
+      "image": "assets/gen/images/helpers/dirty_pink_shirt.webp",
       "label": {
         "en": "Dirty pink shirt",
         "ar": "قَمِيصٌ وَرْدِيٌّ مُتَّسِخٌ"
@@ -86,20 +50,8 @@
       }
     },
     {
-      "id": "pink_shirt",
-      "image": "assets/gen/images/helpers/pink_shirt.png",
-      "label": {
-        "en": "Clean pink shirt",
-        "ar": "قَمِيصٌ وَرْدِيٌّ نَظِيفٌ"
-      },
-      "attributes": {
-        "destination": "clean",
-        "size": "same"
-      }
-    },
-    {
       "id": "dirty_white_shirt",
-      "image": "assets/gen/images/helpers/dirty_white_shirt.png",
+      "image": "assets/gen/images/helpers/dirty_white_shirt.webp",
       "label": {
         "en": "Dirty white shirt",
         "ar": "قَمِيصٌ أَبْيَضُ مُتَّسِخٌ"
@@ -110,11 +62,59 @@
       }
     },
     {
+      "id": "blue_shorts",
+      "image": "assets/gen/images/helpers/blue_shorts.webp",
+      "label": {
+        "en": "Clean blue shorts",
+        "ar": "سِرْوَالٌ أَزْرَقُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
       "id": "white_shirt",
-      "image": "assets/gen/images/helpers/white_shirt.png",
+      "image": "assets/gen/images/helpers/white_shirt.webp",
       "label": {
         "en": "Clean white shirt",
         "ar": "قَمِيصٌ أَبْيَضُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "green_shorts",
+      "image": "assets/gen/images/helpers/green_shorts.webp",
+      "label": {
+        "en": "Clean green shorts",
+        "ar": "سِرْوَالٌ أَخْضَرُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "yellow_shirt",
+      "image": "assets/gen/images/helpers/yellow_shirt.webp",
+      "label": {
+        "en": "Clean yellow shirt",
+        "ar": "قَمِيصٌ أَصْفَرُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "pink_shirt",
+      "image": "assets/gen/images/helpers/pink_shirt.webp",
+      "label": {
+        "en": "Clean pink shirt",
+        "ar": "قَمِيصٌ وَرْدِيٌّ نَظِيفٌ"
       },
       "attributes": {
         "destination": "clean",
