@@ -22,6 +22,7 @@ import 'package:kidzo/features/FruitVegSorterGame/ui/sorter_game_screen.dart';
 import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
+import 'package:kidzo/features/HumanBody/human_body_screen.dart';
 import 'package:kidzo/features/LittleHelpers/little_helpers_screen.dart';
 import 'package:kidzo/features/MathGame/Ui/math_game.dart';
 import 'package:kidzo/features/MazeGame/UI/maze_game_screen.dart';
@@ -303,6 +304,15 @@ GameCatalog buildDefaultGameCatalog() {
       flipImageAsset: 'assets/gen/images/helpers/washer.png',
       surface: GameSurface.education,
       screenBuilder: () => const LittleHelpersScreen(),
+    ),
+    GameDescriptor(
+      activityId: 'learn_human_body',
+      titleLocalizationKey: 'learnHumanBody',
+      iconAsset: 'assets/gen/images/avatar/avatar-boy.webp',
+      flipImageAsset: 'assets/gen/images/avatar/avatar-girl.webp',
+      surface: GameSurface.education,
+      backIcon: Icons.accessibility_new_rounded,
+      screenBuilder: () => const HumanBodyScreen(),
     ),
   ]);
 }

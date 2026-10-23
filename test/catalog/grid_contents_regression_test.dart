@@ -56,6 +56,7 @@ void main() {
     'animal_quiz',
     'math_game',
     'little_helpers',
+    'learn_human_body',
   ];
 
   /// The keys already written to `GameScores.gameKey` before this migration.
