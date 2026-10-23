@@ -22,6 +22,7 @@ import 'package:kidzo/features/FruitVegSorterGame/ui/sorter_game_screen.dart';
 import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
+import 'package:kidzo/features/LittleHelpers/little_helpers_screen.dart';
 import 'package:kidzo/features/MathGame/Ui/math_game.dart';
 import 'package:kidzo/features/MazeGame/UI/maze_game_screen.dart';
 import 'package:kidzo/features/MemoryGame/UI/memory_game.dart';
@@ -294,6 +295,14 @@ GameCatalog buildDefaultGameCatalog() {
       surface: GameSurface.education,
       backIcon: Icons.calculate_rounded,
       gameBuilder: (KidDifficulty d) => MathGame(level: d.level),
+    ),
+    GameDescriptor(
+      activityId: 'little_helpers',
+      titleLocalizationKey: 'littleHelpers',
+      iconAsset: 'assets/gen/images/helpers/tooth.png',
+      flipImageAsset: 'assets/gen/images/helpers/washer.png',
+      surface: GameSurface.education,
+      screenBuilder: () => const LittleHelpersScreen(),
     ),
   ]);
 }

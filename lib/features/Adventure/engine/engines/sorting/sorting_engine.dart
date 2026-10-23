@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:kidzo/core/helpers/speech.dart';
@@ -11,7 +12,9 @@ import 'package:kidzo/features/Adventure/engine/contract/activity_spec.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_state.dart';
 import 'package:kidzo/features/Adventure/engine/contract/activity_step.dart';
 import 'package:kidzo/features/Adventure/engine/contract/item_pack.dart';
+import 'package:kidzo/features/Adventure/engine/host/widgets/activity_feedback_scope.dart';
 import 'package:kidzo/features/Adventure/engine/host/widgets/activity_glyph_text.dart';
+import 'package:kidzo/features/Adventure/engine/support/activity_soundboard.dart';
 import 'package:kidzo/features/Adventure/engine/support/localized_text.dart';
 
 /// What a token does when it arrives in a bin, and what it does when it is put
@@ -162,8 +165,8 @@ class SortingStep extends ActivityStep {
   /// activity's output rather than a number in the corner of the screen.
   final List<SortedToken> alreadySorted;
 
-  Iterable<SortedToken> sortedInto(String binId) => alreadySorted
-      .where((SortedToken token) => token.binId == binId);
+  Iterable<SortedToken> sortedInto(String binId) =>
+      alreadySorted.where((SortedToken token) => token.binId == binId);
 
   SortingBin? binById(String id) {
     for (final SortingBin bin in bins) {
@@ -286,7 +289,8 @@ class SortingEngine extends ActivityEngine<SortingContent> {
           ContentParameter.list('heldConstant',
               description: 'attributes kept identical so the target attribute '
                   'is the only thing that varies'),
-          ContentParameter.list('bins', isRequired: true,
+          ContentParameter.list('bins',
+              isRequired: true,
               description: 'each with id, value, label, optional image and an '
                   'optional settleMotion (rise | sink | settle) saying which '
                   'way this bin sends things — which is how a wrong placement '
@@ -497,13 +501,21 @@ class _SortingBoardState extends State<_SortingBoard>
                 imageAsset: widget.step.item.imageAsset,
                 size: tokenSize,
                 dragData: widget.step.item.id,
+                onDragStarted: () => unawaited(
+                    ActivityFeedbackScope.maybeOf(context)
+                        ?.soundboard
+                        .play(ActivitySound.tap)),
                 state: _isTokenSelected
                     ? KidCardState.selected
                     : KidCardState.idle,
                 label:
                     widget.step.item.label.resolve(widget.state.languageCode),
-                onTap: () =>
-                    setState(() => _isTokenSelected = !_isTokenSelected),
+                onTap: () {
+                  unawaited(ActivityFeedbackScope.maybeOf(context)
+                      ?.soundboard
+                      .play(ActivitySound.tap));
+                  setState(() => _isTokenSelected = !_isTokenSelected);
+                },
               ),
             ),
             Row(
@@ -619,8 +631,8 @@ class _BinTarget extends StatelessWidget {
                           if (imageAsset != null)
                             Opacity(
                               opacity: contents.isEmpty ? 1.0 : 0.3,
-                              child: Image.asset(imageAsset!,
-                                  fit: BoxFit.contain),
+                              child:
+                                  Image.asset(imageAsset!, fit: BoxFit.contain),
                             ),
                           if (contents.isNotEmpty)
                             Padding(

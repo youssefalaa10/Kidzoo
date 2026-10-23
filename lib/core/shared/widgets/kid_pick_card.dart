@@ -41,9 +41,11 @@ class KidPickCard<T extends Object> extends StatefulWidget {
     this.state = KidCardState.idle,
     this.accent = KidUi.primary,
     this.semanticLabel,
+    this.onDragStarted,
   });
 
   final String imageAsset;
+  final VoidCallback? onDragStarted;
 
   /// Edge of the card; the caller derives it from the space it actually has.
   final double size;
@@ -231,7 +233,10 @@ class _KidPickCardState<T extends Object> extends State<KidPickCard<T>>
     return Draggable<T>(
       data: widget.dragData as T,
       dragAnchorStrategy: pointerDragAnchorStrategy,
-      onDragStarted: KidHaptics.tap,
+      onDragStarted: () {
+        KidHaptics.tap();
+        widget.onDragStarted?.call();
+      },
       feedback: Transform.translate(
         // Lift the card above the finger so the child can see what they hold.
         offset: Offset(-widget.size / 2, -widget.size * 0.75),

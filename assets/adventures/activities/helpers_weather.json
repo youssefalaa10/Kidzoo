@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "helpers.weather",
+  "engineId": "sorting",
+  "locales": [
+    "en",
+    "ar"
+  ],
+  "presentation": {
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Is it rainy or sunny? Put each thing where we use it.",
+      "ar": "هَلِ اليَوْمُ مُمْطِرٌ أَمْ مُشْمِسٌ؟ ضَعْ كُلَّ شَيْءٍ فِي مَكَانِهِ."
+    },
+    "hint1": {
+      "en": "Look at the picture. Where does it belong?",
+      "ar": "اُنْظُرْ إِلَى الصُّورَةِ. أَيْنَ مَكَانُهَا؟"
+    },
+    "hint2": {
+      "en": "Try the glowing picture.",
+      "ar": "جَرِّبِ الصُّورَةَ المُضِيئَةَ."
+    },
+    "model": {
+      "en": "Here is its home. Now you try!",
+      "ar": "هَذَا مَكَانُهَا. جَرِّبْ أَنْتَ!"
+    },
+    "success": {
+      "en": "You sorted everything! Great helping!",
+      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَحْسَنْتَ يَا بَطَلُ!"
+    }
+  },
+  "payload": {
+    "activeAttribute": "destination",
+    "heldConstant": [
+      "size"
+    ],
+    "itemsRef": "packs/helpers_weather",
+    "itemsPerRound": 9,
+    "roundCount": 1,
+    "bins": [
+      {
+        "id": "rainy",
+        "value": "rainy",
+        "image": "assets/gen/images/helpers/rain.png",
+        "label": {
+          "en": "Rainy day",
+          "ar": "يَوْمٌ مُمْطِرٌ"
+        }
+      },
+      {
+        "id": "sunny",
+        "value": "sunny",
+        "image": "assets/gen/images/helpers/sun.png",
+        "label": {
+          "en": "Sunny day",
+          "ar": "يَوْمٌ مُشْمِسٌ"
+        }
+      }
+    ]
+  },
+  "support": {
+    "allowTapToSelect": true,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 9,
+    "max": 9
+  }
+}

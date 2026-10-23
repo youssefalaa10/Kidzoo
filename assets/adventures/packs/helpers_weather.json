@@ -1,0 +1,113 @@
+{
+  "packId": "helpers_weather",
+  "items": [
+    {
+      "id": "umbrella",
+      "image": "assets/gen/images/helpers/umbrella.png",
+      "label": {
+        "en": "Umbrella",
+        "ar": "مِظَلَّةُ المَطَرِ"
+      },
+      "attributes": {
+        "destination": "rainy",
+        "size": "same"
+      }
+    },
+    {
+      "id": "boots",
+      "image": "assets/gen/images/helpers/boots.png",
+      "label": {
+        "en": "Rain boots",
+        "ar": "حِذَاءُ المَطَرِ"
+      },
+      "attributes": {
+        "destination": "rainy",
+        "size": "same"
+      }
+    },
+    {
+      "id": "raincoat",
+      "image": "assets/gen/images/helpers/raincoat.png",
+      "label": {
+        "en": "Raincoat",
+        "ar": "مِعْطَفُ المَطَرِ"
+      },
+      "attributes": {
+        "destination": "rainy",
+        "size": "same"
+      }
+    },
+    {
+      "id": "rainhat",
+      "image": "assets/gen/images/helpers/rainhat.png",
+      "label": {
+        "en": "Rain hat",
+        "ar": "قُبَّعَةُ المَطَرِ"
+      },
+      "attributes": {
+        "destination": "rainy",
+        "size": "same"
+      }
+    },
+    {
+      "id": "sunhat",
+      "image": "assets/gen/images/helpers/sunhat.png",
+      "label": {
+        "en": "Sun hat",
+        "ar": "قُبَّعَةُ الشَّمْسِ"
+      },
+      "attributes": {
+        "destination": "sunny",
+        "size": "same"
+      }
+    },
+    {
+      "id": "sunglasses",
+      "image": "assets/gen/images/helpers/sunglasses.png",
+      "label": {
+        "en": "Sunglasses",
+        "ar": "نَظَّارَةٌ شَمْسِيَّةٌ"
+      },
+      "attributes": {
+        "destination": "sunny",
+        "size": "same"
+      }
+    },
+    {
+      "id": "sunscreen",
+      "image": "assets/gen/images/helpers/sunscreen.png",
+      "label": {
+        "en": "Sunscreen",
+        "ar": "وَاقِي الشَّمْسِ"
+      },
+      "attributes": {
+        "destination": "sunny",
+        "size": "same"
+      }
+    },
+    {
+      "id": "fan",
+      "image": "assets/gen/images/helpers/fan.png",
+      "label": {
+        "en": "Fan",
+        "ar": "مِرْوَحَةٌ يَدَوِيَّةٌ"
+      },
+      "attributes": {
+        "destination": "sunny",
+        "size": "same"
+      }
+    },
+    {
+      "id": "ball",
+      "image": "assets/gen/images/helpers/ball.png",
+      "label": {
+        "en": "Beach ball",
+        "ar": "كُرَةُ الشَّاطِئِ"
+      },
+      "attributes": {
+        "destination": "sunny",
+        "size": "same"
+      }
+    }
+  ]
+}

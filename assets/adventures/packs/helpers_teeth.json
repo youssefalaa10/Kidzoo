@@ -1,0 +1,125 @@
+{
+  "packId": "helpers_teeth",
+  "items": [
+    {
+      "id": "bread",
+      "image": "assets/gen/images/helpers/bread.png",
+      "label": {
+        "en": "Bread",
+        "ar": "خُبْزٌ"
+      },
+      "attributes": {
+        "destination": "everyday",
+        "size": "same"
+      }
+    },
+    {
+      "id": "grapes",
+      "image": "assets/gen/images/helpers/grapes.png",
+      "label": {
+        "en": "Grapes",
+        "ar": "عِنَبٌ"
+      },
+      "attributes": {
+        "destination": "everyday",
+        "size": "same"
+      }
+    },
+    {
+      "id": "broccoli",
+      "image": "assets/gen/images/helpers/broccoli.png",
+      "label": {
+        "en": "Broccoli",
+        "ar": "بُرُوكْلِي"
+      },
+      "attributes": {
+        "destination": "everyday",
+        "size": "same"
+      }
+    },
+    {
+      "id": "yogurt",
+      "image": "assets/gen/images/helpers/yogurt.png",
+      "label": {
+        "en": "Plain yogurt",
+        "ar": "زَبَادِي سَادَةٌ"
+      },
+      "attributes": {
+        "destination": "everyday",
+        "size": "same"
+      }
+    },
+    {
+      "id": "tomato",
+      "image": "assets/gen/images/helpers/tomato.png",
+      "label": {
+        "en": "Tomato",
+        "ar": "طَمَاطِمُ"
+      },
+      "attributes": {
+        "destination": "everyday",
+        "size": "same"
+      }
+    },
+    {
+      "id": "soda",
+      "image": "assets/gen/images/helpers/soda.png",
+      "label": {
+        "en": "Soda",
+        "ar": "مَشْرُوبٌ غَازِيٌّ"
+      },
+      "attributes": {
+        "destination": "treat",
+        "size": "same"
+      }
+    },
+    {
+      "id": "cupcake",
+      "image": "assets/gen/images/helpers/cupcake.png",
+      "label": {
+        "en": "Cupcake",
+        "ar": "كَعْكَةٌ صَغِيرَةٌ"
+      },
+      "attributes": {
+        "destination": "treat",
+        "size": "same"
+      }
+    },
+    {
+      "id": "lollipop",
+      "image": "assets/gen/images/helpers/lollipop.png",
+      "label": {
+        "en": "Lollipop",
+        "ar": "حَلْوَى عَلَى عَصًا"
+      },
+      "attributes": {
+        "destination": "treat",
+        "size": "same"
+      }
+    },
+    {
+      "id": "cake",
+      "image": "assets/gen/images/helpers/cake.png",
+      "label": {
+        "en": "Cake",
+        "ar": "كَعْكٌ"
+      },
+      "attributes": {
+        "destination": "treat",
+        "size": "same"
+      }
+    },
+    {
+      "id": "cereal",
+      "image": "assets/gen/images/helpers/cereal.png",
+      "label": {
+        "en": "Sugary cereal",
+        "ar": "حُبُوبٌ مُحَلَّاةٌ"
+      },
+      "attributes": {
+        "destination": "treat",
+        "size": "same"
+      }
+    }
+  ]
+}

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "helpers.teeth",
+  "engineId": "sorting",
+  "locales": [
+    "en",
+    "ar"
+  ],
+  "presentation": {
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Put everyday foods by the happy tooth. Put sugary treats by the other tooth.",
+      "ar": "ضَعِ الطَّعَامَ اليَوْمِيَّ عِنْدَ السِّنِّ السَّعِيدَةِ، وَالحَلْوَى عِنْدَ السِّنِّ الأُخْرَى."
+    },
+    "hint1": {
+      "en": "Look at the picture. Where does it belong?",
+      "ar": "اُنْظُرْ إِلَى الصُّورَةِ. أَيْنَ مَكَانُهَا؟"
+    },
+    "hint2": {
+      "en": "Try the glowing picture.",
+      "ar": "جَرِّبِ الصُّورَةَ المُضِيئَةَ."
+    },
+    "model": {
+      "en": "Here is its home. Now you try!",
+      "ar": "هَذَا مَكَانُهَا. جَرِّبْ أَنْتَ!"
+    },
+    "success": {
+      "en": "You sorted everything! Great helping!",
+      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَحْسَنْتَ يَا بَطَلُ!"
+    }
+  },
+  "payload": {
+    "activeAttribute": "destination",
+    "heldConstant": [
+      "size"
+    ],
+    "itemsRef": "packs/helpers_teeth",
+    "itemsPerRound": 10,
+    "roundCount": 1,
+    "bins": [
+      {
+        "id": "everyday",
+        "value": "everyday",
+        "image": "assets/gen/images/helpers/tooth.png",
+        "label": {
+          "en": "Everyday foods",
+          "ar": "طَعَامٌ يَوْمِيٌّ"
+        }
+      },
+      {
+        "id": "treat",
+        "value": "treat",
+        "image": "assets/gen/images/helpers/sad_tooth.png",
+        "label": {
+          "en": "Sugary treats",
+          "ar": "حَلْوَى"
+        }
+      }
+    ]
+  },
+  "support": {
+    "allowTapToSelect": true,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 10,
+    "max": 10
+  }
+}

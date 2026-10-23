@@ -36,6 +36,7 @@ class ActivityHostScreen extends StatefulWidget {
     this.onFinished,
     this.continueLabel,
     this.heroAsset,
+    this.onReplay,
   });
 
   final ActivityEngine<ActivityContent> engine;
@@ -51,6 +52,7 @@ class ActivityHostScreen extends StatefulWidget {
   final String? continueLabel;
 
   final String? heroAsset;
+  final VoidCallback? onReplay;
 
   @override
   State<ActivityHostScreen> createState() => _ActivityHostScreenState();
@@ -283,7 +285,7 @@ class _ActivityHostScreenState extends State<ActivityHostScreen>
       score: state.result.score,
       maxScore: state.result.maxScore,
       title: widget.title,
-      onPlayAgain: () => Navigator.of(context).maybePop(),
+      onPlayAgain: widget.onReplay ?? () => Navigator.of(context).maybePop(),
       onExit: () => Navigator.of(context).maybePop(),
     );
   }

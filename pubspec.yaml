@@ -52,6 +52,7 @@ flutter:
   assets:
     - assets/gen/images/backgrounds/
     - assets/gen/images/feed/
+    - assets/gen/images/helpers/
     - assets/gen/images/home/
     - assets/gen/images/flappy/
     - assets/gen/images/shapes/

@@ -55,6 +55,7 @@ void main() {
     // exact order they have always had.
     'animal_quiz',
     'math_game',
+    'little_helpers',
   ];
 
   /// The keys already written to `GameScores.gameKey` before this migration.

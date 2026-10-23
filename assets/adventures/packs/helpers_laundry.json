@@ -1,0 +1,125 @@
+{
+  "packId": "helpers_laundry",
+  "items": [
+    {
+      "id": "dirty_yellow_shirt",
+      "image": "assets/gen/images/helpers/dirty_yellow_shirt.png",
+      "label": {
+        "en": "Dirty yellow shirt",
+        "ar": "قَمِيصٌ أَصْفَرُ مُتَّسِخٌ"
+      },
+      "attributes": {
+        "destination": "dirty",
+        "size": "same"
+      }
+    },
+    {
+      "id": "yellow_shirt",
+      "image": "assets/gen/images/helpers/yellow_shirt.png",
+      "label": {
+        "en": "Clean yellow shirt",
+        "ar": "قَمِيصٌ أَصْفَرُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "dirty_green_shorts",
+      "image": "assets/gen/images/helpers/dirty_green_shorts.png",
+      "label": {
+        "en": "Dirty green shorts",
+        "ar": "سِرْوَالٌ أَخْضَرُ مُتَّسِخٌ"
+      },
+      "attributes": {
+        "destination": "dirty",
+        "size": "same"
+      }
+    },
+    {
+      "id": "green_shorts",
+      "image": "assets/gen/images/helpers/green_shorts.png",
+      "label": {
+        "en": "Clean green shorts",
+        "ar": "سِرْوَالٌ أَخْضَرُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "dirty_blue_shorts",
+      "image": "assets/gen/images/helpers/dirty_blue_shorts.png",
+      "label": {
+        "en": "Dirty blue shorts",
+        "ar": "سِرْوَالٌ أَزْرَقُ مُتَّسِخٌ"
+      },
+      "attributes": {
+        "destination": "dirty",
+        "size": "same"
+      }
+    },
+    {
+      "id": "blue_shorts",
+      "image": "assets/gen/images/helpers/blue_shorts.png",
+      "label": {
+        "en": "Clean blue shorts",
+        "ar": "سِرْوَالٌ أَزْرَقُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "dirty_pink_shirt",
+      "image": "assets/gen/images/helpers/dirty_pink_shirt.png",
+      "label": {
+        "en": "Dirty pink shirt",
+        "ar": "قَمِيصٌ وَرْدِيٌّ مُتَّسِخٌ"
+      },
+      "attributes": {
+        "destination": "dirty",
+        "size": "same"
+      }
+    },
+    {
+      "id": "pink_shirt",
+      "image": "assets/gen/images/helpers/pink_shirt.png",
+      "label": {
+        "en": "Clean pink shirt",
+        "ar": "قَمِيصٌ وَرْدِيٌّ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    },
+    {
+      "id": "dirty_white_shirt",
+      "image": "assets/gen/images/helpers/dirty_white_shirt.png",
+      "label": {
+        "en": "Dirty white shirt",
+        "ar": "قَمِيصٌ أَبْيَضُ مُتَّسِخٌ"
+      },
+      "attributes": {
+        "destination": "dirty",
+        "size": "same"
+      }
+    },
+    {
+      "id": "white_shirt",
+      "image": "assets/gen/images/helpers/white_shirt.png",
+      "label": {
+        "en": "Clean white shirt",
+        "ar": "قَمِيصٌ أَبْيَضُ نَظِيفٌ"
+      },
+      "attributes": {
+        "destination": "clean",
+        "size": "same"
+      }
+    }
+  ]
+}

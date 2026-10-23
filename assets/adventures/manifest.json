@@ -11,6 +11,9 @@
     "stars"
   ],
   "activities": [
+    "helpers_teeth",
+    "helpers_weather",
+    "helpers_laundry",
     "jungle_ask_animals",
     "jungle_count_watchers",
     "jungle_sort_watchers",
@@ -35,6 +38,9 @@
     "stars_who_carries_it"
   ],
   "packs": [
+    "helpers_teeth",
+    "helpers_weather",
+    "helpers_laundry",
     "animals",
     "market_goods",
     "tide_pool",

@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "instanceId": "helpers.laundry",
+  "engineId": "sorting",
+  "locales": [
+    "en",
+    "ar"
+  ],
+  "presentation": {
+    "accent": "#4AC49A"
+  },
+  "narration": {
+    "prompt": {
+      "en": "Dirty clothes go to the washer. Clean clothes go to the wardrobe.",
+      "ar": "ضَعِ المَلَابِسَ المُتَّسِخَةَ فِي الغَسَّالَةِ، وَالنَّظِيفَةَ فِي الخِزَانَةِ."
+    },
+    "hint1": {
+      "en": "Look at the picture. Where does it belong?",
+      "ar": "اُنْظُرْ إِلَى الصُّورَةِ. أَيْنَ مَكَانُهَا؟"
+    },
+    "hint2": {
+      "en": "Try the glowing picture.",
+      "ar": "جَرِّبِ الصُّورَةَ المُضِيئَةَ."
+    },
+    "model": {
+      "en": "Here is its home. Now you try!",
+      "ar": "هَذَا مَكَانُهَا. جَرِّبْ أَنْتَ!"
+    },
+    "success": {
+      "en": "You sorted everything! Great helping!",
+      "ar": "رَتَّبْتَ كُلَّ شَيْءٍ! أَحْسَنْتَ يَا بَطَلُ!"
+    }
+  },
+  "payload": {
+    "activeAttribute": "destination",
+    "heldConstant": [
+      "size"
+    ],
+    "itemsRef": "packs/helpers_laundry",
+    "itemsPerRound": 10,
+    "roundCount": 1,
+    "bins": [
+      {
+        "id": "dirty",
+        "value": "dirty",
+        "image": "assets/gen/images/helpers/washer.png",
+        "label": {
+          "en": "Needs washing",
+          "ar": "يَحْتَاجُ إِلَى الغَسِيلِ"
+        }
+      },
+      {
+        "id": "clean",
+        "value": "clean",
+        "image": "assets/gen/images/helpers/wardrobe.png",
+        "label": {
+          "en": "Clean and ready",
+          "ar": "نَظِيفٌ وَجَاهِزٌ"
+        }
+      }
+    ]
+  },
+  "support": {
+    "allowTapToSelect": true,
+    "scaffolding": "errorless"
+  },
+  "adaptation": {
+    "min": 10,
+    "max": 10
+  }
+}
