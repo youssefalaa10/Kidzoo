@@ -86,7 +86,7 @@ class BodyGameCubit extends Cubit<BodyGameState> {
         selected: id,
         hintVisible: !forDrag,
         message: _partLine('bodyFind', id)));
-    unawaited(_announce(state.message, cue: BodyAudioCue.pick));
+    unawaited(_announce(state.message));
   }
 
   bool placeAt(BodyPartId id, Offset point) {

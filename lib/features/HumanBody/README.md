@@ -47,11 +47,13 @@ files**. An installed voice or configured cloud voice is required; a failed or
 missing voice shows a visible message. Physical-device pronunciation and
 speaker quality still need a listening check on the target devices.
 
-The existing bundled `boop.wav`, `success.mp3`, `piano-d.wav` and `score.mp3`
-provide distinct, low-volume pickup, correct, gentle retry and celebration
-effects. Effect failure does not block speech. Latest interaction wins over
-old narration, and delayed congratulations cannot interrupt a new stage or
-replay. The screen pauses background music while open, inherits the app's sound
+The existing bundled `success.mp3`, `piano-d.wav` and `score.mp3`
+provide low-volume correct, gentle retry and celebration effects. Selecting a
+piece speaks its prompt without a pickup sound. The game confirms its locale
+with the shared voice service before speaking. Effect failure does not block
+speech. Latest interaction wins over old narration, and delayed congratulations
+cannot interrupt a new stage or replay. The screen pauses background music
+while open, inherits the app's sound
 preference, offers a session mute button, stops audio when backgrounded, and
 disposes its player when leaving.
 

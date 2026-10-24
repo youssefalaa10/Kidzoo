@@ -2,7 +2,7 @@ import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:kidzo/core/helpers/speech.dart';
 
-enum BodyAudioCue { pick, correct, retry, celebrate }
+enum BodyAudioCue { correct, retry, celebrate }
 
 abstract class BodyAudio {
   Future<bool> say(String text, {BodyAudioCue? cue});
@@ -13,8 +13,11 @@ abstract class BodyAudio {
 /// Uses Kidzo's configured device/Azure voice; no nonexistent recording paths.
 /// A quiet piano note replaces the app's harsher wrong-answer buzzer.
 class SpeechBodyAudio implements BodyAudio {
-  SpeechBodyAudio({required AudioPlayer effects}) : _effects = effects;
+  SpeechBodyAudio({required AudioPlayer effects, required String languageCode})
+      : _effects = effects,
+        _voiceReady = Speech.configureLanguage(languageCode);
   final AudioPlayer _effects;
+  final Future<SpeechRoute> _voiceReady;
   int _revision = 0;
   bool _disposed = false;
 
@@ -28,7 +31,6 @@ class SpeechBodyAudio implements BodyAudio {
         await _effects.stop();
         if (cue != null) {
           final String asset = switch (cue) {
-            BodyAudioCue.pick => 'audio/boop.wav',
             BodyAudioCue.correct => 'audio/success.mp3',
             BodyAudioCue.retry => 'audio/piano-d.wav',
             BodyAudioCue.celebrate => 'audio/score.mp3',
@@ -39,6 +41,8 @@ class SpeechBodyAudio implements BodyAudio {
       } catch (error) {
         debugPrint('Human Body effect unavailable: $error');
       }
+      if (_disposed || revision != _revision) return true;
+      await _voiceReady;
       if (_disposed || revision != _revision) return true;
       final SpeechOutcome outcome = await Speech.speakAndWait(text);
       return outcome != SpeechOutcome.failed &&

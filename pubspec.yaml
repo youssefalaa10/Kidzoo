@@ -3,7 +3,7 @@ description: "Kids education app"
 
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
-version: 1.0.2+4
+version: 1.0.3+5
 
 environment:
   sdk: ^3.5.1
@@ -51,6 +51,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/gen/images/backgrounds/
+    - assets/gen/images/logo/
     - assets/gen/images/feed/
     - assets/gen/images/helpers/
     - assets/gen/images/home/
@@ -84,6 +85,8 @@ flutter:
     - assets/data/
     - assets/lang/
     - assets/audio/
+    - assets/audio/balloon/
+    - assets/fonts/OFL.txt
     - assets/audio/animals-sounds/
     - assets/flags/
     # Adventure content. Exactly five directories, fixed forever: pubspec asset
@@ -103,6 +106,10 @@ flutter_assets:
   #   - images/a_dot_ham.jpeg
 
   # fonts:
+  fonts:
+    - family: TracingNaskh
+      fonts:
+        - asset: assets/fonts/NotoNaskhArabic-Regular.ttf
   #   - family: Schyler
   #     fonts:
   #       - asset: fonts/Schyler-Regular.ttf

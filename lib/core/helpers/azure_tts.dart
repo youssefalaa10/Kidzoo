@@ -168,16 +168,13 @@ String escapeXml(String value) => value
 /// `String.hashCode` is deliberately not stable between Dart VM launches, which
 /// would silently defeat the on-disk cache.
 String stableHash(String input) {
-  var hash = 0xcbf29ce484222325;
+  // BigInt preserves the same 64 bits on both the VM and JavaScript, whose
+  // numbers cannot represent the FNV offset basis exactly.
+  var hash = BigInt.parse('cbf29ce484222325', radix: 16);
+  final prime = BigInt.parse('100000001b3', radix: 16);
+  final mask = BigInt.parse('ffffffffffffffff', radix: 16);
   for (final unit in utf8.encode(input)) {
-    hash ^= unit;
-    hash = (hash * 0x100000001b3) & 0xFFFFFFFFFFFFFFFF;
+    hash = ((hash ^ BigInt.from(unit)) * prime) & mask;
   }
-  // Dart ints are signed 64-bit, so the accumulator can come out negative and
-  // toRadixString would prefix a '-' - not something to put in a filename.
-  // Emitting two unsigned 32-bit halves keeps it 16 hex characters, always.
-  final high = (hash >> 32) & 0xFFFFFFFF;
-  final low = hash & 0xFFFFFFFF;
-  return high.toRadixString(16).padLeft(8, '0') +
-      low.toRadixString(16).padLeft(8, '0');
+  return hash.toRadixString(16).padLeft(16, '0');
 }

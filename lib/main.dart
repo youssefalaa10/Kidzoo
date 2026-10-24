@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,9 @@ import 'core/localization/app_localizations.dart';
 import 'core/localization/language_provider.dart';
 import 'core/managers/game_asset_manager.dart';
 import 'core/scoring/game_score_recorder.dart';
+import 'core/services/background_resolver.dart';
 import 'core/services/cubit/music_cubit.dart';
+import 'core/shared/style/image_manager.dart';
 import 'features/Alphabets/bloc/alphabet_bloc.dart';
 import 'features/Profile/profile_cubit.dart';
 import 'features/Profile/profile_setup_screen.dart';
@@ -31,6 +34,10 @@ import 'features/settings/cubit/settings_cubit.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  runApp(_StartupApp(initialization: _initializeApp()));
+}
+
+Future<MyApp> _initializeApp() async {
   final database = AppDatabase();
   final profileDao = ProfileDao(database);
   final gameScoresDao = GameScoresDao(database);
@@ -69,12 +76,12 @@ void main() async {
   );
   final gameAssetManager = GameAssetManager();
 
-  // Read the profile before the first frame so the app opens straight onto
-  // the right screen instead of flashing a blank colored one while it loads.
+  // Read the profile before building the home screen so the splash can cover
+  // the correct destination while it renders.
   final profileCubit = ProfileCubit(profileDao, badgeService: badgeService);
   await profileCubit.checkProfile();
 
-  runApp(MyApp(
+  return MyApp(
     initialLanguage: savedLanguage,
     profileCubit: profileCubit,
     database: database,
@@ -87,7 +94,137 @@ void main() async {
     flutterTts: flutterTts,
     audioPlayer: audioPlayer,
     gameAssetManager: gameAssetManager,
-  ));
+  );
+}
+
+class _StartupApp extends StatefulWidget {
+  const _StartupApp({required this.initialization});
+
+  final Future<MyApp> initialization;
+
+  @override
+  State<_StartupApp> createState() => _StartupAppState();
+}
+
+class _StartupAppState extends State<_StartupApp> {
+  final _splashKey = GlobalKey<_AnimatedSplashState>();
+  MyApp? _app;
+  bool _showSplash = true;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.initialization.then((app) {
+      if (!mounted) return;
+      setState(() => _app = app);
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        unawaited(_showHomeWhenReady());
+      });
+    });
+  }
+
+  Future<void> _showHomeWhenReady() async {
+    final splashContext = _splashKey.currentContext;
+    final app = _app;
+    if (!mounted || splashContext == null || app == null) return;
+
+    final profileState = app.profileCubit.state;
+    if (profileState is ProfileLoaded && profileState.currentProfile != null) {
+      final background = BackgroundResolver(
+        splashContext,
+        BackgroundType.tech,
+      ).resolveBackground()!;
+      final avatarIndex = profileState.currentProfile!.avatarIndex;
+      final avatar =
+          avatarIndex >= 0 && avatarIndex < ImageManager.kidAvatars.length
+              ? ImageManager.kidAvatars[avatarIndex]
+              : ImageManager.kidAvatars.first;
+      await Future.wait([
+        for (final asset in [
+          background,
+          avatar,
+          ImageManager.gamepad,
+          ImageManager.letters,
+          ImageManager.brainstorming,
+        ])
+          precacheImage(AssetImage(asset), splashContext),
+      ]);
+    }
+
+    if (mounted) setState(() => _showSplash = false);
+  }
+
+  @override
+  Widget build(BuildContext context) => Stack(
+        alignment: Alignment.topLeft,
+        fit: StackFit.expand,
+        children: [
+          if (_app != null)
+            KeyedSubtree(key: const ValueKey('ready-app'), child: _app!),
+          if (_showSplash)
+            KeyedSubtree(
+              key: const ValueKey('startup-splash'),
+              child: MaterialApp(
+                debugShowCheckedModeBanner: false,
+                home: _AnimatedSplash(key: _splashKey),
+              ),
+            ),
+        ],
+      );
+}
+
+class _AnimatedSplash extends StatefulWidget {
+  const _AnimatedSplash({super.key});
+
+  @override
+  State<_AnimatedSplash> createState() => _AnimatedSplashState();
+}
+
+class _AnimatedSplashState extends State<_AnimatedSplash>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _motion = AnimationController(
+    vsync: this,
+    duration: const Duration(milliseconds: 1400),
+  )..repeat(reverse: true);
+  late final String _mascot = const [
+    'assets/gen/images/logo/kidzo-curious.webp',
+    'assets/gen/images/logo/kidzo-excited.webp',
+    'assets/gen/images/logo/kidzo-learning.webp',
+    'assets/gen/images/logo/kidzo-celebrate.webp',
+  ][Random().nextInt(4)];
+
+  @override
+  void dispose() {
+    _motion.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => Scaffold(
+        backgroundColor: const Color(0xFFFEF9F3),
+        body: Center(
+          child: AnimatedBuilder(
+            animation: _motion,
+            builder: (context, child) => Transform.translate(
+              offset: Offset(0, -8 * _motion.value),
+              child: Transform.rotate(
+                angle: (_motion.value - .5) * .07,
+                child: child,
+              ),
+            ),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween(begin: 0, end: 1),
+              duration: const Duration(milliseconds: 280),
+              curve: Curves.easeOut,
+              builder: (context, opacity, child) => Opacity(
+                opacity: opacity,
+                child: child,
+              ),
+              child: Image.asset(_mascot, width: 220, height: 220),
+            ),
+          ),
+        ),
+      );
 }
 
 class MyApp extends StatelessWidget {

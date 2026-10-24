@@ -39,7 +39,11 @@ class _HumanBodyScreenState extends State<HumanBodyScreen>
     unawaited(_music?.requestPause());
     final AppLocalizations strings = AppLocalizations.of(context);
     _cubit = BodyGameCubit(
-      audio: widget.audio ?? SpeechBodyAudio(effects: AudioPlayer()),
+      audio: widget.audio ??
+          SpeechBodyAudio(
+            effects: AudioPlayer(),
+            languageCode: Localizations.localeOf(context).languageCode,
+          ),
       text: (key) => strings.resolve(key),
       soundEnabled: _music?.state.isSoundEnabled ?? true,
     );

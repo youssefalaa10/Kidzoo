@@ -278,6 +278,10 @@ void main() {
       expect(stableHash('يلا نأكّل الأسد'), stableHash('يلا نأكّل الأسد'));
       expect(stableHash('a'), isNot(stableHash('b')));
       expect(stableHash('a'), hasLength(16));
+      // Standard FNV-1a vectors protect existing filenames across VM/web builds.
+      expect(stableHash(''), 'cbf29ce484222325');
+      expect(stableHash('a'), 'af63dc4c8601ec8c');
+      expect(stableHash('foobar'), '85944171f73967e8');
     });
 
     test('does nothing without a key', () async {

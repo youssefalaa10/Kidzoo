@@ -85,6 +85,7 @@ class _CharacterSelectionScreenState extends State<CharacterSelectionScreen>
     final isLandscape = size.width > size.height;
 
     return Scaffold(
+      backgroundColor: const Color(0xFFFEF9F3),
       body: Container(
         width: double.infinity,
         height: double.infinity,

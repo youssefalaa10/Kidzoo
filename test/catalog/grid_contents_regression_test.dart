@@ -37,6 +37,7 @@ void main() {
     'color_memory_game',
     'puzzle',
     'maze_game',
+    'balloon_pop',
   ];
 
   const List<String> expectedEducationOrder = <String>[
@@ -59,6 +60,7 @@ void main() {
     'weather_sorting',
     'laundry_sorting',
     'learn_human_body',
+    'letter_tracing',
   ];
 
   /// The keys already written to `GameScores.gameKey` before this migration.

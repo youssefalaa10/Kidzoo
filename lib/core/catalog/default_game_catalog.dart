@@ -11,6 +11,7 @@ import 'package:kidzo/features/Alphabets/alphabet_screen.dart';
 import 'package:kidzo/features/Alphabets/bloc/alphabet_bloc.dart';
 import 'package:kidzo/features/AnimalNameGame/UI/animal_name_game_screen.dart';
 import 'package:kidzo/features/AnimalQuiz/UI/animal_quiz_screen.dart';
+import 'package:kidzo/features/BalloonPop/balloon_pop_screen.dart';
 import 'package:kidzo/features/ColorMemoryGame/UI/color_memory_screen.dart';
 import 'package:kidzo/features/ColorSwitchGame/color_switch_screen.dart';
 import 'package:kidzo/features/DotsAndBoxes/UI/dots_and_boxes_screen.dart';
@@ -23,6 +24,7 @@ import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzo/features/HumanBody/human_body_screen.dart';
+import 'package:kidzo/features/LetterTracing/letter_tracing_screen.dart';
 import 'package:kidzo/features/MathGame/Ui/math_game.dart';
 import 'package:kidzo/features/MazeGame/UI/maze_game_screen.dart';
 import 'package:kidzo/features/MemoryGame/UI/memory_game.dart';
@@ -171,6 +173,18 @@ GameCatalog buildDefaultGameCatalog() {
       surface: GameSurface.games,
       backIcon: Icons.route_rounded,
       gameBuilder: (KidDifficulty d) => MazeGameScreen(level: d.level),
+    ),
+
+    // Balloon Park free play.
+    GameDescriptor(
+      activityId: 'balloon_pop',
+      titleLocalizationKey: 'balloon_title',
+      iconAsset: 'assets/gen/images/shapes/circle.png',
+      flipImageAsset: ImageManager.colorLearn,
+      surface: GameSurface.games,
+      frontIcon: Icons.celebration_rounded,
+      backIcon: Icons.touch_app_rounded,
+      screenBuilder: () => const BalloonPopScreen(),
     ),
 
     // ---- Education ----
@@ -329,6 +343,15 @@ GameCatalog buildDefaultGameCatalog() {
       surface: GameSurface.education,
       backIcon: Icons.accessibility_new_rounded,
       screenBuilder: () => const HumanBodyScreen(),
+    ),
+    GameDescriptor(
+      activityId: 'letter_tracing',
+      titleLocalizationKey: 'letterTracing',
+      iconAsset: ImageManager.letters,
+      flipImageAsset: ImageManager.pen,
+      surface: GameSurface.education,
+      backIcon: Icons.gesture_rounded,
+      screenBuilder: () => const LetterTracingScreen(),
     ),
   ]);
 }

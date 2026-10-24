@@ -222,7 +222,6 @@ void main() {
       expect(arabic[key], isNotEmpty, reason: key);
     }
     for (final String asset in [
-      'boop.wav',
       'success.mp3',
       'piano-d.wav',
       'score.mp3'
