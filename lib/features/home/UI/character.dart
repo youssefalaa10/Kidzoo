@@ -323,22 +323,32 @@ class OverlappedCarousel extends StatefulWidget {
 }
 
 class _OverlappedCarouselState extends State<OverlappedCarousel> {
-  late PageController _pageController;
+  late final PageController _pageController;
 
   @override
   void initState() {
     super.initState();
     _pageController = PageController(
-      viewportFraction: 0.8,
+      viewportFraction: 0.76,
       initialPage: widget.selectedIndex,
     );
 
-    // First launch: if the device has no Arabic voice at all, offer the system
-    // installer here rather than letting a child hit silence inside a game.
-    // Shows at most once; the same check also lives in Settings.
+    // First launch: offer voice setup if the device has no Arabic voice.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) TtsService.checkAndRequestArabicVoice(context);
     });
+  }
+
+  void _selectPage(int index) {
+    if (MediaQuery.disableAnimationsOf(context)) {
+      _pageController.jumpToPage(index);
+    } else {
+      _pageController.animateToPage(
+        index,
+        duration: const Duration(milliseconds: 380),
+        curve: Curves.easeInOutCubic,
+      );
+    }
   }
 
   @override
@@ -356,15 +366,10 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
       itemBuilder: (context, index) {
         final category = widget.items[index];
         final isSelected = index == widget.selectedIndex;
-        final double scale = isSelected ? 1.0 : 0.8;
-        final double opacity = isSelected ? 1.0 : 0.8;
-
-        return TweenAnimationBuilder(
-          tween: Tween<double>(begin: scale, end: scale),
-          duration: const Duration(milliseconds: 350),
-          curve: Curves.easeOutCubic,
-          builder: (context, value, child) {
-            return GestureDetector(
+        return AnimatedBuilder(
+          animation: _pageController,
+          child: RepaintBoundary(
+            child: GestureDetector(
               onTap: isSelected
                   ? () => Navigator.push<void>(
                         context,
@@ -372,19 +377,24 @@ class _OverlappedCarouselState extends State<OverlappedCarousel> {
                           builder: (context) => category.screen,
                         ),
                       )
-                  : null,
-              child: Transform.scale(
-                scale: value,
-                child: Opacity(
-                  opacity: opacity,
-                  child: CharacterCard(
-                    category: widget.items[index],
-                    isSelected: isSelected,
-                    characterImage: widget.items[index].characterImage,
-                    mq: widget.mq,
-                  ),
-                ),
+                  : () => _selectPage(index),
+              child: CharacterCard(
+                category: widget.items[index],
+                isSelected: isSelected,
+                characterImage: widget.items[index].characterImage,
+                mq: widget.mq,
               ),
+            ),
+          ),
+          builder: (context, child) {
+            final page = _pageController.hasClients &&
+                    _pageController.position.hasContentDimensions
+                ? _pageController.page ?? widget.selectedIndex.toDouble()
+                : widget.selectedIndex.toDouble();
+            final distance = (page - index).abs().clamp(0.0, 1.0);
+            return Transform.scale(
+              scale: 1 - distance * 0.04,
+              child: Opacity(opacity: 1 - distance * 0.12, child: child),
             );
           },
         );
@@ -413,8 +423,7 @@ class CharacterCard extends StatelessWidget {
 
     return Container(
       margin: EdgeInsets.symmetric(
-          horizontal: mq.width(2.5),
-          vertical: isLandscape ? mq.height(1) : mq.height(2.5)),
+          horizontal: 8, vertical: isLandscape ? mq.height(1) : mq.height(2.5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -435,15 +444,13 @@ class CharacterCard extends StatelessWidget {
                 ],
               ),
               child: Center(
-                child: isSelected
-                    ? Padding(
-                        padding: EdgeInsets.all(isLandscape ? 8.0 : 16.0),
-                        child: Image.asset(
-                          characterImage,
-                          fit: BoxFit.contain,
-                        ),
-                      )
-                    : Container(), // Empty for non-selected cards
+                child: Padding(
+                  padding: EdgeInsets.all(isLandscape ? 8.0 : 16.0),
+                  child: Image.asset(
+                    characterImage,
+                    fit: BoxFit.contain,
+                  ),
+                ),
               ),
             ),
           ),

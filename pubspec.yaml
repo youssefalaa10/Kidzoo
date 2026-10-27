@@ -90,6 +90,7 @@ flutter:
     - assets/audio/animals-sounds/
     - assets/audio/animal_names_ar/
     - assets/audio/human_body/
+    - assets/audio/games_ar/
     - assets/flags/
     # Adventure content. Exactly five directories, fixed forever: pubspec asset
     # entries are NOT recursive, so a new subdirectory would silently ship

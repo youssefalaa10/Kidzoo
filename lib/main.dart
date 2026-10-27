@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:math';
 
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -32,9 +31,16 @@ import 'features/home/UI/character.dart';
 import 'features/settings/cubit/settings_cubit.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-
-  runApp(_StartupApp(initialization: _initializeApp()));
+  final binding = WidgetsFlutterBinding.ensureInitialized();
+  // Keep the OS launch artwork visible until the destination can render.
+  binding.deferFirstFrame();
+  try {
+    final app = await _initializeApp();
+    runApp(_StartupApp(app: app));
+  } catch (_) {
+    binding.allowFirstFrame();
+    rethrow;
+  }
 }
 
 Future<MyApp> _initializeApp() async {
@@ -97,133 +103,77 @@ Future<MyApp> _initializeApp() async {
   );
 }
 
+/// Prepares the destination behind the native launch screen. This widget has
+/// no splash UI, timer, or second MaterialApp.
 class _StartupApp extends StatefulWidget {
-  const _StartupApp({required this.initialization});
+  const _StartupApp({required this.app});
 
-  final Future<MyApp> initialization;
+  final MyApp app;
 
   @override
   State<_StartupApp> createState() => _StartupAppState();
 }
 
 class _StartupAppState extends State<_StartupApp> {
-  final _splashKey = GlobalKey<_AnimatedSplashState>();
-  MyApp? _app;
-  bool _showSplash = true;
+  final _destinationKey = GlobalKey();
+  bool _firstFrameReleased = false;
 
   @override
   void initState() {
     super.initState();
-    widget.initialization.then((app) {
-      if (!mounted) return;
-      setState(() => _app = app);
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        unawaited(_showHomeWhenReady());
-      });
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      unawaited(_prepareDestination());
     });
   }
 
-  Future<void> _showHomeWhenReady() async {
-    final splashContext = _splashKey.currentContext;
-    final app = _app;
-    if (!mounted || splashContext == null || app == null) return;
+  void _releaseFirstFrame() {
+    if (_firstFrameReleased) return;
+    _firstFrameReleased = true;
+    WidgetsBinding.instance.allowFirstFrame();
+  }
 
-    final profileState = app.profileCubit.state;
-    if (profileState is ProfileLoaded && profileState.currentProfile != null) {
-      final background = BackgroundResolver(
-        splashContext,
-        BackgroundType.tech,
-      ).resolveBackground()!;
-      final avatarIndex = profileState.currentProfile!.avatarIndex;
-      final avatar =
-          avatarIndex >= 0 && avatarIndex < ImageManager.kidAvatars.length
-              ? ImageManager.kidAvatars[avatarIndex]
-              : ImageManager.kidAvatars.first;
-      await Future.wait([
-        for (final asset in [
-          background,
-          avatar,
+  Future<void> _prepareDestination() async {
+    try {
+      final destinationContext = _destinationKey.currentContext;
+      if (!mounted || destinationContext == null) return;
+      final profileState = widget.app.profileCubit.state;
+      final assets = <String>{ImageManager.kidAvatars.first};
+      if (profileState is ProfileLoaded &&
+          profileState.currentProfile != null) {
+        final avatarIndex = profileState.currentProfile!.avatarIndex;
+        assets.addAll([
+          BackgroundResolver(destinationContext, BackgroundType.tech)
+              .resolveBackground()!,
+          if (avatarIndex >= 0 && avatarIndex < ImageManager.kidAvatars.length)
+            ImageManager.kidAvatars[avatarIndex],
           ImageManager.gamepad,
           ImageManager.letters,
           ImageManager.brainstorming,
-        ])
-          precacheImage(AssetImage(asset), splashContext),
+        ]);
+      }
+      await Future.wait([
+        for (final asset in assets)
+          precacheImage(AssetImage(asset), destinationContext),
       ]);
+      if (!mounted) return;
+      // Finish a layout/paint pass with decoded images before the OS hands over.
+      // Framework frames still run while their presentation is deferred.
+      await WidgetsBinding.instance.endOfFrame;
+    } finally {
+      _releaseFirstFrame();
     }
-
-    if (mounted) setState(() => _showSplash = false);
   }
 
   @override
-  Widget build(BuildContext context) => Stack(
-        alignment: Alignment.topLeft,
-        fit: StackFit.expand,
-        children: [
-          if (_app != null)
-            KeyedSubtree(key: const ValueKey('ready-app'), child: _app!),
-          if (_showSplash)
-            KeyedSubtree(
-              key: const ValueKey('startup-splash'),
-              child: MaterialApp(
-                debugShowCheckedModeBanner: false,
-                home: _AnimatedSplash(key: _splashKey),
-              ),
-            ),
-        ],
-      );
-}
-
-class _AnimatedSplash extends StatefulWidget {
-  const _AnimatedSplash({super.key});
-
-  @override
-  State<_AnimatedSplash> createState() => _AnimatedSplashState();
-}
-
-class _AnimatedSplashState extends State<_AnimatedSplash>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _motion = AnimationController(
-    vsync: this,
-    duration: const Duration(milliseconds: 1400),
-  )..repeat(reverse: true);
-  late final String _mascot = const [
-    'assets/gen/images/logo/kidzo-curious.webp',
-    'assets/gen/images/logo/kidzo-excited.webp',
-    'assets/gen/images/logo/kidzo-learning.webp',
-    'assets/gen/images/logo/kidzo-celebrate.webp',
-  ][Random().nextInt(4)];
-
-  @override
   void dispose() {
-    _motion.dispose();
+    _releaseFirstFrame();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context) => Scaffold(
-        backgroundColor: const Color(0xFFFEF9F3),
-        body: Center(
-          child: AnimatedBuilder(
-            animation: _motion,
-            builder: (context, child) => Transform.translate(
-              offset: Offset(0, -8 * _motion.value),
-              child: Transform.rotate(
-                angle: (_motion.value - .5) * .07,
-                child: child,
-              ),
-            ),
-            child: TweenAnimationBuilder<double>(
-              tween: Tween(begin: 0, end: 1),
-              duration: const Duration(milliseconds: 280),
-              curve: Curves.easeOut,
-              builder: (context, opacity, child) => Opacity(
-                opacity: opacity,
-                child: child,
-              ),
-              child: Image.asset(_mascot, width: 220, height: 220),
-            ),
-          ),
-        ),
+  Widget build(BuildContext context) => MediaQuery.fromView(
+        view: View.of(context),
+        child: KeyedSubtree(key: _destinationKey, child: widget.app),
       );
 }
 
