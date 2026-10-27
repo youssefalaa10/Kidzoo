@@ -8,6 +8,7 @@ import '../../core/localization/language_provider.dart';
 import '../../core/mixins/background_music_mixin.dart';
 import '../../core/services/cubit/music_cubit.dart';
 import '../../core/shared/widgets/fluid_container.dart';
+import 'privacy_policy_screen.dart';
 import 'widgets/arabic_voice_section.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -61,6 +62,7 @@ class _SettingsScreenState extends State<SettingsScreen>
                     child: Column(
                       children: [
                         // Language Settings Card
+                    
                         _buildSettingsCard(
                           context,
                           mq,
@@ -119,6 +121,16 @@ class _SettingsScreenState extends State<SettingsScreen>
                           color: Colors.teal,
                         ),
                         SizedBox(height: mq.height(3)),
+                         ListTile(
+                          leading: const Icon(Icons.privacy_tip_outlined),
+                          title: Text(l10n.resolve('privacyPolicy')),
+                          trailing: const Icon(Icons.chevron_right),
+                          onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute<void>(
+                              builder: (_) => const PrivacyPolicyScreen(),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

@@ -886,5 +886,7 @@
   "balloon_challengeHint": "العب براحتك! كل بالونة عليها ١٠ نقط. لو فرقتها قبل ثانيتين ونص، نقاطك تزيد لحد خمسة أضعاف. كل ١٢ بالونة السرعة تزيد. لو واحدة فاتتك، المضاعف بس هو اللي بيرجع. خلّص وقت ما تحب.",
   "balloon_challengeStatus": "موجة {wave} · مضاعف ×{combo} · {pops} فرقعة",
   "balloon_finish": "إنهاء",
-  "balloon_challengeSummary": "جبت {score} نقطة من {pops} بالونة! ووصلت للموجة {wave}."
+  "balloon_challengeSummary": "جبت {score} نقطة من {pops} بالونة! ووصلت للموجة {wave}.",
+  "privacyPolicy": "سياسة الخصوصية",
+  "privacyPolicyLoadError": "تعذّر تحميل سياسة الخصوصية. يُرجى المحاولة مرة أخرى."
 }

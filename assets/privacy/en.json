@@ -1,0 +1,46 @@
+{
+  "date": "Effective October 27, 2026",
+  "intro": "This policy explains how Annotex handles information in the Kidzo iOS and Android apps, on this website and its browser games, and when you contact support. App data and website data are described separately below.",
+  "sections": [
+    {
+      "title": "Children and local profiles",
+      "text": "Kidzo is designed for children with guidance from a parent, guardian, or educator. The mobile app does not require an online account. Local profiles can contain a name or nickname, age, selected avatar, creation date, learning progress, scores, and achievements. Use a nickname rather than a child’s full name. These records are stored on the device; Kidzo does not upload its profile database to an Annotex account or game server."
+    },
+    {
+      "title": "App settings, permissions, and drawings",
+      "text": "Language and activity preferences are stored locally. Optional learning reminders use device notifications, which you can allow or disable in iOS or Android Settings. Saving a drawing to your photo library requires the relevant system permission when prompted. Drawings saved there remain under your control and are not published to other users by Kidzo. These features do not require camera, microphone, contacts, or location access."
+    },
+    {
+      "title": "Audio and network services",
+      "text": "Learning audio uses bundled recordings and the device’s speech service. An optional Microsoft Azure Speech integration can be enabled in a particular app build; it is disabled when no service credentials are configured. When enabled, text to be spoken and ordinary connection information are sent to Microsoft to generate audio, and generated audio may be cached on the device. Device speech engines and font downloads may also make requests to their providers. Provider processing depends on their service and device settings; we do not promise that all speech or resources always work offline. Contact us about the configuration of your installed version."
+    },
+    {
+      "title": "Advertising, tracking, and sharing",
+      "text": "The reviewed mobile app and website do not include advertising networks, behavioral advertising, social feeds, public uploads, or third-party analytics SDKs. We do not sell local profile records or use them for advertising. Service requests described in this policy are distinct from publishing or sharing a child’s profile. Apple, Google, and device service providers may process installation, diagnostics, backup, or service information under their own settings and policies."
+    },
+    {
+      "title": "Website games and preferences",
+      "text": "Browser-game choices, scores, and artwork remain in the current page’s memory and reset when you reload or leave the activity. They are not uploaded to a game server. A first-party kidzo-locale cookie remembers Arabic or English for up to one year and can be removed in your browser. Website sound controls apply to the current session; they do not record your voice."
+    },
+    {
+      "title": "Website hosting and support",
+      "text": "Hosting and securing the website may process IP addresses, browser information, requested pages, and request times through the hosting provider. Infrastructure settings govern operational logs. Contact links open your email application; nothing is sent until you send the message. Your email provider and our support mailbox then process your address and message. A grown-up should contact us and avoid sending children’s personal details."
+    },
+    {
+      "title": "Retention, deletion, and backups",
+      "text": "App records remain on the device until removed through available app controls or local app storage is erased. On Android you can clear app storage; on iOS deleting the app removes its local container, while offloading can retain data. Device or cloud backups may retain copies under your Apple or Google backup settings; manage those separately. Saved drawings remain in Photos until you delete them there. Removing the app does not delete Photos or backups. We cannot remotely erase a local profile database we do not receive. Browser state resets on reload, and the language cookie can be removed earlier than its one-year expiry. Contact us to request deletion of support correspondence; information necessary for legal obligations may need to be retained. Hosting logs follow provider retention settings."
+    },
+    {
+      "title": "Your choices and security",
+      "text": "Parents can manage system permissions and backups, stop using the service, and ask about information sent to support. Depending on applicable law, you may request access, correction, deletion, or restriction of information we hold; we may need to verify your authority. These rights are separate from data held only on your device. We take reasonable precautions, but no device or online service guarantees absolute security."
+    },
+    {
+      "title": "External services",
+      "text": "Links to app stores, Annotex, and other sites open separate services with their own privacy policies. Opening a link sends ordinary connection information to its destination. Website cookies are separate from mobile app preferences. Store availability does not mean the website and mobile app have identical features or data practices."
+    },
+    {
+      "title": "Contact and changes",
+      "text": "Annotex is responsible for Kidzo. Parents and guardians can contact annotex.work@gmail.com with privacy questions, concerns about a child’s information, or requests about support messages. We update this page and its effective date when practices change. Material changes affecting children’s data will be communicated and any required parental consent obtained before that processing begins."
+    }
+  ]
+}

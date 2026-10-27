@@ -886,5 +886,7 @@
   "balloon_challengeHint": "Endless play! 10 points per pop. Pop within 2.5 seconds to build up to 5× points. Every 12 pops brings faster balloons. Misses only reset your combo. Finish anytime.",
   "balloon_challengeStatus": "Wave {wave} · ×{combo} combo · {pops} pops",
   "balloon_finish": "Finish",
-  "balloon_challengeSummary": "{score} points from {pops} pops! You reached wave {wave}."
+  "balloon_challengeSummary": "{score} points from {pops} pops! You reached wave {wave}.",
+  "privacyPolicy": "Privacy policy",
+  "privacyPolicyLoadError": "Unable to load the privacy policy. Please try again."
 }
