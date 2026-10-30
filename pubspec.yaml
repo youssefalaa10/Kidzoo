@@ -55,6 +55,7 @@ flutter:
     - assets/fonts/DaiBannaSIL/OFL.txt
     - assets/privacy/
     - assets/gen/images/backgrounds/
+    - assets/gen/images/play/
     - assets/gen/images/logo/
     - assets/gen/images/feed/
     - assets/gen/images/helpers/

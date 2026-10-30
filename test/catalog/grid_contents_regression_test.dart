@@ -38,6 +38,7 @@ void main() {
     'puzzle',
     'maze_game',
     'balloon_pop',
+    'football',
   ];
 
   const List<String> expectedEducationOrder = <String>[
@@ -61,6 +62,7 @@ void main() {
     'laundry_sorting',
     'learn_human_body',
     'letter_tracing',
+    'little_inventor',
   ];
 
   /// The keys already written to `GameScores.gameKey` before this migration.
@@ -187,7 +189,11 @@ void main() {
       // These keys are read through AppLocalizations.resolve rather than a
       // getter, so locale_parity_test cannot see them. Without this guard a
       // missing key degrades silently to a blank line on the card.
-Map<String, dynamic> loadLocale(String code) =>          json.decode(File('assets/lang/$code.json').readAsStringSync())              as Map<String, dynamic>;      final Map<String, dynamic> english = loadLocale('en');      final Map<String, dynamic> arabic = loadLocale('ar');
+      Map<String, dynamic> loadLocale(String code) =>
+          json.decode(File('assets/lang/$code.json').readAsStringSync())
+              as Map<String, dynamic>;
+      final Map<String, dynamic> english = loadLocale('en');
+      final Map<String, dynamic> arabic = loadLocale('ar');
       const List<String> prefixes = <String>[
         'animalQuiz',
         'colorMemory',
@@ -208,8 +214,8 @@ Map<String, dynamic> loadLocale(String code) =>          json.decode(File('asset
     });
 
     test('the tiered builders cover all three tiers', () {
-      for (final GameDescriptor descriptor in catalog.all
-          .where((GameDescriptor d) => d.hasDifficultyTiers)) {
+      for (final GameDescriptor descriptor
+          in catalog.all.where((GameDescriptor d) => d.hasDifficultyTiers)) {
         for (final KidDifficulty tier in KidDifficulty.values) {
           expect(() => descriptor.tieredScreenBuilder!(tier), returnsNormally,
               reason: " cannot build ");

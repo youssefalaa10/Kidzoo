@@ -19,12 +19,14 @@ import 'package:kidzo/features/DrawLab/UI/screens/drawlab_screen.dart';
 import 'package:kidzo/features/FeedTheAnimalGame/ui/feed_animal_screen.dart';
 import 'package:kidzo/features/FlagGame/pages/flag_game_menu_screen.dart';
 import 'package:kidzo/features/FlappyBird/flappy_bird_screen.dart';
+import 'package:kidzo/features/Football/football_screen.dart';
 import 'package:kidzo/features/FruitVegSorterGame/ui/sorter_game_screen.dart';
 import 'package:kidzo/features/FruitsGame/UI/fruits_game_screen.dart';
 import 'package:kidzo/features/Game2048/UI/game_2048_home.dart';
 import 'package:kidzo/features/Game2048/data/logic/game_cubit.dart';
 import 'package:kidzo/features/HumanBody/human_body_screen.dart';
 import 'package:kidzo/features/LetterTracing/letter_tracing_screen.dart';
+import 'package:kidzo/features/LittleInventor/little_inventor_screen.dart';
 import 'package:kidzo/features/MathGame/Ui/math_game.dart';
 import 'package:kidzo/features/MazeGame/UI/maze_game_screen.dart';
 import 'package:kidzo/features/MemoryGame/UI/memory_game.dart';
@@ -185,6 +187,17 @@ GameCatalog buildDefaultGameCatalog() {
       frontIcon: Icons.celebration_rounded,
       backIcon: Icons.touch_app_rounded,
       screenBuilder: () => const BalloonPopScreen(),
+    ),
+
+    GameDescriptor(
+      activityId: 'football',
+      titleLocalizationKey: 'football_title',
+      iconAsset: 'assets/gen/images/logo/football_fox.png',
+      flipImageAsset: ImageManager.gamepad,
+      surface: GameSurface.games,
+      frontIcon: Icons.sports_soccer_rounded,
+      backIcon: Icons.sports_soccer_rounded,
+      screenBuilder: () => const FootballScreen(),
     ),
 
     // ---- Education ----
@@ -352,6 +365,16 @@ GameCatalog buildDefaultGameCatalog() {
       surface: GameSurface.education,
       backIcon: Icons.gesture_rounded,
       screenBuilder: () => const LetterTracingScreen(),
+    ),
+    GameDescriptor(
+      activityId: 'little_inventor',
+      titleLocalizationKey: 'littleInventor',
+      iconAsset: ImageManager.puzzle,
+      flipImageAsset: ImageManager.brainstorming,
+      surface: GameSurface.education,
+      frontIcon: Icons.construction_rounded,
+      backIcon: Icons.lightbulb_rounded,
+      screenBuilder: () => const LittleInventorScreen(),
     ),
   ]);
 }
