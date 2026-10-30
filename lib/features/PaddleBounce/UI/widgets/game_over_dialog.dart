@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../data/models/paddle_bounce_models.dart';
@@ -79,7 +78,8 @@ class GameOverDialog extends StatelessWidget {
             // Winner text
             Text(
               winnerText,
-              style: GoogleFonts.poppins(
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
                 color: isPlayer1Winner
@@ -107,7 +107,8 @@ class GameOverDialog extends StatelessWidget {
                             gameMode == PaddleBounceGameMode.vsAI
                                 ? l10n.ai
                                 : l10n.player2,
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 14,
                               color: Colors.cyan.shade700,
                               fontWeight: FontWeight.bold,
@@ -115,7 +116,8 @@ class GameOverDialog extends StatelessWidget {
                           ),
                           Text(
                             '$player2Score',
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.cyan.shade700,
@@ -125,7 +127,8 @@ class GameOverDialog extends StatelessWidget {
                       ),
                       Text(
                         'VS',
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           fontSize: 16,
                           color: Colors.grey.shade600,
                         ),
@@ -134,7 +137,8 @@ class GameOverDialog extends StatelessWidget {
                         children: [
                           Text(
                             l10n.player1,
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 14,
                               color: Colors.pink.shade700,
                               fontWeight: FontWeight.bold,
@@ -142,7 +146,8 @@ class GameOverDialog extends StatelessWidget {
                           ),
                           Text(
                             '$player1Score',
-                            style: GoogleFonts.poppins(
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
                               fontSize: 24,
                               fontWeight: FontWeight.bold,
                               color: Colors.pink.shade700,

@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:kidzo/core/helpers/azure_tts.dart';
 import 'package:kidzo/core/helpers/speech.dart';
 import 'package:kidzo/core/helpers/tts_service.dart';
 import 'package:kidzo/core/helpers/tts_voice_selection.dart';
@@ -135,7 +134,7 @@ void main() {
 
     test('iOS has no female Egyptian voice, so the bar is not met there', () {
       // iOS ships only Maged (ar-SA, male). This is the case that makes the
-      // cloud voice necessary on that platform.
+      // a different installed Arabic accent may be needed on that platform.
       final voices = parseVoices([ios('Maged', 'ar-SA', 'male')]);
       final best = selectBestArabicVoice(voices);
       expect(best?.name, 'Maged');
@@ -143,171 +142,42 @@ void main() {
     });
   });
 
-  group('Choosing between the device and the cloud', () {
-    SpeechRoute route({
-      required TtsLanguageOutcome? deviceOutcome,
-      bool azure = true,
-      bool force = false,
-      String language = 'ar',
-    }) =>
-        Speech.decideRoute(
-          languageCode: language,
-          outcome: deviceOutcome,
-          azureConfigured: azure,
-          forceAzure: force,
-        );
-
-    test('keeps the device voice when it is female and Egyptian', () {
+  group('Offline speech routing', () {
+    test('uses an installed Arabic voice regardless of accent or gender', () {
+      for (final gender in TtsVoiceGender.values) {
+        expect(
+            Speech.decideRoute(
+                languageCode: 'ar',
+                outcome: outcome(isEgyptian: false, gender: gender)),
+            SpeechRoute.device);
+      }
+    });
+    test('missing Arabic never falls back to cloud or a foreign voice', () {
+      expect(Speech.decideRoute(languageCode: 'ar', outcome: null),
+          SpeechRoute.needsVoiceData);
       expect(
-        route(
-          deviceOutcome:
-              outcome(isEgyptian: true, gender: TtsVoiceGender.female),
-        ),
-        SpeechRoute.device,
-      );
+          Speech.decideRoute(
+              languageCode: 'ar',
+              outcome: const TtsLanguageOutcome(
+                  locale: 'en-US', isArabic: false, isEgyptian: false)),
+          SpeechRoute.needsVoiceData);
     });
-
-    test('goes to Azure for an Egyptian male voice', () {
+    test('English uses the device route', () {
+      expect(Speech.decideRoute(languageCode: 'en', outcome: null),
+          SpeechRoute.device);
+    });
+    test('network-only Arabic voice is never selected', () {
       expect(
-        route(
-          deviceOutcome: outcome(isEgyptian: true, gender: TtsVoiceGender.male),
-        ),
-        SpeechRoute.azure,
-      );
-    });
-
-    test('goes to Azure for a female voice that is not Egyptian', () {
+          selectBestArabicVoice(parseVoices([
+            android('network', 'ar-EG', network: true),
+          ])),
+          isNull);
       expect(
-        route(
-          deviceOutcome:
-              outcome(isEgyptian: false, gender: TtsVoiceGender.female),
-        ),
-        SpeechRoute.azure,
-      );
-    });
-
-    test('goes to Azure when the device has no Arabic voice at all', () {
-      expect(route(deviceOutcome: null), SpeechRoute.azure);
-    });
-
-    test('never uses Azure when no key is configured', () {
-      // A non-ideal but genuinely Arabic voice is an acceptable stand-in.
-      expect(
-        route(
-          deviceOutcome: outcome(isEgyptian: true, gender: TtsVoiceGender.male),
-          azure: false,
-        ),
-        SpeechRoute.device,
-      );
-      expect(
-        route(
-          deviceOutcome:
-              outcome(isEgyptian: false, gender: TtsVoiceGender.unknown),
-          azure: false,
-        ),
-        SpeechRoute.device,
-      );
-    });
-
-    test('stays silent rather than reading Arabic in a foreign voice', () {
-      // No Arabic voice and no cloud voice. Handing Arabic script to an
-      // English engine is the bug being fixed, so nothing is spoken and the
-      // UI prompts for a download instead.
-      expect(
-        route(deviceOutcome: null, azure: false),
-        SpeechRoute.needsVoiceData,
-      );
-      expect(
-        route(
-          deviceOutcome: const TtsLanguageOutcome(
-            locale: 'en-US',
-            isArabic: false,
-            isEgyptian: false,
-            gender: TtsVoiceGender.female,
-          ),
-          azure: false,
-        ),
-        SpeechRoute.needsVoiceData,
-      );
-    });
-
-    test('leaves English on the device voice even with Azure available', () {
-      expect(
-        route(deviceOutcome: null, language: 'en'),
-        SpeechRoute.device,
-      );
-    });
-
-    test('the force flag overrides a perfectly good device voice', () {
-      expect(
-        route(
-          deviceOutcome:
-              outcome(isEgyptian: true, gender: TtsVoiceGender.female),
-          force: true,
-        ),
-        SpeechRoute.azure,
-      );
-    });
-  });
-
-  group('Azure request building', () {
-    // The default voice is already asserted below, so this just needs a key.
-    final client = AzureTtsClient(subscriptionKey: 'test-key');
-
-    test('names the Egyptian female voice and locale', () {
-      final ssml = client.buildSsml('مرحبا');
-      expect(ssml, contains('name="ar-EG-SalmaNeural"'));
-      expect(ssml, contains('xml:lang="ar-EG"'));
-      expect(ssml, contains('مرحبا'));
-    });
-
-    test('escapes characters that would break the request', () {
-      // An unescaped & makes Azure reject the whole body with a 400.
-      final ssml = client.buildSsml('Tom & Jerry <5> "x"');
-      expect(ssml, contains('Tom &amp; Jerry &lt;5&gt;'));
-      expect(ssml, isNot(contains('& J')));
-    });
-
-    test('escapes every XML metacharacter', () {
-      expect(escapeXml('''&<>"' '''), '&amp;&lt;&gt;&quot;&apos; ');
-    });
-
-    test('cache keys are stable across runs and differ per text', () {
-      // String.hashCode is not stable between VM launches, which would quietly
-      // defeat the on-disk cache.
-      expect(stableHash('يلا نأكّل الأسد'), stableHash('يلا نأكّل الأسد'));
-      expect(stableHash('a'), isNot(stableHash('b')));
-      expect(stableHash('a'), hasLength(16));
-      // Standard FNV-1a vectors protect existing filenames across VM/web builds.
-      expect(stableHash(''), 'cbf29ce484222325');
-      expect(stableHash('a'), 'af63dc4c8601ec8c');
-      expect(stableHash('foobar'), '85944171f73967e8');
-    });
-
-    test('does nothing without a key', () async {
-      // Explicit even though it matches the (unconfigured) default: the
-      // point of the test is the empty key, and the default stops being
-      // empty as soon as anyone builds with --dart-define.
-      // ignore: avoid_redundant_argument_values
-      final unconfigured = AzureTtsClient(subscriptionKey: '');
-      expect(await unconfigured.synthesizeToFile('hello'), isNull);
-    });
-
-    test('the default voice is Azure\'s female Egyptian one', () {
-      expect(AzureSpeechConfig.voice, 'ar-EG-SalmaNeural');
-      expect(AzureSpeechConfig.locale, 'ar-EG');
-    });
-
-    test('is inert until a key is supplied at build time', () {
-      // No --dart-define in a test run, so nothing can call out.
-      expect(AzureSpeechConfig.isConfigured, isFalse);
-    });
-
-    test('endpoint follows the documented regional pattern', () {
-      final uri = AzureSpeechConfig.endpoint;
-      expect(uri.scheme, 'https');
-      expect(uri.host, endsWith('.tts.speech.microsoft.com'));
-      expect(uri.path, '/cognitiveservices/v1');
+          selectBestArabicVoice(parseVoices([
+            android('network', 'ar-EG', network: true),
+            android('local', 'ar-SA'),
+          ]))?.name,
+          'local');
     });
   });
 

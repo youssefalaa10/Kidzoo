@@ -89,19 +89,35 @@ class TtsService {
   static Future<TtsLanguageOutcome> applyLanguageTo(
       FlutterTts tts, String languageCode) async {
     if (!_isArabicCode(languageCode)) {
-      await _trySetLanguage(tts, 'en-US');
-      return const TtsLanguageOutcome(
-        locale: 'en-US',
+      // Pin an installed offline voice instead of letting the engine choose a
+      // potentially network-backed default.
+      TtsVoiceCandidate? voice;
+      try {
+        final voices = parseVoices(await tts.getVoices)
+            .where((v) =>
+                !v.networkRequired &&
+                normalizeLocale(v.locale).startsWith('en'))
+            .toList();
+        if (voices.isNotEmpty) voice = voices.first;
+      } catch (_) {}
+      final outcome = TtsLanguageOutcome(
+        locale: voice?.locale ?? 'en-US',
+        voiceName: voice?.name,
         isArabic: false,
         isEgyptian: false,
       );
+      if (voice != null && await _applyOutcome(tts, outcome)) return outcome;
+      return const TtsLanguageOutcome(
+          locale: 'en-US', isArabic: false, isEgyptian: false);
     }
 
     final cached = _cachedArabicOutcome;
     if (cached != null) {
-      await _applyOutcome(tts, cached);
-      lastArabicOutcome = cached;
-      return cached;
+      if (cached.voiceName != null && await _applyOutcome(tts, cached)) {
+        lastArabicOutcome = cached;
+        return cached;
+      }
+      _cachedArabicOutcome = null;
     }
 
     final outcome = await _resolveArabic(tts);
@@ -211,34 +227,8 @@ class TtsService {
     }
 
     // 3. No voice list at all: fall back to locale-only selection.
-    List<String> attempts;
-    try {
-      final languages = await tts.getLanguages;
-      attempts = arabicLocaleAttempts(
-        languages is List
-            ? languages.map((l) => l.toString())
-            : const <String>[],
-      );
-    } catch (_) {
-      attempts = arabicLocaleAttempts(const <String>[]);
-    }
-
-    for (final locale in attempts) {
-      if (await _trySetLanguage(tts, locale)) {
-        debugPrint('TTS: Arabic set by locale $locale (no voice list)');
-        return TtsLanguageOutcome(
-          locale: locale,
-          isArabic: true,
-          isEgyptian: normalizeLocale(locale).contains('-eg'),
-          engine: _activeEngine,
-        );
-      }
-    }
-
-    // 4. Nothing Arabic here. Deliberately NOT falling back to an English
-    // voice: making an English engine sound out Arabic script is the exact
-    // failure being fixed. The caller prompts for a download, and Speech
-    // routes to the cloud voice when one is configured.
+    // A language-only fallback could select a network voice. Keep the
+    // activity usable without narration until an offline voice is installed.
     debugPrint('TTS: no Arabic voice on this device');
     return const TtsLanguageOutcome(
       locale: 'ar-EG',
@@ -266,8 +256,9 @@ class TtsService {
   static Future<TtsEngineReport?> _surveyCurrentEngine(
       FlutterTts tts, String engine) async {
     try {
-      final voices =
-          parseVoices(await tts.getVoices).where((v) => v.isArabic).toList();
+      final voices = parseVoices(await tts.getVoices)
+          .where((v) => v.isArabic && !v.networkRequired)
+          .toList();
       final best = selectBestArabicVoice(voices);
       return TtsEngineReport(
         engine: engine,
@@ -300,7 +291,7 @@ class TtsService {
       FlutterTts tts, TtsLanguageOutcome outcome) async {
     final localeOk = await _trySetLanguage(tts, outcome.locale);
     final name = outcome.voiceName;
-    if (name == null || name.isEmpty) return localeOk;
+    if (name == null || name.isEmpty || !localeOk) return false;
 
     try {
       // setVoice wants both keys; the locale must be the voice's own.
@@ -308,7 +299,7 @@ class TtsService {
       return true;
     } catch (e) {
       debugPrint('TTS: setVoice failed for $name: $e');
-      return localeOk;
+      return false;
     }
   }
 
@@ -329,7 +320,7 @@ class TtsService {
   /// Speak the given text in the current language.
   ///
   /// Delegates to [Speech] so this older entry point takes the same
-  /// device-or-cloud route as everything else in the app.
+  /// offline device route as everything else in the app.
   Future<void> speak(String text) async {
     if (text.isEmpty) return;
     await Speech.speak(text);
@@ -371,7 +362,6 @@ class TtsService {
 
     final report = await Speech.surveyArabic();
     if (report == null || report.hasAnyArabic) return true;
-    if (Speech.isUsingAzure) return true;
 
     if (!context.mounted) return false;
     final l10n = AppLocalizations.of(context);

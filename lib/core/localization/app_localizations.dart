@@ -661,7 +661,6 @@ class AppLocalizations {
   String get ttsStatusArabicNotEgyptian =>
       _localizedValues['ttsStatusArabicNotEgyptian']!;
   String get ttsStatusMissing => _localizedValues['ttsStatusMissing']!;
-  String get ttsStatusCloud => _localizedValues['ttsStatusCloud']!;
   String get ttsNone => _localizedValues['ttsNone']!;
   String get ttsFirstRunTitle => _localizedValues['ttsFirstRunTitle']!;
   String get ttsFirstRunBody => _localizedValues['ttsFirstRunBody']!;
@@ -908,8 +907,7 @@ class AppLocalizations {
   String get recentActivityTitle => _localizedValues['recentActivityTitle']!;
   String get recentActivityEmpty => _localizedValues['recentActivityEmpty']!;
   String get storyProgressTitle => _localizedValues['storyProgressTitle']!;
-  String get storyPagesFoundLabel =>
-      _localizedValues['storyPagesFoundLabel']!;
+  String get storyPagesFoundLabel => _localizedValues['storyPagesFoundLabel']!;
   String get storyBeatsLabel => _localizedValues['storyBeatsLabel']!;
   String get adventuresCompletedLabel =>
       _localizedValues['adventuresCompletedLabel']!;

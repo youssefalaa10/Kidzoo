@@ -4,7 +4,6 @@ import 'package:confetti/confetti.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/base/kid_game_screen.dart';
 import '../../../core/difficulty/difficulty_run_scope.dart';
@@ -231,7 +230,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                         // Title
                         Text(
                           l10n.mathWizard,
-                          style: GoogleFonts.poppins(
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                             color: Colors.purple.shade700,
@@ -255,7 +255,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                             children: [
                               Text(
                                 l10n.youEarned,
-                                style: GoogleFonts.poppins(
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
                                   fontSize: 18,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.purple.shade700,
@@ -288,7 +289,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                               const SizedBox(height: 8),
                               Text(
                                 '${state.starsEarned} ${l10n.stars}',
-                                style: GoogleFonts.poppins(
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
                                   fontSize: 16,
                                   fontWeight: FontWeight.bold,
                                   color: Colors.amber.shade700,
@@ -442,7 +444,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                               children: [
                                 Text(
                                   AppLocalizations.of(context).mathMagic,
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 28,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -457,7 +460,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                   ),
                                   child: Text(
                                     '${state.currentQuestionIndex + 1}/5',
-                                    style: GoogleFonts.poppins(
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.purple,
@@ -513,7 +517,8 @@ class _MathGameState extends KidGameScreenState<MathGame>
                                                 fit: BoxFit.scaleDown,
                                                 child: Text(
                                                   currentQuestion['question'],
-                                                  style: GoogleFonts.poppins(
+                                                  style: TextStyle(
+                                                    fontFamily: 'Poppins',
                                                     fontSize: 40,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.purple,
@@ -742,7 +747,8 @@ class __FunnyOptionButtonState extends State<_FunnyOptionButton>
         ),
         child: Text(
           '${widget.option}',
-          style: GoogleFonts.poppins(
+          style: TextStyle(
+            fontFamily: 'Poppins',
             fontSize: 28,
             fontWeight: FontWeight.bold,
             color: Colors.white,

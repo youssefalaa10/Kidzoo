@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../../core/localization/app_localizations.dart';
 import '../../../../core/shared/style/kid_ui.dart';
@@ -71,7 +70,8 @@ void showMazeInstructionsDialog(
               const SizedBox(height: 16),
               Text(
                 l10n.mazeGame,
-                style: GoogleFonts.poppins(
+                style: TextStyle(
+                  fontFamily: 'Poppins',
                   fontSize: 26,
                   fontWeight: FontWeight.bold,
                   color: difficulty.color,
@@ -92,7 +92,8 @@ void showMazeInstructionsDialog(
                 ),
                 child: Text(
                   l10n.resolve(difficulty.nameKey),
-                  style: GoogleFonts.poppins(
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
                     fontSize: 18,
                     color: difficulty.color,
                     fontWeight: FontWeight.bold,
@@ -167,7 +168,8 @@ void showMazeInstructionsDialog(
                       icon: const Icon(Icons.play_arrow, size: 28),
                       label: Text(
                         l10n.startPlaying,
-                        style: GoogleFonts.poppins(
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                         ),
@@ -230,7 +232,8 @@ Widget _buildInstructionItem(
           child: Center(
             child: Text(
               number,
-              style: GoogleFonts.poppins(
+              style: TextStyle(
+                fontFamily: 'Poppins',
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
@@ -242,7 +245,8 @@ Widget _buildInstructionItem(
         Expanded(
           child: Text(
             instruction,
-            style: GoogleFonts.poppins(
+            style: TextStyle(
+              fontFamily: 'Poppins',
               fontSize: 15,
               fontWeight: FontWeight.w600,
               color: Colors.grey.shade800,

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/mixins/background_music_mixin.dart';
@@ -236,7 +235,8 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                                   state.gameMode == PaddleBounceGameMode.vsAI
                                       ? l10n.ai
                                       : l10n.player2,
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 16,
                                     color: Colors.cyan,
                                     fontWeight: FontWeight.bold,
@@ -244,7 +244,8 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                                 ),
                                 Text(
                                   '${state.player2Score}',
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.cyan,
@@ -283,7 +284,8 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                               children: [
                                 Text(
                                   l10n.player1,
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 16,
                                     color: Colors.pink,
                                     fontWeight: FontWeight.bold,
@@ -291,7 +293,8 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                                 ),
                                 Text(
                                   '${state.player1Score}',
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 32,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.pink,
@@ -316,7 +319,8 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                                   PaddleBounceGameStatus.waiting)
                                 Text(
                                   l10n.tapToStart,
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,
@@ -325,7 +329,8 @@ class _PaddleBounceGameScreenState extends State<PaddleBounceGameScreen>
                               else
                                 Text(
                                   l10n.pause,
-                                  style: GoogleFonts.poppins(
+                                  style: TextStyle(
+                                    fontFamily: 'Poppins',
                                     fontSize: 24,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white,

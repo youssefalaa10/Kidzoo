@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/localization/app_localizations.dart';
 import '../../../core/localization/language_provider.dart';
@@ -123,7 +122,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                   Center(
                     child: Text(
                       l10n.missingLetter,
-                      style: GoogleFonts.daiBannaSil(
+                      style: TextStyle(
+                        fontFamily: 'DaiBannaSIL',
                         fontSize: 42,
                         color: Colors.white,
                         shadows: [
@@ -140,7 +140,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                   Center(
                     child: Text(
                       l10n.learnTheAlphabet,
-                      style: GoogleFonts.nunito(
+                      style: TextStyle(
+                        fontFamily: 'Nunito',
                         fontSize: 18,
                         color: Colors.white.withValues(alpha: 0.9),
                       ),
@@ -165,7 +166,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                       children: [
                         Text(
                           l10n.yourProgress,
-                          style: GoogleFonts.nunito(
+                          style: TextStyle(
+                            fontFamily: 'Nunito',
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF6C63FF),
@@ -208,14 +210,16 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
                               children: [
                                 Text(
                                   l10n.currentScore,
-                                  style: GoogleFonts.nunito(
+                                  style: TextStyle(
+                                    fontFamily: 'Nunito',
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,
                                   ),
                                 ),
                                 Text(
                                   '$_currentScore',
-                                  style: GoogleFonts.nunito(
+                                  style: TextStyle(
+                                    fontFamily: 'Nunito',
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.blue.shade700,
@@ -266,7 +270,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
         const SizedBox(height: 8),
         Text(
           value,
-          style: GoogleFonts.nunito(
+          style: TextStyle(
+            fontFamily: 'Nunito',
             fontSize: 24,
             fontWeight: FontWeight.bold,
             color: Colors.black87,
@@ -275,7 +280,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
         const SizedBox(height: 4),
         Text(
           label,
-          style: GoogleFonts.nunito(
+          style: TextStyle(
+            fontFamily: 'Nunito',
             fontSize: 14,
             color: Colors.grey.shade600,
           ),
@@ -320,7 +326,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
             const SizedBox(width: 12),
             Text(
               label,
-              style: GoogleFonts.nunito(
+              style: TextStyle(
+                fontFamily: 'Nunito',
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
                 color: Colors.white,
@@ -347,7 +354,8 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
             const SizedBox(width: 12),
             Text(
               l10n.changeLanguage,
-              style: GoogleFonts.nunito(
+              style: TextStyle(
+                fontFamily: 'Nunito',
                 fontSize: 22,
                 fontWeight: FontWeight.bold,
               ),
@@ -356,7 +364,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
         ),
         content: Text(
           isArabic ? l10n.translateToEnglish : l10n.translateToArabic,
-          style: GoogleFonts.nunito(fontSize: 16),
+          style: TextStyle(fontFamily: 'Nunito', fontSize: 16),
           textAlign: TextAlign.center,
         ),
         actions: [
@@ -364,7 +372,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(
               l10n.no,
-              style: GoogleFonts.nunito(fontSize: 16),
+              style: TextStyle(fontFamily: 'Nunito', fontSize: 16),
             ),
           ),
           ElevatedButton(
@@ -381,7 +389,7 @@ class _MissingLetterHomeState extends State<MissingLetterHome> {
             ),
             child: Text(
               l10n.yes,
-              style: GoogleFonts.nunito(fontSize: 16),
+              style: TextStyle(fontFamily: 'Nunito', fontSize: 16),
             ),
           ),
         ],

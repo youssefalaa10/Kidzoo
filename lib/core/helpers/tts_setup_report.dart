@@ -43,17 +43,13 @@ class TtsSetupReport {
     required this.selectedEngine,
     required this.selectedVoice,
     this.defaultEngine,
-    this.usingCloudVoice = false,
-    this.cloudVoiceName,
   });
 
   const TtsSetupReport.unavailable()
       : engines = const [],
         selectedEngine = null,
         selectedVoice = null,
-        defaultEngine = null,
-        usingCloudVoice = false,
-        cloudVoiceName = null;
+        defaultEngine = null;
 
   /// Every engine on the device, with what Arabic each can do.
   final List<TtsEngineReport> engines;
@@ -67,9 +63,6 @@ class TtsSetupReport {
   /// The engine the *system* defaults to, which is not necessarily ours.
   final String? defaultEngine;
 
-  final bool usingCloudVoice;
-  final String? cloudVoiceName;
-
   bool get hasAnyArabic => engines.any((e) => e.hasArabic);
 
   bool get hasEgyptian => engines.any((e) => e.hasEgyptian);
@@ -77,25 +70,22 @@ class TtsSetupReport {
   bool get hasEgyptianFemale => engines.any((e) => e.hasEgyptianFemale);
 
   /// True when the selected voice is the one the app actually wants.
-  bool get isIdeal =>
-      usingCloudVoice ||
-      (selectedVoice != null &&
-          selectedVoice!.isEgyptian &&
-          selectedVoice!.isFemale);
+  bool get isIdeal => (selectedVoice != null &&
+      selectedVoice!.isEgyptian &&
+      selectedVoice!.isFemale);
 
   /// True when Arabic will be spoken by something that is not an Arabic voice.
   ///
   /// This is the state that produced "a foreign speaker reading broken
   /// Arabic": a Samsung engine pinned to `en_US` reading Arabic script.
   bool get willSoundForeign =>
-      !usingCloudVoice && (selectedVoice == null || !selectedVoice!.isArabic);
+      (selectedVoice == null || !selectedVoice!.isArabic);
 
   /// Whether we should ask the user to install voice data.
-  bool get needsVoiceDownload => !usingCloudVoice && !hasAnyArabic;
+  bool get needsVoiceDownload => !hasAnyArabic;
 
   /// Short status line for the settings screen.
   TtsSetupQuality get quality {
-    if (usingCloudVoice) return TtsSetupQuality.cloud;
     if (willSoundForeign) return TtsSetupQuality.missing;
     if (selectedVoice == null) return TtsSetupQuality.missing;
     if (selectedVoice!.isEgyptian && selectedVoice!.isFemale) {
@@ -118,7 +108,4 @@ enum TtsSetupQuality {
 
   /// No Arabic voice at all - Arabic would be read by a foreign voice.
   missing,
-
-  /// Speaking through the cloud neural voice.
-  cloud,
 }

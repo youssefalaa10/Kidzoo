@@ -126,21 +126,6 @@ void main() {
       expect(report.isIdeal, isFalse);
     });
 
-    test('the cloud voice counts as ideal whatever the device has', () {
-      final report = TtsSetupReport(
-        engines: [samsung],
-        selectedEngine: samsung,
-        selectedVoice: null,
-        usingCloudVoice: true,
-        cloudVoiceName: 'ar-EG-SalmaNeural',
-      );
-      expect(report.quality, TtsSetupQuality.cloud);
-      expect(report.isIdeal, isTrue);
-      expect(report.willSoundForeign, isFalse);
-      // Nothing to install when the cloud is answering.
-      expect(report.needsVoiceDownload, isFalse);
-    });
-
     test('an unavailable report degrades safely', () {
       const report = TtsSetupReport.unavailable();
       expect(report.engines, isEmpty);

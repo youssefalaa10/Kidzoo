@@ -1,10 +1,8 @@
 import 'dart:async';
 
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
-import 'azure_tts.dart';
 import 'tts_service.dart';
 import 'tts_setup_report.dart';
 import 'tts_voice_selection.dart';
@@ -34,10 +32,7 @@ enum SpeechRoute {
   /// The device's own text-to-speech engine.
   device,
 
-  /// Azure's neural Egyptian voice.
-  azure,
-
-  /// The device has no Arabic voice and no cloud voice is configured.
+  /// The device has no installed Arabic voice.
   ///
   /// Arabic is **not** spoken in this state. Handing Arabic script to an
   /// English engine is what produced "a foreign speaker reading broken
@@ -46,22 +41,12 @@ enum SpeechRoute {
   needsVoiceData,
 }
 
-/// The single place the app speaks from.
-///
-/// Everything that used to call `flutterTts.speak(...)` goes through here, so
-/// one decision - device voice or cloud voice - applies everywhere instead of
-/// being re-made in every game.
-///
-/// The rule: use the device voice when it can offer a **female Egyptian**
-/// voice, and otherwise, if Azure is configured, use `ar-EG-SalmaNeural`. A
-/// male or non-Egyptian Arabic voice is exactly the case the device fails at,
-/// so it does not count as good enough to keep.
+/// Shared speech lifecycle using installed device voices only.
+/// Bundled recordings remain handled by the individual activity audio services.
 class Speech {
   const Speech._();
 
   static FlutterTts? _tts;
-  static AudioPlayer? _player;
-  static AzureTtsClient? _azure;
 
   /// The utterance [speakAndWait] is currently waiting on, if any.
   static Completer<SpeechOutcome>? _utterance;
@@ -73,8 +58,6 @@ class Speech {
   /// callback belonging to an abandoned utterance cannot resolve a newer one.
   static int _utteranceGeneration = 0;
 
-  static StreamSubscription<void>? _playerCompletion;
-
   static String _languageCode = 'en';
   static SpeechRoute _route = SpeechRoute.device;
 
@@ -82,8 +65,6 @@ class Speech {
   static TtsLanguageOutcome? deviceOutcome;
 
   static SpeechRoute get route => _route;
-
-  static bool get isUsingAzure => _route == SpeechRoute.azure;
 
   /// True when Arabic cannot be spoken until voice data is installed.
   static bool get needsVoiceData => _route == SpeechRoute.needsVoiceData;
@@ -93,16 +74,14 @@ class Speech {
   static void Function()? onVoiceDataMissing;
 
   /// Wires the facade to the app's shared engine. Call once from `main`.
-  static void attach({required FlutterTts tts, required AudioPlayer player}) {
+  static void attach({required FlutterTts tts}) {
     _tts = tts;
-    _player = player;
-    if (AzureSpeechConfig.isConfigured) _azure ??= AzureTtsClient();
-    _wireCompletion(tts, player);
+    _wireCompletion(tts);
   }
 
   /// Attaches the completion callbacks that make [speakAndWait] real.
   ///
-  /// These go on **this** facade's engine and player. There is a second
+  /// These go on **this** facade's engine. There is a second
   /// `FlutterTts` inside `TtsService`, and a handler registered through
   /// `TtsService.setCompletionHandler` fires for that other instance - so it
   /// would never see an utterance spoken through here, and the wait would hang
@@ -114,30 +93,22 @@ class Speech {
   /// top. Turning those awaits from "dispatched" into "finished" would re-time
   /// every one of them. The handlers below give the real completion event
   /// without changing what `speak` means to anyone already calling it.
-  static void _wireCompletion(FlutterTts tts, AudioPlayer player) {
+  static void _wireCompletion(FlutterTts tts) {
     tts.setCompletionHandler(() => _settle(SpeechOutcome.completed));
     tts.setCancelHandler(() => _settle(SpeechOutcome.cancelled));
     tts.setErrorHandler((dynamic message) {
       debugPrint('Speech: engine error: $message');
       _settle(SpeechOutcome.failed);
     });
-    _playerCompletion?.cancel();
-    // The cloud route plays a file, so its completion comes from the player.
-    _playerCompletion =
-        player.onPlayerComplete.listen((_) => _settle(SpeechOutcome.completed));
   }
 
   @visibleForTesting
   static void reset() {
     _watchdog?.cancel();
     _watchdog = null;
-    _playerCompletion?.cancel();
-    _playerCompletion = null;
     _utterance = null;
     _utteranceGeneration = 0;
     _tts = null;
-    _player = null;
-    _azure = null;
     _route = SpeechRoute.device;
     deviceOutcome = null;
     _languageCode = 'en';
@@ -155,8 +126,6 @@ class Speech {
     _route = decideRoute(
       languageCode: languageCode,
       outcome: deviceOutcome,
-      azureConfigured: AzureSpeechConfig.isConfigured,
-      forceAzure: AzureSpeechConfig.force,
     );
 
     debugPrint('Speech: language=$languageCode route=${_route.name} '
@@ -169,36 +138,16 @@ class Speech {
   static SpeechRoute decideRoute({
     required String languageCode,
     required TtsLanguageOutcome? outcome,
-    required bool azureConfigured,
-    required bool forceAzure,
   }) {
-    // English keeps using the device voice, which is good and free.
-    final wantsArabic = normalizeLocale(languageCode).startsWith('ar');
-    if (!wantsArabic) return SpeechRoute.device;
-
-    if (azureConfigured && forceAzure) return SpeechRoute.azure;
-
-    // The device voice is kept only when it is genuinely what we asked for.
-    final ideal = outcome != null && outcome.isEgyptian && outcome.isFemale;
-    if (ideal) return SpeechRoute.device;
-
-    // Anything less than ideal goes to the cloud when we can.
-    if (azureConfigured) return SpeechRoute.azure;
-
-    // No cloud voice. A different *Arabic* voice is an acceptable stand-in -
-    // it is still Arabic. A non-Arabic voice is not: it would read the script
-    // phonetically in a foreign accent, which is the bug being fixed.
-    if (outcome != null && outcome.isArabic) return SpeechRoute.device;
-
-    return SpeechRoute.needsVoiceData;
+    if (!normalizeLocale(languageCode).startsWith('ar')) {
+      return SpeechRoute.device;
+    }
+    return outcome?.isArabic == true
+        ? SpeechRoute.device
+        : SpeechRoute.needsVoiceData;
   }
 
-  /// Speaks [text], falling back to the device voice if the cloud call fails.
-  ///
-  /// Returns whether audio was actually dispatched, which callers use to
-  /// decide whether to wait before moving on. The old code inspected
-  /// flutter_tts's Android "1" return code for this, which says nothing once
-  /// the cloud route may have answered instead.
+  /// Speaks through the installed device voice without a cloud fallback.
   static Future<bool> speak(String text) async {
     if (text.trim().isEmpty) return false;
 
@@ -208,32 +157,12 @@ class Speech {
       return false;
     }
 
-    // Network down, quota spent, or a bad key falls through to the device
-    // voice inside `_dispatch`. Better a plainer voice than silence in a
-    // child's game.
     return _dispatch(text);
-  }
-
-  static Future<bool> _speakWithAzure(String text) async {
-    final azure = _azure;
-    final player = _player;
-    if (azure == null || player == null) return false;
-
-    try {
-      final file = await azure.synthesizeToFile(text);
-      if (file == null) return false;
-      await player.stop();
-      await player.play(DeviceFileSource(file.path));
-      return true;
-    } catch (e) {
-      debugPrint('Speech: Azure playback failed: $e');
-      return false;
-    }
   }
 
   static Future<bool> _speakWithDevice(String text) async {
     final tts = _tts;
-    if (tts == null) return false;
+    if (tts == null || deviceOutcome?.voiceName == null) return false;
     try {
       await tts.speak(text);
       return true;
@@ -288,25 +217,18 @@ class Speech {
       return completer.future;
     }
     if (!completer.isCompleted) {
-      _watchdog = Timer(watchdogFor(trimmed), () => _onWatchdogFired(generation));
+      _watchdog =
+          Timer(watchdogFor(trimmed), () => _onWatchdogFired(generation));
     }
     return completer.future;
   }
 
-  /// Sends [text] to whichever route is active, cloud first with a device
-  /// fallback. Returns whether audio was actually started.
-  static Future<bool> _dispatch(String text) async {
-    if (_route == SpeechRoute.azure) {
-      if (await _speakWithAzure(text)) return true;
-      debugPrint('Speech: Azure unavailable, using device voice');
-    }
-    return _speakWithDevice(text);
-  }
+  /// Dispatches speech only through the selected installed voice.
+  static Future<bool> _dispatch(String text) => _speakWithDevice(text);
 
   /// Longest a dispatch may take before it is treated as failed.
   ///
-  /// Generous because the cloud route synthesises to a file first, and that is
-  /// a network round trip before a single sound is made.
+  /// Bounds platform dispatch so a stalled device engine cannot block play.
   static const Duration dispatchTimeout = Duration(seconds: 15);
 
   /// How long to wait for a completion event before assuming it is never
@@ -376,9 +298,6 @@ class Speech {
     try {
       await _tts?.stop();
     } catch (_) {}
-    try {
-      await _player?.stop();
-    } catch (_) {}
   }
 
   /// Re-runs voice resolution, e.g. after the user installs voice data.
@@ -409,7 +328,7 @@ class Speech {
     return report;
   }
 
-  /// The most recent survey, including the cloud decision.
+  /// The most recent device voice survey.
   static TtsSetupReport? get report {
     final base = TtsService.lastReport;
     if (base == null) return null;
@@ -418,9 +337,6 @@ class Speech {
       selectedEngine: base.selectedEngine,
       selectedVoice: base.selectedVoice,
       defaultEngine: base.defaultEngine,
-      usingCloudVoice: _route == SpeechRoute.azure,
-      cloudVoiceName:
-          _route == SpeechRoute.azure ? AzureSpeechConfig.voice : null,
     );
   }
 

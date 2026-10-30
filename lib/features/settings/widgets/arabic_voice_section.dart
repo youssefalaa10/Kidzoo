@@ -174,11 +174,6 @@ class _StatusBanner extends StatelessWidget {
           KidUi.correct,
           Icons.check_circle_rounded
         ),
-      TtsSetupQuality.cloud => (
-          l10n.ttsStatusCloud,
-          KidUi.primary,
-          Icons.cloud_done_rounded
-        ),
       TtsSetupQuality.egyptianWrongGender => (
           l10n.ttsStatusEgyptianWrongGender,
           KidUi.hint,

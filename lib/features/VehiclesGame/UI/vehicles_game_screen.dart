@@ -263,16 +263,14 @@ class _VehiclesGameLayoutState extends State<_VehiclesGameLayout> {
                 current: index + 1,
                 total: widget.totalQuestions,
                 score: score,
-                onReplayPrompt: () =>
-                    context.read<FlutterTts>().speak(question.prompt),
+                onReplayPrompt: () => Speech.speak(question.prompt),
               ),
               SizedBox(height: m.gap * 0.75),
               KidPromptBanner(
                 metrics: m,
                 text: question.prompt,
                 hint: l10n.tapOrDragHint,
-                onSpeak: () =>
-                    context.read<FlutterTts>().speak(question.prompt),
+                onSpeak: () => Speech.speak(question.prompt),
               ),
               SizedBox(height: m.gap * 0.75),
               Expanded(

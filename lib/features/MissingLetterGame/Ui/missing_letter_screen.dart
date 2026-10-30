@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_tts/flutter_tts.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:kidzo/core/localization/language_provider.dart';
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_cubit.dart';
 import 'package:kidzo/features/MissingLetterGame/Data/Logic/cubit/missing_letter_state.dart';
@@ -237,7 +236,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             alignment: Alignment.centerLeft,
             child: Text(
               l10n.missingLetter,
-              style: GoogleFonts.daiBannaSil(
+              style: TextStyle(
+                fontFamily: 'DaiBannaSIL',
                 fontSize: titleSize,
                 color: Colors.white,
                 shadows: const [
@@ -301,7 +301,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
               ),
               child: Text(
                 '${state.completedWords}/${state.totalWords}',
-                style: GoogleFonts.nunito(
+                style: TextStyle(
+                  fontFamily: 'Nunito',
                   fontSize: 14,
                   fontWeight: FontWeight.w900,
                   color: KidUi.ink,
@@ -425,7 +426,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                               isMissing
                                   ? (isFilled ? filledLetter : '_')
                                   : word.word[index],
-                              style: GoogleFonts.comicNeue(
+                              style: TextStyle(
+                                fontFamily: 'ComicNeue',
                                 fontSize: fontSize,
                                 fontWeight: FontWeight.bold,
                                 color: isMissing
@@ -548,8 +550,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 child: FittedBox(
                   child: Text(
                     option,
-                    style: GoogleFonts.daiBannaSil(
-                        fontSize: tileSize * 0.45, color: Colors.white),
+                    style: TextStyle(
+                        fontFamily: 'DaiBannaSIL',
+                        fontSize: tileSize * 0.45,
+                        color: Colors.white),
                   ),
                 ),
               ),
@@ -603,7 +607,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 Flexible(
                   child: Text(
                     text,
-                    style: GoogleFonts.nunito(
+                    style: TextStyle(
+                        fontFamily: 'Nunito',
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Colors.white),
@@ -635,8 +640,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             const SizedBox(height: 10),
             Text(
               l10n.congratulations,
-              style:
-                  GoogleFonts.nunito(fontSize: 24, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  fontFamily: 'Nunito',
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold),
             ),
           ],
         ),
@@ -645,7 +652,7 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
           children: [
             Text(
               l10n.youCompletedAllWords,
-              style: GoogleFonts.nunito(fontSize: 16),
+              style: TextStyle(fontFamily: 'Nunito', fontSize: 16),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 20),
@@ -658,10 +665,11 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(l10n.finalScore,
-                      style: GoogleFonts.nunito(fontSize: 16)),
+                      style: TextStyle(fontFamily: 'Nunito', fontSize: 16)),
                   Text(
                     '${state.score}',
-                    style: GoogleFonts.nunito(
+                    style: TextStyle(
+                        fontFamily: 'Nunito',
                         fontSize: 20,
                         fontWeight: FontWeight.bold,
                         color: Colors.amber.shade700),
@@ -677,7 +685,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
               Navigator.of(dialogContext).pop();
               Navigator.of(context).pop();
             },
-            child: Text(l10n.done, style: GoogleFonts.nunito(fontSize: 16)),
+            child: Text(l10n.done,
+                style: TextStyle(fontFamily: 'Nunito', fontSize: 16)),
           ),
           ElevatedButton(
             onPressed: () {
@@ -691,8 +700,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12)),
             ),
-            child:
-                Text(l10n.playAgain, style: GoogleFonts.nunito(fontSize: 16)),
+            child: Text(l10n.playAgain,
+                style: TextStyle(fontFamily: 'Nunito', fontSize: 16)),
           ),
         ],
       ),
@@ -713,15 +722,17 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                 color: Colors.orange, size: 32),
             const SizedBox(width: 12),
             Text(l10n.pauseGame,
-                style: GoogleFonts.nunito(
-                    fontSize: 22, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold)),
           ],
         ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(l10n.doYouWantToExit,
-                style: GoogleFonts.nunito(fontSize: 16),
+                style: TextStyle(fontFamily: 'Nunito', fontSize: 16),
                 textAlign: TextAlign.center),
             const SizedBox(height: 16),
             Container(
@@ -735,10 +746,11 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(l10n.currentScore,
-                          style: GoogleFonts.nunito(fontSize: 14)),
+                          style: TextStyle(fontFamily: 'Nunito', fontSize: 14)),
                       Text(
                         '${state.score}',
-                        style: GoogleFonts.nunito(
+                        style: TextStyle(
+                            fontFamily: 'Nunito',
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.blue.shade700),
@@ -750,10 +762,11 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(l10n.progress,
-                          style: GoogleFonts.nunito(fontSize: 14)),
+                          style: TextStyle(fontFamily: 'Nunito', fontSize: 14)),
                       Text(
                         '${state.completedWords}/${state.totalWords}',
-                        style: GoogleFonts.nunito(
+                        style: TextStyle(
+                            fontFamily: 'Nunito',
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
                             color: Colors.blue.shade700),
@@ -766,7 +779,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
             const SizedBox(height: 12),
             Text(
               l10n.yourProgressWillBeSaved,
-              style: GoogleFonts.nunito(
+              style: TextStyle(
+                  fontFamily: 'Nunito',
                   fontSize: 12,
                   color: Colors.grey.shade600,
                   fontStyle: FontStyle.italic),
@@ -778,8 +792,10 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
           TextButton(
             onPressed: () => Navigator.of(dialogContext).pop(),
             child: Text(l10n.resume,
-                style: GoogleFonts.nunito(
-                    fontSize: 16, fontWeight: FontWeight.bold)),
+                style: TextStyle(
+                    fontFamily: 'Nunito',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold)),
           ),
           ElevatedButton.icon(
             onPressed: () {
@@ -787,8 +803,8 @@ class _MissingLetterScreenState extends State<MissingLetterScreen>
               Navigator.of(context).pop();
             },
             icon: const Icon(Icons.exit_to_app),
-            label:
-                Text(l10n.exitAndSave, style: GoogleFonts.nunito(fontSize: 16)),
+            label: Text(l10n.exitAndSave,
+                style: TextStyle(fontFamily: 'Nunito', fontSize: 16)),
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.orange,
               foregroundColor: Colors.white,
@@ -825,8 +841,11 @@ class _HeaderChip extends StatelessWidget {
           const SizedBox(width: 4),
           Text(
             label,
-            style: GoogleFonts.nunito(
-                fontSize: 14, fontWeight: FontWeight.bold, color: Colors.white),
+            style: TextStyle(
+                fontFamily: 'Nunito',
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
+                color: Colors.white),
           ),
         ],
       ),

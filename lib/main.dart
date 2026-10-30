@@ -65,10 +65,8 @@ Future<MyApp> _initializeApp() async {
   );
   final flutterTts = FlutterTts();
   final audioPlayer = AudioPlayer();
-  // Speech goes through one facade so the device-or-cloud decision is made
-  // once. A separate player is used for synthesized audio so a spoken prompt
-  // never cuts off a game sound effect.
-  Speech.attach(tts: flutterTts, player: AudioPlayer());
+  // Speech uses installed offline voices through one shared facade.
+  Speech.attach(tts: flutterTts);
   // Resolve the voice up front using the language the user last chose, so the
   // first prompt of a saved Arabic session already uses the right voice
   // instead of switching a moment later.

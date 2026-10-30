@@ -701,7 +701,6 @@
   "ttsStatusEgyptianWrongGender": "Egyptian voice found, but not a female one",
   "ttsStatusArabicNotEgyptian": "Arabic voice found, but not Egyptian",
   "ttsStatusMissing": "No Arabic voice installed on this device",
-  "ttsStatusCloud": "Using the online Egyptian voice",
   "ttsNone": "None",
   "ttsFirstRunTitle": "Set up the Arabic voice",
   "ttsFirstRunBody": "This device has no Egyptian Arabic voice yet, so Arabic will not be read aloud. Open the voice settings to download it - choose Arabic and tap install.",

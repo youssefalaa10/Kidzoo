@@ -265,6 +265,7 @@ TtsVoiceCandidate? selectBestArabicVoice(
   var bestScore = 0;
 
   for (final voice in voices) {
+    if (voice.networkRequired) continue;
     final score = scoreArabicVoice(
       voice,
       preference: preference,
@@ -279,7 +280,7 @@ TtsVoiceCandidate? selectBestArabicVoice(
   return best;
 }
 
-/// Whether [voice] is good enough that we should not reach for a cloud voice.
+/// Whether [voice] matches the preferred Egyptian female voice.
 ///
 /// The bar is deliberately specific: a **female Egyptian** voice. Anything
 /// less - a male Egyptian, a female Saudi, a generic `ar` - is the situation

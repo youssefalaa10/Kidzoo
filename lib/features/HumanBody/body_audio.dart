@@ -13,7 +13,7 @@ abstract class BodyAudio {
 }
 
 /// Uses VoiceTut-TTS (Yasmin) pre-rendered clips for Arabic voice narration,
-/// falling back to Kidzo's configured device/Azure voice for other locales.
+/// falling back to Kidzo's configured installed device voice for other locales.
 /// A quiet piano note replaces the app's harsher wrong-answer buzzer.
 class SpeechBodyAudio implements BodyAudio {
   SpeechBodyAudio({

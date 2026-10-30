@@ -42,7 +42,7 @@ retry and hint sentences in the existing locale JSON files. Welcome, stage
 introductions, congratulations and completion are also localized.
 
 Voice uses the app's existing `Speech.speakAndWait` service (device TTS, or the
-app's configured Azure Arabic voice). There are **no newly recorded voice
+app's installed Arabic voice). There are **no newly recorded voice
 files**. An installed voice or configured cloud voice is required; a failed or
 missing voice shows a visible message. Physical-device pronunciation and
 speaker quality still need a listening check on the target devices.
